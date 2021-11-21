@@ -18,7 +18,7 @@
 #define PROS_USE_SIMPLE_NAMES
 #define PROS_USE_LITERALS
 
-#include "api.h"
+#include "pros/apix.h"
 
 using namespace pros;
 
@@ -37,5 +37,13 @@ void opcontrol(void);
 #ifdef __cplusplus
 //#include <iostream>
 #endif
+
+enum ControlState {
+	INITIALIZE,
+	COMPETITION_INITIALIZE,
+	AUTONOMOUS,
+	OPERATOR_CONTROL,
+	DISABLED
+};
 
 #endif  // _PROS_MAIN_H_
