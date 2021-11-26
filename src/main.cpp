@@ -10,8 +10,7 @@ void left(uint16_t distance, int32_t voltage);
 void stop();
 void move_for(uint16_t distance, int32_t rf, int32_t rb, int32_t lf, int32_t lb);
 void setState(ControlState state);
-
-template <typename T> T printErr(T value);
+lv_res_t on_button_click(struct _lv_obj_t * obj);
 
 static Motor motor_rf(1);
 static Motor motor_rb(11);
@@ -20,20 +19,37 @@ static Motor motor_lb(20);
 static Controller controller(E_CONTROLLER_MASTER);
 static ControlState controlState = INITIALIZE;
 
+static lv_obj_t* state_line = NULL;
+static lv_obj_t* motor_rf_line = NULL;
+static lv_obj_t* motor_rb_line = NULL;
+static lv_obj_t* motor_lf_line = NULL;
+static lv_obj_t* motor_lb_line = NULL;
+
 static bool force_auto = false;
 
-void on_center_button() {
+lv_res_t on_button_click(struct _lv_obj_t * obj) {
 	force_auto = !force_auto;
-	if (force_auto) {
-		setState(ControlState::AUTONOMOUS);
-	}	
+	return LV_RES_OK;
 }
 
+ void concurrent_screen_update(void* param) {
+	while (true) {
+		update_screen();
+		delay(100);
+	}
+ }
+
+
 void initialize() {
-	init_screen();
-	// lcd::initialize();
+	init_screen(on_button_click);
+	state_line = create_static_line("State: <uninitialized>");
+	motor_rf_line = create_static_line("RF volatage: <uninitialized>");
+	motor_rb_line = create_static_line("RB volatage: <uninitialized>");
+	motor_lf_line = create_static_line("LF volatage: <uninitialized>");
+	motor_lb_line = create_static_line("LB volatage: <uninitialized>");
+    Task task(concurrent_screen_update);
+
 	setState(ControlState::INITIALIZE);
-	// lcd::register_btn1_cb(on_center_button);
 }
 
 void disabled() {
@@ -55,7 +71,7 @@ void opcontrol() {
 	setState(ControlState::OPERATOR_CONTROL);
 
 	while (true) {
-		if (competition::is_disabled() && force_auto) {
+		if (force_auto) {
 			autonomous();
 			setState(ControlState::OPERATOR_CONTROL);
 		}
@@ -69,10 +85,10 @@ void opcontrol() {
 		motor_lf.move(-joystickY + joystickRotX - joystickX);
 		motor_lb.move(joystickY + joystickRotX - joystickX);
 
-		// lcd::set_text(1, "Front Right: " + std::to_string(printErr<int32_t>(motor_rf.get_voltage())));
-		// lcd::set_text(2, "Front Left: "  + std::to_string(printErr<int32_t>(motor_rb.get_voltage())));
-		// lcd::set_text(3, "Back Right: "  + std::to_string(printErr<int32_t>(motor_lf.get_voltage())));
-		// lcd::set_text(4, "Back Left: "   + std::to_string(printErr<int32_t>(motor_lb.get_voltage())));
+		set_line(motor_rf_line, "Right Front: " + std::to_string(print_error<int32_t>(motor_rf.get_voltage())));
+		set_line(motor_rb_line, "Right Back: "  + std::to_string(print_error<int32_t>(motor_rb.get_voltage())));
+		set_line(motor_lf_line, "Left Front: "  + std::to_string(print_error<int32_t>(motor_lf.get_voltage())));
+		set_line(motor_lb_line, "Left Back: "   + std::to_string(print_error<int32_t>(motor_lb.get_voltage())));
 
 		delay(20);
 	}
@@ -96,13 +112,6 @@ void left(uint16_t distance, int32_t voltage) {
 
 void stop() {
 	move_for(20, 0, 0, 0, 0);
-}
-
-template <typename T> T printErr(T value) {
-	if (value == PROS_ERR || value == PROS_ERR_F) {
-		// lcd::set_text(7, std::string("Operation Failed: ") + std::string(strerror(errno)));
-	}
-	return value;
 }
 
 void move_for(uint16_t distance, int32_t rf, int32_t rb, int32_t lf, int32_t lb) {
@@ -136,25 +145,5 @@ std::string stateName(ControlState state) {
 
 void setState(ControlState state) {
 	controlState = state;
-	// lcd::set_text(0, "State: " + stateName(state));
-}
-
-lv_res_t always_ok_event(struct _lv_obj_t * obj) {
-    return LV_RES_OK;
-}
-
-void init_screen() {
-	lv_obj_t * list = lv_list_create(lv_scr_act(), NULL);
-	lv_cont_set_fit(list, true, true); 
-	lv_obj_t * btn = lv_list_add(list, NULL, "Test", always_ok_event);
-	lv_cont_set_fit(btn, true, true);
-
-    // lv_obj_t * btn = lv_btn_create(lv_scr_act(), NULL);
-    // lv_obj_set_pos(btn, 10, 10);
-    // lv_obj_set_size(btn, 120, 50);
-    // lv_btn_set_action(btn, LV_BTN_ACTION_CLICK, always_ok_event);
-
-    // lv_obj_t * label = lv_label_create(btn, NULL);
-    // lv_label_set_text(label, "Button");
-    // lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
+	set_line(state_line, "State: " + stateName(state));
 }
