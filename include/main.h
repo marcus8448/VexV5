@@ -38,12 +38,4 @@ void opcontrol(void);
 //#include <iostream>
 #endif
 
-enum ControlState {
-	INITIALIZE,
-	COMPETITION_INITIALIZE,
-	AUTONOMOUS,
-	OPERATOR_CONTROL,
-	DISABLED
-};
-
 #endif  // _PROS_MAIN_H_

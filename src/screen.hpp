@@ -1,8 +1,9 @@
-#ifndef _LVGL_SCREEN_H_
-#define _LVGL_SCREEN_H_
+#ifndef _SCREEN_MANAGEMENT_H_
+#define _SCREEN_MANAGEMENT_H_
 
 #include <string>
 #include "display/lvgl.h"
+#include "definitions.hpp"
 
 static lv_obj_t* force_auto_button = NULL;
 static lv_obj_t* autoscroll_button = NULL;
@@ -122,4 +123,4 @@ template <typename T> T print_error(T value) {
 	return value;
 }
 
-#endif //_LVGL_SCREEN_H_
+#endif //_SCREEN_MANAGEMENT_H_

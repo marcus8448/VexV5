@@ -1,5 +1,6 @@
 #include "main.h"
-#include "screen.h"
+#include "screen.hpp"
+#include "definitions.hpp"
 
 #define TIME_PER_INCH 1
 
@@ -28,7 +29,8 @@ static lv_obj_t* motor_lb_line = NULL;
 static bool force_auto = false;
 
 lv_res_t on_button_click(struct _lv_obj_t * obj) {
-	force_auto = !force_auto;
+	force_auto = true;
+	lv_obj_set_click(force_auto_button, false);
 	return LV_RES_OK;
 }
 
@@ -39,6 +41,12 @@ lv_res_t on_button_click(struct _lv_obj_t * obj) {
 	}
  }
 
+ void print_motor_info() {
+	set_line(motor_rf_line, "Right Front: " + std::to_string(print_error<int32_t>(motor_rf.get_voltage())));
+	set_line(motor_rb_line, "Right Back: "  + std::to_string(print_error<int32_t>(motor_rb.get_voltage())));
+	set_line(motor_lf_line, "Left Front: "  + std::to_string(print_error<int32_t>(motor_lf.get_voltage())));
+	set_line(motor_lb_line, "Left Back: "   + std::to_string(print_error<int32_t>(motor_lb.get_voltage())));
+ }
 
 void initialize() {
 	init_screen(on_button_click);
@@ -73,22 +81,22 @@ void opcontrol() {
 	while (true) {
 		if (force_auto) {
 			autonomous();
+			force_auto = false;
+			lv_obj_set_click(force_auto_button, true);
+
 			setState(ControlState::OPERATOR_CONTROL);
 		}
 
 		int joystickRotX = controller.get_analog(ANALOG_RIGHT_X);
 		int joystickY = controller.get_analog(ANALOG_LEFT_Y);
 		int joystickX = controller.get_analog(ANALOG_LEFT_X);
-
-		motor_rf.move(-joystickY + joystickRotX + joystickX);
-		motor_rb.move(joystickY + joystickRotX + joystickX);
-		motor_lf.move(-joystickY + joystickRotX - joystickX);
+		
+		motor_rf.move(joystickY - joystickRotX + joystickX);
+		motor_rb.move(joystickY - joystickRotX + joystickX);
+		motor_lf.move(joystickY + joystickRotX - joystickX);
 		motor_lb.move(joystickY + joystickRotX - joystickX);
 
-		set_line(motor_rf_line, "Right Front: " + std::to_string(print_error<int32_t>(motor_rf.get_voltage())));
-		set_line(motor_rb_line, "Right Back: "  + std::to_string(print_error<int32_t>(motor_rb.get_voltage())));
-		set_line(motor_lf_line, "Left Front: "  + std::to_string(print_error<int32_t>(motor_lf.get_voltage())));
-		set_line(motor_lb_line, "Left Back: "   + std::to_string(print_error<int32_t>(motor_lb.get_voltage())));
+		print_motor_info();
 
 		delay(20);
 	}
@@ -119,28 +127,13 @@ void move_for(uint16_t distance, int32_t rf, int32_t rb, int32_t lf, int32_t lb)
 	motor_rb = rb;
 	motor_lf = lf;
 	motor_lb = lb;
+
 	delay(distance / TIME_PER_INCH);
 
 	motor_rf = 0;
 	motor_rb = 0;
 	motor_lf = 0;
 	motor_lb = 0;
-}
-
-std::string stateName(ControlState state) {
-	switch (state) {
-		case INITIALIZE:
-			return "Initialize";
-		case COMPETITION_INITIALIZE:
-			return "Competition Initialize";
-		case AUTONOMOUS:
-			return "Autonomous";
-		case OPERATOR_CONTROL:
-			return "Operator Control";
-		case DISABLED:
-			return "Disabled";
-	}
-	return "INVALID";
 }
 
 void setState(ControlState state) {
