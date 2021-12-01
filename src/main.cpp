@@ -17,8 +17,9 @@ static Motor motor_rf(1);
 static Motor motor_rb(11);
 static Motor motor_lf(10);
 static Motor motor_lb(20);
+static Motor arm(2);
+
 static Controller controller(E_CONTROLLER_MASTER);
-static ControlState controlState = INITIALIZE;
 
 static lv_obj_t* state_line = NULL;
 static lv_obj_t* motor_rf_line = NULL;
@@ -27,6 +28,7 @@ static lv_obj_t* motor_lf_line = NULL;
 static lv_obj_t* motor_lb_line = NULL;
 
 static bool force_auto = false;
+static ControlState controlState = INITIALIZE;
 
 lv_res_t on_button_click(struct _lv_obj_t * obj) {
 	force_auto = true;
