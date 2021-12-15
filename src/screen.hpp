@@ -108,6 +108,22 @@ void print_out(std::string line) {
 	print_out(line.c_str());
 }
 
+void print_out(int line) {
+	print_out(std::to_string(line));
+}
+
+void print_out(float line) {
+	print_out(std::to_string(line));
+}
+
+void print_out(double line) {
+	print_out(std::to_string(line));
+}
+
+void print_out(long long line) {
+	print_out(std::to_string(line));
+}
+
 void set_line(lv_obj_t* button, const char * line) {
 	lv_label_set_text(lv_obj_get_child(button, NULL), line);
 }

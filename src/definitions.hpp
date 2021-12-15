@@ -1,6 +1,7 @@
 #ifndef _MISC_DEFINITIONS_H_
 #define _MISC_DEFINITIONS_H_
 
+#include <math.h>
 #include <string>
 
 enum ControlState {

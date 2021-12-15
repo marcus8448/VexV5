@@ -1,26 +1,10 @@
 #include "main.h"
 #include "screen.hpp"
 #include "definitions.hpp"
+#include "robot.hpp"
 
-#define TIME_PER_INCH 1
-
-void forwards(uint16_t distance, int32_t voltage);
-void backwards(uint16_t distance, int32_t voltage);
-void right(uint16_t distance, int32_t voltage);
-void left(uint16_t distance, int32_t voltage);
-void stop();
-void move_for(uint16_t distance, int32_t rf, int32_t rb, int32_t lf, int32_t lb);
 void setState(ControlState state);
 lv_res_t on_force_autonomous_click(struct _lv_obj_t * obj);
-
-static Motor motor_rf(10, true);
-static Motor motor_rb(20, true);
-static Motor motor_lf(1);
-static Motor motor_lb(11);
-static Motor arm(2, E_MOTOR_GEARSET_36);
-static Motor arm2(9, E_MOTOR_GEARSET_36, true);
-
-static Controller controller(E_CONTROLLER_MASTER);
 
 static lv_obj_t* state_line = NULL;
 static lv_obj_t* motor_rf_line = NULL;
@@ -30,15 +14,6 @@ static lv_obj_t* motor_lb_line = NULL;
 
 static bool force_autonomous = false;
 static ControlState controlState = INITIALIZE;
-
-/**
- * Called when the "Force Autonomous" button is pressed.
- */
-lv_res_t on_force_autonomous_click(struct _lv_obj_t * obj) {
-	force_autonomous = true;
-	lv_obj_set_click(obj, false);
-	return LV_RES_OK;
-}
 
 /**
  * Updates the screen at a rate of 10fps.
@@ -73,6 +48,13 @@ void initialize() {
 	motor_lf_line = create_static_line("LF volatage: <uninitialized>");
 	motor_lb_line = create_static_line("LB volatage: <uninitialized>");
     Task task(screen_update_task);
+	
+	motor_rf.set_brake_mode(MOTOR_BRAKE_BRAKE);
+	motor_rb.set_brake_mode(MOTOR_BRAKE_BRAKE);
+	motor_lf.set_brake_mode(MOTOR_BRAKE_BRAKE);
+	motor_lb.set_brake_mode(MOTOR_BRAKE_BRAKE);
+	arm.set_brake_mode(MOTOR_BRAKE_BRAKE);
+	arm2.set_brake_mode(MOTOR_BRAKE_BRAKE);
 
 	setState(ControlState::INITIALIZE);
 }
@@ -93,7 +75,10 @@ void competition_initialize() {
 void autonomous() {
 	setState(ControlState::AUTONOMOUS);
 	
-	forwards(2000, 32);
+	// forwards(24, 100);
+	// delay(5000);
+	// backwards(24, 100);
+	turn_right(90, 30);
 }
 
 /**
@@ -107,7 +92,6 @@ void opcontrol() {
 		if (force_autonomous) {
 			autonomous();
 			force_autonomous = false;
-			lv_obj_set_click(force_auto_button, true);
 
 			setState(ControlState::OPERATOR_CONTROL);
 		}
@@ -137,66 +121,19 @@ void opcontrol() {
 }
 
 /**
- * Moves the robot forwards in inches.
- * @param distance The distance to move in inches.
+ * Called when the "Force Autonomous" button is pressed.
  */
-void forwards(uint16_t distance, int32_t voltage) {
-	move_for(distance / TIME_PER_INCH, voltage, voltage, voltage, voltage);
+lv_res_t on_force_autonomous_click(struct _lv_obj_t * obj) {
+	force_autonomous = true;
+	return LV_RES_OK;
 }
 
 /**
- * Moves the robot backwards in inches.
- * @param distance The distance to move in inches.
+ * Sets the state of the robot for display.
+ * (Remove?)
  */
-void backwards(uint16_t distance, int32_t voltage) {
-	move_for(distance / TIME_PER_INCH, -voltage, -voltage, -voltage, -voltage);
-}
-
-/**
- * Turns the robot right.
- * @param angle The distance to turn in degrees.
- */
-void turn_right(uint16_t angle, int32_t voltage) {
-	move_for(angle, -voltage, -voltage, voltage, voltage);
-}
-
-/**
- * Turns the robot left.
- * @param angle The distance to turn in degrees.
- */
-void turn_left(uint16_t angle, int32_t voltage) {
-	move_for(angle, -voltage, voltage, -voltage, -voltage);
-}
-
-/**
- * Stops the robot.
- */
-void stop() {
-	move_for(20, 0, 0, 0, 0);
-}
-
-/**
- * Powers the motors for a specific amount of time.
- * @param rf The power level for the motor on the front right.
- * @param rb The power level for the motor on the back right.
- * @param lf The power level for the motor on the front left.
- * @param lb The power level for the motor on the back left.
- */
-void move_for(uint16_t time, int32_t rf, int32_t rb, int32_t lf, int32_t lb) {
-	motor_rf = rf;
-	motor_rb = rb;
-	motor_lf = lf;
-	motor_lb = lb;
-
-	delay(time);
-
-	motor_rf = 0;
-	motor_rb = 0;
-	motor_lf = 0;
-	motor_lb = 0;
-}
-
 void setState(ControlState state) {
 	controlState = state;
 	set_line(state_line, "State: " + stateName(state));
+	print_out("State: " + stateName(state));
 }
