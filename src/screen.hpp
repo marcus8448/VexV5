@@ -13,10 +13,6 @@ static lv_obj_t* printed_information = NULL;
 static bool autoscroll = false;
 static bool autoscroll_direction = true;
 
-lv_res_t always_ok_event(struct _lv_obj_t * obj) {
-    return LV_RES_OK;
-}
-
 lv_res_t autoscroll_event(struct _lv_obj_t * obj) {
     if (!autoscroll) {
         autoscroll = true;
@@ -130,13 +126,6 @@ void set_line(lv_obj_t* button, const char * line) {
 
 void set_line(lv_obj_t* button, std::string line) {
 	set_line(button, line.c_str());
-}
-
-template <typename T> T print_error(T value) {
-	if (value == PROS_ERR || value == PROS_ERR_F) {
-        print_out(std::string("Operation Failed: ") + std::string(strerror(errno)));
-	}
-	return value;
 }
 
 #endif //_SCREEN_MANAGEMENT_H_

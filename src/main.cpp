@@ -11,9 +11,24 @@ static lv_obj_t* motor_rf_line = NULL;
 static lv_obj_t* motor_rb_line = NULL;
 static lv_obj_t* motor_lf_line = NULL;
 static lv_obj_t* motor_lb_line = NULL;
+static lv_obj_t* arm_line = NULL;
+static lv_obj_t* arm2_line = NULL;
 
 static bool force_autonomous = false;
 static ControlState controlState = INITIALIZE;
+
+/**
+ * Updates the motor debug info.
+ * Will print out errno values if an error occours.
+ */
+ void update_motor_info() {
+	set_line(motor_rf_line, "RFV: " + value_or_error(motor_rf.get_actual_velocity()));
+	set_line(motor_rb_line, "RBV: "  + value_or_error(motor_rb.get_actual_velocity()));
+	set_line(motor_lf_line, "LFV: "  + value_or_error(motor_lf.get_actual_velocity()));
+	set_line(motor_lb_line, "LBV: "   + value_or_error(motor_lb.get_actual_velocity()));
+	set_line(arm_line, "AP: "   + value_or_error(arm.get_actual_velocity()));
+	set_line(arm2_line, "A2P: "   + value_or_error(arm2.get_actual_velocity()));
+ }
 
 /**
  * Updates the screen at a rate of 10fps.
@@ -22,20 +37,11 @@ static ControlState controlState = INITIALIZE;
  void screen_update_task(void* param) {
 	while (true) {
 		update_screen();
+		update_motor_info();
 		delay(100); //10 updates per second as we don't care *that* much about the screen.
 	}
  }
 
-/**
- * Updates the motor debug info.
- * Will print out errno values if an error occours.
- */
- void update_motor_info() {
-	set_line(motor_rf_line, "Right Front: " + std::to_string(print_error<int32_t>(motor_rf.get_voltage())));
-	set_line(motor_rb_line, "Right Back: "  + std::to_string(print_error<int32_t>(motor_rb.get_voltage())));
-	set_line(motor_lf_line, "Left Front: "  + std::to_string(print_error<int32_t>(motor_lf.get_voltage())));
-	set_line(motor_lb_line, "Left Back: "   + std::to_string(print_error<int32_t>(motor_lb.get_voltage())));
- }
 
 /**
  * Called when the robot is first initialized.
@@ -43,10 +49,12 @@ static ControlState controlState = INITIALIZE;
 void initialize() {
 	init_screen(on_force_autonomous_click);
 	state_line = create_static_line("State: <uninitialized>");
-	motor_rf_line = create_static_line("RF volatage: <uninitialized>");
-	motor_rb_line = create_static_line("RB volatage: <uninitialized>");
-	motor_lf_line = create_static_line("LF volatage: <uninitialized>");
-	motor_lb_line = create_static_line("LB volatage: <uninitialized>");
+	motor_rf_line = create_static_line("RFV: <uninitialized>");
+	motor_rb_line = create_static_line("RBV: <uninitialized>");
+	motor_lf_line = create_static_line("LFV: <uninitialized>");
+	motor_lb_line = create_static_line("LBV: <uninitialized>");
+	arm_line = create_static_line("AP: <uninitialized>");
+	arm2_line = create_static_line("A2P: <uninitialized>");
     Task task(screen_update_task);
 	
 	motor_rf.set_brake_mode(MOTOR_BRAKE_BRAKE);
@@ -55,10 +63,11 @@ void initialize() {
 	motor_lb.set_brake_mode(MOTOR_BRAKE_BRAKE);
 	arm.set_brake_mode(MOTOR_BRAKE_BRAKE);
 	arm2.set_brake_mode(MOTOR_BRAKE_BRAKE);
+	arm.set_zero_position(0);
+	arm2.set_zero_position(0);
 
 	setState(ControlState::INITIALIZE);
 }
-
 
 void disabled() {
 	setState(ControlState::DISABLED);
@@ -75,10 +84,15 @@ void competition_initialize() {
 void autonomous() {
 	setState(ControlState::AUTONOMOUS);
 	
-	// forwards(24, 100);
-	// delay(5000);
-	// backwards(24, 100);
-	turn_right(90, 30);
+	for (int i = 0; i < 3; i++) {
+		// arm_down(128);
+		forwards(5 * 12, 100);
+		// arm_lift();
+		delay(500);
+		backwards(5 * 12, 100);
+		// arm_up(128);
+		delay(1000);
+	}
 }
 
 /**
@@ -98,23 +112,22 @@ void opcontrol() {
 
 		int joystickL = controller.get_analog(E_CONTROLLER_ANALOG_LEFT_Y);
 		int joystickR = controller.get_analog(E_CONTROLLER_ANALOG_RIGHT_Y);
-		if (controller.get_digital(E_CONTROLLER_DIGITAL_R1)) {
+		if (controller.get_digital(E_CONTROLLER_DIGITAL_R1) && arm.get_position() > 0) {
 			arm.move(-127);
 			arm2.move(-127);
-		} else if (controller.get_digital(E_CONTROLLER_DIGITAL_R2)) {
+		} else if (controller.get_digital(E_CONTROLLER_DIGITAL_R2) && arm.get_position() < 130) {
 			arm.move(127);
 			arm2.move(127);
 		} else {
 			arm.move(0);
 			arm2.move(0);
 		}
+		print_out(arm.get_position());
 		
 		motor_rf.move(joystickR);
 		motor_rb.move(joystickR);
 		motor_lf.move(joystickL);
 		motor_lb.move(joystickL);
-
-		update_motor_info();
 
 		delay(20);
 	}
