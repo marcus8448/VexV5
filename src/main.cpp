@@ -32,7 +32,7 @@ void update_motor_info() {
  * Updates the screen at a rate of 10fps.
  * Used for autoscroll because scrolling by hand doesn't work half the time.
  */
-[[noreturn]] void screen_update_task(void* param) {
+[[noreturn]] void screen_update_task() {
     while (true) {
         update_screen();
         update_motor_info();
@@ -75,10 +75,9 @@ void autonomous() {
     setState(ControlState::AUTONOMOUS);
 
     for (int i = 0; i < 3; i++) {
-        // arm_down(128);
+        arm_down();
         forwards(5 * 12, 100);
-        // arm_lift();
-        delay(500);
+        arm_lift(100, true);
         backwards(5 * 12, 100);
         // arm_up(128);
         delay(1000);
@@ -102,22 +101,22 @@ void autonomous() {
 
         int joystickL = controller.get_analog(E_CONTROLLER_ANALOG_LEFT_Y);
         int joystickR = controller.get_analog(E_CONTROLLER_ANALOG_RIGHT_Y);
-        if (controller.get_digital(E_CONTROLLER_DIGITAL_R1) && print_errno(arm.get_position()) > 0.0) {
-            print_errno(arm.move(100));// UP
-            print_errno(arm2.move(100));
-        } else if (controller.get_digital(E_CONTROLLER_DIGITAL_R2) && print_errno(arm.get_position()) < 130.0) {
-            print_errno(arm.move(-100));// DOWN
-            print_errno(arm2.move(-100));
+        if (controller.get_digital(E_CONTROLLER_DIGITAL_R1) && p_err(arm.get_position()) > 0.0) {
+            p_err(arm.move(100)); // UP
+            p_err(arm2.move(100));
+        } else if (controller.get_digital(E_CONTROLLER_DIGITAL_R2) && p_err(arm.get_position()) < 130.0) {
+            p_err(arm.move(-100)); // DOWN
+            p_err(arm2.move(-100));
         } else {
-            print_errno(arm.move(0));
-            print_errno(arm2.move(0));
+            p_err(arm.move(0)); // STOP
+            p_err(arm2.move(0));
         }
-        print_out(arm.get_position());
+        print(arm.get_position());
 
-        print_errno(motor_rf.move(joystickR));
-        print_errno(motor_rb.move(joystickR));
-        print_errno(motor_lf.move(joystickL));
-        print_errno(motor_lb.move(joystickL));
+        p_err(motor_rf.move(joystickR));
+        p_err(motor_rb.move(joystickR));
+        p_err(motor_lf.move(joystickL));
+        p_err(motor_lb.move(joystickL));
 
         delay(20);
     }
@@ -138,5 +137,5 @@ lv_res_t on_force_autonomous_click(struct _lv_obj_t* obj) {
 void setState(ControlState state) {
     static lv_obj_t* state_line = create_static_line("State: <uninitialized>");
     set_line(state_line, "State: " + stateName(state));
-    print_out("State: " + stateName(state));
+    print("State: " + stateName(state));
 }
