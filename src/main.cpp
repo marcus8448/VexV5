@@ -76,11 +76,10 @@ void autonomous() {
 
     for (int i = 0; i < 3; i++) {
         arm_down();
-        forwards(5 * 12, 100);
+        forwards(5 * IN_TO_FT, 100);
         arm_lift(100, true);
-        backwards(5 * 12, 100);
-        // arm_up(128);
-        delay(1000);
+        backwards(5 * IN_TO_FT, 100);
+        arm_up(100, true);
     }
 }
 
@@ -99,12 +98,12 @@ void autonomous() {
             setState(ControlState::OPERATOR_CONTROL);
         }
 
-        int joystickL = controller.get_analog(E_CONTROLLER_ANALOG_LEFT_Y);
-        int joystickR = controller.get_analog(E_CONTROLLER_ANALOG_RIGHT_Y);
-        if (controller.get_digital(E_CONTROLLER_DIGITAL_R1) && p_err(arm.get_position()) > 0.0) {
+        int joystickL = p_err(controller.get_analog(E_CONTROLLER_ANALOG_LEFT_Y));
+        int joystickR = p_err(controller.get_analog(E_CONTROLLER_ANALOG_RIGHT_Y));
+        if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_R1)) && p_err(arm.get_position()) > 0.0) {
             p_err(arm.move(100)); // UP
             p_err(arm2.move(100));
-        } else if (controller.get_digital(E_CONTROLLER_DIGITAL_R2) && p_err(arm.get_position()) < 130.0) {
+        } else if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_R2)) && p_err(arm.get_position()) < 130.0) {
             p_err(arm.move(-100)); // DOWN
             p_err(arm2.move(-100));
         } else {

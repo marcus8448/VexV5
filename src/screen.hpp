@@ -13,6 +13,7 @@ static lv_obj_t* printed_information = nullptr;
 static bool enable_lvgl = false;
 static bool autoscroll = false;
 static bool autoscroll_direction = true;
+static int lineNum = 0;
 
 lv_res_t autoscroll_event(struct _lv_obj_t* obj) {
     if (!autoscroll) {
@@ -123,6 +124,8 @@ void print(long long line) {
 void set_line(lv_obj_t* button, const char* line) {
     if (enable_lvgl) {
         lv_label_set_text(lv_obj_get_child(button, nullptr), line);
+    } else {
+        screen::print(TEXT_MEDIUM, lineNum++, line);
     }
 }
 

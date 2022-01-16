@@ -4,6 +4,9 @@
 #include <cmath>
 #include <string>
 
+#define PI 3.14159265
+#define IN_TO_FT 12
+
 enum ControlState {
     INITIALIZE,
     COMPETITION_INITIALIZE,
