@@ -14,12 +14,11 @@ Motor motor_rb(20, E_MOTOR_GEARSET_18, true, E_MOTOR_ENCODER_DEGREES);
 Motor motor_lf(1, E_MOTOR_GEARSET_18, false, E_MOTOR_ENCODER_DEGREES);
 Motor motor_lb(11, E_MOTOR_GEARSET_18, false, E_MOTOR_ENCODER_DEGREES);
 Motor arm(2, E_MOTOR_GEARSET_36, true, E_MOTOR_ENCODER_DEGREES);
-Motor arm2(9, E_MOTOR_GEARSET_36, false, E_MOTOR_ENCODER_DEGREES);
 
 Controller controller(E_CONTROLLER_MASTER);
 
 double arm_position() {
-    return (p_err(arm.get_position()) + p_err(arm2.get_position())) / 2.0;
+    return p_err(arm.get_position());
 }
 
 double motor_offset_relative() {
@@ -105,7 +104,6 @@ void turn_left(uint16_t angle, int32_t max_rpm) {
 void arm_down(int32_t max_rpm = 100, bool block = true) {
     print("Arm Down");
     p_err(arm.move_absolute(135, max_rpm));
-    p_err(arm2.move_absolute(135, max_rpm));
     if (block) {
         while (fabs(arm_position() - 135) > 8.0) {
             delay(50);
@@ -121,7 +119,6 @@ void arm_down(int32_t max_rpm = 100, bool block = true) {
 void arm_lift(int32_t max_rpm = 100, bool block = true) {
     print("Arm Lift");
     p_err(arm.move_absolute(110, max_rpm));
-    p_err(arm2.move_absolute(110, max_rpm));
     if (block) {
         while (fabs(arm_position() - 110) > 8.0) {
             delay(50);
@@ -137,7 +134,6 @@ void arm_lift(int32_t max_rpm = 100, bool block = true) {
 void arm_up(int32_t max_rpm = 100, bool block = true) {
     print("Arm Up");
     p_err(arm.move_absolute(0, max_rpm));
-    p_err(arm2.move_absolute(0, max_rpm));
     if (block) {
         while (fabs(arm_position() - 0.0) > 8.0) {
             delay(50);

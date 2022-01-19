@@ -18,9 +18,7 @@ void initialize() {
     motor_lf.set_brake_mode(MOTOR_BRAKE_BRAKE);
     motor_lb.set_brake_mode(MOTOR_BRAKE_BRAKE);
     arm.set_brake_mode(MOTOR_BRAKE_BRAKE);
-    arm2.set_brake_mode(MOTOR_BRAKE_BRAKE);
     arm.set_zero_position(0);
-    arm2.set_zero_position(0);
 }
 
 void disabled() {
@@ -58,13 +56,10 @@ void autonomous() {
         int joystickR = p_err(controller.get_analog(E_CONTROLLER_ANALOG_RIGHT_Y));
         if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_R1)) && p_err(arm.get_position()) > 0.0) {
             p_err(arm.move(100)); // UP
-            p_err(arm2.move(100));
         } else if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_R2)) && p_err(arm.get_position()) < 130.0) {
             p_err(arm.move(-100)); // DOWN
-            p_err(arm2.move(-100));
         } else {
             p_err(arm.move(0)); // STOP
-            p_err(arm2.move(0));
         }
         print(arm.get_position());
 
