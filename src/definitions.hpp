@@ -7,30 +7,6 @@
 #define PI 3.14159265
 #define IN_TO_FT 12
 
-enum ControlState {
-    INITIALIZE,
-    COMPETITION_INITIALIZE,
-    AUTONOMOUS,
-    OPERATOR_CONTROL,
-    DISABLED
-};
-
-std::string stateName(ControlState state) {
-    switch (state) {
-        case INITIALIZE:
-            return "Initialize";
-        case COMPETITION_INITIALIZE:
-            return "Competition Initialize";
-        case AUTONOMOUS:
-            return "Autonomous";
-        case OPERATOR_CONTROL:
-            return "Operator Control";
-        case DISABLED:
-            return "Disabled";
-    }
-    return "INVALID";
-}
-
 lv_res_t always_ok_event(struct _lv_obj_t* obj) {
     return LV_RES_OK;
 }

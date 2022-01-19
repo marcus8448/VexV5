@@ -29,8 +29,23 @@ lv_res_t autoscroll_event(struct _lv_obj_t* obj) {
     return LV_RES_OK;
 }
 
+/**
+ * Updates the screen at a rate of 10fps.
+ * Used for autoscroll because scrolling by hand doesn't work half the time.
+ */
+[[noreturn]] void screen_update_task() {
+    while (true) {
+        if (autoscroll) {
+            lv_page_scroll_ver(printed_information, autoscroll_direction ? -10 : 10);
+        }
+        delay(100); // 10 updates per second as we don't care *that* much about the screen.
+    }
+}
+
 void init_screen(lv_action_t action) {
     if (enable_lvgl) {
+        Task::create(screen_update_task, TASK_PRIORITY_DEFAULT - 2, TASK_STACK_DEPTH_DEFAULT, "Screen Update");
+
         force_auto_button = lv_btn_create(lv_scr_act(), nullptr);
         autoscroll_button = lv_btn_create(lv_scr_act(), nullptr);
         static_information = lv_list_create(lv_scr_act(), nullptr);
@@ -57,12 +72,6 @@ void init_screen(lv_action_t action) {
 
         lv_label_set_text(lv_label_create(force_auto_button, nullptr), "Force Autonomous");
         lv_label_set_text(lv_label_create(autoscroll_button, nullptr), "Autoscroll");
-    }
-}
-
-void update_screen() {
-    if (autoscroll) {
-        lv_page_scroll_ver(printed_information, autoscroll_direction ? -10 : 10);
     }
 }
 
