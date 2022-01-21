@@ -1,7 +1,6 @@
 #ifndef _ROBOT_H_
 #define _ROBOT_H_
-// 4 1/8 d (2 1/16 r)
-#define WHEEL_SIZE 2.0625
+#define WHEEL_SIZE 2.0625 /* 4 1/8 d (2 1/16 r) */
 #define INCHES_TO_DEGREES (360.0 / ((2.0 * 3.14159265358979323846) * (WHEEL_SIZE * WHEEL_SIZE))) * 2.0
 #define DEGREES_TO_ROTATION_DEGREES 4
 
@@ -34,7 +33,7 @@ double motor_offset_relative() {
  * \param left_distance the distance to move the left motors in degrees.
  * \param max_rpm The maximum allowable rpm for the motors.
  */
-void move_for(double right_distance, double left_distance, int32_t max_rpm) {
+void move_for(double right_distance, double left_distance, int32_t max_rpm = 120) {
     p_err(motor_rf.move_relative(right_distance, max_rpm));
     p_err(motor_rb.move_relative(right_distance, max_rpm));
     p_err(motor_lf.move_relative(left_distance, max_rpm));
@@ -59,7 +58,7 @@ void move_for(double right_distance, double left_distance, int32_t max_rpm) {
  * \param distance The distance to move in inches.
  * \param max_rpm The maximum allowable rpm for the motors.
  */
-void forwards(double distance, int32_t max_rpm) {
+void forwards(double distance, int32_t max_rpm = 120) {
     print("Move forwards: " + std::to_string(distance));
     move_for(distance * INCHES_TO_DEGREES, distance * INCHES_TO_DEGREES, max_rpm);
 }
@@ -69,7 +68,7 @@ void forwards(double distance, int32_t max_rpm) {
  * \param distance The distance to move in inches.
  * \param max_rpm The maximum allowable rpm for the motors.
  */
-void backwards(double distance, int32_t max_rpm) {
+void backwards(double distance, int32_t max_rpm = 120) {
     print("Move back: " + std::to_string(distance));
     move_for(-distance * INCHES_TO_DEGREES, -distance * INCHES_TO_DEGREES, max_rpm);
 }
@@ -79,7 +78,7 @@ void backwards(double distance, int32_t max_rpm) {
  * \param angle The amount to turn in degrees.
  * \param max_rpm The maximum allowable rpm for the motors.
  */
-void turn_right(double angle, int32_t max_rpm) {
+void turn_right(double angle, int32_t max_rpm = 120) {
     print("Turn right: " + std::to_string(angle));
     angle *= DEGREES_TO_ROTATION_DEGREES;
     move_for(-angle, angle, max_rpm);
@@ -90,7 +89,7 @@ void turn_right(double angle, int32_t max_rpm) {
  * \param angle The amount to turn in degrees.
  * \param max_rpm The maximum allowable rpm for the motors.
  */
-void turn_left(uint16_t angle, int32_t max_rpm) {
+void turn_left(uint16_t angle, int32_t max_rpm = 120) {
     print("Turn left: " + std::to_string(angle));
     angle *= DEGREES_TO_ROTATION_DEGREES;
     move_for(angle, -angle, max_rpm);
@@ -141,4 +140,4 @@ void arm_up(int32_t max_rpm = 100, bool block = true) {
     }
 }
 
-#endif// _ROBOT_H_
+#endif // _ROBOT_H_

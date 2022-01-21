@@ -3,15 +3,15 @@
 #include "robot.hpp"
 #include "screen.hpp"
 
-lv_res_t on_force_autonomous_click(struct _lv_obj_t* obj);
+#define FORCE_AUTONOMOUS false
 
-static bool force_autonomous = false;
+void debug_input_task();
 
 /**
  * Called when the robot is first initialized.
  */
 void initialize() {
-    init_screen(on_force_autonomous_click);
+    Task::create(debug_input_task, "Debug Input Task");
 
     motor_rf.set_brake_mode(MOTOR_BRAKE_BRAKE);
     motor_rb.set_brake_mode(MOTOR_BRAKE_BRAKE);
@@ -34,9 +34,9 @@ void competition_initialize() {
 void autonomous() {
     for (int i = 0; i < 3; i++) {
         arm_down();
-        forwards(5 * IN_TO_FT, 100);
+        forwards(60, 100);
         arm_lift(100, true);
-        backwards(5 * IN_TO_FT, 100);
+        backwards(60, 100);
         arm_up(100, true);
     }
 }
@@ -46,36 +46,60 @@ void autonomous() {
  * Will delegate to autonomous control if the "Force Autonomous" button is pressed.
  */
 [[noreturn]] void opcontrol() {
-    while (true) {
-        if (force_autonomous) {
-            autonomous();
-            force_autonomous = false;
+    if (FORCE_AUTONOMOUS) {
+        autonomous();
+    } else {
+        while (true) {
+            int joystickL = p_err(controller.get_analog(E_CONTROLLER_ANALOG_LEFT_Y));
+            int joystickR = p_err(controller.get_analog(E_CONTROLLER_ANALOG_RIGHT_Y));
+            if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_R1))/*  && p_err(arm_position()) < 300.0 */) {
+                p_err(arm.move(127)); // UP
+            } else if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_R2))/*  && p_err(arm_position()) > 0.0 */) {
+                p_err(arm.move(-127)); // DOWN
+            } else {
+                p_err(arm.move(0)); // STOP
+            }
+
+            p_err(motor_rf.move(joystickR));
+            p_err(motor_rb.move(joystickR));
+            p_err(motor_lf.move(joystickL));
+            p_err(motor_lb.move(joystickL));
+
+            delay(20);
         }
-
-        int joystickL = p_err(controller.get_analog(E_CONTROLLER_ANALOG_LEFT_Y));
-        int joystickR = p_err(controller.get_analog(E_CONTROLLER_ANALOG_RIGHT_Y));
-        if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_R1)) && p_err(arm.get_position()) > 0.0) {
-            p_err(arm.move(100)); // UP
-        } else if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_R2)) && p_err(arm.get_position()) < 130.0) {
-            p_err(arm.move(-100)); // DOWN
-        } else {
-            p_err(arm.move(0)); // STOP
-        }
-        print(arm.get_position());
-
-        p_err(motor_rf.move(joystickR));
-        p_err(motor_rb.move(joystickR));
-        p_err(motor_lf.move(joystickL));
-        p_err(motor_lb.move(joystickL));
-
-        delay(20);
     }
 }
 
+void print_motor_info(Motor motor) {
+    std::cout << motor.get_actual_velocity()
+    << " / " << motor.get_target_velocity()
+    << " " << motor.get_position()
+    << "° / " << motor.get_target_position()
+    << "° " << motor.get_voltage()
+    << "V";
+}
+
 /**
- * Called when the "Force Autonomous" button is pressed.
+ * Handles debug commands.
  */
-lv_res_t on_force_autonomous_click(struct _lv_obj_t* obj) {
-    force_autonomous = true;
-    return LV_RES_OK;
+void debug_input_task() {
+    std::cin.clear();
+    while (true) {
+        std::string command;
+        std::getline(std::cin, command);
+        if (command == "arm") {
+            std::cout << "Arm:\n";
+            print_motor_info(arm);
+        } else if (command == "drivetrain") {
+            std::cout << "RF Motor:\n";
+            print_motor_info(motor_rf);
+            std::cout << "RB Motor:\n";
+            print_motor_info(motor_rb);
+            std::cout << "LF Motor:\n";
+            print_motor_info(motor_lf);
+            std::cout << "LB Motor:\n";
+            print_motor_info(motor_lb);
+        }
+        std::cout << std::endl;
+    }
 }
