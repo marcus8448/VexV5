@@ -4,17 +4,7 @@
 #include "definitions.hpp"
 #include <string>
 
-static lv_obj_t* static_information = nullptr;
-static lv_obj_t* printed_information = nullptr;
-
-static int lineNum = 0;
-
 void init_screen() {
-}
-
-void init_btn(lv_obj_t* btn) {
-    lv_obj_set_height(btn, lv_obj_get_height(btn) - lv_obj_get_height(btn) / 4);
-    lv_obj_set_click(btn, false);
 }
 
 void print(const char* line) {
