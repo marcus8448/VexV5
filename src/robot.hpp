@@ -12,7 +12,7 @@ Motor motor_rf(10, E_MOTOR_GEARSET_18, true, E_MOTOR_ENCODER_DEGREES);
 Motor motor_rb(20, E_MOTOR_GEARSET_18, true, E_MOTOR_ENCODER_DEGREES);
 Motor motor_lf(1, E_MOTOR_GEARSET_18, false, E_MOTOR_ENCODER_DEGREES);
 Motor motor_lb(11, E_MOTOR_GEARSET_18, false, E_MOTOR_ENCODER_DEGREES);
-Motor lift(8, E_MOTOR_GEARSET_36, false, E_MOTOR_ENCODER_DEGREES);
+Motor lift(8, E_MOTOR_GEARSET_36, true, E_MOTOR_ENCODER_DEGREES);
 Motor arm_1(9, E_MOTOR_GEARSET_18, true, E_MOTOR_ENCODER_DEGREES);
 Motor arm_2(2, E_MOTOR_GEARSET_18, false, E_MOTOR_ENCODER_DEGREES);
 Motor arm_hook(16, E_MOTOR_GEARSET_18, false, E_MOTOR_ENCODER_DEGREES);
@@ -24,6 +24,18 @@ Controller controller(E_CONTROLLER_MASTER);
  */
 double lift_position() {
     return p_err(lift.get_position());
+}
+
+/**
+ * \return the average position of the arm.
+ */
+double arm_position() {
+    return p_err((arm_1.get_position() + arm_2.get_position()) / 2.0);
+}
+
+void move_arm_absolute(double position, int32_t velocity) {
+    p_err(arm_1.move_absolute(position, velocity));
+    p_err(arm_2.move_absolute(position, velocity));
 }
 
 /**
@@ -111,9 +123,9 @@ void turn_left(uint16_t angle, int32_t max_rpm = 120) {
  */
 void lift_down(int32_t max_rpm = 100, bool block = true) {
     print("Lift Down");
-    p_err(lift.move_absolute(135, max_rpm));
+    p_err(lift.move_absolute(-470.0, max_rpm));
     if (block) {
-        while (fabs(lift_position() - 135) > 8.0) {
+        while (fabs(lift_position() - -470.0) > 8.0) {
             delay(50);
         }
     }
@@ -126,9 +138,9 @@ void lift_down(int32_t max_rpm = 100, bool block = true) {
  */
 void lift_lift(int32_t max_rpm = 100, bool block = true) {
     print("Lift Lift");
-    p_err(lift.move_absolute(110, max_rpm));
+    p_err(lift.move_absolute(-387, max_rpm));
     if (block) {
-        while (fabs(lift_position() - 110) > 8.0) {
+        while (fabs(lift_position() - -387) > 8.0) {
             delay(50);
         }
     }
@@ -144,6 +156,51 @@ void lift_up(int32_t max_rpm = 100, bool block = true) {
     p_err(lift.move_absolute(0, max_rpm));
     if (block) {
         while (fabs(lift_position() - 0.0) > 8.0) {
+            delay(50);
+        }
+    }
+}
+
+/**
+ * Puts the arm down to pick up or drop off a mobile goal.
+ * \param max_rpm The maximum allowable rpm for the arm motors.
+ * \param block Whether this operation is blocking and should wait for the arm to move.
+ */
+void arm_down(int32_t max_rpm = 100, bool block = true) {
+    print("Arm Down");
+    move_arm_absolute(0, max_rpm);
+    if (block) {
+        while (fabs(arm_position()) > 8.0) {
+            delay(50);
+        }
+    }
+}
+
+/**
+ * Moves the arm all the way up to its starting position.
+ * \param max_rpm The maximum allowable rpm for the arm motors.
+ * \param block Whether this operation is blocking and should wait for the arm to move.
+ */
+void arm_prime(int32_t max_rpm = 100, bool block = true) {
+    print("Arm Prime");
+    move_arm_absolute(-50.0, max_rpm);
+    if (block) {
+        while (fabs(arm_position() - -50.0) > 8.0) {
+            delay(50);
+        }
+    }
+}
+
+/**
+ * Moves the arm all the way up to its starting position.
+ * \param max_rpm The maximum allowable rpm for the arm motors.
+ * \param block Whether this operation is blocking and should wait for the arm to move.
+ */
+void arm_up(int32_t max_rpm = 100, bool block = true) {
+    print("Arm Up");
+    move_arm_absolute(-450.0, max_rpm);
+    if (block) {
+        while (fabs(arm_position() - -450.0) > 8.0) {
             delay(50);
         }
     }

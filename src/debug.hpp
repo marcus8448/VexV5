@@ -23,23 +23,23 @@ void debug_input_task() {
         std::string command;
         std::getline(std::cin, command);
         if (command == "lift") {
-            std::cout << "Lift:\n";
+            std::cout << "Lift: ";
             print_motor_info(lift);
         } else if (command == "arm") {
-            std::cout << "Arm 1:\n";
+            std::cout << "Arm 1: ";
             print_motor_info(arm_1);
-            std::cout << "Arm 2:\n";
+            std::cout << "Arm 2: ";
             print_motor_info(arm_2);
-            std::cout << "Arm Hook:\n";
+            std::cout << "Arm Hook: ";
             print_motor_info(arm_hook);
         } else if (command == "drivetrain") {
-            std::cout << "RF Motor:\n";
+            std::cout << "RF Motor: ";
             print_motor_info(motor_rf);
-            std::cout << "RB Motor:\n";
+            std::cout << "RB Motor: ";
             print_motor_info(motor_rb);
-            std::cout << "LF Motor:\n";
+            std::cout << "LF Motor: ";
             print_motor_info(motor_lf);
-            std::cout << "LB Motor:\n";
+            std::cout << "LB Motor: ";
             print_motor_info(motor_lb);
         }
         std::cout << std::endl;

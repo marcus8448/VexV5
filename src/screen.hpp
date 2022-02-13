@@ -28,7 +28,7 @@ void print(long long line) {
 }
 
 void print_error(const char* line) {
-    std::cerr << line << std::endl;   
+    std::cerr << "\u001b[31m" << line << "\u001b[0m" << std::endl;   
 }
 
 void print_error(const std::string& line) {
