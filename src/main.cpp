@@ -22,7 +22,7 @@ void initialize() {
     lift.set_zero_position(0);
     arm_1.set_brake_mode(MOTOR_BRAKE_HOLD);
     arm_2.set_brake_mode(MOTOR_BRAKE_HOLD);
-    arm_hook.set_brake_mode(MOTOR_BRAKE_COAST);
+    arm_hook.set_brake_mode(MOTOR_BRAKE_HOLD);
     arm_1.set_zero_position(0);
     arm_2.set_zero_position(0);
 }
@@ -38,13 +38,7 @@ void competition_initialize() {
  * Or when the "Force Autonomous" button is presssed on the screen.
  */
 void autonomous() {
-    for (int i = 0; i < 3; i++) {
-        lift_down();
-        forwards(60, 100);
-        lift_lift(100, true);
-        backwards(60, 100);
-        lift_up(100, true);
-    }
+    
 }
 
 /**
