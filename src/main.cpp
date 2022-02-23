@@ -1,10 +1,19 @@
+#define FORCE_AUTONOMOUS false
+#define _RECORD_MATCH_
+#define _REPLAY_MATCH_
+
 #include "main.h"
 #include "definitions.hpp"
 #include "debug.hpp"
 #include "robot.hpp"
 #include "screen.hpp"
 
-#define FORCE_AUTONOMOUS false
+#ifdef _RECORD_MATCH_
+#include "recording.hpp"
+#endif
+#ifdef _REPLAY_MATCH_
+#include "replay.hpp"
+#endif
 
 void debug_input_task();
 
@@ -38,7 +47,6 @@ void competition_initialize() {
  * Or when the "Force Autonomous" button is presssed on the screen.
  */
 void autonomous() {
-    
 }
 
 /**
@@ -46,6 +54,11 @@ void autonomous() {
  * Will delegate to autonomous control if the "Force Autonomous" button is pressed.
  */
 [[noreturn]] void opcontrol() {
+    #ifdef _REPLAY_MATCH_
+    replay_match();
+    return;
+    #endif
+
     int digital_speed = 127;
     int cooldown = 0;
     bool lift_lock = false;
@@ -133,6 +146,10 @@ void autonomous() {
 
             move_right_motors(p_err(controller.get_analog(E_CONTROLLER_ANALOG_RIGHT_Y)));
             move_left_motors(p_err(controller.get_analog(E_CONTROLLER_ANALOG_LEFT_Y)));
+
+            #ifdef _RECORD_MATCH_
+            serialize_controller_state();
+            #endif // _RECORD_MATCH_
             delay(20);
         }
     }
