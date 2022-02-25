@@ -122,7 +122,7 @@ void turn_left(uint16_t angle, int32_t max_rpm = 120) {
  * \param block Whether this operation is blocking and should wait for the lift to move.
  */
 void lift_down(int32_t max_rpm = 100, bool block = true) {
-    print("Lift Down");
+    print("Lift down");
     p_err(lift.move_absolute(-470.0, max_rpm));
     if (block) {
         while (fabs(lift_position() - -470.0) > 8.0) {
@@ -137,7 +137,7 @@ void lift_down(int32_t max_rpm = 100, bool block = true) {
  * \param block Whether this operation is blocking and should wait for the lift to move.
  */
 void lift_lift(int32_t max_rpm = 100, bool block = true) {
-    print("Lift Lift");
+    print("Lift lift");
     p_err(lift.move_absolute(-387, max_rpm));
     if (block) {
         while (fabs(lift_position() - -387) > 8.0) {
@@ -152,7 +152,7 @@ void lift_lift(int32_t max_rpm = 100, bool block = true) {
  * \param block Whether this operation is blocking and should wait for the lift to move.
  */
 void lift_up(int32_t max_rpm = 100, bool block = true) {
-    print("Lift Up");
+    print("Lift up");
     p_err(lift.move_absolute(0, max_rpm));
     if (block) {
         while (fabs(lift_position() - 0.0) > 8.0) {
@@ -167,7 +167,7 @@ void lift_up(int32_t max_rpm = 100, bool block = true) {
  * \param block Whether this operation is blocking and should wait for the arm to move.
  */
 void arm_down(int32_t max_rpm = 100, bool block = true) {
-    print("Arm Down");
+    print("Arm down");
     move_arm_absolute(0, max_rpm);
     if (block) {
         while (fabs(arm_position()) > 8.0) {
@@ -182,7 +182,7 @@ void arm_down(int32_t max_rpm = 100, bool block = true) {
  * \param block Whether this operation is blocking and should wait for the arm to move.
  */
 void arm_prime(int32_t max_rpm = 100, bool block = true) {
-    print("Arm Prime");
+    print("Arm prime");
     move_arm_absolute(-50.0, max_rpm);
     if (block) {
         while (fabs(arm_position() - -50.0) > 8.0) {
@@ -197,7 +197,7 @@ void arm_prime(int32_t max_rpm = 100, bool block = true) {
  * \param block Whether this operation is blocking and should wait for the arm to move.
  */
 void arm_up(int32_t max_rpm = 100, bool block = true) {
-    print("Arm Up");
+    print("Arm up");
     move_arm_absolute(-450.0, max_rpm);
     if (block) {
         while (fabs(arm_position() - -450.0) > 8.0) {

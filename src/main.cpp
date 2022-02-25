@@ -53,13 +53,14 @@ void autonomous() {
  * Called when the robot is under driver control.
  * Will delegate to autonomous control if the "Force Autonomous" button is pressed.
  */
-[[noreturn]] void opcontrol() {
+void opcontrol() {
     #ifdef _REPLAY_MATCH_
     replay_match();
     return;
     #endif
 
     int digital_speed = 127;
+    int prev_digital_speed = 0;
     int cooldown = 0;
     bool lift_lock = false;
     bool arm_lock = false;
@@ -146,6 +147,11 @@ void autonomous() {
 
             move_right_motors(p_err(controller.get_analog(E_CONTROLLER_ANALOG_RIGHT_Y)));
             move_left_motors(p_err(controller.get_analog(E_CONTROLLER_ANALOG_LEFT_Y)));
+
+            if (digital_speed != prev_digital_speed) {
+                prev_digital_speed = digital_speed;
+                controller.set_text(0, 0, std::string("Digital Speed: ").append(std::to_string((int)digital_speed)));
+            }
 
             #ifdef _RECORD_MATCH_
             serialize_controller_state();

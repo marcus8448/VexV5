@@ -6,7 +6,7 @@
 #include "pros/misc.hpp"
 
 void write_out(char c) {
-    static std::ofstream outf("/usd/record.v5r", std::ios::out | std::ios::binary || std::ios::trunc);
+    static std::ofstream outf("/usd/record.v5r", std::ios::out | std::ios::binary | std::ios::trunc);
     outf << c;
 }
 
@@ -14,7 +14,6 @@ void serialize_controller_state() {
     static bool a, b, x, y, up, down, left, right, l1, l2, r1, r2;
     static int lx, ly, rx, ry;
 
-    write_out(127);
     if (a != (a = controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))) {
         write_out(a ? 1 : -1);
     } else if (b != (b = controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))) {
@@ -41,15 +40,10 @@ void serialize_controller_state() {
         write_out(r2 ? 12 : -12);
     }
     write_out(13);
-    if (lx != (lx = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X))) {
-        write_out(lx);
-    } else if (ly != (ly = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y))) {
-        write_out(ly);
-    } else if (rx != (rx = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X))) {
-        write_out(rx);
-    } else if (ry != (ry = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y ))) {
-        write_out(ry);
-    }
+    write_out(lx);
+    write_out(ly);
+    write_out(rx);
+    write_out(ry);
 }
 
 #endif //_RECORDING_H_

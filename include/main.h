@@ -29,7 +29,7 @@ void autonomous(void);
 void initialize(void);
 void disabled(void);
 void competition_initialize(void);
-[[noreturn]] void opcontrol(void);
+void opcontrol(void);
 #ifdef __cplusplus
 }
 #endif
