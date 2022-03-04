@@ -4,18 +4,19 @@
 #include <fstream>
 #include "pros/rtos.hpp"
 #include "robot.hpp"
-#include "screen.hpp"
+#include "debug.hpp"
 
 void replay_match() {
-    static std::ifstream inf("/usd/record.v5r", std::ios::in | std::ios::binary);
+    std::ifstream inf("/usd/record.v5r", std::ios::in | std::ios::binary);
 
-    static bool a, b, x, y, up, down, left, right, l1, l2, r1, r2;
-    static int lx, ly, rx, ry;
-    char c; 
+    bool a, b, x, y, up, down, left, right, l1, l2, r1, r2;
+    int lx, ly, rx, ry;
+    unsigned char c; 
 
     while (true) {
         bool exit = false;
-        while (inf.get(c) && !exit) {
+        inf >> c;
+        while (!exit) {
             switch (std::abs(c)) {
             case 1:
             a = c == 1;
@@ -61,13 +62,13 @@ void replay_match() {
                 return;
             }
         }
-        inf.get(c);
+        inf >> c;
         lx = c;
-        inf.get(c);
+        inf >> c;
         ly = c;
-        inf.get(c);
+        inf >> c;
         rx = c;
-        inf.get(c);
+        inf >> c;
         ry = c;
 
         int digital_speed = 127;

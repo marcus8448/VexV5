@@ -1,23 +1,15 @@
 #ifndef _ROBOT_H_
 #define _ROBOT_H_
+
 #define WHEEL_SIZE 2.0625 /* 4 1/8 d (2 1/16 r) */
 #define INCHES_TO_DEGREES (360.0 / ((2.0 * 3.14159265358979323846) * (WHEEL_SIZE * WHEEL_SIZE))) * 2.0
+// todo: 12.9590697in = 360 degrees
 #define DEGREES_TO_ROTATION_DEGREES 4
-// 12.9590697in = 360 degrees
-#include "screen.hpp"
+
 #include <cmath>
 #include <string>
-
-Motor motor_rf(10, E_MOTOR_GEARSET_18, true, E_MOTOR_ENCODER_DEGREES);
-Motor motor_rb(20, E_MOTOR_GEARSET_18, true, E_MOTOR_ENCODER_DEGREES);
-Motor motor_lf(1, E_MOTOR_GEARSET_18, false, E_MOTOR_ENCODER_DEGREES);
-Motor motor_lb(11, E_MOTOR_GEARSET_18, false, E_MOTOR_ENCODER_DEGREES);
-Motor lift(8, E_MOTOR_GEARSET_36, true, E_MOTOR_ENCODER_DEGREES);
-Motor arm_1(9, E_MOTOR_GEARSET_18, true, E_MOTOR_ENCODER_DEGREES);
-Motor arm_2(14, E_MOTOR_GEARSET_18, false, E_MOTOR_ENCODER_DEGREES);
-Motor arm_hook(16, E_MOTOR_GEARSET_18, false, E_MOTOR_ENCODER_DEGREES);
-
-Controller controller(E_CONTROLLER_MASTER);
+#include "debug.hpp"
+#include "devices.hpp"
 
 /**
  * \return the position of the lift.
@@ -138,9 +130,9 @@ void lift_down(int32_t max_rpm = 100, bool block = true) {
  */
 void lift_lift(int32_t max_rpm = 100, bool block = true) {
     print("Lift lift");
-    p_err(lift.move_absolute(-387, max_rpm));
+    p_err(lift.move_absolute(-120.0, max_rpm));
     if (block) {
-        while (fabs(lift_position() - -387) > 8.0) {
+        while (fabs(lift_position() - -120.0) > 8.0) {
             delay(50);
         }
     }
@@ -183,9 +175,9 @@ void arm_down(int32_t max_rpm = 100, bool block = true) {
  */
 void arm_prime(int32_t max_rpm = 100, bool block = true) {
     print("Arm prime");
-    move_arm_absolute(-50.0, max_rpm);
+    move_arm_absolute(-200.0, max_rpm);
     if (block) {
-        while (fabs(arm_position() - -50.0) > 8.0) {
+        while (fabs(arm_position() - -200.0) > 8.0) {
             delay(50);
         }
     }
@@ -198,9 +190,9 @@ void arm_prime(int32_t max_rpm = 100, bool block = true) {
  */
 void arm_up(int32_t max_rpm = 100, bool block = true) {
     print("Arm up");
-    move_arm_absolute(-450.0, max_rpm);
+    move_arm_absolute(-460.0, max_rpm);
     if (block) {
-        while (fabs(arm_position() - -450.0) > 8.0) {
+        while (fabs(arm_position() - -460.0) > 8.0) {
             delay(50);
         }
     }
@@ -232,4 +224,5 @@ void move_left_motors(int32_t voltage) {
     p_err(motor_lf.move(voltage));
     p_err(motor_lb.move(voltage));
 }
+
 #endif // _ROBOT_H_
