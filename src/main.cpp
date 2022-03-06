@@ -16,6 +16,7 @@
  */
 void initialize() {
     Task::create(debug_input_task, "Debug Input Task");
+    Task::create(controller_update_task, "Controller Alert Task");
 
     motor_rf.set_brake_mode(MOTOR_BRAKE_BRAKE);
     motor_rb.set_brake_mode(MOTOR_BRAKE_BRAKE);
@@ -41,6 +42,7 @@ void competition_initialize() {
  * Or when the "Force Autonomous" button is presssed on the screen.
  */
 void autonomous() {
+    driver_control = false;
     #ifdef REPLAY_MATCH
     replay_match();
     #endif
@@ -51,11 +53,22 @@ void autonomous() {
  * Will delegate to autonomous control if the "Force Autonomous" button is pressed.
  */
 void opcontrol() {
+    driver_control = true;
     #ifdef RECORD_MATCH
-    std::basic_ofstream<unsigned char, std::char_traits<unsigned char>> outf("/usd/record.v5r", std::ios::out | std::ios::binary | std::ios::app | std::ios::trunc);
+    while (!usd::is_installed()) {
+        controller.set_text(2, 0, "Missing microSD!");
+        delay(250);
+    }
+    controller.clear_line(2);
+    std::basic_ofstream<signed int, std::char_traits<signed int>> outf("/usd/record.v5r", std::ios::out | std::ios::binary | std::ios::app | std::ios::trunc);
     #endif // RECORD_MATCH
 
     #ifdef REPLAY_MATCH
+    while (!usd::is_installed()) {
+        controller.set_text(2, 0, "Missing microSD!");
+        delay(250);
+    }
+    controller.clear_line(2);
     replay_match();
     return;
     #endif
@@ -74,8 +87,6 @@ void opcontrol() {
     while (true) {
         if (cooldown > 0) {
             cooldown--;
-        } else if (cooldown < 0) {
-            cooldown = 0;
         }
         if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_R1))) {
             p_err(lift.move(digital_speed)); // UP
@@ -92,7 +103,7 @@ void opcontrol() {
             move_arm(-digital_speed); // UP
             arm_lock = false;
         } else if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_L2))) {
-            move_arm(digital_speed); // DOWN
+            move_arm(digital_speed / 2); // DOWN
             arm_lock = false;
         } else {
             if (!arm_lock) {
@@ -147,11 +158,11 @@ void opcontrol() {
 
         if (digital_speed != prev_digital_speed) {
             prev_digital_speed = digital_speed;
-            controller.set_text(0, 0, std::string("Digital Speed: ").append(std::to_string((int)digital_speed)));
+            controller.set_text(0, 0, "Digital Speed: " + std::to_string((unsigned int)digital_speed));
         }
 
         #ifdef RECORD_MATCH
-        if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_A)) && p_err(controller.get_digital(E_CONTROLLER_DIGITAL_Y))) {
+        if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_UP)) && p_err(controller.get_digital(E_CONTROLLER_DIGITAL_DOWN))) {
             outf.flush();
             outf.close();
             break;

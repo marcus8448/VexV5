@@ -223,6 +223,6 @@ void move_right_motors(int32_t voltage) {
 void move_left_motors(int32_t voltage) {
     p_err(motor_lf.move(voltage));
     p_err(motor_lb.move(voltage));
-}
+}   
 
 #endif // _ROBOT_H_

@@ -6,89 +6,52 @@
 #include "devices.hpp"
 #include "pros/motors.hpp"
 
-void print_motor_info(Motor motor) {
-    std::cout << motor.get_actual_velocity()
-    << " / " << motor.get_target_velocity()
-    << " | " << motor.get_position()
-    << "° / " << motor.get_target_position()
-    << "° | " << motor.get_voltage()
-    << "V";
-}
+using namespace std;
 
-/**
- * Handles debug commands.
- */
-void debug_input_task() {
-    std::cin.clear();
-    while (true) {
-        std::string command;
-        std::getline(std::cin, command);
-        if (command == "lift") {
-            std::cout << "Lift: ";
-            print_motor_info(lift);
-        } else if (command == "arm") {
-            std::cout << "Arm 1: ";
-            print_motor_info(arm_1);
-            std::cout << "\nArm 2: ";
-            print_motor_info(arm_2);
-            std::cout << "\nArm Hook: ";
-            print_motor_info(arm_hook);
-        } else if (command == "drivetrain") {
-            std::cout << "RF Motor: ";
-            print_motor_info(motor_rf);
-            std::cout << "\nRB Motor: ";
-            print_motor_info(motor_rb);
-            std::cout << "\nLF Motor: ";
-            print_motor_info(motor_lf);
-            std::cout << "\nLB Motor: ";
-            print_motor_info(motor_lb);
-        }
-        std::cout << std::endl;
-    }
-}
+bool driver_control = false;
 
 void print(const char* line) {
-    std::cout << line << std::endl;   
+    cout << line << endl;   
 }
 
-void print(const std::string& line) {
+void print(const string& line) {
     print(line.c_str());
 }
 
 void print(int line) {
-    print(std::to_string(line));
+    print(to_string(line));
 }
 
 void print(unsigned int line) {
-    print(std::to_string(line));
+    print(to_string(line));
 }
 
 void print(double line) {
-    print(std::to_string(line));
+    print(to_string(line));
 }
 
 void print(long long line) {
-    print(std::to_string(line));
+    print(to_string(line));
 }
 
 void print_error(const char* line) {
-    std::cerr << "\u001b[31m" << line << "\u001b[0m" << std::endl;   
+    cerr << "\u001b[31m" << line << "\u001b[0m" << endl;   
 }
 
-void print_error(const std::string& line) {
+void print_error(const string& line) {
     print_error(line.c_str());
 }
 
 void print_error(int line) {
-    print_error(std::to_string(line));
+    print_error(to_string(line));
 }
 
 void print_error(double line) {
-    print_error(std::to_string(line));
+    print_error(to_string(line));
 }
 
 void print_error(long long line) {
-    print_error(std::to_string(line));
+    print_error(to_string(line));
 }
 
 /**
@@ -114,5 +77,68 @@ double p_err(double return_code) {
     }
     return return_code;
 }
+
+void print_motor_info(pros::Motor motor) {
+    cout << motor.get_actual_velocity()
+    << " / " << motor.get_target_velocity()
+    << " | " << motor.get_position()
+    << "° / " << motor.get_target_position()
+    << "° | " << motor.get_voltage()
+    << "V";
+}
+
+/**
+ * Handles debug commands.
+ */
+void debug_input_task() {
+    cin.clear();
+    while (true) {
+        string command;
+        getline(cin, command);
+        if (command == "lift") {
+            cout << "Lift: ";
+            print_motor_info(lift);
+        } else if (command == "arm") {
+            cout << "Arm 1: ";
+            print_motor_info(arm_1);
+            cout << "\nArm 2: ";
+            print_motor_info(arm_2);
+            cout << "\nArm Hook: ";
+            print_motor_info(arm_hook);
+        } else if (command == "drivetrain") {
+            cout << "RF Motor: ";
+            print_motor_info(motor_rf);
+            cout << "\nRB Motor: ";
+            print_motor_info(motor_rb);
+            cout << "\nLF Motor: ";
+            print_motor_info(motor_lf);
+            cout << "\nLB Motor: ";
+            print_motor_info(motor_lb);
+        }
+        cout << endl;
+    }
+}
+
+/**
+ * 
+ */
+void controller_update_task() {
+    while (true) {
+        if (driver_control) {
+            if (arm_hook.get_efficiency() < 15.0 && arm_hook.get_efficiency() > 2.0) {
+                // p_err(controller.rumble("-"));
+                controller.set_text(1, 0, "Resistance on hook!");
+            } else {
+                controller.clear_line(1);
+            }
+            delay(150);
+        } else {
+            p_err(controller.rumble(" "));
+            delay(500);
+        }
+    }
+    
+}
+
 
 #endif // _DEBUG_TOOLS_H_
