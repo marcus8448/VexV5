@@ -208,6 +208,15 @@ void move_arm(int32_t voltage) {
 }
 
 /**
+ * Moves the arm at the specificed rate.
+ * \param voltage The maximum allowable 'voltage' for the arm motors.
+ */
+void move_arm_absolute(double b, double c, int32_t voltage) {
+    p_err(arm_1.move_absolute(b, voltage));
+    p_err(arm_2.move_absolute(c, voltage));
+}
+
+/**
  * Moves the right motors at the specificed rate.
  * \param voltage The maximum allowable 'voltage' for the arm motors.
  */

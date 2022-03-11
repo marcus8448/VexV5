@@ -2,6 +2,7 @@
 #include "debug.hpp"
 #include "robot.hpp"
 #include "debug.hpp"
+#include <cfloat>
 
 #ifdef REPLAY_MATCH
 #include "replay.hpp"
@@ -81,42 +82,58 @@ void opcontrol() {
     unsigned int digital_speed = 127;
     unsigned int prev_digital_speed = 0;
     int cooldown = 0;
-    bool lift_lock = false;
-    bool arm_lock = false;
-    
+    double lift_lock_pos = DBL_MAX;
+    double arm_lock_pos_1 = DBL_MAX;
+    double arm_lock_pos_2 = DBL_MAX;
+    double arm_hook_lock_pos = DBL_MAX;
+
     while (true) {
         if (cooldown > 0) {
             cooldown--;
         }
         if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_R1))) {
             p_err(lift.move(digital_speed)); // UP
-            lift_lock = false;
+            lift_lock_pos = DBL_MAX;
         } else if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_R2))) {
             p_err(lift.move(-digital_speed)); // DOWN
-            lift_lock = false;
+            lift_lock_pos = DBL_MAX;
         } else {
-            if (!lift_lock) {
+            if (lift_lock_pos == DBL_MAX) {
                 p_err(lift.move(0)); // STOP
+            } else {
+                lift.move_absolute(lift_lock_pos, 20);
             }
         }
         if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_L1))) {
             move_arm(-digital_speed); // UP
-            arm_lock = false;
+            arm_lock_pos_1 = DBL_MAX;
+            arm_lock_pos_2 = DBL_MAX;
         } else if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_L2))) {
             move_arm(digital_speed / 2); // DOWN
-            arm_lock = false;
+            arm_lock_pos_1 = DBL_MAX;
+            arm_lock_pos_2 = DBL_MAX;
         } else {
-            if (!arm_lock) {
+            if (arm_lock_pos_1 == DBL_MAX) {
                 move_arm(0); // STOP
+            } else {
+                move_arm_absolute(arm_lock_pos_1, arm_lock_pos_2, 20);
             }
         }
 
-        if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_LEFT))) {
-            p_err(arm_hook.move(-100)); // OPEN
-        } else if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_RIGHT))) {
-            p_err(arm_hook.move(100)); // SHUT
-        } else {
-            p_err(arm_hook.move(0)); // STOP
+        if (cooldown == 0) {
+            if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_LEFT)) && p_err(controller.get_digital(E_CONTROLLER_DIGITAL_RIGHT))) {
+                p_err(arm_hook.move_relative(0, 100));
+                arm_hook_lock_pos = p_err(arm_hook.get_target_position());
+                cooldown = 20;
+            } else if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_LEFT))) {
+                p_err(arm_hook.move(-100)); // OPEN
+                arm_hook_lock_pos = DBL_MAX;
+            } else if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_RIGHT))) {
+                p_err(arm_hook.move(100)); // SHUT
+                arm_hook_lock_pos = DBL_MAX;
+            } else if (arm_hook_lock_pos == DBL_MAX) {
+                p_err(arm_hook.move(0)); // STOP
+            }
         }
 
         if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_UP))) {
@@ -132,24 +149,26 @@ void opcontrol() {
         if (cooldown == 0) {
             if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_A))) {
                 arm_up(200, false);
-                arm_lock = true;
+                arm_lock_pos_1 = arm_1.get_target_position();
+                arm_lock_pos_2 = arm_2.get_target_position();
             } else if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_Y))) {
                 arm_prime(200, false);
-                arm_lock = true;
+                arm_lock_pos_1 = arm_1.get_target_position();
+                arm_lock_pos_2 = arm_2.get_target_position();
             }
         }
 
         if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_X)) && p_err(controller.get_digital(E_CONTROLLER_DIGITAL_B))) {
             lift_lift(200, false);
-            lift_lock = true;
+            lift_lock_pos = lift.get_target_position();
             cooldown = 20;
         } else if (cooldown == 0) {
             if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_X))) {
                 lift_up(200, false);
-                lift_lock = true;
+                lift_lock_pos = lift.get_target_position();
             } else if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_B))) {
                 lift_down(200, false);
-                lift_lock = true;
+                lift_lock_pos = lift.get_target_position();
             }
         }
 
