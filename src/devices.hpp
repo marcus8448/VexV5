@@ -1,7 +1,8 @@
-#ifndef _ROBOT_DEVICES_H_
-#define _ROBOT_DEVICES_H_
+#ifndef _ROBOT_DEVICES_HPP_
+#define _ROBOT_DEVICES_HPP_
 
 #include "pros/motors.hpp"
+#include "pros/misc.hpp"
 
 using namespace pros;
 
@@ -16,4 +17,4 @@ Motor arm_hook(16, E_MOTOR_GEARSET_18, false, E_MOTOR_ENCODER_DEGREES);
 
 Controller controller(E_CONTROLLER_MASTER);
 
-#endif //_ROBOT_DEVICES_H_
+#endif //_ROBOT_DEVICES_HPP_

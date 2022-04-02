@@ -1,5 +1,5 @@
-#ifndef _RECORDING_H_
-#define _RECORDING_H_
+#ifndef _RECORDING_HPP_
+#define _RECORDING_HPP_
 
 #include <fstream>
 #include "devices.hpp"
@@ -46,4 +46,4 @@ void serialize_controller_state(std::basic_ofstream<signed int, std::char_traits
     outf << (signed int)controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
 }
 
-#endif //_RECORDING_H_
+#endif //_RECORDING_HPP_

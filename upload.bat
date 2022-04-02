@@ -1,4 +1,4 @@
-make -B
+make -B EXTRA_CXXFLAGS="-D BASIC_MODE" EXTRA_CXXFLAGS="-D BASIC_MODE"
 pros upload --slot 1 --after none --target v5 --name "Basic"
 make -B EXTRA_CXXFLAGS="-D RECORD_MATCH" EXTRA_CXXFLAGS="-D RECORD_MATCH"
 pros upload --slot 2 --after none --target v5 --name "Record"

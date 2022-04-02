@@ -1,10 +1,14 @@
-#ifndef _DEBUG_TOOLS_H_
-#define _DEBUG_TOOLS_H_
+#ifndef _DEBUG_TOOLS_HPP_
+#define _DEBUG_TOOLS_HPP_
 
+#include <cerrno>
+#include <cstring>
 #include <iostream>
 #include <string>
 #include "devices.hpp"
+#include "pros/misc.hpp"
 #include "pros/motors.hpp"
+#include "pros/rtos.hpp"
 
 using namespace std;
 
@@ -60,8 +64,8 @@ void print_error(long long line) {
  * \return the same return_code parameter passed.
  */
 int32_t p_err(int32_t return_code) {
-    if (return_code == PROS_ERR) {
-        print(strerror(errno));
+    if (return_code == 2147483647) {
+        print(std::strerror(errno));
     }
     return return_code;
 }
@@ -72,8 +76,8 @@ int32_t p_err(int32_t return_code) {
  * \return the same return_code parameter passed.
  */
 double p_err(double return_code) {
-    if (return_code == PROS_ERR_F) {
-        print_error(strerror(errno));
+    if (return_code == ((float)(1e+300 * 1e+300))) {
+        print_error(std::strerror(errno));
     }
     return return_code;
 }
@@ -140,5 +144,4 @@ void controller_update_task() {
     
 }
 
-
-#endif // _DEBUG_TOOLS_H_
+#endif // _DEBUG_TOOLS_HPP_

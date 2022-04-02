@@ -1,23 +1,26 @@
 #include "main.h"
+#include "autonomous.hpp"
 #include "debug.hpp"
+#include "filesystem.hpp"
 #include "robot.hpp"
-#include "debug.hpp"
 #include <cfloat>
 
 #ifdef REPLAY_MATCH
 #include "replay.hpp"
-#endif
+#endif // REPLAY_MATCH
+
 #ifdef RECORD_MATCH 
 #include "recording.hpp"
 #include <fstream>
-#endif
+#include <filesystem>
+#endif // RECORD_MATCH
 
 /**
  * Called when the robot is first initialized.
  */
 void initialize() {
     Task::create(debug_input_task, "Debug Input Task");
-    Task::create(controller_update_task, "Controller Alert Task");
+    Task::create(controller_update_task, "Controller Update Task");
 
     motor_rf.set_brake_mode(MOTOR_BRAKE_BRAKE);
     motor_rb.set_brake_mode(MOTOR_BRAKE_BRAKE);
@@ -47,6 +50,19 @@ void autonomous() {
     #ifdef REPLAY_MATCH
     replay_match();
     #endif
+    
+    #ifdef RIGHT_SIDE_WINPOINT
+    right_side_winpoint();
+    #endif // RIGHT_SIDE_WINPOINT
+    #ifdef LEFT_SIDE_WINPOINT
+    left_side_winpoint();
+    #endif // LEFT_SIDE_WINPOINT
+    #ifdef MIDDLE_RIGHT_GOAL
+    middle_right_goal();
+    #endif // MIDDLE_RIGHT_GOAL
+    #ifdef MIDDLE_LEFT_GOAL
+    middle_left_goal();
+    #endif // MIDDLE_LEFT_GOAL
 }
 
 /**
@@ -54,11 +70,30 @@ void autonomous() {
  * Will delegate to autonomous control if the "Force Autonomous" button is pressed.
  */
 void opcontrol() {
+    if (true) {
+        left_side_winpoint();
+        return;
+    }
     driver_control = true;
     #ifdef RECORD_MATCH
     while (!usd::is_installed()) {
         controller.set_text(2, 0, "Missing microSD!");
         delay(250);
+    }
+    if (file_exists("/usd/record.v5r")) {
+        bool moved = false;
+        for (int i = 0; i < 50; i++) {
+            std::string filename = std::string("/usd/record_").append(to_string(i)).append(".v5r");
+            if (!file_exists(filename)) {
+                std::filesystem::rename("/usd/record.v5r", filename);
+                moved = true;
+                break;
+            }
+        }
+        if (!moved) {
+            controller.set_text(2, 0, "Too many files!");
+            return;
+        }
     }
     controller.clear_line(2);
     std::basic_ofstream<signed int, std::char_traits<signed int>> outf("/usd/record.v5r", std::ios::out | std::ios::binary | std::ios::app | std::ios::trunc);
@@ -72,12 +107,12 @@ void opcontrol() {
     controller.clear_line(2);
     replay_match();
     return;
-    #endif
+    #endif // REPLAY_MATCH
 
     #ifdef FORCE_AUTONOMOUS
     autonomous();
     return;
-    #endif
+    #endif // FORCE_AUTONOMOUS
 
     unsigned int digital_speed = 127;
     unsigned int prev_digital_speed = 0;
@@ -184,7 +219,7 @@ void opcontrol() {
         if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_UP)) && p_err(controller.get_digital(E_CONTROLLER_DIGITAL_DOWN))) {
             outf.flush();
             outf.close();
-            break;
+            return;
         }
         serialize_controller_state(outf);
         #endif // RECORD_MATCH
