@@ -5,7 +5,7 @@
 
 void right_side_winpoint() {
     backwards(22.0, 80);
-    arm_close();
+    arm_hook_close();
     delay(1000);
     forwards(12.0);
     turn_right(90);
@@ -13,7 +13,7 @@ void right_side_winpoint() {
 
 void left_side_winpoint() {
     backwards(22.0, 80);
-    arm_close();
+    arm_hook_close();
     delay(1000);
     forwards(12.0);
     turn_right(90);

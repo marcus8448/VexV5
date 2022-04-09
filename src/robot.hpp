@@ -5,6 +5,14 @@
 #define WHEEL_SIZE 2.0625
 #define DEGREES_TO_ROTATION_DEGREES 4.0
 
+#define LIFT_DOWN_POSITION -470.0
+#define LIFT_UP_POSITION 0.0
+#define LIFT_LIFTED_POSITION -120.0
+
+#define ARM_DOWN_POSITION -470.0
+#define ARM_UP_POSITION 0.0
+#define ARM_LIFTED_POSITION -120.0
+
 #include <cmath>
 #include <string>
 #include "debug.hpp"
@@ -27,11 +35,6 @@ double lift_position() {
  */
 double arm_position() {
     return p_err((arm_1.get_position() + arm_2.get_position()) / 2.0);
-}
-
-void move_arm_absolute(double position, int32_t velocity) {
-    p_err(arm_1.move_absolute(position, velocity));
-    p_err(arm_2.move_absolute(position, velocity));
 }
 
 /**
@@ -157,6 +160,17 @@ void lift_up(int32_t max_rpm = 100, bool block = true) {
     }
 }
 
+void arm_move_absolute(double position, int32_t max_rpm = 100, bool block = true) {
+    p_err(arm_1.move_absolute(position, max_rpm));
+    p_err(arm_2.move_absolute(position, max_rpm));
+
+    if (block) {
+        while (fabs(arm_position() - -position) > 8.0) {
+            delay(50);
+        }
+    }
+}
+
 /**
  * Puts the arm down to pick up or drop off a mobile goal.
  * \param max_rpm The maximum allowable rpm for the arm motors.
@@ -164,12 +178,7 @@ void lift_up(int32_t max_rpm = 100, bool block = true) {
  */
 void arm_down(int32_t max_rpm = 100, bool block = true) {
     print("Arm down");
-    move_arm_absolute(0, max_rpm);
-    if (block) {
-        while (fabs(arm_position()) > 8.0) {
-            delay(50);
-        }
-    }
+    move_arm_absolute(-0.0, max_rpm, block);
 }
 
 /**
@@ -179,12 +188,7 @@ void arm_down(int32_t max_rpm = 100, bool block = true) {
  */
 void arm_prime(int32_t max_rpm = 100, bool block = true) {
     print("Arm prime");
-    move_arm_absolute(-50.0, max_rpm);
-    if (block) {
-        while (fabs(arm_position() - -50.0) > 8.0) {
-            delay(50);
-        }
-    }
+    move_arm_absolute(-50.0, max_rpm, block);
 }
 
 /**
@@ -194,32 +198,27 @@ void arm_prime(int32_t max_rpm = 100, bool block = true) {
  */
 void arm_up(int32_t max_rpm = 100, bool block = true) {
     print("Arm up");
-    move_arm_absolute(-460.0, max_rpm);
-    if (block) {
-        while (fabs(arm_position() - -460.0) > 8.0) {
-            delay(50);
-        }
-    }
+    move_arm_absolute(-460.0, max_rpm, block);
 }
 
-void arm_open(int32_t max_rpm = 100, bool block = true) {
+void arm_hook_open(int32_t max_rpm = 100, bool block = true) {
     print("Arm open");
     arm_hook.move_absolute(0.0, max_rpm);
     if (block) {
-        while (fabs(arm_hook.get_position() - -0.0) > 8.0) {
+        while (fabs(arm_hook.get_position()) > 8.0) {
             delay(50);
         }
     }
 }
 
-void arm_close(int32_t max_rpm = 60) {
+void arm_hook_close(int32_t max_rpm = 80) {
     print("Arm close");
     arm_hook.move_velocity(-max_rpm);
     delay(100);
     while (arm_hook.get_efficiency() > 2.0) {
         delay(40);
     }
-    arm_hook.move_velocity(-max_rpm / 4);
+    arm_hook.move_velocity(-max_rpm / 8.0);
 }
 
 /**
