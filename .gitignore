@@ -15,6 +15,3 @@ temp.log
 temp.errors
 *.ini
 .d/
-
-# VSCode
-compile_commands.json
