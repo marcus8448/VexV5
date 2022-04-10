@@ -3,15 +3,15 @@
 
 #define PI 3.14159265358979323846
 #define WHEEL_SIZE 2.0625
-#define DEGREES_TO_ROTATION_DEGREES 4.0
+#define WHEEL_CIRCUMFRENCE (WHEEL_SIZE * 2 * PI)
 
 #define LIFT_DOWN_POSITION -470.0
 #define LIFT_UP_POSITION 0.0
 #define LIFT_LIFTED_POSITION -120.0
 
-#define ARM_DOWN_POSITION -470.0
-#define ARM_UP_POSITION 0.0
-#define ARM_LIFTED_POSITION -120.0
+#define ARM_DOWN_POSITION 0.0
+#define ARM_UP_POSITION -460.0
+#define ARM_LIFTED_POSITION -50.0
 
 #include <cmath>
 #include <string>
@@ -20,7 +20,11 @@
 #include "pros/rtos.hpp"
 
 double inches_to_wheel_rotation(double inches) {
-    return inches / (WHEEL_SIZE * 2 * 3.14159265358979323846) * 360;
+    return inches / WHEEL_CIRCUMFRENCE * 360.0;
+}
+
+double deg_rot_to_deg_wheel_rot(double degrees) {
+    return degrees * 4.0;
 }
 
 /**
@@ -100,8 +104,7 @@ void backwards(double distance, int32_t max_rpm = 100) {
  */
 void turn_right(double angle, int32_t max_rpm = 100) {
     print("Turn right: " + std::to_string(angle));
-    angle *= DEGREES_TO_ROTATION_DEGREES;
-    move_for(-angle, angle, max_rpm);
+    move_for(-deg_rot_to_deg_wheel_rot(angle), deg_rot_to_deg_wheel_rot(angle), max_rpm);
 }
 
 /**
@@ -111,8 +114,17 @@ void turn_right(double angle, int32_t max_rpm = 100) {
  */
 void turn_left(uint16_t angle, int32_t max_rpm = 100) {
     print("Turn left: " + std::to_string(angle));
-    angle *= DEGREES_TO_ROTATION_DEGREES;
-    move_for(angle, -angle, max_rpm);
+    move_for(deg_rot_to_deg_wheel_rot(angle), -deg_rot_to_deg_wheel_rot(angle), max_rpm);
+}
+
+void lift_move_absolute(double position, int32_t max_rpm = 100, bool block = true) {
+    p_err(lift.move_absolute(position, max_rpm));
+
+    if (block) {
+        while (fabs(arm_position() - -position) > 8.0) {
+            delay(50);
+        }
+    }
 }
 
 /**
@@ -122,12 +134,7 @@ void turn_left(uint16_t angle, int32_t max_rpm = 100) {
  */
 void lift_down(int32_t max_rpm = 100, bool block = true) {
     print("Lift down");
-    p_err(lift.move_absolute(-470.0, max_rpm));
-    if (block) {
-        while (fabs(lift_position() - -470.0) > 8.0) {
-            delay(50);
-        }
-    }
+    lift_move_absolute(LIFT_DOWN_POSITION, max_rpm, block);
 }
 
 /**
@@ -137,12 +144,7 @@ void lift_down(int32_t max_rpm = 100, bool block = true) {
  */
 void lift_lift(int32_t max_rpm = 100, bool block = true) {
     print("Lift lift");
-    p_err(lift.move_absolute(-120.0, max_rpm));
-    if (block) {
-        while (fabs(lift_position() - -120.0) > 8.0) {
-            delay(50);
-        }
-    }
+    lift_move_absolute(LIFT_LIFTED_POSITION, max_rpm, block);
 }
 
 /**
@@ -152,12 +154,7 @@ void lift_lift(int32_t max_rpm = 100, bool block = true) {
  */
 void lift_up(int32_t max_rpm = 100, bool block = true) {
     print("Lift up");
-    p_err(lift.move_absolute(0, max_rpm));
-    if (block) {
-        while (fabs(lift_position() - 0.0) > 8.0) {
-            delay(50);
-        }
-    }
+    lift_move_absolute(LIFT_UP_POSITION, max_rpm, block);
 }
 
 void arm_move_absolute(double position, int32_t max_rpm = 100, bool block = true) {
@@ -178,7 +175,7 @@ void arm_move_absolute(double position, int32_t max_rpm = 100, bool block = true
  */
 void arm_down(int32_t max_rpm = 100, bool block = true) {
     print("Arm down");
-    move_arm_absolute(-0.0, max_rpm, block);
+    move_arm_absolute(ARM_DOWN_POSITION, max_rpm, block);
 }
 
 /**
@@ -188,7 +185,7 @@ void arm_down(int32_t max_rpm = 100, bool block = true) {
  */
 void arm_prime(int32_t max_rpm = 100, bool block = true) {
     print("Arm prime");
-    move_arm_absolute(-50.0, max_rpm, block);
+    move_arm_absolute(ARM_LIFTED_POSITION, max_rpm, block);
 }
 
 /**
@@ -198,7 +195,7 @@ void arm_prime(int32_t max_rpm = 100, bool block = true) {
  */
 void arm_up(int32_t max_rpm = 100, bool block = true) {
     print("Arm up");
-    move_arm_absolute(-460.0, max_rpm, block);
+    move_arm_absolute(ARM_UP_POSITION, max_rpm, block);
 }
 
 void arm_hook_open(int32_t max_rpm = 100, bool block = true) {
@@ -255,6 +252,6 @@ void move_right_motors(int32_t voltage) {
 void move_left_motors(int32_t voltage) {
     p_err(motor_lf.move(voltage));
     p_err(motor_lb.move(voltage));
-}   
+}
 
 #endif // _ROBOT_HPP_

@@ -219,6 +219,7 @@ void opcontrol() {
         if (p_err(controller.get_digital(E_CONTROLLER_DIGITAL_UP)) && p_err(controller.get_digital(E_CONTROLLER_DIGITAL_DOWN))) {
             outf.flush();
             outf.close();
+            controller.set_text(0, 0, "Recording Stopped");
             return;
         }
         serialize_controller_state(outf);
