@@ -5,13 +5,13 @@
 #define WHEEL_SIZE 2.0625
 #define WHEEL_CIRCUMFRENCE (WHEEL_SIZE * 2 * PI)
 
-#define LIFT_DOWN_POSITION -470.0
+#define LIFT_DOWN_POSITION -475.0
 #define LIFT_UP_POSITION 0.0
-#define LIFT_LIFTED_POSITION -120.0
+#define LIFT_LIFTED_POSITION -410.0
 
 #define ARM_DOWN_POSITION 0.0
-#define ARM_UP_POSITION -460.0
-#define ARM_LIFTED_POSITION -50.0
+#define ARM_UP_POSITION 790.0
+#define ARM_LIFTED_POSITION 125.0
 
 #include <cmath>
 #include <string>
@@ -52,6 +52,28 @@ double motor_offset_relative() {
 }
 
 /**
+ * Moves the arm at the specificed rate.
+ * \param voltage The maximum allowable 'voltage' for the arm motors.
+ */
+void move_arm_absolute(double b, double c, int32_t voltage) {
+    p_err(arm_1.move_absolute(b, voltage));
+    p_err(arm_2.move_absolute(c, voltage));
+}
+
+/**
+ * Moves the arm at the specificed rate.
+ * \param voltage The maximum allowable 'voltage' for the arm motors.
+ */
+void move_arm_absolute(double d, int32_t voltage, bool block) {
+    p_err(arm_1.move_absolute(d, voltage));
+    p_err(arm_2.move_absolute(d, voltage));
+    while (std::abs(arm_position() - d) > 8.0) {
+        delay(50);
+    }
+    delay(100);
+}
+
+/**
  * Moves the drivetrain a specific distance.
  * \param right_distance the distance to move the right motors in degrees.
  * \param left_distance the distance to move the left motors in degrees.
@@ -65,16 +87,16 @@ void move_for(double right_distance, double left_distance, int32_t max_rpm = 60)
     double d = motor_offset_relative();
     double inv_progress = 1.0;
     while ((inv_progress = (motor_offset_relative() / d)) > 0.05) { // 5%
-        if (inv_progress < 0.30) {
-            double speed = (1.0 - (inv_progress / 2.5)) * max_rpm;
-            p_err(motor_rf.modify_profiled_velocity(speed));
-            p_err(motor_rb.modify_profiled_velocity(speed));
-            p_err(motor_lf.modify_profiled_velocity(speed));
-            p_err(motor_lb.modify_profiled_velocity(speed));
-        }
         delay(50);
+        // if (inv_progress < 0.30) {
+        //     double speed = (1.0 - (inv_progress / 2.5)) * max_rpm;
+        //     p_err(motor_rf.modify_profiled_velocity(speed));
+        //     p_err(motor_rb.modify_profiled_velocity(speed));
+        //     p_err(motor_lf.modify_profiled_velocity(speed));
+        //     p_err(motor_lb.modify_profiled_velocity(speed));
+        // }
     }
-    delay(100);
+    // delay(100);
 }
 
 /**
@@ -121,7 +143,7 @@ void lift_move_absolute(double position, int32_t max_rpm = 100, bool block = tru
     p_err(lift.move_absolute(position, max_rpm));
 
     if (block) {
-        while (fabs(arm_position() - -position) > 8.0) {
+        while (fabs(arm_position() - position) > 8.0) {
             delay(50);
         }
     }
@@ -198,7 +220,7 @@ void arm_up(int32_t max_rpm = 100, bool block = true) {
     move_arm_absolute(ARM_UP_POSITION, max_rpm, block);
 }
 
-void arm_hook_open(int32_t max_rpm = 100, bool block = true) {
+void arm_hook_open(int32_t max_rpm = 50, bool block = true) {
     print("Arm open");
     arm_hook.move_absolute(0.0, max_rpm);
     if (block) {
@@ -208,7 +230,7 @@ void arm_hook_open(int32_t max_rpm = 100, bool block = true) {
     }
 }
 
-void arm_hook_close(int32_t max_rpm = 80) {
+void arm_hook_close(int32_t max_rpm = 50) {
     print("Arm close");
     arm_hook.move_velocity(-max_rpm);
     delay(100);
@@ -225,15 +247,6 @@ void arm_hook_close(int32_t max_rpm = 80) {
 void move_arm(int32_t voltage) {
     p_err(arm_1.move(voltage));
     p_err(arm_2.move(voltage));
-}
-
-/**
- * Moves the arm at the specificed rate.
- * \param voltage The maximum allowable 'voltage' for the arm motors.
- */
-void move_arm_absolute(double b, double c, int32_t voltage) {
-    p_err(arm_1.move_absolute(b, voltage));
-    p_err(arm_2.move_absolute(c, voltage));
 }
 
 /**

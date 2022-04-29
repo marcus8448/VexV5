@@ -4,19 +4,25 @@
 #include "robot.hpp"
 
 void right_side_winpoint() {
-    backwards(22.0, 80);
+    backwards(24.0, 80);
     arm_hook_close();
-    delay(1000);
-    forwards(12.0);
-    turn_right(90);
+    arm_hook_open();
+    arm_hook_close();
+    turn_right(30);
+    forwards(6.0);
+    turn_right(30);
+    forwards(20.0);
 }
 
 void left_side_winpoint() {
-    backwards(22.0, 80);
+    backwards(24.0, 80);
     arm_hook_close();
-    delay(1000);
-    forwards(12.0);
-    turn_right(90);
+    arm_hook_open();
+    arm_hook_close();
+    turn_right(30);
+    forwards(6.0);
+    turn_right(30);
+    forwards(20.0);
 }
 
 void middle_right_goal() {
