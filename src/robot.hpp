@@ -9,8 +9,8 @@
 #define LIFT_UP_POSITION 0.0
 #define LIFT_LIFTED_POSITION -410.0
 
-#define ARM_DOWN_POSITION 0.0
-#define ARM_UP_POSITION 790.0
+#define ARM_DOWN_POSITION 30.0
+#define ARM_UP_POSITION 740.0
 #define ARM_LIFTED_POSITION 125.0
 
 #include <cmath>

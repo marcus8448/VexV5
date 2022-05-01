@@ -129,16 +129,11 @@ void debug_input_task() {
 void controller_update_task() {
     while (true) {
         if (driver_control) {
-            if (arm_hook.get_efficiency() < 15.0 && arm_hook.get_efficiency() > 2.0) {
-                // p_err(controller.rumble("-"));
-                controller.set_text(1, 0, "Resistance on hook!");
-            } else {
-                controller.clear_line(1);
-            }
-            delay(150);
-        } else {
-            p_err(controller.rumble(" "));
+            controller.set_text(2, 0, std::string("HR: ") + to_string(arm_hook.get_efficiency()));
             delay(500);
+        } else {
+            // p_err(controller.rumble(" "));
+            delay(1000);
         }
     }
     

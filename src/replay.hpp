@@ -4,6 +4,7 @@
 #include <fstream>
 #include "pros/rtos.hpp"
 #include "debug.hpp"
+#include "opcontrol.hpp"
 #include "robot.hpp"
 
 void replay_match() {
@@ -71,90 +72,9 @@ void replay_match() {
         inf >> i;
         ry = i;
 
-        int digital_speed = 127;
-        int prev_digital_speed = 0;
-        int cooldown = 0;
-        bool lift_lock = false;
-        bool arm_lock = false;
-
-        if (cooldown > 0) {
-            cooldown--;
-        } else if (cooldown < 0) {
-            cooldown = 0;
-        }
-        if (r1) {
-            p_err(lift.move(digital_speed)); // UP
-            lift_lock = false;
-        } else if (r2) {
-            p_err(lift.move(-digital_speed)); // DOWN
-            lift_lock = false;
-        } else {
-            if (!lift_lock) {
-                p_err(lift.move(0)); // STOP
-            }
-        }
-        if (l1) {
-            move_arm(-digital_speed); // UP
-            arm_lock = false;
-        } else if (l2) {
-            move_arm(digital_speed); // DOWN
-            arm_lock = false;
-        } else {
-            if (!arm_lock) {
-                move_arm(0); // STOP
-            }
-        }
-
-        if (left) {
-            p_err(arm_hook.move(-100)); // OPEN
-        } else if (right) {
-            p_err(arm_hook.move(100)); // SHUT
-        } else {
-            p_err(arm_hook.move(0)); // STOP
-        }
-
-        if (up) {
-            if (digital_speed + 1 <= 127) {
-                digital_speed += 1;
-                print(digital_speed);
-            }
-        } else if (down) {
-            if (digital_speed - 1 > 20) {
-                digital_speed -= 1;
-                print(digital_speed);
-            }
-        }
-
-        if (a && y) {
-            arm_down(200, false);
-            arm_lock = true;
-            cooldown = 20;
-        } else if (cooldown == 0) {
-            if (a) {
-                arm_up(200, false);
-                arm_lock = true;
-            } else if (y) {
-                arm_prime(200, false);
-                arm_lock = true;
-            }
-        }
-
-        if (x && b) {
-            lift_lift(200, false);
-            lift_lock = true;
-            cooldown = 20;
-        } else if (cooldown == 0) {
-            if (x) {
-                lift_up(200, false);
-                lift_lock = true;
-            } else if (b) {
-                lift_down(200, false);
-                lift_lock = true;
-            }
-        }
-
-        move_right_motors(ry);
-        move_left_motors(ly);
+        unsigned int digital_speed = 127;
+        unsigned int prev_digital_speed = 0;
+        drive(a, b, x, y, up, down, left, right, l1, l2, r1, r2, lx, ly, rx, ry, &digital_speed, &prev_digital_speed);
         pros::delay(20);
     }
 }
