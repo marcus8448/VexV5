@@ -73,8 +73,7 @@ void replay_match() {
         ry = i;
 
         unsigned int digital_speed = 127;
-        unsigned int prev_digital_speed = 0;
-        drive(a, b, x, y, up, down, left, right, l1, l2, r1, r2, lx, ly, rx, ry, &digital_speed, &prev_digital_speed);
+        drive(a, b, x, y, up, down, left, right, l1, l2, r1, r2, lx, ly, rx, ry, &digital_speed);
         pros::delay(20);
     }
 }

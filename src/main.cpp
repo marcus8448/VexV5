@@ -122,7 +122,6 @@ void opcontrol() {
     #endif // FORCE_AUTONOMOUS
 
     unsigned int digital_speed = 127;
-    unsigned int prev_digital_speed = 127;
 
     while (true) {
         drive(p_err(controller.get_digital(DIGITAL_A)),
@@ -141,8 +140,7 @@ void opcontrol() {
             p_err(controller.get_analog(ANALOG_LEFT_Y)),
             p_err(controller.get_analog(ANALOG_RIGHT_X)),
             p_err(controller.get_analog(ANALOG_RIGHT_Y)),
-            &digital_speed,
-            &prev_digital_speed
+            &digital_speed
         );
 
         #ifdef RECORD_MATCH

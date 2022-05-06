@@ -9,9 +9,9 @@
 #define LIFT_UP_POSITION 0.0
 #define LIFT_LIFTED_POSITION -410.0
 
-#define ARM_DOWN_POSITION 30.0
-#define ARM_UP_POSITION 740.0
-#define ARM_LIFTED_POSITION 125.0
+#define ARM_DOWN_POSITION 0.0
+#define ARM_UP_POSITION 700.0
+#define ARM_LIFTED_POSITION 100.0
 
 #include <cmath>
 #include <string>
@@ -86,17 +86,12 @@ void move_for(double right_distance, double left_distance, int32_t max_rpm = 60)
     p_err(motor_lb.move_relative(left_distance, max_rpm));
     double d = motor_offset_relative();
     double inv_progress = 1.0;
-    while ((inv_progress = (motor_offset_relative() / d)) > 0.05) { // 5%
+    while ((inv_progress = (motor_offset_relative() / d)) > 0.10) {
         delay(50);
-        // if (inv_progress < 0.30) {
-        //     double speed = (1.0 - (inv_progress / 2.5)) * max_rpm;
-        //     p_err(motor_rf.modify_profiled_velocity(speed));
-        //     p_err(motor_rb.modify_profiled_velocity(speed));
-        //     p_err(motor_lf.modify_profiled_velocity(speed));
-        //     p_err(motor_lb.modify_profiled_velocity(speed));
-        // }
     }
-    // delay(100);
+    do {
+        delay(25);
+    } while  ((inv_progress = (motor_offset_relative() / d)) > 0.05);
 }
 
 /**

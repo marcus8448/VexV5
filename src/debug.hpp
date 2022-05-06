@@ -88,7 +88,8 @@ void print_motor_info(pros::Motor motor) {
     << " | " << motor.get_position()
     << "° / " << motor.get_target_position()
     << "° | " << motor.get_voltage()
-    << "V";
+    << "V | " << motor.get_efficiency()
+    << "%";
 }
 
 /**
