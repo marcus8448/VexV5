@@ -28,10 +28,13 @@ void left_side_winpoint() {
 void middle_right_goal() {
     backwards(34.0, 80);
     arm_hook_close();
+    forwards(17.0, 80);
 }
 
 void middle_left_goal() {
     backwards(34.0, 80);
+    arm_hook_close();
+    forwards(17.0, 80);
 }
 
 #endif

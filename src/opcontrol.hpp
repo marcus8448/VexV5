@@ -143,12 +143,14 @@ void move_arm_hook(bool left, bool right, unsigned int digital_speed) {
                 ticks_closed = 0;
             } else if (right) {
                 if (arm_hook.get_efficiency() < 0.001) {
-                    if (++ticks_closed > 20) {
+                    if (++ticks_closed > 10) {
                         p_err(arm_hook.move_relative(0, digital_speed));
                         ticks_closed = 0;
                         controller_locked = true;
                         controller.set_text(1, 0, "Locked");
                         arm_hook_lock_pos = p_err(arm_hook.get_target_position());
+                    } else {
+                        p_err(arm_hook.move(digital_speed / -1.5)); // SHUT
                     }
                 } else {
                     if (ticks_closed > 0) ticks_closed--;

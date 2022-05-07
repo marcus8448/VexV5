@@ -5,45 +5,56 @@
 #include "devices.hpp"
 #include "pros/misc.hpp"
 
-void test() {
-    std::basic_ofstream<signed int, std::char_traits<signed int>> outf("/usd/test.txt", std::ios::out | std::ios::binary | std::ios::app);
-    outf << -50;
-    outf.flush();
-}
+void serialize_controller_state(std::basic_ofstream<signed int, std::char_traits<signed int>>& outf, bool a, bool b, bool x, bool y, bool up, bool down, bool left, bool right, bool l1, bool l2, bool r1, bool r2, double lx, double ly, double rx, double ry) {
+    static bool prev_a, prev_b, prev_x, prev_y, prev_up, prev_down, prev_left, prev_right, prev_l1, prev_l2, prev_r1, prev_r2;
 
-void serialize_controller_state(std::basic_ofstream<signed int, std::char_traits<signed int>>& outf) {
-    static bool a, b, x, y, up, down, left, right, l1, l2, r1, r2;
-
-    if (a != (a = controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))) {
+    if (prev_a != a) {
+        prev_a = a;
         outf << (signed int)(a ? 1 : -1);
-    } else if (b != (b = controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))) {
+    } else if (prev_b != (prev_b = a)) {
+        prev_b = b;
         outf << (signed int)(b ? 2 : -2);
-    } else if (x != (x = controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))) {
+    } else if (prev_x != x) {
+        prev_x = x;
         outf << (signed int)(x ? 3 : -3);
-    } else if (y != (y = controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y))) {
+    } else if (prev_y != y) {
+        prev_y = y;
         outf << (signed int)(y ? 4 : -4);
-    } else if (up != (up = controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP))) {
+    } else if (prev_up != up) {
+        prev_up = up;
         outf << (signed int)(up ? 5 : -5);
-    } else if (down != (down = controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN))) {
+    } else if (prev_down != down) {
+        prev_down = down;
         outf << (signed int)(down ? 6 : -6);
-    } else if (left != (left = controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))) {
+    } else if (prev_left != left) {
+        prev_left = left;
         outf << (signed int)(left ? 7 : -7);
-    } else if (right != (right = controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT))) {
+    } else if (prev_right != right) {
+        prev_right = right;
         outf << (signed int)(right ? 8 : -8);
-    } else if (l1 != (l1 = controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1))) {
+    } else if (prev_l1 != l1) {
+        prev_l1 = l1;
         outf << (signed int)(l1 ? 9 : -9);
-    } else if (l2 != (l2 = controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2))) {
+    } else if (prev_l2 != l2) {
+        prev_l2 = l2;
         outf << (signed int)(l2 ? 10 : -10);
-    } else if (r1 != (r1 = controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))) {
+    } else if (prev_r1 != r1) {
+        prev_r1 = r1;
         outf << (signed int)(r1 ? 11 : -11);
-    } else if (r2 != (r2 = controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2))) {
+    } else if (prev_r2 != r2) {
+        prev_r2 = r2;
         outf << (signed int)(r2 ? 12 : -12);
     }
     outf << (signed int)13;
-    outf << (signed int)controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X);
-    outf << (signed int)controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
-    outf << (signed int)controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
-    outf << (signed int)controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
+    signed long long position;
+    std::memcpy(&position, &lx, sizeof(lx));
+    outf << position;
+    std::memcpy(&position, &ly, sizeof(ly));
+    outf << position;
+    std::memcpy(&position, &rx, sizeof(rx));
+    outf << position;
+    std::memcpy(&position, &ry, sizeof(ry));
+    outf << position;
 }
 
 #endif //_RECORDING_HPP_

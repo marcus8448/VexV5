@@ -103,15 +103,10 @@ void opcontrol() {
         }
     }
     controller.clear_line(2);
-    std::basic_ofstream<signed int, std::char_traits<signed int>> outf("/usd/record.v5r", std::ios::out | std::ios::binary | std::ios::app | std::ios::trunc);
+    std::basic_ofstream<signed int, std::char_traits<signed int>> outf("/usd/record.v5r", std::ios::out | std::ios::binary | std::ios::trunc);
     #endif // RECORD_MATCH
 
     #ifdef REPLAY_MATCH
-    while (!usd::is_installed()) {
-        controller.set_text(2, 0, "Missing microSD!");
-        delay(250);
-    }
-    controller.clear_line(2);
     replay_match();
     return;
     #endif // REPLAY_MATCH
@@ -150,7 +145,24 @@ void opcontrol() {
             controller.set_text(0, 0, "Recording Stopped");
             return;
         }
-        serialize_controller_state(outf);
+        serialize_controller_state(outf,
+            p_err(controller.get_digital(DIGITAL_A)),
+            p_err(controller.get_digital(DIGITAL_B)),
+            p_err(controller.get_digital(DIGITAL_X)),
+            p_err(controller.get_digital(DIGITAL_Y)),
+            p_err(controller.get_digital(DIGITAL_UP)),
+            p_err(controller.get_digital(DIGITAL_DOWN)),
+            p_err(controller.get_digital(DIGITAL_LEFT)),
+            p_err(controller.get_digital(DIGITAL_RIGHT)),
+            p_err(controller.get_digital(DIGITAL_L1)),
+            p_err(controller.get_digital(DIGITAL_L2)),
+            p_err(controller.get_digital(DIGITAL_R1)),
+            p_err(controller.get_digital(DIGITAL_R2)),
+            p_err(controller.get_analog(ANALOG_LEFT_X)),
+            p_err(controller.get_analog(ANALOG_LEFT_Y)),
+            p_err(controller.get_analog(ANALOG_RIGHT_X)),
+            p_err(controller.get_analog(ANALOG_RIGHT_Y))
+        );
         #endif // RECORD_MATCH
         delay(20);
     }

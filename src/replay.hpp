@@ -8,6 +8,12 @@
 #include "robot.hpp"
 
 void replay_match() {
+    while (!usd::is_installed()) {
+        controller.set_text(2, 0, "Missing microSD!");
+        delay(250);
+    }
+    controller.clear_line(2);
+
     std::basic_ifstream<signed int, std::char_traits<signed int>> inf("/usd/record.v5r", std::ios::in | std::ios::binary);
 
     bool a, b, x, y, up, down, left, right, l1, l2, r1, r2;
@@ -63,14 +69,15 @@ void replay_match() {
                 return;
             }
         }
-        inf >> i;
-        lx = i;
-        inf >> i;
-        ly = i;
-        inf >> i;
-        rx = i;
-        inf >> i;
-        ry = i;
+        unsigned long long value;
+        inf >> value;
+        std::memcpy(&lx, &value, sizeof(lx));
+        inf >> value;
+        std::memcpy(&ly, &value, sizeof(ly));
+        inf >> value;
+        std::memcpy(&rx, &value, sizeof(rx));
+        inf >> value;
+        std::memcpy(&ry, &value, sizeof(ry));
 
         unsigned int digital_speed = 127;
         drive(a, b, x, y, up, down, left, right, l1, l2, r1, r2, lx, ly, rx, ry, &digital_speed);
