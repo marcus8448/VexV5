@@ -61,7 +61,7 @@ void reset_positions() {
     Task arm_reset(reset_arm, ((void*) pros::Task::current()), "Arm reset");
     
     while (completed < 2) {
-        completed += pros::Task::notify_take(false, TIMEOUT_MAX);
+        completed += pros::Task::notify_take(true, TIMEOUT_MAX);
     }
 
     std::cout << "Done reset." << std::endl;

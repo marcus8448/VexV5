@@ -128,16 +128,9 @@ void debug_input_task() {
  * 
  */
 void controller_update_task() {
-    while (true) {
-        if (driver_control) {
-            controller.set_text(2, 0, std::string("HR: ") + to_string(arm_hook.get_efficiency()));
-            delay(500);
-        } else {
-            // p_err(controller.rumble(" "));
-            delay(1000);
-        }
-    }
-    
+    // while (true) {
+    //     delay(1000);
+    // }
 }
 
 #endif // _DEBUG_TOOLS_HPP_

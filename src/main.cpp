@@ -25,7 +25,7 @@
  */
 void initialize() {
     Task::create(debug_input_task, "Debug Input Task");
-    Task::create(controller_update_task, "Controller Update Task");
+    // Task::create(controller_update_task, "Controller Update Task");
 
     motor_rf.set_brake_mode(MOTOR_BRAKE_BRAKE);
     motor_rb.set_brake_mode(MOTOR_BRAKE_BRAKE);
@@ -75,16 +75,21 @@ void autonomous() {
  * Will delegate to autonomous control if the "Force Autonomous" button is pressed.
  */
 void opcontrol() {
+    driver_control = true;
+    #ifdef FORCE_AUTONOMOUS
+    autonomous();
+    return;
+    #endif // FORCE_AUTONOMOUS
+
     #ifdef RESET_POSITIONS
     reset_positions();
     return;
     #endif
 
-    driver_control = true;
     #ifdef RECORD_MATCH
     while (!usd::is_installed()) {
         controller.set_text(2, 0, "Missing microSD!");
-        delay(250);
+        delay(500);
     }
     controller.clear_line(2);
     if (file_exists("/usd/record.v5r")) {
@@ -105,16 +110,6 @@ void opcontrol() {
     controller.clear_line(2);
     std::basic_ofstream<signed int, std::char_traits<signed int>> outf("/usd/record.v5r", std::ios::out | std::ios::binary | std::ios::trunc);
     #endif // RECORD_MATCH
-
-    #ifdef REPLAY_MATCH
-    replay_match();
-    return;
-    #endif // REPLAY_MATCH
-
-    #ifdef FORCE_AUTONOMOUS
-    autonomous();
-    return;
-    #endif // FORCE_AUTONOMOUS
 
     unsigned int digital_speed = 127;
 
@@ -139,12 +134,6 @@ void opcontrol() {
         );
 
         #ifdef RECORD_MATCH
-        if (up && down) {
-            outf.flush();
-            outf.close();
-            controller.set_text(0, 0, "Recording Stopped");
-            return;
-        }
         serialize_controller_state(outf,
             p_err(controller.get_digital(DIGITAL_A)),
             p_err(controller.get_digital(DIGITAL_B)),
