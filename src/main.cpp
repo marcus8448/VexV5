@@ -9,7 +9,7 @@
 #include "replay.hpp"
 #endif // REPLAY_MATCH
 
-#ifdef RECORD_MATCH 
+#ifdef RECORD_MATCH
 #include "filesystem.hpp"
 #include "recording.hpp"
 #include <fstream>
