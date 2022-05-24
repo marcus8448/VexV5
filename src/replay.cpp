@@ -1,14 +1,13 @@
-#ifndef _REPLAY_HPP_
-#define _REPLAY_HPP_
-
+#include <cstring>
 #include <fstream>
 #include "pros/rtos.hpp"
-#include "debug.hpp"
-#include "opcontrol.hpp"
-#include "robot.hpp"
+#include "vexv5/debug.hpp"
+#include "vexv5/globals.hpp"
+#include "vexv5/opcontrol.hpp"
+#include "vexv5/robot.hpp"
 
 void replay_match() {
-    while (!usd::is_installed()) {
+    while (!pros::usd::is_installed()) {
         controller.set_text(2, 0, "Missing microSD!");
         delay(250);
     }
@@ -84,5 +83,3 @@ void replay_match() {
         pros::delay(20);
     }
 }
-
-#endif //_REPLAY_HPP_

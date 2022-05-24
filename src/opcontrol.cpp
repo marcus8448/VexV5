@@ -1,8 +1,7 @@
-#ifndef _OPCONTROL_HPP_
-#define _OPCONTROL_HPP_
-
-#include "robot.hpp"
 #include <cfloat>
+#include "vexv5/debug.hpp"
+#include "vexv5/globals.hpp"
+#include "vexv5/robot.hpp"
 
 void move_lift(bool r1, bool r2, bool x, bool b, unsigned int digital_speed) {
     static double lift_lock_pos = DBL_MAX;
@@ -24,7 +23,7 @@ void move_lift(bool r1, bool r2, bool x, bool b, unsigned int digital_speed) {
                         lift_lock_pos = lift.get_position();
                     }
                 } else {
-                    p_err(lift.move(digital_speed)); // UP
+                    erri(lift.move(digital_speed)); // UP
                     lift_lock_pos = DBL_MAX;
                 }
             } else if (r2) {
@@ -33,12 +32,12 @@ void move_lift(bool r1, bool r2, bool x, bool b, unsigned int digital_speed) {
                         lift_lock_pos = lift.get_position();
                     }
                 } else {
-                    p_err(lift.move(-digital_speed)); // DOWN
+                    erri(lift.move(-digital_speed)); // DOWN
                     lift_lock_pos = DBL_MAX;
                 }
             } else {
                 if (lift_lock_pos == DBL_MAX) {
-                    p_err(lift.move(0)); // STOP
+                    erri(lift.move(0)); // STOP
                 }
             }
         }
@@ -127,8 +126,8 @@ void move_arm_hook(bool left, bool right, unsigned int digital_speed) {
     static bool controller_locked = false;
 
     if (left && right) {
-        p_err(arm_hook.move_relative(-20.0, digital_speed));
-        arm_hook_lock_pos = p_err(arm_hook.get_target_position());
+        erri(arm_hook.move_relative(-20.0, digital_speed));
+        arm_hook_lock_pos = erri(arm_hook.get_target_position());
         controller_locked = true;
         ticks_closed = 0;
         controller.set_text(1, 0, "Locked");
@@ -138,26 +137,26 @@ void move_arm_hook(bool left, bool right, unsigned int digital_speed) {
         }
         if (!controller_locked) {
             if (left) {
-                p_err(arm_hook.move(digital_speed / 1.5)); // OPEN
+                erri(arm_hook.move(digital_speed / 1.5)); // OPEN
                 arm_hook_lock_pos = DBL_MAX;
                 ticks_closed = 0;
             } else if (right) {
                 if (arm_hook.get_efficiency() < 0.001) {
                     if (++ticks_closed > 5) {
-                        p_err(arm_hook.move_relative(-20.0, digital_speed));
+                        erri(arm_hook.move_relative(-20.0, digital_speed));
                         ticks_closed = 0;
                         controller_locked = true;
                         controller.rumble(".");
-                        arm_hook_lock_pos = p_err(arm_hook.get_target_position());
+                        arm_hook_lock_pos = erri(arm_hook.get_target_position());
                     } else {
-                        p_err(arm_hook.move(digital_speed / -1.5)); // SHUT
+                        erri(arm_hook.move(digital_speed / -1.5)); // SHUT
                     }
                 } else {
                     if (ticks_closed > 0) ticks_closed--;
-                    p_err(arm_hook.move(digital_speed / -1.5)); // SHUT
+                    erri(arm_hook.move(digital_speed / -1.5)); // SHUT
                 }
             } else if (arm_hook_lock_pos == DBL_MAX) {
-                p_err(arm_hook.move(0)); // STOP
+                erri(arm_hook.move(0)); // STOP
                 ticks_closed = 0;
             }
         }
@@ -185,5 +184,3 @@ void drive(bool a, bool b, bool x, bool y, bool up, bool down, bool left, bool r
     move_right_motors(ry);
     move_left_motors(ly);
 }
-
-#endif

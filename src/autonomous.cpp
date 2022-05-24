@@ -1,7 +1,4 @@
-#ifndef _AUTONOMOUS_HPP_
-#define _AUTONOMOUS_HPP_
-
-#include "robot.hpp"
+#include "vexv5/robot.hpp"
 
 void right_side_winpoint() {
     backwards(20.0, 80);
@@ -38,5 +35,3 @@ void middle_left_goal() {
     arm_hook_close();
     forwards(17.0, 80);
 }
-
-#endif

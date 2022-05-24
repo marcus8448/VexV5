@@ -1,10 +1,8 @@
-#ifndef _RECORDING_HPP_
-#define _RECORDING_HPP_
-
+#include <cstring>
 #include <fstream>
-#include "devices.hpp"
 #include "pros/misc.hpp"
 #include "pros/rtos.hpp"
+#include "vexv5/globals.hpp"
 
 void serialize_controller_state(std::basic_ofstream<signed int, std::char_traits<signed int>>* outf, bool a, bool b, bool x, bool y, bool up, bool down, bool left, bool right, bool l1, bool l2, bool r1, bool r2, double lx, double ly, double rx, double ry) {
     if (outf == nullptr) return;
@@ -69,5 +67,3 @@ void serialize_controller_state(std::basic_ofstream<signed int, std::char_traits
     std::memcpy(&position, &ry, sizeof(ry));
     *outf << position;
 }
-
-#endif //_RECORDING_HPP_

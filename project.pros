@@ -162,6 +162,22 @@
                     ".gitignore"
                 ],
                 "version": "3.6.0"
+            },
+            "robotdata": {
+                "location": "C:\\Users\\UTG Student\\AppData\\Roaming\\PROS\\templates\\robotdata@0.1.0",
+                "metadata": {
+                    "origin": "local"
+                },
+                "name": "robotdata",
+                "py/object": "pros.conductor.templates.local_template.LocalTemplate",
+                "supported_kernels": "^3.6.0",
+                "system_files": [
+                    "include\\rdata\\export.hpp",
+                    "firmware\\robotdata.a"
+                ],
+                "target": "v5",
+                "user_files": [],
+                "version": "0.1.0"
             }
         },
         "upload_options": {}

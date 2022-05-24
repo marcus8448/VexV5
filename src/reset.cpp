@@ -1,6 +1,6 @@
 #include <iostream>
-#include "devices.hpp"
 #include "pros/rtos.hpp"
+#include "vexv5/globals.hpp"
 
 void reset_all_motors() {
     lift.move(0);

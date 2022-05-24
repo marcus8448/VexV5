@@ -1,9 +1,11 @@
-#include "main.h"
-#include "autonomous.hpp"
-#include "debug.hpp"
-#include "opcontrol.hpp"
-#include "robot.hpp"
 #include <cfloat>
+#include <string>
+#include "main.h"
+#include "vexv5/autonomous.hpp"
+#include "vexv5/debug.hpp"
+#include "vexv5/globals.hpp"
+#include "vexv5/opcontrol.hpp"
+#include "vexv5/robot.hpp"
 
 #ifdef REPLAY_MATCH
 #include "replay.hpp"
@@ -40,18 +42,11 @@ void initialize() {
     arm_2.set_zero_position(0);
 }
 
-void disabled() {
-}
-
-void competition_initialize() {
-}
-
 /**
  * Called when the robot is in it's autonomous state in a competition.
  * Or when the "Force Autonomous" button is presssed on the screen.
  */
 void autonomous() {
-    driver_control = false;
     #ifdef REPLAY_MATCH
     replay_match();
     #endif
@@ -75,7 +70,6 @@ void autonomous() {
  * Will delegate to autonomous control if the "Force Autonomous" button is pressed.
  */
 void opcontrol() {
-    driver_control = true;
     #ifdef FORCE_AUTONOMOUS
     autonomous();
     return;
@@ -114,43 +108,43 @@ void opcontrol() {
     unsigned int digital_speed = 127;
 
     while (true) {
-        drive(p_err(controller.get_digital(DIGITAL_A)),
-            p_err(controller.get_digital(DIGITAL_B)),
-            p_err(controller.get_digital(DIGITAL_X)),
-            p_err(controller.get_digital(DIGITAL_Y)),
-            p_err(controller.get_digital(DIGITAL_UP)),
-            p_err(controller.get_digital(DIGITAL_DOWN)),
-            p_err(controller.get_digital(DIGITAL_LEFT)),
-            p_err(controller.get_digital(DIGITAL_RIGHT)),
-            p_err(controller.get_digital(DIGITAL_L1)),
-            p_err(controller.get_digital(DIGITAL_L2)),
-            p_err(controller.get_digital(DIGITAL_R1)),
-            p_err(controller.get_digital(DIGITAL_R2)),
-            p_err(controller.get_analog(ANALOG_LEFT_X)),
-            p_err(controller.get_analog(ANALOG_LEFT_Y)),
-            p_err(controller.get_analog(ANALOG_RIGHT_X)),
-            p_err(controller.get_analog(ANALOG_RIGHT_Y)),
+        drive(erri(controller.get_digital(DIGITAL_A)),
+            erri(controller.get_digital(DIGITAL_B)),
+            erri(controller.get_digital(DIGITAL_X)),
+            erri(controller.get_digital(DIGITAL_Y)),
+            erri(controller.get_digital(DIGITAL_UP)),
+            erri(controller.get_digital(DIGITAL_DOWN)),
+            erri(controller.get_digital(DIGITAL_LEFT)),
+            erri(controller.get_digital(DIGITAL_RIGHT)),
+            erri(controller.get_digital(DIGITAL_L1)),
+            erri(controller.get_digital(DIGITAL_L2)),
+            erri(controller.get_digital(DIGITAL_R1)),
+            erri(controller.get_digital(DIGITAL_R2)),
+            erri(controller.get_analog(ANALOG_LEFT_X)),
+            erri(controller.get_analog(ANALOG_LEFT_Y)),
+            erri(controller.get_analog(ANALOG_RIGHT_X)),
+            erri(controller.get_analog(ANALOG_RIGHT_Y)),
             &digital_speed
         );
 
         #ifdef RECORD_MATCH
         serialize_controller_state(outf,
-            p_err(controller.get_digital(DIGITAL_A)),
-            p_err(controller.get_digital(DIGITAL_B)),
-            p_err(controller.get_digital(DIGITAL_X)),
-            p_err(controller.get_digital(DIGITAL_Y)),
-            p_err(controller.get_digital(DIGITAL_UP)),
-            p_err(controller.get_digital(DIGITAL_DOWN)),
-            p_err(controller.get_digital(DIGITAL_LEFT)),
-            p_err(controller.get_digital(DIGITAL_RIGHT)),
-            p_err(controller.get_digital(DIGITAL_L1)),
-            p_err(controller.get_digital(DIGITAL_L2)),
-            p_err(controller.get_digital(DIGITAL_R1)),
-            p_err(controller.get_digital(DIGITAL_R2)),
-            p_err(controller.get_analog(ANALOG_LEFT_X)),
-            p_err(controller.get_analog(ANALOG_LEFT_Y)),
-            p_err(controller.get_analog(ANALOG_RIGHT_X)),
-            p_err(controller.get_analog(ANALOG_RIGHT_Y))
+            erri(controller.get_digital(DIGITAL_A)),
+            erri(controller.get_digital(DIGITAL_B)),
+            erri(controller.get_digital(DIGITAL_X)),
+            erri(controller.get_digital(DIGITAL_Y)),
+            erri(controller.get_digital(DIGITAL_UP)),
+            erri(controller.get_digital(DIGITAL_DOWN)),
+            erri(controller.get_digital(DIGITAL_LEFT)),
+            erri(controller.get_digital(DIGITAL_RIGHT)),
+            erri(controller.get_digital(DIGITAL_L1)),
+            erri(controller.get_digital(DIGITAL_L2)),
+            erri(controller.get_digital(DIGITAL_R1)),
+            erri(controller.get_digital(DIGITAL_R2)),
+            erri(controller.get_analog(ANALOG_LEFT_X)),
+            erri(controller.get_analog(ANALOG_LEFT_Y)),
+            erri(controller.get_analog(ANALOG_RIGHT_X)),
+            erri(controller.get_analog(ANALOG_RIGHT_Y))
         );
         #endif // RECORD_MATCH
         delay(20);
