@@ -37,6 +37,34 @@ EXCLUDE_SRC_FROM_LIB+=$(foreach file, $(SRCDIR)/main,$(foreach cext,$(CEXTS),$(f
 # that are in the the include directory get exported
 TEMPLATE_FILES=$(INCDIR)/vexv5/*.h $(INCDIR)/vexv5/*.hpp
 
+left_side_winpoint: quick .PHONY
+	pros upload --slot 1 --name "Left side winpoint"
+right_side_winpoint: quick .PHONY
+	pros upload --slot 2 --name "Right side winpoint"
+middle_left_goal: quick .PHONY
+	pros upload --slot 3 --name "Middle left goal"
+middle_right_goal: quick .PHONY
+	pros upload --slot 4 --name "Middle right goal"
+reset: quick .PHONY
+	pros upload --slot 6 --name "Reset"
+basic: quick .PHONY
+	pros upload --slot 5 --name "Basic"
+
+left_side_winpoint: EXTRA_CFLAGS = -D LEFT_SIDE_WINPOINT
+left_side_winpoint: EXTRA_CXXFLAGS = -D LEFT_SIDE_WINPOINT
+
+right_side_winpoint: EXTRA_CFLAGS = -D RIGHT_SIDE_WINPOINT
+right_side_winpoint: EXTRA_CXXFLAGS = -D RIGHT_SIDE_WINPOINT
+
+middle_left_goal: EXTRA_CFLAGS = -D MIDDLE_LEFT_GOAL
+middle_left_goal: EXTRA_CXXFLAGS = -D MIDDLE_LEFT_GOAL
+
+middle_right_goal: EXTRA_CFLAGS = -D MIDDLE_RIGHT_GOAL
+middle_right_goal: EXTRA_CXXFLAGS = -D MIDDLE_RIGHT_GOAL
+
+reset: EXTRA_CFLAGS = -D RESET_POSITIONS
+reset: EXTRA_CXXFLAGS = -D RESET_POSITIONS
+
 .DEFAULT_GOAL=quick
 
 ################################################################################
