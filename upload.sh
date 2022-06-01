@@ -1,7 +1,18 @@
 #!/bin/bash
-make -B
-pros upload --slot 1 --after none --target v5 --name "Basic"
-make -B EXTRA_CXXFLAGS="-D RECORD_MATCH" EXTRA_CXXFLAGS="-D RECORD_MATCH"
-pros upload --slot 2 --after none --target v5 --name "Record"
-make -B EXTRA_CXXFLAGS="-D REPLAY_MATCH" EXTRA_CXXFLAGS="-D REPLAY_MATCH"
-pros upload --slot 3 --after none --target v5 --name "Replay"
+echo ===== Building reset run =====
+pros make reset
+
+echo ===== Building left side auto winpoint run =====
+pros make left_side_winpoint
+echo ===== Building right side auto winpoint =====
+pros make right_side_winpoint
+
+#echo ===== Building middle left goal run =====
+#pros make middle_left_goal
+#echo ===== Building middle right goal run =====
+#pros make middle_right_goal
+
+echo ===== Building recording run =====
+pros make record_match
+echo ===== Building replay run =====
+pros make replay_match

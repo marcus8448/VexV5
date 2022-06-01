@@ -23,6 +23,6 @@
  * \param rx whether the rx button is pressed
  * \param ry whether the ry button is pressed
  */
-void serialize_controller_state(std::basic_ofstream<signed int, std::char_traits<signed int>>* outf, bool a, bool b, bool x, bool y, bool up, bool down, bool left, bool right, bool l1, bool l2, bool r1, bool r2, double lx, double ly, double rx, double ry);
+void serialize_controller_state(std::ofstream* outf, bool a, bool b, bool x, bool y, bool up, bool down, bool left, bool right, bool l1, bool l2, bool r1, bool r2, double lx, double ly, double rx, double ry);
 
 #endif

@@ -5,7 +5,6 @@ CEXTS:=c
 ASMEXTS:=s S
 CXXEXTS:=cpp c++ cc
 
-# probably shouldn't modify these, but you may need them below
 ROOT=.
 FWDIR:=$(ROOT)/firmware
 BINDIR=$(ROOT)/bin
@@ -16,54 +15,42 @@ WARNFLAGS+=
 EXTRA_CFLAGS=
 EXTRA_CXXFLAGS=
 
-# Set to 1 to enable hot/cold linking
 USE_PACKAGE:=1
-
-# Add libraries you do not wish to include in the cold image here
-# EXCLUDE_COLD_LIBRARIES:= $(FWDIR)/your_library.a
 EXCLUDE_COLD_LIBRARIES:= 
 
-# Set this to 1 to add additional rules to compile your project as a PROS library template
 IS_LIBRARY:=0
-# TODO: CHANGE THIS!
-LIBNAME:=libbest
+LIBNAME:=vexv5
 VERSION:=1.0.0
-# EXCLUDE_SRC_FROM_LIB= $(SRCDIR)/unpublishedfile.c
-# this line excludes opcontrol.c and similar files
 EXCLUDE_SRC_FROM_LIB+=$(foreach file, $(SRCDIR)/main,$(foreach cext,$(CEXTS),$(file).$(cext)) $(foreach cxxext,$(CXXEXTS),$(file).$(cxxext)))
-
-# files that get distributed to every user (beyond your source archive) - add
-# whatever files you want here. This line is configured to add all header files
-# that are in the the include directory get exported
 TEMPLATE_FILES=$(INCDIR)/vexv5/*.h $(INCDIR)/vexv5/*.hpp
 
-left_side_winpoint: quick .PHONY
-	pros upload --slot 1 --name "Left side winpoint"
-right_side_winpoint: quick .PHONY
-	pros upload --slot 2 --name "Right side winpoint"
-middle_left_goal: quick .PHONY
-	pros upload --slot 3 --name "Middle left goal"
-middle_right_goal: quick .PHONY
-	pros upload --slot 4 --name "Middle right goal"
-reset: quick .PHONY
-	pros upload --slot 6 --name "Reset"
-basic: quick .PHONY
-	pros upload --slot 5 --name "Basic"
+reset: 
+	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-O3 -D RESET_POSITIONS" EXTRA_CXXFLAGS="-O3 -D RESET_POSITIONS" -W src/switches.cpp
+	pros upload --slot 1 --icon X --after none
 
-left_side_winpoint: EXTRA_CFLAGS = -D LEFT_SIDE_WINPOINT
-left_side_winpoint: EXTRA_CXXFLAGS = -D LEFT_SIDE_WINPOINT
+replay_match: 
+	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-O3 -D REPLAY_MATCH" EXTRA_CXXFLAGS="-O3 -D REPLAY_MATCH" -W src/switches.cpp
+	pros upload --slot 2 --icon ufo --after none
 
-right_side_winpoint: EXTRA_CFLAGS = -D RIGHT_SIDE_WINPOINT
-right_side_winpoint: EXTRA_CXXFLAGS = -D RIGHT_SIDE_WINPOINT
+left_side_winpoint: 
+	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-O3 -D LEFT_SIDE_WINPOINT" EXTRA_CXXFLAGS="-O3 -D LEFT_SIDE_WINPOINT" -W src/switches.cpp
+	pros upload --slot 3 --icon robot --after none
 
-middle_left_goal: EXTRA_CFLAGS = -D MIDDLE_LEFT_GOAL
-middle_left_goal: EXTRA_CXXFLAGS = -D MIDDLE_LEFT_GOAL
+right_side_winpoint: 
+	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-O3 -D RIGHT_SIDE_WINPOINT" EXTRA_CXXFLAGS="-O3 -D RIGHT_SIDE_WINPOINT" -W src/switches.cpp
+	pros upload --slot 4 --icon clawbot --after none
 
-middle_right_goal: EXTRA_CFLAGS = -D MIDDLE_RIGHT_GOAL
-middle_right_goal: EXTRA_CXXFLAGS = -D MIDDLE_RIGHT_GOAL
+middle_left_goal: 
+	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-O3 -D MIDDLE_LEFT_GOAL" EXTRA_CXXFLAGS="-O3 -D MIDDLE_LEFT_GOAL" -W src/switches.cpp
+	pros upload --slot 5 --icon pizza --after none
 
-reset: EXTRA_CFLAGS = -D RESET_POSITIONS
-reset: EXTRA_CXXFLAGS = -D RESET_POSITIONS
+middle_right_goal: 
+	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-O3 -D MIDDLE_RIGHT_GOAL" EXTRA_CXXFLAGS="-O3 -D MIDDLE_RIGHT_GOAL" -W src/switches.cpp
+	pros upload --slot 6 --icon planet --after none
+
+record_match: 
+	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-O3 -D RECORD_MATCH" EXTRA_CXXFLAGS="-O3 -D RECORD_MATCH" -W src/switches.cpp
+	pros upload --slot 7 --icon question --after none
 
 .DEFAULT_GOAL=quick
 

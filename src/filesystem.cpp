@@ -7,5 +7,5 @@ bool file_exists(const char* name) {
         return true;
     } else {
         return false;
-    }   
+    }
 }
