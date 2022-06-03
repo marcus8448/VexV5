@@ -19,10 +19,11 @@ void replay_match() {
     int lx, ly, rx, ry;
     char c; 
 
-    while (true) {
+    while (inf.peek() != EOF) {
         bool exit = false;
-        inf >> c;
         while (!exit) {
+            inf >> c;
+            print("0pace1pace2pace3pace4pace5pace6pace7pace" + c);
             switch (c) {
                 case 'a':
                     a = !a;
@@ -66,16 +67,29 @@ void replay_match() {
                 default:
                     print_error("Invalid code!");
                     print_error(c);
+                    inf.close();
                     return;
             }
         }
         unsigned long long value;
         inf >> value;
         std::memcpy(&lx, &value, sizeof(lx));
+        inf >> c;
+        if (c != ' ') {
+            print("invalid char? " + c);
+        }
         inf >> value;
         std::memcpy(&ly, &value, sizeof(ly));
+        inf >> c;
+        if (c != ' ') {
+            print("invalid char? " + c);
+        }
         inf >> value;
         std::memcpy(&rx, &value, sizeof(rx));
+        inf >> c;
+        if (c != ' ') {
+            print("invalid char? " + c);
+        }
         inf >> value;
         std::memcpy(&ry, &value, sizeof(ry));
 
@@ -83,4 +97,5 @@ void replay_match() {
         drive(a, b, x, y, up, down, left, right, l1, l2, r1, r2, lx, ly, rx, ry, &digital_speed);
         pros::delay(20);
     }
+    inf.close();
 }

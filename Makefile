@@ -25,32 +25,32 @@ EXCLUDE_SRC_FROM_LIB+=$(foreach file, $(SRCDIR)/main,$(foreach cext,$(CEXTS),$(f
 TEMPLATE_FILES=$(INCDIR)/vexv5/*.h $(INCDIR)/vexv5/*.hpp
 
 reset: 
-	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-O3 -D RESET_POSITIONS" EXTRA_CXXFLAGS="-O3 -D RESET_POSITIONS" -W src/switches.cpp
-	pros upload --slot 1 --icon X --after none
+	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D RESET_POSITIONS" EXTRA_CXXFLAGS="-D RESET_POSITIONS" -W src/switches.cpp -W include/vexv5/switches.hpp
+	pros upload --slot 1 --after none --name "Reset"
 
-replay_match: 
-	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-O3 -D REPLAY_MATCH" EXTRA_CXXFLAGS="-O3 -D REPLAY_MATCH" -W src/switches.cpp
-	pros upload --slot 2 --icon ufo --after none
+replay: 
+	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D REPLAY_MATCH" EXTRA_CXXFLAGS="-D REPLAY_MATCH" -W src/switches.cpp -W include/vexv5/switches.hpp
+	pros upload --slot 2 --after none --name "Replay"
 
 left_side_winpoint: 
-	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-O3 -D LEFT_SIDE_WINPOINT" EXTRA_CXXFLAGS="-O3 -D LEFT_SIDE_WINPOINT" -W src/switches.cpp
-	pros upload --slot 3 --icon robot --after none
+	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D LEFT_SIDE_WINPOINT" EXTRA_CXXFLAGS="-D LEFT_SIDE_WINPOINT" -W src/switches.cpp -W include/vexv5/switches.hpp
+	pros upload --slot 3 --after none --name "Left Winpoint"
 
 right_side_winpoint: 
-	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-O3 -D RIGHT_SIDE_WINPOINT" EXTRA_CXXFLAGS="-O3 -D RIGHT_SIDE_WINPOINT" -W src/switches.cpp
-	pros upload --slot 4 --icon clawbot --after none
+	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D RIGHT_SIDE_WINPOINT" EXTRA_CXXFLAGS="-D RIGHT_SIDE_WINPOINT" -W src/switches.cpp -W include/vexv5/switches.hpp
+	pros upload --slot 4 --after none --name "Right Winpoint"
 
 middle_left_goal: 
-	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-O3 -D MIDDLE_LEFT_GOAL" EXTRA_CXXFLAGS="-O3 -D MIDDLE_LEFT_GOAL" -W src/switches.cpp
-	pros upload --slot 5 --icon pizza --after none
+	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D MIDDLE_LEFT_GOAL" EXTRA_CXXFLAGS="-D MIDDLE_LEFT_GOAL" -W src/switches.cpp -W include/vexv5/switches.hpp
+	pros upload --slot 5 --after none --name "Left Goal"
 
 middle_right_goal: 
-	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-O3 -D MIDDLE_RIGHT_GOAL" EXTRA_CXXFLAGS="-O3 -D MIDDLE_RIGHT_GOAL" -W src/switches.cpp
-	pros upload --slot 6 --icon planet --after none
+	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D MIDDLE_RIGHT_GOAL" EXTRA_CXXFLAGS="-D MIDDLE_RIGHT_GOAL" -W src/switches.cpp -W include/vexv5/switches.hpp
+	pros upload --slot 6 --after none --name "Right Goal"
 
-record_match: 
-	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-O3 -D RECORD_MATCH" EXTRA_CXXFLAGS="-O3 -D RECORD_MATCH" -W src/switches.cpp
-	pros upload --slot 7 --icon question --after none
+record: 
+	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D RECORD_MATCH" EXTRA_CXXFLAGS="-D RECORD_MATCH" -W src/switches.cpp -W include/vexv5/switches.hpp
+	pros upload --slot 7 --after none --name "Record"
 
 .DEFAULT_GOAL=quick
 

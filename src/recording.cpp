@@ -1,4 +1,5 @@
 #include <cstring>
+#include <iostream>
 #include <filesystem>
 #include <fstream>
 
@@ -13,10 +14,12 @@ void serialize_controller_state(std::ofstream* outf, bool a, bool b, bool x, boo
             controller.set_text(2, 0, "Missing microSD!");
             delay(250);
         }
-        (*outf).flush();
-        (*outf).close();
+        outf->flush();
+        outf->close();
+        
         controller.set_text(0, 0, "Recording Stopped");
         outf = nullptr;
+        return;
     }
 
     static bool prev_a, prev_b, prev_x, prev_y, prev_up, prev_down, prev_left, prev_right, prev_l1, prev_l2, prev_r1, prev_r2;
@@ -61,11 +64,11 @@ void serialize_controller_state(std::ofstream* outf, bool a, bool b, bool x, boo
     *outf << '*';
     signed long long position;
     std::memcpy(&position, &lx, sizeof(lx));
-    *outf << position;
+    *outf << position << " ";
     std::memcpy(&position, &ly, sizeof(ly));
-    *outf << position;
+    *outf << position << " ";
     std::memcpy(&position, &rx, sizeof(rx));
-    *outf << position;
+    *outf << position << " ";
     std::memcpy(&position, &ry, sizeof(ry));
     *outf << position;
 }

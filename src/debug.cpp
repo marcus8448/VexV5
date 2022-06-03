@@ -111,6 +111,7 @@ void print_error(long long line) {
  */
 int erri(int return_code) {
     if (return_code == 2147483647) {
+        print("errno");
         print(std::strerror(errno));
     }
     return return_code;
@@ -123,6 +124,7 @@ int erri(int return_code) {
  */
 double errd(double return_code) {
     if (return_code == ((float)(1e+300 * 1e+300))) {
+        print("errno");
         print_error(std::strerror(errno));
     }
     return return_code;

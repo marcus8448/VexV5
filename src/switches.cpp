@@ -1,7 +1,8 @@
 #include "pros/misc.hpp"
 #include "vexv5/autonomous.hpp"
+#include "vexv5/debug.hpp"
 #include <fstream>
-#include <iostream>
+#include <filesystem>
 
 #ifdef RECORD_MATCH
 #include "pros/rtos.hpp"
@@ -25,39 +26,44 @@ static std::ofstream outf;
 
 void select_autonomous() {
     #ifdef REPLAY_MATCH
+    print("RPM");
     replay_match();
     #endif
     
     #ifdef RIGHT_SIDE_WINPOINT
+    print("RWP");
     right_side_winpoint();
     #endif // RIGHT_SIDE_WINPOINT
     #ifdef LEFT_SIDE_WINPOINT
+    print("LWP");
     left_side_winpoint();
     #endif // LEFT_SIDE_WINPOINT
     #ifdef MIDDLE_RIGHT_GOAL
+    print("MRG");
     middle_right_goal();
     #endif // MIDDLE_RIGHT_GOAL
     #ifdef MIDDLE_LEFT_GOAL
+    print("MLG");
     middle_left_goal();
     #endif // MIDDLE_LEFT_GOAL
+    print("END_AUTO");
 }
 
 int call_reset_positions() {
-    std::cout << "AA";
     #ifdef RESET_POSITIONS
-    std::cout << "AAA";
     reset_positions();
     return 1;
     #else
-    std::cout << "AAAA";
     return 0;
     #endif
 }
 
 std::ofstream* create_record_stream() {
     #ifdef RECORD_MATCH
+    print("GEN_OFSTREAM");
     while (!pros::usd::is_installed()) {
         controller.set_text(2, 0, "Missing microSD!");
+        print("Missing microSD!");
         delay(500);
     }
     controller.clear_line(2);
@@ -66,7 +72,12 @@ std::ofstream* create_record_stream() {
         for (int i = 0; i < 50; i++) {
             std::string filename = std::string("/usd/record_").append(std::to_string(i)).append(".v5r");
             if (!file_exists(filename.c_str())) {
-                std::filesystem::rename("/usd/record.v5r", filename);
+                std::ofstream out(filename, std::ios::out | std::ios::binary | std::ios::trunc);
+                std::ifstream in("/usd/record.v5r", std::ios::in | std::ios::binary);
+                std::string str((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>()); // apparently rename/copy is not supported
+                out << str;
+                out.close(); 
+                in.close();
                 moved = true;
                 break;
             }
