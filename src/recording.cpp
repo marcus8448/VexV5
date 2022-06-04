@@ -22,7 +22,7 @@ void serialize_controller_state(std::ofstream* outf, bool a, bool b, bool x, boo
         return;
     }
 
-    static bool prev_a, prev_b, prev_x, prev_y, prev_up, prev_down, prev_left, prev_right, prev_l1, prev_l2, prev_r1, prev_r2;
+    static bool prev_a = false, prev_b = false, prev_x = false, prev_y = false, prev_up = false, prev_down = false, prev_left = false, prev_right = false, prev_l1 = false, prev_l2 = false, prev_r1 = false, prev_r2;
 
     if (prev_a != a) {
         prev_a = a;

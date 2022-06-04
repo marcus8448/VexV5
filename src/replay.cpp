@@ -15,15 +15,14 @@ void replay_match() {
 
     std::ifstream inf("/usd/record.v5r", std::ios::in | std::ios::binary);
 
-    bool a, b, x, y, up, down, left, right, l1, l2, r1, r2;
-    int lx, ly, rx, ry;
-    char c; 
+    bool a = false, b = false, x = false, y = false, up = false, down = false, left = false, right = false, l1 = false, l2 = false, r1 = false, r2 = false;
+    double lx = 0.0, ly = 0.0, rx = 0.0, ry = 0.0;
+    char c = '*';
 
     while (inf.peek() != EOF) {
         bool exit = false;
         while (!exit) {
             inf >> c;
-            print("0pace1pace2pace3pace4pace5pace6pace7pace" + c);
             switch (c) {
                 case 'a':
                     a = !a;
@@ -74,22 +73,10 @@ void replay_match() {
         unsigned long long value;
         inf >> value;
         std::memcpy(&lx, &value, sizeof(lx));
-        inf >> c;
-        if (c != ' ') {
-            print("invalid char? " + c);
-        }
         inf >> value;
         std::memcpy(&ly, &value, sizeof(ly));
-        inf >> c;
-        if (c != ' ') {
-            print("invalid char? " + c);
-        }
         inf >> value;
         std::memcpy(&rx, &value, sizeof(rx));
-        inf >> c;
-        if (c != ' ') {
-            print("invalid char? " + c);
-        }
         inf >> value;
         std::memcpy(&ry, &value, sizeof(ry));
 
