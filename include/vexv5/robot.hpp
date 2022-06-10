@@ -1,134 +1,225 @@
 #ifndef ROBOT_HPP
 #define ROBOT_HPP
 
-/**
- * \return the position of the lift.
- */
-double lift_position();
+#include "pros/motors.hpp"
+#include "pros/misc.hpp"
 
-/**
- * \return the average position of the arm.
- */
-double arm_position();
+class Resettable {
+    public:
+        virtual void stop();
+        virtual void reset();
+};
 
-/**
- * \return the distance in motor encoder units the motors are from their target position.
- */
-double motor_offset_relative();
+class Targeting {
+    public:
+        virtual bool is_offset_within(double distance);
+};
 
-/**
- * Moves the arm at the specificed rate.
- * \param voltage The maximum allowable 'voltage' for the arm motors.
- */
-void move_arm_absolute(double b, double c, int voltage);
+class Positioned {
+    public:
+        virtual double get_position();
+        virtual double get_target_position();
+};
 
-/**
- * Moves the arm at the specificed rate.
- * \param voltage The maximum allowable 'voltage' for the arm motors.
- */
-void move_arm_absolute(double d, int voltage, bool block);
+class Controller: public Resettable {
+    public:
+        virtual bool a_pressed();
+        virtual bool b_pressed();
+        virtual bool x_pressed();
+        virtual bool y_pressed();
 
-/**
- * Moves the drivetrain a specific distance.
- * \param right_distance the distance to move the right motors in degrees.
- * \param left_distance the distance to move the left motors in degrees.
- * \param max_rpm The maximum allowable rpm for the motors.
- */
-void move_for(double right_distance, double left_distance, int max_rpm = 60);
+        virtual bool up_pressed();
+        virtual bool down_pressed();
+        virtual bool left_pressed();
+        virtual bool right_pressed();
 
-/**
- * Moves the robot forwards in inches.
- * \param distance The distance to move in inches.
- * \param max_rpm The maximum allowable rpm for the motors.
- */
-void forwards(double distance, int max_rpm = 100);
+        virtual bool l1_pressed();
+        virtual bool l2_pressed();
+        virtual bool r1_pressed();
+        virtual bool r2_pressed();
 
-/**
- * Moves the robot backwards in inches.
- * \param distance The distance to move in inches.
- * \param max_rpm The maximum allowable rpm for the motors.
- */
-void backwards(double distance, int max_rpm = 100);
+        virtual unsigned short int a_press_length();
+        virtual unsigned short int b_press_length();
+        virtual unsigned short int x_press_length();
+        virtual unsigned short int y_press_length();
 
-/**
- * Turns the robot right.
- * \param angle The amount to turn in degrees.
- * \param max_rpm The maximum allowable rpm for the motors.
- */
-void turn_right(double angle, int max_rpm = 100);
+        virtual unsigned short int up_press_length();
+        virtual unsigned short int down_press_length();
+        virtual unsigned short int left_press_length();
+        virtual unsigned short int right_press_length();
 
-/**
- * Turns the robot left.
- * \param angle The amount to turn in degrees.
- * \param max_rpm The maximum allowable rpm for the motors.
- */
-void turn_left(double angle, int max_rpm = 100);
+        virtual unsigned short int l1_press_length();
+        virtual unsigned short int l2_press_length();
+        virtual unsigned short int r1_press_length();
+        virtual unsigned short int r2_press_length();
 
-void lift_move_absolute(double position, int max_rpm = 100, bool block = true);
+        virtual unsigned char get_digital_speed();
+        virtual void set_digital_speed(unsigned char digitalSpeed);
 
-/**
- * Puts the lift down to pick up or drop off a mobile goal.
- * \param max_rpm The maximum allowable rpm for the lift motors.
- * \param block Whether this operation is blocking and should wait for the lift to move.
- */
-void lift_down(int max_rpm = 100, bool block = true);
+        virtual void set_line(unsigned char line, unsigned char col, const char* str);
+        virtual void clear_line(unsigned char line);
 
-/**
- * Lifts the lift up slightly to be able to move around with mobile goals.
- * \param max_rpm The maximum allowable rpm for the lift motors.
- * \param block Whether this operation is blocking and should wait for the lift to move.
- */
-void lift_lift(int max_rpm = 100, bool block = true);
+        virtual void rumble(const char* str);
 
-/**
- * Moves the lift all the way up to its starting position.
- * \param max_rpm The maximum allowable rpm for the lift motors.
- * \param block Whether this operation is blocking and should wait for the lift to move.
- */
-void lift_up(int max_rpm = 100, bool block = true);
+        virtual double left_stick_x();
+        virtual double left_stick_y();
+        virtual double right_stick_x();
+        virtual double right_stick_y();
 
-void arm_move_absolute(double position, int max_rpm = 100, bool block = true);
+        virtual double prev_left_stick_x();
+        virtual double prev_left_stick_y();
+        virtual double prev_right_stick_x();
+        virtual double prev_right_stick_y();
 
-/**
- * Puts the arm down to pick up or drop off a mobile goal.
- * \param max_rpm The maximum allowable rpm for the arm motors.
- * \param block Whether this operation is blocking and should wait for the arm to move.
- */
-void arm_down(int max_rpm = 100, bool block = true);
-/**
- * Moves the arm all the way up to its starting position.
- * \param max_rpm The maximum allowable rpm for the arm motors.
- * \param block Whether this operation is blocking and should wait for the arm to move.
- */
-void arm_prime(int max_rpm = 100, bool block = true);
+        virtual void update();
 
-/**
- * Moves the arm all the way up to its starting position.
- * \param max_rpm The maximum allowable rpm for the arm motors.
- * \param block Whether this operation is blocking and should wait for the arm to move.
- */
-void arm_up(int max_rpm = 100, bool block = true);
+        virtual void reset();
+        virtual void stop();
+};
 
-void arm_hook_open(int max_rpm = 50, bool block = true);
+class Updatable {
+    public:
+        virtual void update(Controller controller);
+};
 
-void arm_hook_close(int max_rpm = 50);
+class DualPositioned: public Positioned {
+    public:
+        virtual double get_left_position();
+        virtual double get_right_position();
+        virtual double get_left_target_position();
+        virtual double get_right_target_position();
+        double get_position();
+        double get_target_position();
+};
 
-/**
- * Moves the arm at the specificed rate.
- * \param voltage The maximum allowable 'voltage' for the arm motors.
- */
-void move_arm(int voltage);
+class Drivetrain: public Resettable, public Targeting, public Updatable {
+    private:
+        pros::Motor rightFront;
+        pros::Motor leftFront;
+        pros::Motor rightBack;
+        pros::Motor leftBack;
 
-/**
- * Moves the right motors at the specificed rate.
- * \param voltage The maximum allowable 'voltage' for the arm motors.
- */
-void move_right_motors(int voltage);
+    public:
+        Drivetrain(pros::Motor rightFront, pros::Motor leftFront, pros::Motor rightBack, pros::Motor leftBack);
 
-/**
- * Moves the left motors at the specificed rate.
- * \param voltage The maximum allowable 'voltage' for the arm motors.
- */
-void move_left_motors(int voltage);
+        bool is_offset_within(double distance);
+        void move_for(double right_distance, double left_distance, int max_rpm = 60, bool block = true);
+        void forwards(double distance, int max_rpm = 100, bool block = true);
+        void backwards(double distance, int max_rpm = 100, bool block = true);
+        void turn_right(double angle, int max_rpm = 100, bool block = true);
+        void turn_left(double angle, int max_rpm = 100, bool block = true);
+        void move_right(int voltage);
+        void move_left(int voltage);
+
+        void update(Controller controller);
+        void reset();
+        void stop();
+};
+
+class OpController: public Resettable, public Controller {
+    public:
+        pros::Controller controller;
+    private:
+        unsigned short int a;
+        unsigned short int b;
+        unsigned short int x;
+        unsigned short int y;
+
+        unsigned short int up;
+        unsigned short int down;
+        unsigned short int left;
+        unsigned short int right;
+
+        unsigned short int l1;
+        unsigned short int l2;
+        unsigned short int r1;
+        unsigned short int r2;
+
+        double leftStickX;
+        double leftStickY;
+        double rightStickX;
+        double rightStickY;
+
+        double prevLeftStickX;
+        double prevLeftStickY;
+        double prevRightStickX;
+        double prevRightStickY;
+
+        unsigned char digitalSpeed;
+    
+    public:
+        OpController(pros::Controller controller);
+
+        bool a_pressed();
+        bool b_pressed();
+        bool x_pressed();
+        bool y_pressed();
+
+        bool up_pressed();
+        bool down_pressed();
+        bool left_pressed();
+        bool right_pressed();
+
+        bool l1_pressed();
+        bool l2_pressed();
+        bool r1_pressed();
+        bool r2_pressed();
+
+        unsigned short int a_press_length();
+        unsigned short int b_press_length();
+        unsigned short int x_press_length();
+        unsigned short int y_press_length();
+
+        unsigned short int up_press_length();
+        unsigned short int down_press_length();
+        unsigned short int left_press_length();
+        unsigned short int right_press_length();
+
+        unsigned short int l1_press_length();
+        unsigned short int l2_press_length();
+        unsigned short int r1_press_length();
+        unsigned short int r2_press_length();
+
+        double left_stick_x();
+        double left_stick_y();
+        double right_stick_x();
+        double right_stick_y();
+
+        double prev_left_stick_x();
+        double prev_left_stick_y();
+        double prev_right_stick_x();
+        double prev_right_stick_y();
+
+        unsigned char get_digital_speed();
+        void set_digital_speed(unsigned char digitalSpeed);
+
+        void set_line(unsigned char line, unsigned char col, const char* str);
+        void clear_line(unsigned char line);
+
+        void rumble(const char* str);
+
+        void update();
+        void reset();
+        void stop();
+};
+
+class Robot: public Resettable {
+    public:
+        Drivetrain drivetrain;
+        Controller controller;
+
+    public:
+        Robot();
+        Robot(Drivetrain drivetrain, Controller controller);
+
+        void forwards(double distance, int max_rpm = 100, bool block = true);
+        void backwards(double distance, int max_rpm = 100, bool block = true);
+        void turn_right(double angle, int max_rpm = 100, bool block = true);
+        void turn_left(double angle, int max_rpm = 100, bool block = true);
+
+        void update();
+        void reset();
+        void stop();
+};
 
 #endif

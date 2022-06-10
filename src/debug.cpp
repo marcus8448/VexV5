@@ -7,7 +7,6 @@
 #include "pros/misc.hpp"
 #include "pros/motors.hpp"
 #include "pros/rtos.hpp"
-#include "vexv5/globals.hpp"
 
 void print_motor_info(pros::Motor motor) {
     std::cout << motor.get_actual_velocity()
@@ -23,32 +22,32 @@ void print_motor_info(pros::Motor motor) {
  * Handles debug commands.
  */
 void debug_input_task() {
-    std::cin.clear();
-    while (true) {
-        std::string command;
-        getline(std::cin, command);
-        if (command == "lift") {
-            std::cout << "Lift: ";
-            print_motor_info(lift);
-        } else if (command == "arm") {
-            std::cout << "Arm 1: ";
-            print_motor_info(arm_1);
-            std::cout << "\nArm 2: ";
-            print_motor_info(arm_2);
-            std::cout << "\nArm Hook: ";
-            print_motor_info(arm_hook);
-        } else if (command == "drivetrain") {
-            std::cout << "RF Motor: ";
-            print_motor_info(motor_rf);
-            std::cout << "\nRB Motor: ";
-            print_motor_info(motor_rb);
-            std::cout << "\nLF Motor: ";
-            print_motor_info(motor_lf);
-            std::cout << "\nLB Motor: ";
-            print_motor_info(motor_lb);
-        }
-        std::cout << std::endl;
-    }
+    // std::cin.clear();
+    // while (true) {
+    //     std::string command;
+    //     getline(std::cin, command);
+    //     if (command == "lift") {
+    //         std::cout << "Lift: ";
+    //         print_motor_info(lift);
+    //     } else if (command == "arm") {
+    //         std::cout << "Arm 1: ";
+    //         print_motor_info(arm_1);
+    //         std::cout << "\nArm 2: ";
+    //         print_motor_info(arm_2);
+    //         std::cout << "\nArm Hook: ";
+    //         print_motor_info(arm_hook);
+    //     } else if (command == "drivetrain") {
+    //         std::cout << "RF Motor: ";
+    //         print_motor_info(motor_rf);
+    //         std::cout << "\nRB Motor: ";
+    //         print_motor_info(motor_rb);
+    //         std::cout << "\nLF Motor: ";
+    //         print_motor_info(motor_lf);
+    //         std::cout << "\nLB Motor: ";
+    //         print_motor_info(motor_lb);
+    //     }
+    //     std::cout << std::endl;
+    // }
 }
 
 /**

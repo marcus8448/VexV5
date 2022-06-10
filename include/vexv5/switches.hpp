@@ -1,7 +1,7 @@
 #ifndef SWITCHES_HPP
 #define SWITCHES_HPP
 
-#include "pros/misc.hpp"
+#include "vexv5/robot.hpp"
 
 void select_autonomous();
 

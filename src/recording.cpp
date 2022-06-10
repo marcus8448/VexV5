@@ -5,70 +5,61 @@
 
 #include "pros/misc.hpp"
 #include "pros/rtos.hpp"
-#include "vexv5/globals.hpp"
+#include "vexv5/robot.hpp"
 
-void serialize_controller_state(std::ofstream* outf, bool a, bool b, bool x, bool y, bool up, bool down, bool left, bool right, bool l1, bool l2, bool r1, bool r2, double lx, double ly, double rx, double ry) {
+void serialize_controller_state(std::ofstream* outf, Controller controller) {
     if (outf == nullptr) return;
-    if (up && down) {
-        while (!usd::is_installed()) {
-            controller.set_text(2, 0, "Missing microSD!");
-            delay(250);
+    if (controller.up_pressed() && controller.down_pressed()) {
+        while (!pros::usd::is_installed()) {
+            controller.set_line(2, 0, "Missing microSD!");
+            pros::delay(250);
         }
         outf->flush();
         outf->close();
         
-        controller.set_text(0, 0, "Recording Stopped");
+        controller.set_line(0, 0, "Recording Stopped");
         outf = nullptr;
         return;
     }
 
-    static bool prev_a = false, prev_b = false, prev_x = false, prev_y = false, prev_up = false, prev_down = false, prev_left = false, prev_right = false, prev_l1 = false, prev_l2 = false, prev_r1 = false, prev_r2;
-
-    if (prev_a != a) {
-        prev_a = a;
+    if (controller.a_press_length() == 1) {
         *outf << 'a';
-    } else if (prev_b != (prev_b = a)) {
-        prev_b = b;
+    } else if (controller.b_press_length() == 1) {
         *outf << 'b';
-    } else if (prev_x != x) {
-        prev_x = x;
+    } else if (controller.x_press_length() == 1) {
         *outf << 'x';
-    } else if (prev_y != y) {
-        prev_y = y;
+    } else if (controller.y_press_length() == 1) {
         *outf << 'y';
-    } else if (prev_up != up) {
-        prev_up = up;
+    } else if (controller.up_press_length() == 1) {
         *outf << 'u';
-    } else if (prev_down != down) {
-        prev_down = down;
+    } else if (controller.down_press_length() == 1) {
         *outf << 'd';
-    } else if (prev_left != left) {
-        prev_left = left;
+    } else if (controller.left_press_length() == 1) {
         *outf << 'l';
-    } else if (prev_right != right) {
-        prev_right = right;
+    } else if (controller.right_press_length() == 1) {
         *outf << 'r';
-    } else if (prev_l1 != l1) {
-        prev_l1 = l1;
+    } else if (controller.l1_press_length() == 1) {
         *outf << '!';
-    } else if (prev_l2 != l2) {
-        prev_l2 = l2;
+    } else if (controller.l2_press_length() == 1) {
         *outf << '@';
-    } else if (prev_r1 != r1) {
-        prev_r1 = r1;
+    } else if (controller.r1_press_length() == 1) {
         *outf << '#';
-    } else if (prev_r2 != r2) {
-        prev_r2 = r2;
+    } else if (controller.r2_press_length() == 1) {
         *outf << '$';
     }
     *outf << '*';
+    double val;
     signed long long position;
-    std::memcpy(&position, &lx, sizeof(lx));
+    val = controller.left_stick_x();
+    std::memcpy(&position, &val, sizeof(val));
     *outf << position << " ";
-    std::memcpy(&position, &ly, sizeof(ly));
+    val = controller.left_stick_y();
+    std::memcpy(&position, &val, sizeof(val));
     *outf << position << " ";
-    std::memcpy(&position, &rx, sizeof(rx));
+    val = controller.right_stick_x();
+    std::memcpy(&position, &val, sizeof(val));
     *outf << position << " ";
-    std::memcpy(&position, &ry, sizeof(ry));
+    val = controller.right_stick_y();
+    std::memcpy(&position, &val, sizeof(val));
     *outf << position;
 }

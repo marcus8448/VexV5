@@ -1,8 +1,6 @@
 #ifndef DEBUG_TOOLS_HPP
 #define DEBUG_TOOLS_HPP
 
-#include <string>
-
 /**
  * Prints out the given characters to standard output.
  * Output viewable through `pros terminal` on a connected computer.
@@ -98,10 +96,5 @@ double errd(double return_code);
  * Handles debug commands/input from standard input.
  */
 void debug_input_task();
-
-/**
- * TODO!
- */
-void controller_update_task();
 
 #endif

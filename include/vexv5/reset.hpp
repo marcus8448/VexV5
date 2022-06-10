@@ -1,14 +1,11 @@
 #ifndef RESET_HPP
 #define RESET_HPP
 
-/**
- * Stops and tares all motors
- */
-void reset_all_motors();
+#include "vexv5/robot.hpp"
 
 /**
  * Resets all motors to their starting positions
  */
-void reset_positions();
+void reset_positions(Robot robot);
 
 #endif

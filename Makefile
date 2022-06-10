@@ -32,25 +32,9 @@ replay:
 	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D REPLAY_MATCH" EXTRA_CXXFLAGS="-D REPLAY_MATCH" -W src/switches.cpp -W include/vexv5/switches.hpp
 	pros upload --slot 2 --after none --name "Replay"
 
-left_side_winpoint: 
-	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D LEFT_SIDE_WINPOINT" EXTRA_CXXFLAGS="-D LEFT_SIDE_WINPOINT" -W src/switches.cpp -W include/vexv5/switches.hpp
-	pros upload --slot 3 --after none --name "Left Winpoint"
-
-right_side_winpoint: 
-	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D RIGHT_SIDE_WINPOINT" EXTRA_CXXFLAGS="-D RIGHT_SIDE_WINPOINT" -W src/switches.cpp -W include/vexv5/switches.hpp
-	pros upload --slot 4 --after none --name "Right Winpoint"
-
-middle_left_goal: 
-	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D MIDDLE_LEFT_GOAL" EXTRA_CXXFLAGS="-D MIDDLE_LEFT_GOAL" -W src/switches.cpp -W include/vexv5/switches.hpp
-	pros upload --slot 5 --after none --name "Left Goal"
-
-middle_right_goal: 
-	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D MIDDLE_RIGHT_GOAL" EXTRA_CXXFLAGS="-D MIDDLE_RIGHT_GOAL" -W src/switches.cpp -W include/vexv5/switches.hpp
-	pros upload --slot 6 --after none --name "Right Goal"
-
 record: 
 	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D RECORD_MATCH" EXTRA_CXXFLAGS="-D RECORD_MATCH" -W src/switches.cpp -W include/vexv5/switches.hpp
-	pros upload --slot 7 --after none --name "Record"
+	pros upload --slot 3 --after none --name "Record"
 
 .DEFAULT_GOAL=quick
 
