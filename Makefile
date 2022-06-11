@@ -16,7 +16,7 @@ EXTRA_CFLAGS=
 EXTRA_CXXFLAGS=
 
 USE_PACKAGE:=1
-EXCLUDE_COLD_LIBRARIES:= 
+EXCLUDE_COLD_LIBRARIES:=
 
 IS_LIBRARY:=0
 LIBNAME:=vexv5
@@ -25,15 +25,15 @@ EXCLUDE_SRC_FROM_LIB+=$(foreach file, $(SRCDIR)/main,$(foreach cext,$(CEXTS),$(f
 TEMPLATE_FILES=$(INCDIR)/vexv5/*.h $(INCDIR)/vexv5/*.hpp
 
 reset: 
-	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D RESET_POSITIONS" EXTRA_CXXFLAGS="-D RESET_POSITIONS" -W src/switches.cpp -W include/vexv5/switches.hpp
+	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D RESET_POSITIONS" EXTRA_CXXFLAGS="-D RESET_POSITIONS" -W src/main.cpp
 	pros upload --slot 1 --after none --name "Reset"
 
 replay: 
-	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D REPLAY_MATCH" EXTRA_CXXFLAGS="-D REPLAY_MATCH" -W src/switches.cpp -W include/vexv5/switches.hpp
+	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D REPLAY_MATCH" EXTRA_CXXFLAGS="-D REPLAY_MATCH" -W src/main.cpp
 	pros upload --slot 2 --after none --name "Replay"
 
 record: 
-	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D RECORD_MATCH" EXTRA_CXXFLAGS="-D RECORD_MATCH" -W src/switches.cpp -W include/vexv5/switches.hpp
+	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D RECORD_MATCH" EXTRA_CXXFLAGS="-D RECORD_MATCH" -W src/main.cpp
 	pros upload --slot 3 --after none --name "Record"
 
 .DEFAULT_GOAL=quick

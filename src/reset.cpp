@@ -1,19 +1,14 @@
-#include <iostream>
 #include "pros/rtos.hpp"
-#include "vexv5/robot.hpp"
+#include "robot.hpp"
+#include <iostream>
 
-void reset_positions(Robot robot) {
-    unsigned int completed = 0;
-    robot.controller.set_line(0, 0, "Reset...");
-    
-    while (completed < 2) {
-        completed += pros::Task::notify_take(true, TIMEOUT_MAX);
+void reset_positions(Robot* robot) {
+    robot->controller->set_line(0, 0, "Reset...");
+
+    for (unsigned char i = 0; i < 2; i += pros::Task::notify_take(true, 0xffffffffUL)) {
     }
 
     std::cout << "Done reset." << std::endl;
-    robot.reset();
-    while (true) {
-        robot.controller.set_line(0, 0, "Done!");
-        pros::delay(1000);
-    }
+    robot->reset();
+    robot->controller->set_line(0, 0, "Done!");
 }

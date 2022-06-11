@@ -1,50 +1,64 @@
-#include <cfloat>
-#include <string>
-#include "pros/misc.hpp"
+#include "debug.hpp"
+#include "error.hpp"
+#include "recording.hpp"
+#include "replay.hpp"
+#include "reset.hpp"
+#include "robot.hpp"
 #include "pros/rtos.hpp"
-#include "vexv5/debug.hpp"
-#include "vexv5/robot.hpp"
-#include "vexv5/switches.hpp"
+#include <string>
 
-extern "C" {
-void autonomous(void);
-void initialize(void);
-void disabled(void);
-void competition_initialize(void);
-void opcontrol(void);
+static Robot* robot = static_cast<Robot*>(malloc(sizeof(Robot)));
+
+[[noreturn]] void main_loop(Robot* ptr) {
+    while (true) {
+        ptr->update();
+        pros::delay(20);
+    }
 }
 
 /**
  * Called when the robot is first initialized.
  */
-void initialize() {
-    pros::Task::create(debug_input_task, "Debug Input Task");
+[[maybe_unused]] void initialize() {
+    robot = new Robot(Drivetrain(
+            pros::Motor(10, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES),
+            pros::Motor(1, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES),
+            pros::Motor(20, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES),
+            pros::Motor(11, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES)
+                    ));
+    pros::Task(debug_input_task, robot, "Debug Input Task");
 }
 
 /**
  * Called when the robot is in it's autonomous state in a competition.
- * Or when the "Force Autonomous" button is presssed on the screen.
  */
-void autonomous() {
-    select_autonomous();
+[[maybe_unused]] void autonomous() {
+    printf("BEGIN AUTO");
+#ifdef REPLAY_MATCH
+    printf("REPLAY_MATCH");
+    robot->controller = new ReplayController();
+#elif defined(TODO)
+    printf("TODO");
+    robot->controller = new ReplayController("test");
+#endif
+    printf("END AUTO");
+    main_loop(robot);
 }
 
 /**
  * Called when the robot is under driver control.
  * Will delegate to autonomous control if the "Force Autonomous" button is pressed.
  */
-void opcontrol() {
-    Robot robot = Robot();
-    if (call_reset_positions()) {
-        return;
-    }
+[[maybe_unused]] void opcontrol() {
+#ifdef RECORD_MATCH
+    robot->controller = new RecordingController();
+#else
+    robot->controller = new OpController();
+#endif
 
-    std::ofstream* outf = create_record_stream();
-
-    while (true) {
-        robot.update();
-
-        call_serialize_controller_state(outf, robot.controller);
-        pros::delay(20);
-    }
+#ifdef RESET_POSITIONS
+    reset_positions(robot);
+#else
+    main_loop(robot);
+#endif
 }
