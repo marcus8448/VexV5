@@ -3,8 +3,8 @@
 #ifndef VEXV5_ROBOT_HPP
 #define VEXV5_ROBOT_HPP
 
-#include "../include/pros/misc.hpp"
-#include "../include/pros/motors.hpp"
+#include "pros/misc.hpp"
+#include "pros/motors.hpp"
 
 class Resettable {
 public:
@@ -87,13 +87,13 @@ public:
 
 class Drivetrain : public Resettable, public Targeting, public Updatable, public Describable {
 private:
-    pros::Motor rightFront;
-    pros::Motor leftFront;
-    pros::Motor rightBack;
-    pros::Motor leftBack;
+    pros::Motor* rightFront;
+    pros::Motor* leftFront;
+    pros::Motor* rightBack;
+    pros::Motor* leftBack;
 
 public:
-    Drivetrain(pros::Motor rightFront, pros::Motor leftFront, pros::Motor rightBack, pros::Motor leftBack);
+    Drivetrain(pros::Motor* rightFront, pros::Motor* leftFront, pros::Motor* rightBack, pros::Motor* leftBack);
 
     bool is_offset_within(double distance) override;
     void move_for(double right_distance, double left_distance, int max_rpm = 60, bool block = true);
@@ -186,16 +186,11 @@ public:
 
 class Robot : public Resettable, public Describable {
 public:
-    Drivetrain drivetrain;
+    Drivetrain* drivetrain;
     Controller* controller;
 
 public:
-    explicit Robot(Drivetrain drivetrain);
-
-    void forwards(double distance, int max_rpm = 100, bool block = true);
-    void backwards(double distance, int max_rpm = 100, bool block = true);
-    void turn_right(double angle, int max_rpm = 100, bool block = true);
-    void turn_left(double angle, int max_rpm = 100, bool block = true);
+    explicit Robot(Drivetrain* drivetrain);
 
     void update();
     void reset() override;

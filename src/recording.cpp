@@ -7,6 +7,7 @@
 #include "pros/rtos.hpp"
 #include "recording.hpp"
 #include "robot.hpp"
+#include "util.hpp"
 
 RecordingController::RecordingController(pros::Controller controller, const char* filename): controller(controller) {
     while (!pros::usd::is_installed()) {
@@ -15,7 +16,7 @@ RecordingController::RecordingController(pros::Controller controller, const char
     }
     this->controller.clear_line(2);
 
-    printf("Generate output stream");
+    println("Generate output stream");
     auto full_path = std::string("/usd/").append(filename).append(".v5r").c_str();
     if (file_exists(full_path)) {
         bool moved = false;
@@ -39,7 +40,7 @@ RecordingController::RecordingController(pros::Controller controller, const char
     }
     controller.clear_line(2);
     this->outf = std::ofstream(filename, std::ios::out | std::ios::binary | std::ios::trunc);
-    printf("Generated output stream");
+    println("Generated output stream");
     this->outf << '0';
 }
 

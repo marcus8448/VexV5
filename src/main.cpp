@@ -1,17 +1,35 @@
 #include "debug.hpp"
-#include "error.hpp"
-#include "recording.hpp"
-#include "replay.hpp"
-#include "reset.hpp"
 #include "robot.hpp"
+#include "util.hpp"
 #include "pros/rtos.hpp"
-#include <string>
+#include <iostream>
 
-static Robot* robot = static_cast<Robot*>(malloc(sizeof(Robot)));
+#ifdef RECORD_MATCH
+#include "recording.hpp"
+#endif
 
-[[noreturn]] void main_loop(Robot* ptr) {
+#if defined REPLAY_MATCH || defined TODO
+#include "replay.hpp"
+#endif
+
+#ifdef RESET_POSITIONS
+#include "reset.hpp"
+#endif
+
+extern "C" {
+void autonomous(void);
+void initialize(void);
+void disabled(void);
+void competition_initialize(void);
+void opcontrol(void);
+}
+
+static Robot* robot = nullptr;
+
+void main_loop(Robot* robot) {
+    println("Main loop");
     while (true) {
-        ptr->update();
+        robot->update();
         pros::delay(20);
     }
 }
@@ -19,29 +37,30 @@ static Robot* robot = static_cast<Robot*>(malloc(sizeof(Robot)));
 /**
  * Called when the robot is first initialized.
  */
-[[maybe_unused]] void initialize() {
-    robot = new Robot(Drivetrain(
-            pros::Motor(10, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES),
-            pros::Motor(1, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES),
-            pros::Motor(20, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES),
-            pros::Motor(11, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES)
-                    ));
-    pros::Task(debug_input_task, robot, "Debug Input Task");
+void initialize() {
+    print_section("Initialize");
+    robot = new Robot(new Drivetrain(
+            new pros::Motor(10, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES),
+            new pros::Motor(1, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES),
+            new pros::Motor(20, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES),
+            new pros::Motor(11, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES)));
+    pros::Task(debug_input_task, static_cast<void*>(robot), "Debug Input Task");
+    print_section("End Initialize");
 }
 
 /**
  * Called when the robot is in it's autonomous state in a competition.
  */
-[[maybe_unused]] void autonomous() {
-    printf("BEGIN AUTO");
+void autonomous() {
+    print_section("Autonomous setup");
 #ifdef REPLAY_MATCH
-    printf("REPLAY_MATCH");
+    println("Replay match");
     robot->controller = new ReplayController();
 #elif defined(TODO)
-    printf("TODO");
+    println("Autonomous: TODO");
     robot->controller = new ReplayController("test");
 #endif
-    printf("END AUTO");
+    print_section("End autonomous setup");
     main_loop(robot);
 }
 
@@ -49,16 +68,21 @@ static Robot* robot = static_cast<Robot*>(malloc(sizeof(Robot)));
  * Called when the robot is under driver control.
  * Will delegate to autonomous control if the "Force Autonomous" button is pressed.
  */
-[[maybe_unused]] void opcontrol() {
+void opcontrol() {
+    print_section("Opcontrol setup");
 #ifdef RECORD_MATCH
+    println("Recording");
     robot->controller = new RecordingController();
 #else
+    println("Normal controller");
     robot->controller = new OpController();
 #endif
 
 #ifdef RESET_POSITIONS
+    print_section("Resetting positions");
     reset_positions(robot);
 #else
+    print_section("End opcontrol setup");
     main_loop(robot);
 #endif
 }

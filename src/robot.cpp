@@ -5,7 +5,7 @@
 #include "pros/motors.hpp"
 #include "pros/rtos.hpp"
 #include <cmath>
-#include <utility>
+#include <iostream>
 
 double DualPositioned::get_position() {
     return (this->get_left_position() + this->get_right_position()) / 2.0;
@@ -264,22 +264,22 @@ std::string OpController::describe() {
             .append(", prev right stick y: ").append(std::to_string(this->prevRightStickY));
 }
 
-Drivetrain::Drivetrain(pros::Motor rightFront, pros::Motor leftFront, pros::Motor rightBack, pros::Motor leftBack) : rightFront(std::move(rightFront)), leftFront(std::move(leftFront)), rightBack(std::move(rightBack)), leftBack(std::move(leftBack)) {
-    this->rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-    this->rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-    this->leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-    this->leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+Drivetrain::Drivetrain(pros::Motor* rightFront, pros::Motor* leftFront, pros::Motor* rightBack, pros::Motor* leftBack) : rightFront(rightFront), leftFront(leftFront), rightBack(rightBack), leftBack(leftBack) {
+    this->rightFront->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    this->rightBack->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    this->leftFront->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+    this->leftBack->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 }
 
 bool Drivetrain::is_offset_within(double distance) {
-    return fabs(errd(this->rightFront.get_position()) - errd(this->rightFront.get_target_position())) < distance && fabs(errd(this->leftFront.get_position()) - errd(this->leftFront.get_target_position())) < distance && fabs(errd(this->rightBack.get_position()) - errd(this->rightBack.get_target_position())) < distance && fabs(errd(this->leftBack.get_position()) - errd(this->leftBack.get_target_position())) < distance;
+    return fabs(errd(this->rightFront->get_position()) - errd(this->rightFront->get_target_position())) < distance && fabs(errd(this->leftFront->get_position()) - errd(this->leftFront->get_target_position())) < distance && fabs(errd(this->rightBack->get_position()) - errd(this->rightBack->get_target_position())) < distance && fabs(errd(this->leftBack->get_position()) - errd(this->leftBack->get_target_position())) < distance;
 }
 
 void Drivetrain::move_for(double right_distance, double left_distance, int max_rpm, bool block) {
-    erri(this->rightFront.move_relative(right_distance, max_rpm));
-    erri(this->rightBack.move_relative(right_distance, max_rpm));
-    erri(this->leftFront.move_relative(left_distance, max_rpm));
-    erri(this->leftBack.move_relative(left_distance, max_rpm));
+    erri(this->rightFront->move_relative(right_distance, max_rpm));
+    erri(this->rightBack->move_relative(right_distance, max_rpm));
+    erri(this->leftFront->move_relative(left_distance, max_rpm));
+    erri(this->leftBack->move_relative(left_distance, max_rpm));
     if (block) {
         while (!this->is_offset_within(5.0)) {
             pros::delay(50);
@@ -307,13 +307,13 @@ void Drivetrain::turn_left(double angle, int max_rpm, bool block) {
 }
 
 void Drivetrain::move_right(int voltage) {
-    erri(this->rightFront.move(voltage));
-    erri(this->rightBack.move(voltage));
+    erri(this->rightFront->move(voltage));
+    erri(this->rightBack->move(voltage));
 }
 
 void Drivetrain::move_left(int voltage) {
-    erri(this->leftFront.move(voltage));
-    erri(this->leftBack.move(voltage));
+    erri(this->leftFront->move(voltage));
+    erri(this->leftBack->move(voltage));
 }
 
 #pragma clang diagnostic push
@@ -325,65 +325,58 @@ void Drivetrain::update(Controller* controller) {
 #pragma clang diagnostic pop
 
 void Drivetrain::stop() {
-    this->rightFront.move(0);
-    this->leftFront.move(0);
-    this->rightBack.move(0);
-    this->leftBack.move(0);
+    this->rightFront->move(0);
+    this->leftFront->move(0);
+    this->rightBack->move(0);
+    this->leftBack->move(0);
 }
 
 void Drivetrain::reset() {
-    this->rightFront.tare_position();
-    this->leftFront.tare_position();
-    this->rightBack.tare_position();
-    this->leftBack.tare_position();
+    this->rightFront->tare_position();
+    this->leftFront->tare_position();
+    this->rightBack->tare_position();
+    this->leftBack->tare_position();
 }
 
 std::string Drivetrain::describe() {
-    return std::string("Right Front: ").append(describe_motor(&this->rightFront))
-                .append("\nLeft Front: ").append(describe_motor(&this->leftFront))
-                .append("\nRight Back: ").append(describe_motor(&this->rightBack))
-                .append("\nLeft Back: ").append(describe_motor(&this->leftBack));
+    return std::string("Right Front: ").append(describe_motor(this->rightFront))
+                .append("\nLeft Front: ").append(describe_motor(this->leftFront))
+                .append("\nRight Back: ").append(describe_motor(this->rightBack))
+                .append("\nLeft Back: ").append(describe_motor(this->leftBack));
 }
 
-Robot::Robot(Drivetrain drivetrain) : drivetrain(std::move(drivetrain)), controller(static_cast<Controller*>(malloc(sizeof(Controller)))) {
-    this->drivetrain.stop();
-}
-
-void Robot::forwards(double distance, int max_rpm, bool block) {
-    this->drivetrain.forwards(distance, max_rpm, block);
-}
-
-void Robot::backwards(double distance, int max_rpm, bool block) {
-    this->drivetrain.backwards(distance, max_rpm, block);
-}
-
-void Robot::turn_right(double angle, int max_rpm, bool block) {
-    this->drivetrain.turn_right(angle, max_rpm, block);
-}
-
-void Robot::turn_left(double angle, int max_rpm, bool block) {
-    this->drivetrain.turn_left(angle, max_rpm, block);
+Robot::Robot(Drivetrain* drivetrain) : drivetrain(drivetrain), controller(nullptr) {
 }
 
 void Robot::update() {
+    if (this->controller == nullptr) {
+        println("Controller is null?");
+    }
+    if (this->drivetrain == nullptr) {
+        println("Drivetrain is null?");
+    }
     this->controller->update();
-    this->drivetrain.update(this->controller);
+    this->drivetrain->update(this->controller);
 }
 
 void Robot::reset() {
     this->controller->reset();
-    this->drivetrain.reset();
+    this->drivetrain->reset();
 }
 
 void Robot::stop() {
     this->controller->stop();
-    this->drivetrain.stop();
+    this->drivetrain->stop();
 }
 
 Robot::~Robot() {
-    free(controller);
+    println("Robot destructor called");
+    if (controller != nullptr) {
+        delete controller;
+        controller = nullptr;
+    }
 }
 
 std::string Robot::describe() {
-    return std::string("\nController: ").append(indent(this->controller->describe())).append("\nDrivetrain: ").append(indent(this->drivetrain.describe()));
+    return std::string("\nController: ").append(indent(this->controller->describe())).append("\nDrivetrain: ").append(indent(this->drivetrain->describe()));
 }

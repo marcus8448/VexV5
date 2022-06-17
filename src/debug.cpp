@@ -15,7 +15,7 @@ void debug_input_task(void* params) {
          if (command == "robot") {
              printf("Robot: %s\n", indent(robot->describe()).c_str());
          } else if (command == "drivetrain") {
-             printf("Arm: %s\n", indent(robot->drivetrain.describe()).c_str());
+             printf("Arm: %s\n", indent(robot->drivetrain->describe()).c_str());
          } else if (command == "kill") {
              throw;
          }

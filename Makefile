@@ -36,7 +36,11 @@ record:
 	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D RECORD_MATCH" EXTRA_CXXFLAGS="-D RECORD_MATCH" -W src/main.cpp
 	pros upload --slot 3 --after none --name "Record"
 
-.DEFAULT_GOAL=quick
+normal: 
+	$(MAKE) $(MAKEFLAGS) quick -W src/main.cpp
+	pros upload --slot 8 --after none --name "Normal"
+
+.DEFAULT_GOAL=normal
 
 ################################################################################
 ################################################################################
