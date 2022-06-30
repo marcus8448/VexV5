@@ -240,6 +240,8 @@ void OpController::reset() {
 OpController::OpController(pros::Controller controller) : controller(controller) {
 }
 
+OpController::~OpController() = default;
+
 std::string OpController::describe() {
     return std::string("Op\n")
             .append("a: ").append(std::to_string(this->a))
@@ -371,10 +373,8 @@ void Robot::stop() {
 
 Robot::~Robot() {
     println("Robot destructor called");
-    if (controller != nullptr) {
-        delete controller;
-        controller = nullptr;
-    }
+    delete controller;
+    controller = nullptr;
 }
 
 std::string Robot::describe() {

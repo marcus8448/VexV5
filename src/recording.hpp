@@ -31,6 +31,8 @@ class RecordingController : public Controller {
 
 public:
     explicit RecordingController(pros::Controller controller = pros::Controller(pros::E_CONTROLLER_MASTER), const char* filename = "record");
+    ~RecordingController() override;
+
     unsigned short int a_pressed() override;
     unsigned short int b_pressed() override;
     unsigned short int x_pressed() override;

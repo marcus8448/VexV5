@@ -44,6 +44,12 @@ RecordingController::RecordingController(pros::Controller controller, const char
     this->outf << '0';
 }
 
+RecordingController::~RecordingController() {
+    if (this->outf.is_open()) {
+        this->outf.close();
+    }
+}
+
 unsigned short int RecordingController::a_pressed() {
     return this->a;
 }

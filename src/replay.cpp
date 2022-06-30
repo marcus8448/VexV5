@@ -17,6 +17,12 @@ ReplayController::ReplayController(const char* filename) {
     this->inf >> this->type;
 }
 
+ReplayController::~ReplayController() {
+    if (this->inf.is_open()) {
+        this->inf.close();
+    }
+}
+
 unsigned short int ReplayController::a_pressed() {
     return this->a;
 }

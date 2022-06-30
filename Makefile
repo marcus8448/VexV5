@@ -28,15 +28,15 @@ reset:
 	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D RESET_POSITIONS" EXTRA_CXXFLAGS="-D RESET_POSITIONS" -W src/main.cpp
 	pros upload --slot 1 --after none --name "Reset"
 
-replay: 
+replay:
 	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D REPLAY_MATCH" EXTRA_CXXFLAGS="-D REPLAY_MATCH" -W src/main.cpp
 	pros upload --slot 2 --after none --name "Replay"
 
-record: 
+record:
 	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D RECORD_MATCH" EXTRA_CXXFLAGS="-D RECORD_MATCH" -W src/main.cpp
 	pros upload --slot 3 --after none --name "Record"
 
-normal: 
+normal:
 	$(MAKE) $(MAKEFLAGS) quick -W src/main.cpp
 	pros upload --slot 8 --after none --name "Normal"
 

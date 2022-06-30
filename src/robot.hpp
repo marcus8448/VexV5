@@ -40,6 +40,8 @@ public:
 
 class Controller : public Resettable, public Describable {
 public:
+    virtual ~Controller() = default;
+
     virtual unsigned short int a_pressed() = 0;
     virtual unsigned short int b_pressed() = 0;
     virtual unsigned short int x_pressed() = 0;
@@ -144,6 +146,7 @@ private:
 
 public:
     explicit OpController(pros::Controller controller = pros::Controller(pros::E_CONTROLLER_MASTER));
+    ~OpController() override;
 
     unsigned short int a_pressed() override;
     unsigned short int b_pressed() override;

@@ -31,6 +31,7 @@ class ReplayController : public Controller {
 
 public:
     explicit ReplayController(const char* filename = "/usd/record.v5r");
+    ~ReplayController() override;
 
     unsigned short int a_pressed() override;
     unsigned short int b_pressed() override;
