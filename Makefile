@@ -25,19 +25,19 @@ EXCLUDE_SRC_FROM_LIB+=$(foreach file, $(SRCDIR)/main,$(foreach cext,$(CEXTS),$(f
 TEMPLATE_FILES=$(INCDIR)/vexv5/*.h $(INCDIR)/vexv5/*.hpp
 
 reset: 
-	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D RESET_POSITIONS" EXTRA_CXXFLAGS="-D RESET_POSITIONS" -W src/main.cpp
+	$(MAKE) -$(MAKEFLAGS) quick EXTRA_CFLAGS="-D RESET_POSITIONS" EXTRA_CXXFLAGS="-D RESET_POSITIONS" -W src/main.cpp
 	pros upload --slot 1 --after none --name "Reset"
 
 replay:
-	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D REPLAY_MATCH" EXTRA_CXXFLAGS="-D REPLAY_MATCH" -W src/main.cpp
+	$(MAKE) -$(MAKEFLAGS) quick EXTRA_CFLAGS="-D REPLAY_MATCH" EXTRA_CXXFLAGS="-D REPLAY_MATCH" -W src/main.cpp
 	pros upload --slot 2 --after none --name "Replay"
 
 record:
-	$(MAKE) $(MAKEFLAGS) quick EXTRA_CFLAGS="-D RECORD_MATCH" EXTRA_CXXFLAGS="-D RECORD_MATCH" -W src/main.cpp
+	$(MAKE) -$(MAKEFLAGS) quick EXTRA_CFLAGS="-D RECORD_MATCH" EXTRA_CXXFLAGS="-D RECORD_MATCH" -W src/main.cpp
 	pros upload --slot 3 --after none --name "Record"
 
 normal:
-	$(MAKE) $(MAKEFLAGS) quick -W src/main.cpp
+	$(MAKE) -$(MAKEFLAGS) quick -W src/main.cpp
 	pros upload --slot 8 --after none --name "Normal"
 
 .DEFAULT_GOAL=normal
