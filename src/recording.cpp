@@ -44,12 +44,6 @@ RecordingController::RecordingController(pros::Controller controller, const char
     this->outf << '0';
 }
 
-RecordingController::~RecordingController() {
-    if (this->outf.is_open()) {
-        this->outf.close();
-    }
-}
-
 unsigned short int RecordingController::a_pressed() {
     return this->a;
 }
@@ -289,28 +283,4 @@ void RecordingController::reset() {
 void RecordingController::stop() {
     this->outf.flush();
     this->outf.close();
-}
-
-std::string RecordingController::describe() {
-    return std::string("Recording\n")
-            .append("\na: ").append(std::to_string(this->a))
-            .append(", b: ").append(std::to_string(this->b))
-            .append(", x: ").append(std::to_string(this->x))
-            .append(", y: ").append(std::to_string(this->y))
-            .append("\nup: ").append(std::to_string(this->up))
-            .append(", down: ").append(std::to_string(this->down))
-            .append(", left: ").append(std::to_string(this->left))
-            .append(", right: ").append(std::to_string(this->right))
-            .append("\nl1: ").append(std::to_string(this->l1))
-            .append(", l2: ").append(std::to_string(this->l2))
-            .append(", r1: ").append(std::to_string(this->r1))
-            .append(", r2: ").append(std::to_string(this->r2))
-            .append("\nleft stick x: ").append(std::to_string(this->leftStickX))
-            .append(", left stick y: ").append(std::to_string(this->leftStickY))
-            .append("\nright stick x: ").append(std::to_string(this->rightStickX))
-            .append(", right stick y: ").append(std::to_string(this->rightStickY))
-            .append("\nprev left stick x: ").append(std::to_string(this->prevLeftStickX))
-            .append(", prev left stick y: ").append(std::to_string(this->prevLeftStickY))
-            .append("\nprev right stick x: ").append(std::to_string(this->prevRightStickX))
-            .append(", prev right stick y: ").append(std::to_string(this->prevRightStickY));
 }

@@ -240,37 +240,18 @@ void OpController::reset() {
 OpController::OpController(pros::Controller controller) : controller(controller) {
 }
 
-OpController::~OpController() = default;
-
-std::string OpController::describe() {
-    return std::string("Op\n")
-            .append("a: ").append(std::to_string(this->a))
-            .append(", b: ").append(std::to_string(this->b))
-            .append(", x: ").append(std::to_string(this->x))
-            .append(", y: ").append(std::to_string(this->y))
-            .append("\nup: ").append(std::to_string(this->up))
-            .append(", down: ").append(std::to_string(this->down))
-            .append(", left: ").append(std::to_string(this->left))
-            .append(", right: ").append(std::to_string(this->right))
-            .append("\nl1: ").append(std::to_string(this->l1))
-            .append(", l2: ").append(std::to_string(this->l2))
-            .append(", r1: ").append(std::to_string(this->r1))
-            .append(", r2: ").append(std::to_string(this->r2))
-            .append("\nleft stick x: ").append(std::to_string(this->leftStickX))
-            .append(", left stick y: ").append(std::to_string(this->leftStickY))
-            .append("\nright stick x: ").append(std::to_string(this->rightStickX))
-            .append(", right stick y: ").append(std::to_string(this->rightStickY))
-            .append("\nprev left stick x: ").append(std::to_string(this->prevLeftStickX))
-            .append(", prev left stick y: ").append(std::to_string(this->prevLeftStickY))
-            .append("\nprev right stick x: ").append(std::to_string(this->prevRightStickX))
-            .append(", prev right stick y: ").append(std::to_string(this->prevRightStickY));
-}
-
 Drivetrain::Drivetrain(pros::Motor* rightFront, pros::Motor* leftFront, pros::Motor* rightBack, pros::Motor* leftBack) : rightFront(rightFront), leftFront(leftFront), rightBack(rightBack), leftBack(leftBack) {
     this->rightFront->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
     this->rightBack->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
     this->leftFront->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
     this->leftBack->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+}
+
+Drivetrain::~Drivetrain() {
+    // delete this->rightFront;
+    // delete this->rightBack;
+    // delete this->leftFront;
+    // delete this->leftBack;
 }
 
 bool Drivetrain::is_offset_within(double distance) {
@@ -318,13 +299,10 @@ void Drivetrain::move_left(int voltage) {
     erri(this->leftBack->move(voltage));
 }
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "cppcoreguidelines-narrowing-conversions"
 void Drivetrain::update(Controller* controller) {
-    this->move_right(controller->right_stick_y());
-    this->move_left(controller->left_stick_y());
+    this->move_right((int)controller->right_stick_y());
+    this->move_left((int)controller->left_stick_y());
 }
-#pragma clang diagnostic pop
 
 void Drivetrain::stop() {
     this->rightFront->move(0);
@@ -338,13 +316,6 @@ void Drivetrain::reset() {
     this->leftFront->tare_position();
     this->rightBack->tare_position();
     this->leftBack->tare_position();
-}
-
-std::string Drivetrain::describe() {
-    return std::string("Right Front: ").append(describe_motor(this->rightFront))
-                .append("\nLeft Front: ").append(describe_motor(this->leftFront))
-                .append("\nRight Back: ").append(describe_motor(this->rightBack))
-                .append("\nLeft Back: ").append(describe_motor(this->leftBack));
 }
 
 Robot::Robot(Drivetrain* drivetrain) : drivetrain(drivetrain), controller(nullptr) {
@@ -375,8 +346,6 @@ Robot::~Robot() {
     println("Robot destructor called");
     delete controller;
     controller = nullptr;
-}
-
-std::string Robot::describe() {
-    return std::string("\nController: ").append(indent(this->controller->describe())).append("\nDrivetrain: ").append(indent(this->drivetrain->describe()));
+    delete drivetrain;
+    drivetrain = nullptr;
 }

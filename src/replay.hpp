@@ -31,7 +31,6 @@ class ReplayController : public Controller {
 
 public:
     explicit ReplayController(const char* filename = "/usd/record.v5r");
-    ~ReplayController() override;
 
     unsigned short int a_pressed() override;
     unsigned short int b_pressed() override;
@@ -70,7 +69,6 @@ public:
 
     void reset() override;
     void stop() override;
-    std::string describe() override;
 };
 
 #endif//VEXV5_REPLAY_HPP

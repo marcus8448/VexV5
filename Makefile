@@ -40,7 +40,10 @@ normal:
 	$(MAKE) -$(MAKEFLAGS) quick -W src/main.cpp
 	pros upload --slot 8 --after none --name "Normal"
 
-.DEFAULT_GOAL=normal
+buildonly:
+	$(MAKE) -$(MAKEFLAGS) quick -W src/main.cpp
+
+.DEFAULT_GOAL=quick
 
 ################################################################################
 ################################################################################

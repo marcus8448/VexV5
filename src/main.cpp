@@ -1,5 +1,6 @@
 #include "debug.hpp"
 #include "robot.hpp"
+#include "robot_debug.hpp"
 #include "util.hpp"
 #include "pros/rtos.hpp"
 #include <iostream>
@@ -44,7 +45,8 @@ void initialize() {
             new pros::Motor(1, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES),
             new pros::Motor(20, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES),
             new pros::Motor(11, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES)));
-    pros::Task(debug_input_task, static_cast<void*>(robot), "Debug Input Task");
+    PLUGINS.push_back(new RobotStatePlugin(robot));
+    create_debug_task();
     print_section("End Initialize");
 }
 

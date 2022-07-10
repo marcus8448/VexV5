@@ -12,10 +12,6 @@ double in_to_rot(double inches);
 
 double turn_to_rot(double degrees);
 
-std::string indent(const std::string& str);
-
-std::string describe_motor(pros::Motor* motor);
-
 void print(const char* string);
 void print(std::string string);
 

@@ -1,5 +1,3 @@
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #ifndef VEXV5_ROBOT_HPP
 #define VEXV5_ROBOT_HPP
 
@@ -33,12 +31,7 @@ public:
     double get_target_position() override;
 };
 
-class Describable {
-public:
-    virtual std::string describe() = 0;
-};
-
-class Controller : public Resettable, public Describable {
+class Controller : public Resettable {
 public:
     virtual ~Controller() = default;
 
@@ -79,7 +72,6 @@ public:
 
     void reset() override = 0;
     void stop() override = 0;
-    std::string describe() override = 0;
 };
 
 class Updatable {
@@ -87,8 +79,8 @@ public:
     virtual void update(Controller* controller){};
 };
 
-class Drivetrain : public Resettable, public Targeting, public Updatable, public Describable {
-private:
+class Drivetrain : public Resettable, public Targeting, public Updatable {
+public:
     pros::Motor* rightFront;
     pros::Motor* leftFront;
     pros::Motor* rightBack;
@@ -96,6 +88,7 @@ private:
 
 public:
     Drivetrain(pros::Motor* rightFront, pros::Motor* leftFront, pros::Motor* rightBack, pros::Motor* leftBack);
+    virtual ~Drivetrain();
 
     bool is_offset_within(double distance) override;
     void move_for(double right_distance, double left_distance, int max_rpm = 60, bool block = true);
@@ -109,7 +102,6 @@ public:
     void update(Controller* controller) override;
     void reset() override;
     void stop() override;
-    std::string describe() override;
 };
 
 class OpController : public Controller {
@@ -146,7 +138,6 @@ private:
 
 public:
     explicit OpController(pros::Controller controller = pros::Controller(pros::E_CONTROLLER_MASTER));
-    ~OpController() override;
 
     unsigned short int a_pressed() override;
     unsigned short int b_pressed() override;
@@ -184,10 +175,9 @@ public:
     void update() override;
     void reset() override;
     void stop() override;
-    std::string describe() override;
 };
 
-class Robot : public Resettable, public Describable {
+class Robot : public Resettable {
 public:
     Drivetrain* drivetrain;
     Controller* controller;
@@ -198,10 +188,7 @@ public:
     void update();
     void reset() override;
     void stop() override;
-    std::string describe() override;
     ~Robot();
 };
 
 #endif//VEXV5_ROBOT_HPP
-
-#pragma clang diagnostic pop

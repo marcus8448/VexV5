@@ -17,12 +17,6 @@ ReplayController::ReplayController(const char* filename) {
     this->inf >> this->type;
 }
 
-ReplayController::~ReplayController() {
-    if (this->inf.is_open()) {
-        this->inf.close();
-    }
-}
-
 unsigned short int ReplayController::a_pressed() {
     return this->a;
 }
@@ -187,29 +181,4 @@ void ReplayController::reset() {
 
 void ReplayController::stop() {
     inf.close();
-}
-
-std::string ReplayController::describe() {
-    return std::string("Replay\n")
-            .append("type: ").append(std::to_string(this->type))
-            .append("\na: ").append(std::to_string(this->a))
-            .append(", b: ").append(std::to_string(this->b))
-            .append(", x: ").append(std::to_string(this->x))
-            .append(", y: ").append(std::to_string(this->y))
-            .append("\nup: ").append(std::to_string(this->up))
-            .append(", down: ").append(std::to_string(this->down))
-            .append(", left: ").append(std::to_string(this->left))
-            .append(", right: ").append(std::to_string(this->right))
-            .append("\nl1: ").append(std::to_string(this->l1))
-            .append(", l2: ").append(std::to_string(this->l2))
-            .append(", r1: ").append(std::to_string(this->r1))
-            .append(", r2: ").append(std::to_string(this->r2))
-            .append("\nleft stick x: ").append(std::to_string(this->leftStickX))
-            .append(", left stick y: ").append(std::to_string(this->leftStickY))
-            .append("\nright stick x: ").append(std::to_string(this->rightStickX))
-            .append(", right stick y: ").append(std::to_string(this->rightStickY))
-            .append("\nprev left stick x: ").append(std::to_string(this->prevLeftStickX))
-            .append(", prev left stick y: ").append(std::to_string(this->prevLeftStickY))
-            .append("\nprev right stick x: ").append(std::to_string(this->prevRightStickX))
-            .append(", prev right stick y: ").append(std::to_string(this->prevRightStickY));
 }
