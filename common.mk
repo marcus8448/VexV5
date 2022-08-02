@@ -1,16 +1,11 @@
-ARCHTUPLE = arm-none-eabi
-DEVICE = VEX EDR V5
+ARCHTUPLE=arm-none-eabi-
+DEVICE=VEX EDR V5
 
-MFLAGS = -mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp -g -Oz
-CPPFLAGS = -D_POSIX_THREADS -D_UNIX98_THREAD_MUTEX_ATTRIBUTES
-GCCFLAGS = -ffunction-sections -fdata-sections -fdiagnostics-color -funwind-tables
+MFLAGS=-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp -Os -g
+CPPFLAGS=-D_POSIX_THREADS -D_UNIX98_THREAD_MUTEX_ATTRIBUTES
+GCCFLAGS=-ffunction-sections -fdata-sections -fdiagnostics-color -funwind-tables
 
-ARM_SYSROOT := $(shell arm-none-eabi-gcc $(MFLAGS) -print-sysroot)
-ARM_MULTI_DIR := $(shell arm-none-eabi-gcc $(MFLAGS) -print-multi-directory)
-ARM_LIB_GCC := $(shell arm-none-eabi-gcc $(MFLAGS) -print-libgcc-file-name)
-ARM_GCC_VERSION := $(shell arm-none-eabi-gcc $(MFLAGS) -dumpversion)
-
-WARNFLAGS += -Wno-psabi -Wall
+WARNFLAGS+=-Wno-psabi
 
 SPACE := $() $()
 COMMA := ,
@@ -26,25 +21,26 @@ LIBRARIES+=$(wildcard $(FWDIR)/*.a)
 EXCLUDE_COLD_LIBRARIES+=$(FWDIR)/libc.a $(FWDIR)/libm.a
 COLD_LIBRARIES=$(filter-out $(EXCLUDE_COLD_LIBRARIES), $(LIBRARIES))
 wlprefix=-Wl,$(subst $(SPACE),$(COMMA),$1)
-LNK_FLAGS=--gc-sections --start-group $(strip $(LIBRARIES)) -lgcc -lstdc++ --end-group -T$(FWDIR)/v5-common.ld --no-enum-size-warning
+LNK_FLAGS=--gc-sections --start-group $(strip $(LIBRARIES)) -lgcc -lstdc++ --end-group -T$(FWDIR)/v5-common.ld
 
 ASMFLAGS=$(MFLAGS) $(WARNFLAGS)
 CFLAGS=$(MFLAGS) $(CPPFLAGS) $(WARNFLAGS) $(GCCFLAGS) --std=gnu11
 CXXFLAGS=$(MFLAGS) $(CPPFLAGS) $(WARNFLAGS) $(GCCFLAGS) --std=gnu++17
-LDFLAGS=$(MFLAGS) $(WARNFLAGS) $(GCCFLAGS)
+LDFLAGS=$(MFLAGS) $(WARNFLAGS) -nostdlib $(GCCFLAGS)
 SIZEFLAGS=-d --common
 NUMFMTFLAGS=--to=iec --format %.2f --suffix=B
 
-AR:=llvm-ar
-AS:=clang --target=$(ARCHTUPLE) --sysroot=$(ARM_SYSROOT)
-CC:=clang --target=$(ARCHTUPLE) --sysroot=$(ARM_SYSROOT)
-CXX:=clang++ --target=$(ARCHTUPLE) --sysroot=$(ARM_SYSROOT) -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION) -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION)/tr1 -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION)/$(ARCHTUPLE) -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION)/$(ARCHTUPLE)/$(ARM_MULTI_DIR) -v
-#LD:=clang++ --target=$(ARCHTUPLE) --sysroot=$(ARM_SYSROOT) -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION) -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION)/tr1 -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION)/$(ARCHTUPLE) -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION)/$(ARCHTUPLE)/$(ARM_MULTI_DIR) -isystem $(ARM_SYSROOT)/lib/$(ARM_MULTI_DIR) $(ARM_LIB_GCC) -v
-LD:=$(ARCHTUPLE)-g++
-OBJCOPY:=llvm-objcopy
-SIZETOOL:=llvm-size
-READELF:=llvm-readelf
-STRIP:=llvm-strip
+AR:=$(ARCHTUPLE)ar
+# using arm-none-eabi-as generates a listing by default. This produces a super verbose output.
+# Using gcc accomplishes the same thing without the extra output
+AS:=$(ARCHTUPLE)gcc
+CC:=$(ARCHTUPLE)gcc
+CXX:=$(ARCHTUPLE)g++
+LD:=$(ARCHTUPLE)g++
+OBJCOPY:=$(ARCHTUPLE)objcopy
+SIZETOOL:=$(ARCHTUPLE)size
+READELF:=$(ARCHTUPLE)readelf
+STRIP:=$(ARCHTUPLE)strip
 
 ifneq (, $(shell command -v gnumfmt 2> /dev/null))
 	SIZES_NUMFMT:=| gnumfmt --field=-4 --header $(NUMFMTFLAGS)
@@ -283,9 +279,5 @@ cxx-sysroot:
 
 $(DEPDIR)/%.d: ;
 .PRECIOUS: $(DEPDIR)/%.d
-test:
-	$(foreach v,                                        \
-      $(filter-out $(VARS_OLD) VARS_OLD,$(.VARIABLES)), \
-      $(info $(v) = $($(v))))
 
 include $(wildcard $(patsubst $(SRCDIR)/%,$(DEPDIR)/%.d,$(CSRC) $(CXXSRC)))
