@@ -21,10 +21,29 @@ enum State {
 State state = NOT_CONNECTED;
 long long lastTime = -1;
 
+void timeout_hack(void* params) {
+    auto task = static_cast<pros::Task>(params);
+    const long long TIMEOUT_LENGTH = 5000;
+    while (true) {
+        if (state == NOT_CONNECTED) {
+            pros::delay(TIMEOUT_LENGTH);
+        } else {
+            if (pros::millis() - lastTime > TIMEOUT_LENGTH) {
+                state = NOT_CONNECTED;
+                task.remove(); // kill the task.
+                create_debug_task();
+                break;
+            } else {
+                pros::delay(pros::millis() - lastTime + 1);
+            }
+        }
+    }
+}
+
 /**
  * Handles debug commands.
  */
-void debug_input_task(void* _) {
+[[noreturn]] void debug_input_task([[maybe_unused]] void* params) {
     // everything is static as we kill + re-run the task if the connection times out
     static std::ostringstream log_buf; // logs from the running program.
     static std::istringstream in_passthrough_buf; // input to be passed to the program.
@@ -35,6 +54,8 @@ void debug_input_task(void* _) {
     for (SerialPlugin* plugin : PLUGINS) {
         plugin->clear_state();
     }
+
+    pros::Task(timeout_hack, static_cast<void*>(pros::Task::current()), "Timeout hack");
 
     while (true) {
         raw_out->pubsync();
@@ -52,7 +73,7 @@ void debug_input_task(void* _) {
                     raw_out->sputn(RECIEVED, SIZE);
                     state = ESTABLISHED;
                     for (SerialPlugin* plugin : PLUGINS) {
-                        plugin->initialize(raw_in, raw_out);
+                        plugin->initialize(raw_out, raw_in);
                     }
                 }
                 break;
@@ -77,21 +98,3 @@ void create_debug_task() {
     pros::Task(debug_input_task, nullptr, "Debug Input Task");
 }
 
-void timeout_hack(void* param) {
-    auto task = static_cast<pros::Task*>(param);
-    const long long TIMEOUT_LENGTH = 5000;
-    while (true) {
-        if (state == NOT_CONNECTED) {
-            pros::delay(TIMEOUT_LENGTH);
-        } else {
-            if (pros::millis() - lastTime > TIMEOUT_LENGTH) {
-                state = NOT_CONNECTED;
-                task->remove(); // kill the task.
-                create_debug_task();
-                break;
-            } else {
-                pros::delay(pros::millis() - lastTime + 1);
-            }
-        }
-    }
-}

@@ -1,13 +1,16 @@
-ARCHTUPLE=arm-none-eabi
-ARM_SYSROOT:=$(shell $(ARCHTUPLE)-gcc -print-sysroot)
-GCC_ARM_VERSION:=$(shell ls $(ARM_SYSROOT)/include/c++)
-DEVICE=VEX EDR V5
+ARCHTUPLE = arm-none-eabi
+DEVICE = VEX EDR V5
 
-MFLAGS=-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp -g -Oz
-CPPFLAGS=-D_POSIX_THREADS -D_UNIX98_THREAD_MUTEX_ATTRIBUTES -Wall
-GCCFLAGS=-ffunction-sections -fdata-sections -fdiagnostics-color -funwind-tables
+MFLAGS = -mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp -g -Oz
+CPPFLAGS = -D_POSIX_THREADS -D_UNIX98_THREAD_MUTEX_ATTRIBUTES
+GCCFLAGS = -ffunction-sections -fdata-sections -fdiagnostics-color -funwind-tables
 
-WARNFLAGS+=-Wno-psabi
+ARM_SYSROOT := $(shell arm-none-eabi-gcc $(MFLAGS) -print-sysroot)
+ARM_MULTI_DIR := $(shell arm-none-eabi-gcc $(MFLAGS) -print-multi-directory)
+ARM_LIB_GCC := $(shell arm-none-eabi-gcc $(MFLAGS) -print-libgcc-file-name)
+ARM_GCC_VERSION := $(shell arm-none-eabi-gcc $(MFLAGS) -dumpversion)
+
+WARNFLAGS += -Wno-psabi -Wall
 
 SPACE := $() $()
 COMMA := ,
@@ -28,15 +31,15 @@ LNK_FLAGS=--gc-sections --start-group $(strip $(LIBRARIES)) -lgcc -lstdc++ --end
 ASMFLAGS=$(MFLAGS) $(WARNFLAGS)
 CFLAGS=$(MFLAGS) $(CPPFLAGS) $(WARNFLAGS) $(GCCFLAGS) --std=gnu11
 CXXFLAGS=$(MFLAGS) $(CPPFLAGS) $(WARNFLAGS) $(GCCFLAGS) --std=gnu++17
-LDFLAGS=$(MFLAGS) $(WARNFLAGS) -nostdlib $(GCCFLAGS)
+LDFLAGS=$(MFLAGS) $(WARNFLAGS) $(GCCFLAGS)
 SIZEFLAGS=-d --common
 NUMFMTFLAGS=--to=iec --format %.2f --suffix=B
 
 AR:=llvm-ar
-AS:=clang --target=$(ARCHTUPLE)
-CC:=clang --target=$(ARCHTUPLE)
-CXX:=clang++ --target=$(ARCHTUPLE) -iwithsysroot $(ARM_SYSROOT)/include/ -I$(ARM_SYSROOT)/include/c++/$(GCC_ARM_VERSION) -iwithsysroot $(ARM_SYSROOT)/include/c++/$(GCC_ARM_VERSION)/$(ARCHTUPLE)
-# TODO - use ld.lld [-L$(ARM_SYSROOT)/lib/ -L/lib/gcc/$(ARCHTUPLE)/$(GCC_ARM_VERSION)/]
+AS:=clang --target=$(ARCHTUPLE) --sysroot=$(ARM_SYSROOT)
+CC:=clang --target=$(ARCHTUPLE) --sysroot=$(ARM_SYSROOT)
+CXX:=clang++ --target=$(ARCHTUPLE) --sysroot=$(ARM_SYSROOT) -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION) -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION)/tr1 -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION)/$(ARCHTUPLE) -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION)/$(ARCHTUPLE)/$(ARM_MULTI_DIR) -v
+#LD:=clang++ --target=$(ARCHTUPLE) --sysroot=$(ARM_SYSROOT) -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION) -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION)/tr1 -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION)/$(ARCHTUPLE) -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION)/$(ARCHTUPLE)/$(ARM_MULTI_DIR) -isystem $(ARM_SYSROOT)/lib/$(ARM_MULTI_DIR) $(ARM_LIB_GCC) -v
 LD:=$(ARCHTUPLE)-g++
 OBJCOPY:=llvm-objcopy
 SIZETOOL:=llvm-size
@@ -182,10 +185,6 @@ clean:
 	-$Drm -rf $(DEPDIR)
 
 ifeq ($(IS_LIBRARY),1)
-ifeq ($(LIBNAME),libbest)
-$(errror "You should rename your library! libbest is the default library name and should be changed")
-endif
-
 LIBAR=$(BINDIR)/$(LIBNAME).a
 TEMPLATE_DIR=$(ROOT)/template
 
@@ -284,5 +283,9 @@ cxx-sysroot:
 
 $(DEPDIR)/%.d: ;
 .PRECIOUS: $(DEPDIR)/%.d
+test:
+	$(foreach v,                                        \
+      $(filter-out $(VARS_OLD) VARS_OLD,$(.VARIABLES)), \
+      $(info $(v) = $($(v))))
 
 include $(wildcard $(patsubst $(SRCDIR)/%,$(DEPDIR)/%.d,$(CSRC) $(CXXSRC)))
