@@ -9,7 +9,6 @@
 class RobotStatePlugin: public SerialPlugin {
 public:
     std::streambuf *raw_out = nullptr; // do not delete these in the destructor, as they are shared between plugins
-    std::streambuf *raw_in = nullptr;
     Robot* robot = nullptr;
 
     explicit RobotStatePlugin(Robot* robot);

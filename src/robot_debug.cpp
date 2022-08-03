@@ -10,17 +10,14 @@ RobotStatePlugin::RobotStatePlugin(Robot* robot): robot(robot) {
 
 void RobotStatePlugin::initialize(std::streambuf* out, std::streambuf* in) {
     this->raw_out = out;
-    this->raw_in = in;
 }
 
 void RobotStatePlugin::clear_state() {
     this->raw_out = nullptr;
-    this->raw_in = nullptr;
 }
 
 void RobotStatePlugin::disconnected() {
     this->raw_out = nullptr;
-    this->raw_in = nullptr;
 }
 
 typedef double floating;
@@ -33,35 +30,33 @@ void serialize_motor(unsigned char* buffer, pros::Motor* motor) {
     std::memcpy(&buffer[sizeof(floating) * 1], &src, sizeof(floating));
     src = motor->get_position();
     std::memcpy(&buffer[sizeof(floating) * 2], &src, sizeof(floating));
-//    src = motor->get_efficiency();
-//    std::memcpy(&buffer[sizeof(floating) * 3], &src, sizeof(floating));
-//    src = motor->get_power();
-//    std::memcpy(&buffer[sizeof(floating) * 4], &src, sizeof(floating));
-//    src = motor->get_temperature();
-//    std::memcpy(&buffer[sizeof(floating) * 5], &src, sizeof(floating));
-//    src = motor->get_torque();
-//    std::memcpy(&buffer[sizeof(floating) * 6], &src, sizeof(floating));
+    src = motor->get_efficiency();
+    std::memcpy(&buffer[sizeof(floating) * 3], &src, sizeof(floating));
+    src = motor->get_power();
+    std::memcpy(&buffer[sizeof(floating) * 4], &src, sizeof(floating));
+    src = motor->get_temperature();
+    std::memcpy(&buffer[sizeof(floating) * 5], &src, sizeof(floating));
+    src = motor->get_torque();
+    std::memcpy(&buffer[sizeof(floating) * 6], &src, sizeof(floating));
     int isrc;
     isrc = motor->get_target_velocity();
     std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 0], &isrc, sizeof(int));
-//    isrc = motor->get_current_draw();
-//    std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 1], &isrc, sizeof(int));
-//    isrc = motor->get_voltage();
-//    std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 2], &isrc, sizeof(int));
-//    isrc = motor->get_current_limit();
-//    std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 3], &isrc, sizeof(int));
-//    isrc = motor->get_voltage_limit();
-//    std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 4], &isrc, sizeof(int));
+    isrc = motor->get_current_draw();
+    std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 1], &isrc, sizeof(int));
+    isrc = motor->get_voltage();
+    std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 2], &isrc, sizeof(int));
+    isrc = motor->get_current_limit();
+    std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 3], &isrc, sizeof(int));
+    isrc = motor->get_voltage_limit();
+    std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 4], &isrc, sizeof(int));
 }
 
 void RobotStatePlugin::handle(char *type) {
     const int CONTROLLER_SIZE = 3 + (sizeof(float) * 4);
-    const int MOTOR_SIZE = (sizeof(floating) * 3) + (sizeof(int) * 1);
+    const int MOTOR_SIZE = (sizeof(floating) * 7) + (sizeof(int) * 5);
     const int SIZE = CONTROLLER_SIZE + (MOTOR_SIZE * 4);
-    static char buf[4];
-    this->raw_in->sgetn(buf, 4);
-
     static unsigned char buffer[SIZE] = {0};
+
     if (type == ROBOT_STATE) {
         if (this->robot->controller->a_pressed()) buffer[0] |= 0b00000001;
         if (this->robot->controller->b_pressed()) buffer[0] |= 0b00000010;
