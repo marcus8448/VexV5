@@ -46,6 +46,7 @@ void initialize() {
             new pros::Motor(20, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES),
             new pros::Motor(11, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES)));
     PLUGINS.push_back(new RobotStatePlugin(robot));
+    PLUGINS.push_back(new RobotCommandsPlugin(robot));
     create_debug_task();
     print_section("End Initialize");
 }

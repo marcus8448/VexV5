@@ -4,6 +4,7 @@
 #include <cstring>
 
 const char* ROBOT_STATE = "R_ST";
+const char* ROBOT_DEBUG = "RDBG";
 
 RobotStatePlugin::RobotStatePlugin(Robot* robot): robot(robot) {
 }
@@ -51,7 +52,7 @@ void serialize_motor(unsigned char* buffer, pros::Motor* motor) {
     std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 4], &isrc, sizeof(int));
 }
 
-void RobotStatePlugin::handle(char *type) {
+bool RobotStatePlugin::handle(char *type) {
     const int CONTROLLER_SIZE = 3 + (sizeof(float) * 4);
     const int MOTOR_SIZE = (sizeof(floating) * 7) + (sizeof(int) * 5);
     const int SIZE = CONTROLLER_SIZE + (MOTOR_SIZE * 4);
@@ -86,5 +87,65 @@ void RobotStatePlugin::handle(char *type) {
         serialize_motor(&buffer[CONTROLLER_SIZE + MOTOR_SIZE * 2], this->robot->drivetrain->rightBack);
         serialize_motor(&buffer[CONTROLLER_SIZE + MOTOR_SIZE * 3], this->robot->drivetrain->leftBack);
         raw_out->sputn(reinterpret_cast<char*>(buffer), SIZE);
+    }
+}
+
+RobotCommandsPlugin::RobotCommandsPlugin(Robot* robot): robot(robot) {
+}
+
+void RobotCommandsPlugin::initialize(std::streambuf* out, std::streambuf* in) {
+    this->raw_out = out;
+    this->raw_in = in;
+}
+
+void RobotCommandsPlugin::clear_state() {
+    this->raw_out = nullptr;
+    this->raw_in = nullptr;
+}
+
+void RobotCommandsPlugin::disconnected() {
+    this->raw_out = nullptr;
+    this->raw_in = nullptr;
+}
+
+bool RobotCommandsPlugin::handle(char *type) {
+    static char sizebuf[1];
+
+    if (type == ROBOT_DEBUG) {
+        this->raw_in->sgetn(sizebuf, 1);
+        int len = static_cast<int>(sizebuf[0]);
+        char* buf = new char[len];
+        this->raw_in->sgetn(sizebuf, len);
+        for(int i = 0; buf[i]; i++) buf[i] = tolower(buf[i]); 
+        std::vector<std::string> vec;
+        do {
+            buf = strtok(buf, " ");
+            vec.push_back(std::string(buf));
+        } while (buf != nullptr);
+        if (vec.size() == 0) return;
+        
+        if (vec.size() > 5) {
+            if (vec[0] == "set") {
+                if (vec[1] == "drivetrain") {
+                    if (vec[2] == "right_front") {
+                        if (vec[3] == "target_velocity") {
+
+                        } else if (vec[3] == "target_voltage") {
+
+                        } else if (vec[3] == "target_position") {
+
+                        } else if (vec[3] == "relative_target_position") {
+
+                        }
+                    } else if (vec[2] == "right_back") {
+
+                    } else if (vec[2] == "left_front") {
+
+                    } else if (vec[2] == "left_back") {
+
+                    }
+                }
+            }
+        }
     }
 }

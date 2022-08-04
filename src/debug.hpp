@@ -11,7 +11,7 @@ public:
     * Called when the robot successfully connects to the client computer.
     */
     virtual void initialize(std::streambuf* raw_out, std::streambuf* raw_in) = 0;
-    virtual void handle(char type[4]) = 0;
+    virtual bool handle(char type[4]) = 0;
     /**
     * Called when the robot is gracefully disconnected from the computer.
     * Not guarenteed to be called.

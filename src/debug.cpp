@@ -1,5 +1,6 @@
 #include "debug.hpp"
 #include "pros/rtos.hpp"
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -49,7 +50,8 @@ void timeout_hack(void* params) {
     static std::istringstream in_passthrough_buf; // input to be passed to the program.
     static std::streambuf* raw_out = std::cout.rdbuf(log_buf.rdbuf()); // send data through the serial port
     static std::streambuf* raw_in = std::cin.rdbuf(in_passthrough_buf.rdbuf()); // read data from the serial port
-
+    log_buf.clear();
+    in_passthrough_buf.clear();
     static char buf[4];
     for (SerialPlugin* plugin : PLUGINS) {
         plugin->clear_state();
@@ -66,10 +68,15 @@ void timeout_hack(void* params) {
                 if (buf == CONNECT) {
                     raw_out->sputn(RECIEVED, SIZE);
                     state = AWAITING_RESPONSE;
+                } else {
+                    if (raw_in->in_avail() > 0) { // delete all other chars
+                        raw_in->pubseekoff(0, std::ios_base::end);
+                    }
                 }
                 break;
             case AWAITING_RESPONSE:
                 if (buf == RESPONSE) {
+                    lastTime = pros::millis();
                     raw_out->sputn(RECIEVED, SIZE);
                     state = ESTABLISHED;
                     for (SerialPlugin* plugin : PLUGINS) {
@@ -83,10 +90,15 @@ void timeout_hack(void* params) {
                     for (SerialPlugin* plugin : PLUGINS) {
                         plugin->disconnected();
                     }
+                    if (raw_in->in_avail() > 0) { // delete all other chars
+                        raw_in->pubseekoff(0, std::ios_base::end);
+                    }
                 } else {
-                    lastTime = pros::millis();
                     for (SerialPlugin* plugin : PLUGINS) {
-                        plugin->handle(buf);
+                        if (plugin->handle(buf)) {
+                            lastTime = pros::millis();
+                            break;
+                        }
                     }
                 }
             break;
