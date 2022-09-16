@@ -10,15 +10,15 @@ RobotStatePlugin::RobotStatePlugin(Robot* robot): robot(robot) {
 }
 
 void RobotStatePlugin::initialize(std::streambuf* out, std::streambuf* in) {
-    this->raw_out = out;
+    this->outputBuf = out;
 }
 
 void RobotStatePlugin::clear_state() {
-    this->raw_out = nullptr;
+    this->outputBuf = nullptr;
 }
 
 void RobotStatePlugin::disconnected() {
-    this->raw_out = nullptr;
+    this->outputBuf = nullptr;
 }
 
 typedef double floating;
@@ -39,7 +39,7 @@ void serialize_motor(unsigned char* buffer, pros::Motor* motor) {
     std::memcpy(&buffer[sizeof(floating) * 5], &src, sizeof(floating));
     src = motor->get_torque();
     std::memcpy(&buffer[sizeof(floating) * 6], &src, sizeof(floating));
-    int isrc;
+    uint32_t isrc;
     isrc = motor->get_target_velocity();
     std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 0], &isrc, sizeof(int));
     isrc = motor->get_current_draw();
@@ -53,9 +53,9 @@ void serialize_motor(unsigned char* buffer, pros::Motor* motor) {
 }
 
 bool RobotStatePlugin::handle(char *type) {
-    const int CONTROLLER_SIZE = 3 + (sizeof(float) * 4);
-    const int MOTOR_SIZE = (sizeof(floating) * 7) + (sizeof(int) * 5);
-    const int SIZE = CONTROLLER_SIZE + (MOTOR_SIZE * 4);
+    const uint32_t CONTROLLER_SIZE = 3 + (sizeof(float) * 4);
+    const uint32_t MOTOR_SIZE = (sizeof(floating) * 7) + (sizeof(int) * 5);
+    const uint32_t SIZE = CONTROLLER_SIZE + (MOTOR_SIZE * 4);
     static unsigned char buffer[SIZE] = {0};
 
     if (type == ROBOT_STATE) {
@@ -71,7 +71,7 @@ bool RobotStatePlugin::handle(char *type) {
         if (this->robot->controller->l2_pressed()) buffer[1] |= 0b00000010;
         if (this->robot->controller->r1_pressed()) buffer[1] |= 0b00000100;
         if (this->robot->controller->r2_pressed()) buffer[1] |= 0b00001000;
-        buffer[2] = this->robot->controller->get_digital_speed();
+        buffer[2] = this->robot->controller->digital_speed();
         float src;
         src = (float)this->robot->controller->left_stick_x();
         std::memcpy(&buffer[3 + sizeof(float) * 0], &src, sizeof(float));
@@ -86,7 +86,7 @@ bool RobotStatePlugin::handle(char *type) {
         serialize_motor(&buffer[CONTROLLER_SIZE + MOTOR_SIZE * 1], this->robot->drivetrain->leftFront);
         serialize_motor(&buffer[CONTROLLER_SIZE + MOTOR_SIZE * 2], this->robot->drivetrain->rightBack);
         serialize_motor(&buffer[CONTROLLER_SIZE + MOTOR_SIZE * 3], this->robot->drivetrain->leftBack);
-        raw_out->sputn(reinterpret_cast<char*>(buffer), SIZE);
+        outputBuf->sputn(reinterpret_cast<char*>(buffer), SIZE);
     }
 }
 
@@ -94,35 +94,35 @@ RobotCommandsPlugin::RobotCommandsPlugin(Robot* robot): robot(robot) {
 }
 
 void RobotCommandsPlugin::initialize(std::streambuf* out, std::streambuf* in) {
-    this->raw_out = out;
-    this->raw_in = in;
+    this->outputBuf = out;
+    this->inputBuf = in;
 }
 
 void RobotCommandsPlugin::clear_state() {
-    this->raw_out = nullptr;
-    this->raw_in = nullptr;
+    this->outputBuf = nullptr;
+    this->inputBuf = nullptr;
 }
 
 void RobotCommandsPlugin::disconnected() {
-    this->raw_out = nullptr;
-    this->raw_in = nullptr;
+    this->outputBuf = nullptr;
+    this->inputBuf = nullptr;
 }
 
 bool RobotCommandsPlugin::handle(char *type) {
     static char sizebuf[1];
 
     if (type == ROBOT_DEBUG) {
-        this->raw_in->sgetn(sizebuf, 1);
-        int len = static_cast<int>(sizebuf[0]);
+        this->inputBuf->sgetn(sizebuf, 1);
+        uint32_t len = static_cast<int>(sizebuf[0]);
         char* buf = new char[len];
-        this->raw_in->sgetn(sizebuf, len);
-        for(int i = 0; buf[i]; i++) buf[i] = tolower(buf[i]); 
+        this->inputBuf->sgetn(sizebuf, len);
+        for(uint32_t i = 0; buf[i]; i++) buf[i] = tolower(buf[i]); 
         std::vector<std::string> vec;
         do {
             buf = strtok(buf, " ");
             vec.push_back(std::string(buf));
         } while (buf != nullptr);
-        if (vec.size() == 0) return;
+        if (vec.size() == 0) return true;
         
         if (vec.size() > 5) {
             if (vec[0] == "set") {
@@ -147,5 +147,7 @@ bool RobotCommandsPlugin::handle(char *type) {
                 }
             }
         }
+        return true;
     }
+    return false;
 }

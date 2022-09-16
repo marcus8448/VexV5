@@ -1,5 +1,6 @@
 #include "robot.hpp"
 #include "error.hpp"
+#include "logger.hpp"
 #include "util.hpp"
 #include "pros/misc.hpp"
 #include "pros/motors.hpp"
@@ -15,51 +16,51 @@ double DualPositioned::get_target_position() {
     return (this->get_left_target_position() + this->get_right_target_position()) / 2.0;
 }
 
-unsigned short int OpController::a_pressed() {
+uint16_t OpController::a_pressed() {
     return this->a;
 }
 
-unsigned short int OpController::b_pressed() {
+uint16_t OpController::b_pressed() {
     return this->b;
 }
 
-unsigned short int OpController::x_pressed() {
+uint16_t OpController::x_pressed() {
     return this->x;
 }
 
-unsigned short int OpController::y_pressed() {
+uint16_t OpController::y_pressed() {
     return this->y;
 }
 
-unsigned short int OpController::up_pressed() {
+uint16_t OpController::up_pressed() {
     return this->up;
 }
 
-unsigned short int OpController::down_pressed() {
+uint16_t OpController::down_pressed() {
     return this->down;
 }
 
-unsigned short int OpController::left_pressed() {
+uint16_t OpController::left_pressed() {
     return this->left;
 }
 
-unsigned short int OpController::right_pressed() {
+uint16_t OpController::right_pressed() {
     return this->right;
 }
 
-unsigned short int OpController::l1_pressed() {
+uint16_t OpController::l1_pressed() {
     return this->l1;
 }
 
-unsigned short int OpController::l2_pressed() {
+uint16_t OpController::l2_pressed() {
     return this->l2;
 }
 
-unsigned short int OpController::r1_pressed() {
+uint16_t OpController::r1_pressed() {
     return this->r1;
 }
 
-unsigned short int OpController::r2_pressed() {
+uint16_t OpController::r2_pressed() {
     return this->r2;
 }
 
@@ -95,119 +96,119 @@ double OpController::prev_right_stick_y() {
     return this->prevRightStickY;
 }
 
-unsigned char OpController::get_digital_speed() {
+unsigned char OpController::digital_speed() {
     return this->digitalSpeed;
 }
 
-void OpController::set_digital_speed(unsigned char speed) {
+void OpController::digital_speed(unsigned char speed) {
     this->digitalSpeed = speed;
 }
 
 void OpController::set_line(unsigned char line, unsigned char col, const char* str) {
-    erri(this->controller.set_text(line, col, str));
+    check_error(this->controller.set_text(line, col, str));
 }
 
 void OpController::clear_line(unsigned char line) {
-    erri(this->controller.clear_line(line));
+    check_error(this->controller.clear_line(line));
 }
 
 void OpController::rumble(const char* str) {
-    erri(this->controller.rumble(str));
+    check_error(this->controller.rumble(str));
 }
 
 void OpController::update() {
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))) {
         this->a++;
     } else {
         this->a = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))) {
         this->b++;
     } else {
         this->b = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))) {
         this->x++;
     } else {
         this->x = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y))) {
         this->y++;
     } else {
         this->y = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP))) {
         this->up++;
     } else {
         this->up = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN))) {
         this->down++;
     } else {
         this->down = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))) {
         this->left++;
     } else {
         this->left = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT))) {
         this->right++;
     } else {
         this->right = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1))) {
         this->l1++;
     } else {
         this->l1 = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2))) {
         this->l2++;
     } else {
         this->l2 = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))) {
         this->r1++;
     } else {
         this->r1 = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2))) {
         this->r2++;
     } else {
         this->r2 = 0;
     }
 
     this->prevLeftStickX = this->leftStickX;
-    this->leftStickX = errd(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X));
+    this->leftStickX = check_error(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X));
 
     this->prevLeftStickY = this->leftStickY;
-    this->leftStickY = errd(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y));
+    this->leftStickY = check_error(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y));
 
     this->prevRightStickX = this->rightStickX;
-    this->rightStickX = errd(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X));
+    this->rightStickX = check_error(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X));
 
     this->prevRightStickY = this->rightStickY;
-    this->rightStickY = errd(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
+    this->rightStickY = check_error(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
 
     if (this->up_pressed()) {
-        this->set_digital_speed(std::min(this->get_digital_speed() + 1, 127));
+        this->digital_speed(std::min(this->digital_speed() + 1, 127));
     } else if (this->down_pressed()) {
-        this->set_digital_speed(std::max(this->get_digital_speed() - 1, 127));
+        this->digital_speed(std::max(this->digital_speed() - 1, 127));
     }
 
     if (this->up_pressed() || this->down_pressed()) {
-        this->set_line(0, 0, ("Dig Spd: " + std::to_string(this->get_digital_speed()).append(" ")).c_str());//append ' ' to clear out buffer
+        this->set_line(0, 0, ("Dig Spd: " + std::to_string(this->digital_speed()).append(" ")).c_str());//append ' ' to clear out buffer
     }
 }
 
@@ -255,14 +256,14 @@ Drivetrain::~Drivetrain() {
 }
 
 bool Drivetrain::is_offset_within(double distance) {
-    return fabs(errd(this->rightFront->get_position()) - errd(this->rightFront->get_target_position())) < distance && fabs(errd(this->leftFront->get_position()) - errd(this->leftFront->get_target_position())) < distance && fabs(errd(this->rightBack->get_position()) - errd(this->rightBack->get_target_position())) < distance && fabs(errd(this->leftBack->get_position()) - errd(this->leftBack->get_target_position())) < distance;
+    return fabs(check_error(this->rightFront->get_position()) - check_error(this->rightFront->get_target_position())) < distance && fabs(check_error(this->leftFront->get_position()) - check_error(this->leftFront->get_target_position())) < distance && fabs(check_error(this->rightBack->get_position()) - check_error(this->rightBack->get_target_position())) < distance && fabs(check_error(this->leftBack->get_position()) - check_error(this->leftBack->get_target_position())) < distance;
 }
 
-void Drivetrain::move_for(double right_distance, double left_distance, int max_rpm, bool block) {
-    erri(this->rightFront->move_relative(right_distance, max_rpm));
-    erri(this->rightBack->move_relative(right_distance, max_rpm));
-    erri(this->leftFront->move_relative(left_distance, max_rpm));
-    erri(this->leftBack->move_relative(left_distance, max_rpm));
+void Drivetrain::move_for(double right_distance, double left_distance, uint32_t max_rpm, bool block) {
+    check_error(this->rightFront->move_relative(right_distance, max_rpm));
+    check_error(this->rightBack->move_relative(right_distance, max_rpm));
+    check_error(this->leftFront->move_relative(left_distance, max_rpm));
+    check_error(this->leftBack->move_relative(left_distance, max_rpm));
     if (block) {
         while (!this->is_offset_within(5.0)) {
             pros::delay(50);
@@ -273,30 +274,30 @@ void Drivetrain::move_for(double right_distance, double left_distance, int max_r
     }
 }
 
-void Drivetrain::forwards(double distance, int max_rpm, bool block) {
+void Drivetrain::forwards(double distance, uint32_t max_rpm, bool block) {
     this->move_for(in_to_rot(distance), in_to_rot(distance), max_rpm, block);
 }
 
-void Drivetrain::backwards(double distance, int max_rpm, bool block) {
+void Drivetrain::backwards(double distance, uint32_t max_rpm, bool block) {
     this->move_for(-in_to_rot(distance), -in_to_rot(distance), max_rpm, block);
 }
 
-void Drivetrain::turn_right(double angle, int max_rpm, bool block) {
+void Drivetrain::turn_right(double angle, uint32_t max_rpm, bool block) {
     this->move_for(-turn_to_rot(angle), turn_to_rot(angle), max_rpm, block);
 }
 
-void Drivetrain::turn_left(double angle, int max_rpm, bool block) {
+void Drivetrain::turn_left(double angle, uint32_t max_rpm, bool block) {
     this->move_for(turn_to_rot(angle), -turn_to_rot(angle), max_rpm, block);
 }
 
-void Drivetrain::move_right(int voltage) {
-    erri(this->rightFront->move(voltage));
-    erri(this->rightBack->move(voltage));
+void Drivetrain::move_right(uint32_t voltage) {
+    check_error(this->rightFront->move(voltage));
+    check_error(this->rightBack->move(voltage));
 }
 
-void Drivetrain::move_left(int voltage) {
-    erri(this->leftFront->move(voltage));
-    erri(this->leftBack->move(voltage));
+void Drivetrain::move_left(uint32_t voltage) {
+    check_error(this->leftFront->move(voltage));
+    check_error(this->leftBack->move(voltage));
 }
 
 void Drivetrain::update(Controller* controller) {
@@ -323,10 +324,10 @@ Robot::Robot(Drivetrain* drivetrain) : drivetrain(drivetrain), controller(nullpt
 
 void Robot::update() {
     if (this->controller == nullptr) {
-        println("Controller is null?");
+        logger::info("Controller is null?");
     }
     if (this->drivetrain == nullptr) {
-        println("Drivetrain is null?");
+        logger::info("Drivetrain is null?");
     }
     this->controller->update();
     this->drivetrain->update(this->controller);
@@ -343,7 +344,7 @@ void Robot::stop() {
 }
 
 Robot::~Robot() {
-    println("Robot destructor called");
+    logger::info("Robot destructor called");
     delete controller;
     controller = nullptr;
     delete drivetrain;

@@ -4,14 +4,17 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
-const int SIZE = 4;
+const uint16_t SIZE = 4;
 
 const char* CONNECT = "cnct";
 const char* RECIEVED = "recv";
 const char* RESPONSE = "okay";
 const char* SPECIAL = "rqst";
 const char* DISCONNECT = "gbye";
+
+static std::vector<SerialPlugin*> PLUGINS;
 
 enum State {
     NOT_CONNECTED,
@@ -46,12 +49,12 @@ void timeout_hack(void* params) {
  */
 [[noreturn]] void debug_input_task([[maybe_unused]] void* params) {
     // everything is static as we kill + re-run the task if the connection times out
-    static std::ostringstream log_buf; // logs from the running program.
-    static std::istringstream in_passthrough_buf; // input to be passed to the program.
-    static std::streambuf* raw_out = std::cout.rdbuf(log_buf.rdbuf()); // send data through the serial port
-    static std::streambuf* raw_in = std::cin.rdbuf(in_passthrough_buf.rdbuf()); // read data from the serial port
-    log_buf.clear();
-    in_passthrough_buf.clear();
+    static std::ostringstream bufferFromProgram; // logs from the running program.
+    static std::istringstream bufferToProgram; // input to be passed to the program.
+    static std::streambuf* outputBuf = std::cout.rdbuf(bufferFromProgram.rdbuf()); // send data through the serial port
+    static std::streambuf* inputBuf = std::cin.rdbuf(bufferToProgram.rdbuf()); // read data from the serial port
+    bufferFromProgram.clear();
+    bufferToProgram.clear();
     static char buf[4];
     for (SerialPlugin* plugin : PLUGINS) {
         plugin->clear_state();
@@ -60,27 +63,27 @@ void timeout_hack(void* params) {
     pros::Task(timeout_hack, static_cast<void*>(pros::Task::current()), "Timeout hack");
 
     while (true) {
-        raw_out->pubsync();
+        outputBuf->pubsync();
         lastTime = pros::millis();
-        raw_in->sgetn(buf, SIZE);
+        inputBuf->sgetn(buf, SIZE);
         switch (state) {
             case NOT_CONNECTED:
                 if (buf == CONNECT) {
-                    raw_out->sputn(RECIEVED, SIZE);
+                    outputBuf->sputn(RECIEVED, SIZE);
                     state = AWAITING_RESPONSE;
                 } else {
-                    if (raw_in->in_avail() > 0) { // delete all other chars
-                        raw_in->pubseekoff(0, std::ios_base::end);
+                    if (inputBuf->in_avail() > 0) { // delete all other chars
+                        inputBuf->pubseekoff(0, std::ios_base::end);
                     }
                 }
                 break;
             case AWAITING_RESPONSE:
                 if (buf == RESPONSE) {
                     lastTime = pros::millis();
-                    raw_out->sputn(RECIEVED, SIZE);
+                    outputBuf->sputn(RECIEVED, SIZE);
                     state = ESTABLISHED;
                     for (SerialPlugin* plugin : PLUGINS) {
-                        plugin->initialize(raw_out, raw_in);
+                        plugin->initialize(outputBuf, inputBuf);
                     }
                 }
                 break;
@@ -90,8 +93,8 @@ void timeout_hack(void* params) {
                     for (SerialPlugin* plugin : PLUGINS) {
                         plugin->disconnected();
                     }
-                    if (raw_in->in_avail() > 0) { // delete all other chars
-                        raw_in->pubseekoff(0, std::ios_base::end);
+                    if (inputBuf->in_avail() > 0) { // delete all other chars
+                        inputBuf->pubseekoff(0, std::ios_base::end);
                     }
                 } else {
                     for (SerialPlugin* plugin : PLUGINS) {
@@ -106,7 +109,10 @@ void timeout_hack(void* params) {
     }
 }
 
+void add_plugin(SerialPlugin* plugin) {
+    PLUGINS.push_back(plugin);
+}
+
 void create_debug_task() {
     pros::Task(debug_input_task, nullptr, "Debug Input Task");
 }
-

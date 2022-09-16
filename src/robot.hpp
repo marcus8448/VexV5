@@ -35,23 +35,23 @@ class Controller : public Resettable {
 public:
     virtual ~Controller() = default;
 
-    virtual unsigned short int a_pressed() = 0;
-    virtual unsigned short int b_pressed() = 0;
-    virtual unsigned short int x_pressed() = 0;
-    virtual unsigned short int y_pressed() = 0;
+    virtual uint16_t a_pressed() = 0;
+    virtual uint16_t b_pressed() = 0;
+    virtual uint16_t x_pressed() = 0;
+    virtual uint16_t y_pressed() = 0;
 
-    virtual unsigned short int up_pressed() = 0;
-    virtual unsigned short int down_pressed() = 0;
-    virtual unsigned short int left_pressed() = 0;
-    virtual unsigned short int right_pressed() = 0;
+    virtual uint16_t up_pressed() = 0;
+    virtual uint16_t down_pressed() = 0;
+    virtual uint16_t left_pressed() = 0;
+    virtual uint16_t right_pressed() = 0;
 
-    virtual unsigned short int l1_pressed() = 0;
-    virtual unsigned short int l2_pressed() = 0;
-    virtual unsigned short int r1_pressed() = 0;
-    virtual unsigned short int r2_pressed() = 0;
+    virtual uint16_t l1_pressed() = 0;
+    virtual uint16_t l2_pressed() = 0;
+    virtual uint16_t r1_pressed() = 0;
+    virtual uint16_t r2_pressed() = 0;
 
-    virtual unsigned char get_digital_speed() = 0;
-    virtual void set_digital_speed(unsigned char digitalSpeed) = 0;
+    virtual unsigned char digital_speed() = 0;
+    virtual void digital_speed(unsigned char digitalSpeed) = 0;
 
     virtual void set_line(unsigned char line, unsigned char col, const char* str) = 0;
     virtual void clear_line(unsigned char line) = 0;
@@ -91,13 +91,13 @@ public:
     virtual ~Drivetrain();
 
     bool is_offset_within(double distance) override;
-    void move_for(double right_distance, double left_distance, int max_rpm = 60, bool block = true);
-    void forwards(double distance, int max_rpm = 100, bool block = true);
-    void backwards(double distance, int max_rpm = 100, bool block = true);
-    void turn_right(double angle, int max_rpm = 100, bool block = true);
-    void turn_left(double angle, int max_rpm = 100, bool block = true);
-    void move_right(int voltage);
-    void move_left(int voltage);
+    void move_for(double right_distance, double left_distance, uint32_t max_rpm = 60, bool block = true);
+    void forwards(double distance, uint32_t max_rpm = 100, bool block = true);
+    void backwards(double distance, uint32_t max_rpm = 100, bool block = true);
+    void turn_right(double angle, uint32_t max_rpm = 100, bool block = true);
+    void turn_left(double angle, uint32_t max_rpm = 100, bool block = true);
+    void move_right(uint32_t voltage);
+    void move_left(uint32_t voltage);
 
     void update(Controller* controller) override;
     void reset() override;
@@ -109,20 +109,20 @@ public:
     pros::Controller controller;
 
 private:
-    unsigned short int a = 0;
-    unsigned short int b = 0;
-    unsigned short int x = 0;
-    unsigned short int y = 0;
+    uint16_t a = 0;
+    uint16_t b = 0;
+    uint16_t x = 0;
+    uint16_t y = 0;
 
-    unsigned short int up = 0;
-    unsigned short int down = 0;
-    unsigned short int left = 0;
-    unsigned short int right = 0;
+    uint16_t up = 0;
+    uint16_t down = 0;
+    uint16_t left = 0;
+    uint16_t right = 0;
 
-    unsigned short int l1 = 0;
-    unsigned short int l2 = 0;
-    unsigned short int r1 = 0;
-    unsigned short int r2 = 0;
+    uint16_t l1 = 0;
+    uint16_t l2 = 0;
+    uint16_t r1 = 0;
+    uint16_t r2 = 0;
 
     double leftStickX = 0.0;
     double leftStickY = 0.0;
@@ -139,20 +139,20 @@ private:
 public:
     explicit OpController(pros::Controller controller = pros::Controller(pros::E_CONTROLLER_MASTER));
 
-    unsigned short int a_pressed() override;
-    unsigned short int b_pressed() override;
-    unsigned short int x_pressed() override;
-    unsigned short int y_pressed() override;
+    uint16_t a_pressed() override;
+    uint16_t b_pressed() override;
+    uint16_t x_pressed() override;
+    uint16_t y_pressed() override;
 
-    unsigned short int up_pressed() override;
-    unsigned short int down_pressed() override;
-    unsigned short int left_pressed() override;
-    unsigned short int right_pressed() override;
+    uint16_t up_pressed() override;
+    uint16_t down_pressed() override;
+    uint16_t left_pressed() override;
+    uint16_t right_pressed() override;
 
-    unsigned short int l1_pressed() override;
-    unsigned short int l2_pressed() override;
-    unsigned short int r1_pressed() override;
-    unsigned short int r2_pressed() override;
+    uint16_t l1_pressed() override;
+    uint16_t l2_pressed() override;
+    uint16_t r1_pressed() override;
+    uint16_t r2_pressed() override;
 
     double left_stick_x() override;
     double left_stick_y() override;
@@ -164,8 +164,8 @@ public:
     double prev_right_stick_x() override;
     double prev_right_stick_y() override;
 
-    unsigned char get_digital_speed() override;
-    void set_digital_speed(unsigned char speed) override;
+    unsigned char digital_speed() override;
+    void digital_speed(unsigned char speed) override;
 
     void set_line(unsigned char line, unsigned char col, const char* str) override;
     void clear_line(unsigned char line) override;

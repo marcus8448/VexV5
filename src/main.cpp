@@ -1,4 +1,5 @@
 #include "debug.hpp"
+#include "logger.hpp"
 #include "robot.hpp"
 #include "robot_debug.hpp"
 #include "util.hpp"
@@ -27,8 +28,7 @@ void opcontrol(void);
 
 static Robot* robot = nullptr;
 
-void main_loop(Robot* robot) {
-    println("Main loop");
+[[noreturn]] void main_loop(Robot* robot) {
     while (true) {
         robot->update();
         pros::delay(20);
@@ -39,23 +39,23 @@ void main_loop(Robot* robot) {
  * Called when the robot is first initialized.
  */
 void initialize() {
-    print_section("Initialize");
+    logger::push_section("Initialize");
     robot = new Robot(new Drivetrain(
             new pros::Motor(10, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES),
             new pros::Motor(1, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES),
             new pros::Motor(20, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES),
             new pros::Motor(11, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES)));
-    PLUGINS.push_back(new RobotStatePlugin(robot));
-    PLUGINS.push_back(new RobotCommandsPlugin(robot));
+    add_plugin(new RobotStatePlugin(robot));
+    add_plugin(new RobotCommandsPlugin(robot));
     create_debug_task();
-    print_section("End Initialize");
+    logger::pop_section();
 }
 
 /**
  * Called when the robot is in it's autonomous state in a competition.
  */
 void autonomous() {
-    print_section("Autonomous setup");
+    logger::push_section("Autonomous Setup");
 #ifdef REPLAY_MATCH
     println("Replay match");
     robot->controller = new ReplayController();
@@ -63,7 +63,7 @@ void autonomous() {
     println("Autonomous: TODO");
     robot->controller = new ReplayController("test");
 #endif
-    print_section("End autonomous setup");
+    logger::pop_section();
     main_loop(robot);
 }
 
@@ -72,20 +72,19 @@ void autonomous() {
  * Will delegate to autonomous control if the "Force Autonomous" button is pressed.
  */
 void opcontrol() {
-    print_section("Opcontrol setup");
+    logger::push_section("Opcontrol Setup");
 #ifdef RECORD_MATCH
-    println("Recording");
+    logger::info("Recording controller");
     robot->controller = new RecordingController();
 #else
-    println("Normal controller");
+    logger::info("Normal controller");
     robot->controller = new OpController();
 #endif
+    logger::pop_section();
 
 #ifdef RESET_POSITIONS
-    print_section("Resetting positions");
     reset_positions(robot);
 #else
-    print_section("End opcontrol setup");
     main_loop(robot);
 #endif
 }

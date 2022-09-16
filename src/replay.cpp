@@ -17,58 +17,58 @@ ReplayController::ReplayController(const char* filename) {
     this->inf >> this->type;
 }
 
-unsigned short int ReplayController::a_pressed() {
+uint16_t ReplayController::a_pressed() {
     return this->a;
 }
 
-unsigned short int ReplayController::b_pressed() {
+uint16_t ReplayController::b_pressed() {
     return this->b;
 }
 
-unsigned short int ReplayController::x_pressed() {
+uint16_t ReplayController::x_pressed() {
     return this->x;
 }
 
-unsigned short int ReplayController::y_pressed() {
+uint16_t ReplayController::y_pressed() {
     return this->y;
 }
 
-unsigned short int ReplayController::up_pressed() {
+uint16_t ReplayController::up_pressed() {
     return this->up;
 }
 
-unsigned short int ReplayController::down_pressed() {
+uint16_t ReplayController::down_pressed() {
     return this->down;
 }
-unsigned short int ReplayController::left_pressed() {
+uint16_t ReplayController::left_pressed() {
     return this->left;
 }
 
-unsigned short int ReplayController::right_pressed() {
+uint16_t ReplayController::right_pressed() {
     return this->right;
 }
 
-unsigned short int ReplayController::l1_pressed() {
+uint16_t ReplayController::l1_pressed() {
     return this->l1;
 }
 
-unsigned short int ReplayController::l2_pressed() {
+uint16_t ReplayController::l2_pressed() {
     return this->l2;
 }
 
-unsigned short int ReplayController::r1_pressed() {
+uint16_t ReplayController::r1_pressed() {
     return this->r1;
 }
 
-unsigned short int ReplayController::r2_pressed() {
+uint16_t ReplayController::r2_pressed() {
     return this->r2;
 }
 
-unsigned char ReplayController::get_digital_speed() {
+unsigned char ReplayController::digital_speed() {
     return this->digitalSpeed;
 }
 
-void ReplayController::set_digital_speed(unsigned char speed) {
+void ReplayController::digital_speed(unsigned char speed) {
     this->digitalSpeed = speed;
 }
 

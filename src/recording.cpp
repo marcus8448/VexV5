@@ -2,12 +2,12 @@
 #include <fstream>
 
 #include "error.hpp"
+#include "logger.hpp"
 #include "filesystem.hpp"
 #include "pros/misc.hpp"
 #include "pros/rtos.hpp"
 #include "recording.hpp"
 #include "robot.hpp"
-#include "util.hpp"
 
 RecordingController::RecordingController(pros::Controller controller, const char* filename): controller(controller) {
     while (!pros::usd::is_installed()) {
@@ -16,15 +16,15 @@ RecordingController::RecordingController(pros::Controller controller, const char
     }
     this->controller.clear_line(2);
 
-    println("Generate output stream");
-    auto full_path = std::string("/usd/").append(filename).append(".v5r").c_str();
-    if (file_exists(full_path)) {
+    logger::push_section("Generate ofstream");
+    auto fullPath = std::string("/usd/").append(filename).append(".v5r").c_str();
+    if (file_exists(fullPath)) {
         bool moved = false;
         for (char i = 0; i < 127; i++) {
             auto name = std::string("/usd/").append(filename).append("_").append(std::to_string(i)).append(".v5r").c_str();
             if (!file_exists(name)) {
                 std::ofstream out(name, std::ios::out | std::ios::binary | std::ios::trunc);
-                std::ifstream in(full_path, std::ios::in | std::ios::binary);
+                std::ifstream in(fullPath, std::ios::in | std::ios::binary);
                 out << std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>()); // apparently rename/copy is not supported
                 out.close();
                 in.close();
@@ -40,63 +40,63 @@ RecordingController::RecordingController(pros::Controller controller, const char
     }
     controller.clear_line(2);
     this->outf = std::ofstream(filename, std::ios::out | std::ios::binary | std::ios::trunc);
-    println("Generated output stream");
+    logger::pop_section();
     this->outf << '0';
 }
 
-unsigned short int RecordingController::a_pressed() {
+uint16_t RecordingController::a_pressed() {
     return this->a;
 }
 
-unsigned short int RecordingController::b_pressed() {
+uint16_t RecordingController::b_pressed() {
     return this->b;
 }
 
-unsigned short int RecordingController::x_pressed() {
+uint16_t RecordingController::x_pressed() {
     return this->x;
 }
 
-unsigned short int RecordingController::y_pressed() {
+uint16_t RecordingController::y_pressed() {
     return this->y;
 }
 
-unsigned short int RecordingController::up_pressed() {
+uint16_t RecordingController::up_pressed() {
     return this->up;
 }
 
-unsigned short int RecordingController::down_pressed() {
+uint16_t RecordingController::down_pressed() {
     return this->down;
 }
 
-unsigned short int RecordingController::left_pressed() {
+uint16_t RecordingController::left_pressed() {
     return this->left;
 }
 
-unsigned short int RecordingController::right_pressed() {
+uint16_t RecordingController::right_pressed() {
     return this->right;
 }
 
-unsigned short int RecordingController::l1_pressed() {
+uint16_t RecordingController::l1_pressed() {
     return this->l1;
 }
 
-unsigned short int RecordingController::l2_pressed() {
+uint16_t RecordingController::l2_pressed() {
     return this->l2;
 }
 
-unsigned short int RecordingController::r1_pressed() {
+uint16_t RecordingController::r1_pressed() {
     return this->r1;
 }
 
-unsigned short int RecordingController::r2_pressed() {
+uint16_t RecordingController::r2_pressed() {
     return this->r2;
 }
 
-unsigned char RecordingController::get_digital_speed() {
+unsigned char RecordingController::digital_speed() {
     return this->digitalSpeed;
 }
 
-void RecordingController::set_digital_speed(unsigned char speed) {
+void RecordingController::digital_speed(unsigned char speed) {
     this->digitalSpeed = speed;
 }
 
@@ -137,89 +137,89 @@ double RecordingController::prev_right_stick_y() {
 }
 
 void RecordingController::update() {
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))) {
         this->a++;
     } else {
         this->a = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_B))) {
         this->b++;
     } else {
         this->b = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_X))) {
         this->x++;
     } else {
         this->x = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y))) {
         this->y++;
     } else {
         this->y = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP))) {
         this->up++;
     } else {
         this->up = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN))) {
         this->down++;
     } else {
         this->down = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT))) {
         this->left++;
     } else {
         this->left = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT))) {
         this->right++;
     } else {
         this->right = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1))) {
         this->l1++;
     } else {
         this->l1 = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2))) {
         this->l2++;
     } else {
         this->l2 = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1))) {
         this->r1++;
     } else {
         this->r1 = 0;
     }
 
-    if (erri(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2))) {
+    if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2))) {
         this->r2++;
     } else {
         this->r2 = 0;
     }
 
     this->prevLeftStickX = this->leftStickX;
-    this->leftStickX = errd(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X));
+    this->leftStickX = check_error(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X));
 
     this->prevLeftStickY = this->leftStickY;
-    this->leftStickY = errd(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y));
+    this->leftStickY = check_error(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y));
 
     this->prevRightStickX = this->rightStickX;
-    this->rightStickX = errd(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X));
+    this->rightStickX = check_error(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X));
 
     this->prevRightStickY = this->rightStickY;
-    this->rightStickY = errd(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
+    this->rightStickY = check_error(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
 
     if (!this->outf.is_open()) return;
 

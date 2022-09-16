@@ -181,6 +181,10 @@ clean:
 	-$Drm -rf $(DEPDIR)
 
 ifeq ($(IS_LIBRARY),1)
+ifeq ($(LIBNAME),libbest)
+$(errror "You should rename your library! libbest is the default library name and should be changed")
+endif
+
 LIBAR=$(BINDIR)/$(LIBNAME).a
 TEMPLATE_DIR=$(ROOT)/template
 

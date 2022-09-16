@@ -12,13 +12,4 @@ double in_to_rot(double inches);
 
 double turn_to_rot(double degrees);
 
-void print(const char* string);
-void print(std::string string);
-
-void println(const char* string);
-void println(std::string string);
-
-void print_section(const char* string);
-void print_section(std::string string);
-
 #endif//VEXV5_UTIL_HPP
