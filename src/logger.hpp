@@ -2,6 +2,7 @@
 #define VEXV5_LOGGING_HPP
 
 #include <string>
+#include <memory>
 
 namespace logger {
     template<typename ... Args>

@@ -1,6 +1,5 @@
 #include "logger.hpp"
 #include <iostream>
-#include <memory>
 #include <vector>
 
 namespace logger {

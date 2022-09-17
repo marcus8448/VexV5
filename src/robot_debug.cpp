@@ -87,7 +87,9 @@ bool RobotStatePlugin::handle(char *type) {
         serialize_motor(&buffer[CONTROLLER_SIZE + MOTOR_SIZE * 2], this->robot->drivetrain->rightBack);
         serialize_motor(&buffer[CONTROLLER_SIZE + MOTOR_SIZE * 3], this->robot->drivetrain->leftBack);
         outputBuf->sputn(reinterpret_cast<char*>(buffer), SIZE);
+        return true;
     }
+    return false;
 }
 
 RobotCommandsPlugin::RobotCommandsPlugin(Robot* robot): robot(robot) {

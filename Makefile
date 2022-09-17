@@ -24,7 +24,7 @@ VERSION:=1.0.0
 EXCLUDE_SRC_FROM_LIB+=$(foreach file, $(SRCDIR)/main,$(foreach cext,$(CEXTS),$(file).$(cext)) $(foreach cxxext,$(CXXEXTS),$(file).$(cxxext)))
 TEMPLATE_FILES=$(INCDIR)/vexv5/*.h $(INCDIR)/vexv5/*.hpp
 
-reset: 
+reset:
 	$(MAKE) -$(MAKEFLAGS) quick EXTRA_CFLAGS="-D RESET_POSITIONS" EXTRA_CXXFLAGS="-D RESET_POSITIONS" -W src/main.cpp
 	pros upload --slot 1 --after none --name "Reset"
 
