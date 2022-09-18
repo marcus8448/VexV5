@@ -8,11 +8,11 @@
 
 const uint16_t SIZE = 4;
 
-const char* CONNECT = "cnct";
-const char* RECIEVED = "recv";
-const char* RESPONSE = "okay";
-const char* SPECIAL = "rqst";
-const char* DISCONNECT = "gbye";
+#define CONNECT "cnct"
+#define RECIEVED "recv"
+#define RESPONSE "okay"
+#define SPECIAL "rqst"
+#define DISCONNECT "gbye"
 
 static std::vector<SerialPlugin*> PLUGINS;
 

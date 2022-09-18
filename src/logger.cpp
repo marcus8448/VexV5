@@ -42,15 +42,19 @@ namespace logger {
     }
 
     void push_section(const char* string) {
+        #ifdef DEBUG_LOG
         SECTIONS.push_back(string);
         std::cout << "== BEGIN " << string << " ==";
+        #endif
     }
 
     void pop_section() {
+        #ifdef DEBUG_LOG
         if (SECTIONS.empty()) {
             error("Section stack underflow!");
         }
         std::cout << "=== END " << SECTIONS.back() << " ===";
         SECTIONS.pop_back();
+        #endif
     }
 } //namespace logger

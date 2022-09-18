@@ -1,3 +1,4 @@
+#include "constants.hpp"
 #include "debug.hpp"
 #include "logger.hpp"
 #include "robot.hpp"
@@ -41,10 +42,10 @@ static Robot* robot = nullptr;
 void initialize() {
     logger::push_section("Initialize");
     robot = new Robot(new Drivetrain(
-            new pros::Motor(10, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES),
-            new pros::Motor(1, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES),
-            new pros::Motor(20, pros::E_MOTOR_GEARSET_18, true, pros::E_MOTOR_ENCODER_DEGREES),
-            new pros::Motor(11, pros::E_MOTOR_GEARSET_18, false, pros::E_MOTOR_ENCODER_DEGREES)));
+            new pros::Motor(RIGHT_FRONT_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
+            new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
+            new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
+            new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)));
     add_plugin(new RobotStatePlugin(robot));
     add_plugin(new RobotCommandsPlugin(robot));
     create_debug_task();
@@ -59,7 +60,7 @@ void autonomous() {
 #ifdef REPLAY_MATCH
     println("Replay match");
     robot->controller = new ReplayController();
-#elif defined(TODO)
+#elif defined TODO
     println("Autonomous: TODO");
     robot->controller = new ReplayController("test");
 #endif
