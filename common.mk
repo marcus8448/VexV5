@@ -1,5 +1,10 @@
-ARCHTUPLE=arm-none-eabi-
+ARCHTUPLE=arm-none-eabi
 DEVICE=VEX EDR V5
+
+ARM_SYSROOT := $(shell arm-none-eabi-gcc $(MFLAGS) -print-sysroot)
+ARM_MULTI_DIR := $(shell arm-none-eabi-gcc $(MFLAGS) -print-multi-directory)
+ARM_LIB_GCC := $(shell arm-none-eabi-gcc $(MFLAGS) -print-libgcc-file-name)
+ARM_GCC_VERSION := $(shell arm-none-eabi-gcc $(MFLAGS) -dumpversion)
 
 MFLAGS=-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp -Os -g
 CPPFLAGS=-D_POSIX_THREADS -D_UNIX98_THREAD_MUTEX_ATTRIBUTES
@@ -30,17 +35,16 @@ LDFLAGS=$(MFLAGS) $(WARNFLAGS) -nostdlib $(GCCFLAGS)
 SIZEFLAGS=-d --common
 NUMFMTFLAGS=--to=iec --format %.2f --suffix=B
 
-AR:=$(ARCHTUPLE)ar
-# using arm-none-eabi-as generates a listing by default. This produces a super verbose output.
-# Using gcc accomplishes the same thing without the extra output
-AS:=$(ARCHTUPLE)gcc
-CC:=$(ARCHTUPLE)gcc
-CXX:=$(ARCHTUPLE)g++
-LD:=$(ARCHTUPLE)g++
-OBJCOPY:=$(ARCHTUPLE)objcopy
-SIZETOOL:=$(ARCHTUPLE)size
-READELF:=$(ARCHTUPLE)readelf
-STRIP:=$(ARCHTUPLE)strip
+AR:=llvm-ar
+AS:=clang --target=$(ARCHTUPLE) --sysroot=$(ARM_SYSROOT)
+CC:=clang --target=$(ARCHTUPLE) --sysroot=$(ARM_SYSROOT)
+CXX:=clang++ --target=$(ARCHTUPLE) --sysroot=$(ARM_SYSROOT) -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION) -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION)/$(ARCHTUPLE)/$(ARM_MULTI_DIR)
+LD:=$(ARCHTUPLE)-g++
+#$(CXX) $(ARM_LIB_GCC) -L/usr/lib/gcc/$(ARCHTUPLE)/$(ARM_GCC_VERSION) -v
+OBJCOPY:=llvm-objcopy
+SIZETOOL:=llvm-size
+READELF:=llvm-readelf
+STRIP:=llvm-strip
 
 ifneq (, $(shell command -v gnumfmt 2> /dev/null))
 	SIZES_NUMFMT:=| gnumfmt --field=-4 --header $(NUMFMTFLAGS)
