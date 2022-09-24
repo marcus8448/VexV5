@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.20)
 project(VexV5 VERSION 1.0.0 LANGUAGES C CXX)
 include(toolchain.cmake)
 
@@ -44,7 +44,7 @@ add_executable(
 add_dependencies(HotPackage ColdPackage)
 
 set_target_properties(
-        HotPackage ColdPackage
+        HotPackage ColdPackage Timestamp
         PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR} PREFIX "" SUFFIX ""
 )
 set_property(TARGET HotPackage PROPERTY OUTPUT_NAME hot.package.elf)

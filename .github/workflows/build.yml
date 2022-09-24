@@ -4,11 +4,11 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - run: sudo apt-get install -y gcc-arm-none-eabi llvm
-      - uses: actions/cache@v3
-        with:
-          path: bin/
-          key: ${{ runner.os }}-makefile-${{ hashFiles('Makefile', 'common.mk') }}
-          restore-keys: |
-            ${{ runner.os }}-makefile-
-      - run: make
+      - name: Install arm-none-eabi toolchain
+        run: sudo apt-get install -y gcc-arm-none-eabi
+      - name: Build
+      - run: |
+          mkdir build &&
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Release .. &&
+          cmake --build .
