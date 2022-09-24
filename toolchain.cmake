@@ -23,7 +23,7 @@ find_library(LibC NAMES c PATHS ${CMAKE_SOURCE_DIR}/firmware NO_DEFAULT_PATH REQ
 find_library(LibM NAMES m PATHS ${CMAKE_SOURCE_DIR}/firmware NO_DEFAULT_PATH REQUIRED)
 find_library(LibPROS NAMES pros PATHS ${CMAKE_SOURCE_DIR}/firmware NO_DEFAULT_PATH REQUIRED)
 
-set(MFLAGS "-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp -g -Oz")
+set(MFLAGS "-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp -g -Os")
 set(CFLAGS "-D_POSIX_THREADS -D_UNIX98_THREAD_MUTEX_ATTRIBUTES")
 set(WARNFLAGS "-Wall -Wno-psabi")
 set(GCCFLAGS "-ffunction-sections -fdata-sections -fdiagnostics-color -funwind-tables")
