@@ -1,10 +1,11 @@
 #ifndef ROBOT_DEBUG_HPP
 #define ROBOT_DEBUG_HPP
 
-#include "debug.hpp"
-#include "robot.hpp"
 #include <vector>
 #include <streambuf>
+
+#include "debug.hpp"
+#include "robot.hpp"
 
 class RobotStatePlugin : public SerialPlugin {
 public:

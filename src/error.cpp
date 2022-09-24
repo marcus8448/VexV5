@@ -5,7 +5,7 @@
 
 bool check_error() {
   if (errno != 0) {
-    logger::info_("Error: ", strerror(errno));
+    logger::_info("Error: ", strerror(errno));
     errno = 0;
     return false;
   }

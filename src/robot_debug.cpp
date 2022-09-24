@@ -21,7 +21,7 @@ void RobotStatePlugin::disconnected() {
 
 typedef double floating;
 
-void serialize_motor(unsigned char *buffer, pros::Motor *motor) {
+void serialize_motor(uint8_t *buffer, pros::Motor *motor) {
   floating src;
   src = motor->get_target_position();
   std::memcpy(&buffer[sizeof(floating) * 0], &src, sizeof(floating));
@@ -54,7 +54,7 @@ bool RobotStatePlugin::handle(char *type) {
   const uint32_t CONTROLLER_SIZE = 3 + (sizeof(float) * 4);
   const uint32_t MOTOR_SIZE = (sizeof(floating) * 7) + (sizeof(int) * 5);
   const uint32_t SIZE = CONTROLLER_SIZE + (MOTOR_SIZE * 4);
-  static unsigned char buffer[SIZE] = {0};
+  static uint8_t buffer[SIZE] = {0};
 
   if (type == ROBOT_STATE) {
     if (this->robot->controller->a_pressed())
@@ -133,9 +133,9 @@ bool RobotCommandsPlugin::handle(char *type) {
     std::vector <std::string> vec;
     do {
       buf = strtok(buf, " ");
-      vec.push_back(std::string(buf));
+      vec.emplace_back(buf);
     } while (buf != nullptr);
-    if (vec.size() == 0)
+    if (vec.empty())
       return true;
 
     if (vec.size() > 5) {

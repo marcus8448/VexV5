@@ -1,3 +1,4 @@
+#include "config.hpp"
 #include "constants.hpp"
 #include "debug.hpp"
 #include "logger.hpp"
@@ -17,6 +18,10 @@
 #include "reset.hpp"
 #endif
 
+#ifdef SCREEN
+#include "screen.hpp"
+#endif
+
 extern "C" {
 void autonomous(void);
 void initialize(void);
@@ -27,9 +32,9 @@ void opcontrol(void);
 
 static Robot *robot = nullptr;
 
-[[noreturn]] void main_loop(Robot *robot) {
+[[noreturn]] void main_loop(Robot *rbt) {
   while (true) {
-    robot->update();
+    rbt->update();
     pros::delay(20);
   }
 }
@@ -39,14 +44,22 @@ static Robot *robot = nullptr;
  */
 void initialize() {
   logger::push_section("Initialize");
-  robot = new Robot(new Drivetrain(
-      new pros::Motor(RIGHT_FRONT_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
-      new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
-      new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
-      new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)));
+  robot = new Robot(
+      new Drivetrain(
+          new pros::Motor(RIGHT_FRONT_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
+          new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
+          new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
+          new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)
+          ),
+          new Flywheel(
+              new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, false, ENCODER_UNITS)
+              ));
   add_plugin(new RobotStatePlugin(robot));
   add_plugin(new RobotCommandsPlugin(robot));
   create_debug_task();
+#ifdef SCREEN
+  screen::initialize(robot);
+#endif //SCREEN
   logger::pop_section();
 }
 
@@ -71,6 +84,9 @@ void autonomous() {
  * Will delegate to autonomous control if the "Force Autonomous" button is pressed.
  */
 void opcontrol() {
+  if (robot == nullptr) {
+    initialize();
+  }
   logger::push_section("Opcontrol Setup");
 #ifdef RECORD_MATCH
   logger::info("Recording controller");

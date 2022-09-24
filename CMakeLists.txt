@@ -19,17 +19,16 @@ add_executable(
         include/constants.hpp
         include/debug.hpp
         include/error.hpp
-        include/filesystem.hpp
         include/logger.hpp
         include/recording.hpp
         include/replay.hpp
         include/reset.hpp
         include/robot.hpp
         include/robot_debug.hpp
+        include/screen.hpp
         include/util.hpp
         src/debug.cpp
         src/error.cpp
-        src/filesystem.cpp
         src/logger.cpp
         src/main.cpp
         src/recording.cpp
@@ -37,6 +36,7 @@ add_executable(
         src/reset.cpp
         src/robot.cpp
         src/robot_debug.cpp
+        src/screen.cpp
         src/util.cpp
         ${Timestamp}
 )

@@ -62,17 +62,17 @@ uint16_t ReplayController::r2_pressed() {
   return this->r2;
 }
 
-unsigned char ReplayController::digital_speed() {
+uint8_t ReplayController::digital_speed() {
   return this->digitalSpeed;
 }
 
-void ReplayController::digital_speed(unsigned char speed) {
+void ReplayController::digital_speed(uint8_t speed) {
   this->digitalSpeed = speed;
 }
 
-void ReplayController::set_line(unsigned char line, unsigned char col, const char *str) {}
+void ReplayController::set_line(uint8_t line, uint8_t col, const char *str) {}
 
-void ReplayController::clear_line(unsigned char line) {}
+void ReplayController::clear_line(uint8_t line) {}
 
 void ReplayController::rumble(const char *str) {}
 
@@ -150,7 +150,7 @@ void ReplayController::update() {
       return;
     }
   }
-  unsigned long long value;
+  uint64_t value;
 
   inf >> value;
   std::memcpy(&leftStickX, &value, sizeof(value));

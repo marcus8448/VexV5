@@ -3,41 +3,69 @@
 #include <iostream>
 #include <vector>
 
+#ifdef SCREEN
+#include "screen.hpp"
+#endif
+
 namespace logger {
 static std::vector<const char *> SECTIONS;
 
 void info(const char *string) {
+#ifdef SCREEN
+  screen::write_line(string, screen::WHITE);
+#endif
   std::cout << string;
 }
 
-void info(const std::string string) {
+void info(const std::string& string) {
+#ifdef SCREEN
+  screen::write_line(string, screen::WHITE);
+#endif
   std::cout << string;
 }
 
 void warn(const char *string) {
+#ifdef SCREEN
+  screen::write_line(string, screen::YELLOW);
+#endif
   std::cout << string;
 }
 
-void warn(const std::string string) {
+void warn(const std::string& string) {
+#ifdef SCREEN
+  screen::write_line(string, screen::YELLOW);
+#endif
   std::cout << string;
 }
 
 void error(const char *string) {
-  std::cout << string; //todo: cerr?
+#ifdef SCREEN
+  screen::write_line(string, screen::RED);
+#endif
+  std::cout << string;
 }
 
-void error(const std::string string) {
+void error(const std::string& string) {
+#ifdef SCREEN
+  screen::write_line(string, screen::RED);
+#endif
   std::cout << string;
 }
 
 void debug(const char *string) {
 #ifdef DEBUG_LOG
+#ifdef SCREEN
+  screen::write_line(string, screen::GREEN);
+#endif
   std::cout << string;
 #endif
 }
 
-void debug(const std::string string) {
+void debug(const std::string& string) {
 #ifdef DEBUG_LOG
+#ifdef SCREEN
+  screen::write_line(string, screen::GREEN);
+#endif
   std::cout << string;
 #endif
 }

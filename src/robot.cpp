@@ -92,19 +92,19 @@ double OpController::prev_right_stick_y() {
   return this->prevRightStickY;
 }
 
-unsigned char OpController::digital_speed() {
+uint8_t OpController::digital_speed() {
   return this->digitalSpeed;
 }
 
-void OpController::digital_speed(unsigned char speed) {
+void OpController::digital_speed(uint8_t speed) {
   this->digitalSpeed = speed;
 }
 
-void OpController::set_line(unsigned char line, unsigned char col, const char *str) {
+void OpController::set_line(uint8_t line, uint8_t col, const char *str) {
   check_error(this->controller.set_text(line, col, str));
 }
 
-void OpController::clear_line(unsigned char line) {
+void OpController::clear_line(uint8_t line) {
   check_error(this->controller.clear_line(line));
 }
 
@@ -324,7 +324,7 @@ void Drivetrain::reset() {
   this->leftBack->tare_position();
 }
 
-Robot::Robot(Drivetrain *drivetrain) : drivetrain(drivetrain), controller(nullptr) {
+Robot::Robot(Drivetrain *drivetrain, Flywheel *flywheel) : drivetrain(drivetrain), flywheel(flywheel), controller(nullptr) {
 }
 
 void Robot::update() {
@@ -354,4 +354,30 @@ Robot::~Robot() {
   controller = nullptr;
   delete drivetrain;
   drivetrain = nullptr;
+}
+
+Flywheel::Flywheel(pros::Motor *motor): motor(motor) {
+
+}
+
+void Flywheel::engage() {
+  this->motor->move(127);
+  this->engaged = true;
+}
+
+void Flywheel::disengage() {
+  this->engaged = false;
+  this->motor->move(0);
+}
+
+bool Flywheel::isEngaged() {
+  return this->engaged;
+}
+
+void Flywheel::update(Controller *controller) {
+  if (controller->r1_pressed()) {
+    this->engage();
+  } else if (controller->r2_pressed()) {
+    this->disengage();
+  }
 }

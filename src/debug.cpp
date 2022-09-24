@@ -24,11 +24,11 @@ enum State {
 };
 
 State state = NOT_CONNECTED;
-long long lastTime = -1;
+int32_t lastTime = -1;
 
 void timeout_hack(void *params) {
   auto task = static_cast<pros::Task>(params);
-  const long long TIMEOUT_LENGTH = 5000;
+  const uint32_t TIMEOUT_LENGTH = 5000;
   while (true) {
     if (state == NOT_CONNECTED) {
       pros::delay(TIMEOUT_LENGTH);
@@ -69,7 +69,7 @@ void timeout_hack(void *params) {
     inputBuf->sgetn(buf, SIZE);
     switch (state) {
     case NOT_CONNECTED:
-      if (strcmp(CONNECT, buf)) {
+      if (strcmp(CONNECT, buf) != 0) {
         outputBuf->sputn(RECEIVED, SIZE);
         state = AWAITING_RESPONSE;
       } else {
@@ -79,7 +79,7 @@ void timeout_hack(void *params) {
       }
       break;
     case AWAITING_RESPONSE:
-      if (strcmp(RESPONSE, buf)) {
+      if (strcmp(RESPONSE, buf) != 0) {
         lastTime = pros::millis();
         outputBuf->sputn(RECEIVED, SIZE);
         state = ESTABLISHED;
@@ -89,7 +89,7 @@ void timeout_hack(void *params) {
       }
       break;
     case ESTABLISHED:
-      if (strcmp(DISCONNECT, buf)) {
+      if (strcmp(DISCONNECT, buf) != 0) {
         state = NOT_CONNECTED;
         for (SerialPlugin *plugin : PLUGINS) {
           plugin->disconnected();

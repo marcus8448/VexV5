@@ -1,12 +1,13 @@
 #include <cstring>
 #include <fstream>
 
-#include "error.hpp"
-#include "logger.hpp"
-#include "filesystem.hpp"
 #include "pros/misc.hpp"
 #include "pros/rtos.hpp"
+
+#include "error.hpp"
+#include "logger.hpp"
 #include "recording.hpp"
+#include "util.hpp"
 
 RecordingController::RecordingController(pros::Controller controller, const char *filename) : controller(controller) {
   while (!pros::usd::is_installed()) {
@@ -93,17 +94,17 @@ uint16_t RecordingController::r2_pressed() {
   return this->r2;
 }
 
-unsigned char RecordingController::digital_speed() {
+uint8_t RecordingController::digital_speed() {
   return this->digitalSpeed;
 }
 
-void RecordingController::digital_speed(unsigned char speed) {
+void RecordingController::digital_speed(uint8_t speed) {
   this->digitalSpeed = speed;
 }
 
-void RecordingController::set_line(unsigned char line, unsigned char col, const char *str) {}
+void RecordingController::set_line(uint8_t line, uint8_t col, const char *str) {}
 
-void RecordingController::clear_line(unsigned char line) {}
+void RecordingController::clear_line(uint8_t line) {}
 
 void RecordingController::rumble(const char *str) {}
 
@@ -266,19 +267,19 @@ void RecordingController::update() {
   }
   this->outf << '*';
   double val;
-  signed long long position;
+  uint64_t bits;
   val = this->left_stick_x();
-  std::memcpy(&position, &val, sizeof(val));
-  this->outf << position << " ";
+  std::memcpy(&bits, &val, sizeof(val));
+  this->outf << bits << " ";
   val = this->left_stick_y();
-  std::memcpy(&position, &val, sizeof(val));
-  this->outf << position << " ";
+  std::memcpy(&bits, &val, sizeof(val));
+  this->outf << bits << " ";
   val = this->right_stick_x();
-  std::memcpy(&position, &val, sizeof(val));
-  this->outf << position << " ";
+  std::memcpy(&bits, &val, sizeof(val));
+  this->outf << bits << " ";
   val = this->right_stick_y();
-  std::memcpy(&position, &val, sizeof(val));
-  this->outf << position;
+  std::memcpy(&bits, &val, sizeof(val));
+  this->outf << bits;
 }
 
 void RecordingController::reset() {

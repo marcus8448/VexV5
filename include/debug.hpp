@@ -13,7 +13,7 @@ public:
   virtual bool handle(char type[4]) = 0;
   /**
   * Called when the robot is gracefully disconnected from the computer.
-  * Not guarenteed to be called.
+  * Not guaranteed to be called.
   */
   virtual void disconnected() = 0;
 };

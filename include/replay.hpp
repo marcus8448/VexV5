@@ -1,8 +1,8 @@
 #ifndef REPLAY_HPP
 #define REPLAY_HPP
 
-#include "robot.hpp"
 #include <fstream>
+#include "robot.hpp"
 
 class ReplayController : public Controller {
   std::ifstream inf;
@@ -27,7 +27,7 @@ class ReplayController : public Controller {
   double prevLeftStickY = 0.0;
   double prevRightStickX = 0.0;
   double prevRightStickY = 0.0;
-  unsigned char digitalSpeed = 127;
+  uint8_t digitalSpeed = 127;
 
 public:
   explicit ReplayController(const char *filename = "/usd/record.v5r");
@@ -47,11 +47,11 @@ public:
   uint16_t r1_pressed() override;
   uint16_t r2_pressed() override;
 
-  unsigned char digital_speed() override;
-  void digital_speed(unsigned char digitalSpeed) override;
+  uint8_t digital_speed() override;
+  void digital_speed(uint8_t digitalSpeed) override;
 
-  void set_line(unsigned char line, unsigned char col, const char *str) override;
-  void clear_line(unsigned char line) override;
+  void set_line(uint8_t line, uint8_t col, const char *str) override;
+  void clear_line(uint8_t line) override;
 
   void rumble(const char *str) override;
 

@@ -50,11 +50,11 @@ public:
   virtual uint16_t r1_pressed() = 0;
   virtual uint16_t r2_pressed() = 0;
 
-  virtual unsigned char digital_speed() = 0;
-  virtual void digital_speed(unsigned char digitalSpeed) = 0;
+  virtual uint8_t digital_speed() = 0;
+  virtual void digital_speed(uint8_t digitalSpeed) = 0;
 
-  virtual void set_line(unsigned char line, unsigned char col, const char *str) = 0;
-  virtual void clear_line(unsigned char line) = 0;
+  virtual void set_line(uint8_t line, uint8_t col, const char *str) = 0;
+  virtual void clear_line(uint8_t line) = 0;
 
   virtual void rumble(const char *str) = 0;
 
@@ -77,6 +77,21 @@ public:
 class Updatable {
 public:
   virtual void update(Controller *controller) {};
+};
+
+class Flywheel : public Updatable {
+public:
+  pros::Motor *motor;
+private:
+  bool engaged = false;
+public:
+  explicit Flywheel(pros::Motor *motor);
+
+  void engage();
+  void disengage();
+
+  bool isEngaged();
+  void update(Controller *controller) override;
 };
 
 class Drivetrain : public Resettable, public Targeting, public Updatable {
@@ -134,7 +149,7 @@ private:
   double prevRightStickX = 0.0;
   double prevRightStickY = 0.0;
 
-  unsigned char digitalSpeed = 127;
+  uint8_t digitalSpeed = 127;
 
 public:
   explicit OpController(pros::Controller controller = pros::Controller(pros::E_CONTROLLER_MASTER));
@@ -164,11 +179,11 @@ public:
   double prev_right_stick_x() override;
   double prev_right_stick_y() override;
 
-  unsigned char digital_speed() override;
-  void digital_speed(unsigned char speed) override;
+  uint8_t digital_speed() override;
+  void digital_speed(uint8_t speed) override;
 
-  void set_line(unsigned char line, unsigned char col, const char *str) override;
-  void clear_line(unsigned char line) override;
+  void set_line(uint8_t line, uint8_t col, const char *str) override;
+  void clear_line(uint8_t line) override;
 
   void rumble(const char *str) override;
 
@@ -180,10 +195,11 @@ public:
 class Robot : public Resettable {
 public:
   Drivetrain *drivetrain;
+  Flywheel *flywheel;
   Controller *controller;
 
 public:
-  explicit Robot(Drivetrain *drivetrain);
+  explicit Robot(Drivetrain *drivetrain, Flywheel *flywheel);
 
   void update();
   void reset() override;
