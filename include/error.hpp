@@ -1,5 +1,5 @@
-#ifndef VEXV5_DEBUG_TOOLS_HPP
-#define VEXV5_DEBUG_TOOLS_HPP
+#ifndef DEBUG_TOOLS_HPP
+#define DEBUG_TOOLS_HPP
 
 /**
  * Tests for a PROS error and prints out errno if one is found.
@@ -12,8 +12,8 @@ bool check_error();
  * \return the same return_code parameter passed.
  */
 template<class T> T check_error(T value) {
-    check_error();
-    return value;
+  check_error();
+  return value;
 }
 
-#endif//VEXV5_DEBUG_TOOLS_HPP
+#endif//DEBUG_TOOLS_HPP

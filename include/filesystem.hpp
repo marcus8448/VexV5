@@ -1,5 +1,5 @@
-#ifndef VEXV5_FILESYSTEM_HPP
-#define VEXV5_FILESYSTEM_HPP
+#ifndef FILESYSTEM_HPP
+#define FILESYSTEM_HPP
 
 /**
  * Tests if a file exists on the microSD filesystem.
@@ -7,6 +7,6 @@
  * \param name the name of the file
  * \return whether the file exists
  */
-bool file_exists(const char* name);
+bool file_exists(const char *name);
 
-#endif//VEXV5_FILESYSTEM_HPP
+#endif//FILESYSTEM_HPP

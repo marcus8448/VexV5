@@ -4,8 +4,6 @@
 #include "robot.hpp"
 #include "robot_debug.hpp"
 #include "util.hpp"
-#include "pros/rtos.hpp"
-#include <iostream>
 
 #ifdef RECORD_MATCH
 #include "recording.hpp"
@@ -27,45 +25,45 @@ void competition_initialize(void);
 void opcontrol(void);
 }
 
-static Robot* robot = nullptr;
+static Robot *robot = nullptr;
 
-[[noreturn]] void main_loop(Robot* robot) {
-    while (true) {
-        robot->update();
-        pros::delay(20);
-    }
+[[noreturn]] void main_loop(Robot *robot) {
+  while (true) {
+    robot->update();
+    pros::delay(20);
+  }
 }
 
 /**
  * Called when the robot is first initialized.
  */
 void initialize() {
-    logger::push_section("Initialize");
-    robot = new Robot(new Drivetrain(
-            new pros::Motor(RIGHT_FRONT_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
-            new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
-            new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
-            new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)));
-    add_plugin(new RobotStatePlugin(robot));
-    add_plugin(new RobotCommandsPlugin(robot));
-    create_debug_task();
-    logger::pop_section();
+  logger::push_section("Initialize");
+  robot = new Robot(new Drivetrain(
+      new pros::Motor(RIGHT_FRONT_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
+      new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
+      new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
+      new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)));
+  add_plugin(new RobotStatePlugin(robot));
+  add_plugin(new RobotCommandsPlugin(robot));
+  create_debug_task();
+  logger::pop_section();
 }
 
 /**
  * Called when the robot is in it's autonomous state in a competition.
  */
 void autonomous() {
-    logger::push_section("Autonomous Setup");
+  logger::push_section("Autonomous Setup");
 #ifdef REPLAY_MATCH
-    println("Replay match");
-    robot->controller = new ReplayController();
+  println("Replay match");
+  robot->controller = new ReplayController();
 #elif defined TODO
-    println("Autonomous: TODO");
-    robot->controller = new ReplayController("test");
+  println("Autonomous: TODO");
+  robot->controller = new ReplayController("test");
 #endif
-    logger::pop_section();
-    main_loop(robot);
+  logger::pop_section();
+  main_loop(robot);
 }
 
 /**
@@ -73,19 +71,19 @@ void autonomous() {
  * Will delegate to autonomous control if the "Force Autonomous" button is pressed.
  */
 void opcontrol() {
-    logger::push_section("Opcontrol Setup");
+  logger::push_section("Opcontrol Setup");
 #ifdef RECORD_MATCH
-    logger::info("Recording controller");
-    robot->controller = new RecordingController();
+  logger::info("Recording controller");
+  robot->controller = new RecordingController();
 #else
-    logger::info("Normal controller");
-    robot->controller = new OpController();
+  logger::info("Normal controller");
+  robot->controller = new OpController();
 #endif
-    logger::pop_section();
+  logger::pop_section();
 
 #ifdef RESET_POSITIONS
-    reset_positions(robot);
+  reset_positions(robot);
 #else
-    main_loop(robot);
+  main_loop(robot);
 #endif
 }

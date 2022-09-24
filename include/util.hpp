@@ -1,5 +1,5 @@
-#ifndef VEXV5_UTIL_HPP
-#define VEXV5_UTIL_HPP
+#ifndef UTIL_HPP
+#define UTIL_HPP
 
 #include "pros/motors.hpp"
 #include <string>
@@ -12,4 +12,4 @@ double in_to_rot(double inches);
 
 double turn_to_rot(double degrees);
 
-#endif//VEXV5_UTIL_HPP
+#endif//UTIL_HPP

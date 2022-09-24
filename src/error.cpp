@@ -4,10 +4,10 @@
 #include <cstring>
 
 bool check_error() {
-    if (errno != 0) {
-        logger::info_("Error: ", strerror(errno));
-        errno = 0;
-        return false;
-    }
-    return true;
+  if (errno != 0) {
+    logger::info_("Error: ", strerror(errno));
+    errno = 0;
+    return false;
+  }
+  return true;
 }
