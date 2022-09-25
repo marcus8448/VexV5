@@ -1,10 +1,24 @@
+extern "C" {
+void autonomous(void);
+void initialize(void);
+void disabled(void);
+void competition_initialize(void);
+void opcontrol(void);
+}
+
+#include "pros/misc.hpp"
+#include "pros/motors.hpp"
+#include "pros/rtos.hpp"
+
 #include "config.hpp"
 #include "constants.hpp"
-#include "debug.hpp"
 #include "logger.hpp"
 #include "robot.hpp"
-#include "robot_debug.hpp"
-#include "util.hpp"
+
+#ifdef SERIAL_LINK
+#include "seriallink/seriallink.hpp"
+#include "seriallink/plugins.hpp"
+#endif
 
 #ifdef RECORD_MATCH
 #include "recording.hpp"
@@ -21,14 +35,6 @@
 #ifdef SCREEN
 #include "screen.hpp"
 #endif
-
-extern "C" {
-void autonomous(void);
-void initialize(void);
-void disabled(void);
-void competition_initialize(void);
-void opcontrol(void);
-}
 
 static Robot *robot = nullptr;
 
@@ -54,9 +60,11 @@ void initialize() {
           new Flywheel(
               new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, false, ENCODER_UNITS)
               ));
-  add_plugin(new RobotStatePlugin(robot));
-  add_plugin(new RobotCommandsPlugin(robot));
-  create_debug_task();
+#ifdef SERIAL_LINK
+  seriallink::add_plugin(new seriallink::RobotStatePlugin(robot));
+  seriallink::add_plugin(new seriallink::RobotCommandsPlugin(robot));
+  seriallink::create_debug_task();
+#endif //SERIAL_LINK
 #ifdef SCREEN
   screen::initialize(robot);
 #endif //SCREEN
@@ -103,3 +111,6 @@ void opcontrol() {
   main_loop(robot);
 #endif
 }
+
+void competition_initialize() {}
+void disabled() {}

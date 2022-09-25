@@ -1,5 +1,3 @@
-#include "debug.hpp"
-#include "pros/rtos.hpp"
 #include <cstring>
 #include <fstream>
 #include <iostream>
@@ -7,14 +5,17 @@
 #include <string>
 #include <vector>
 
+#include "pros/rtos.hpp"
+#include "seriallink/seriallink.hpp"
+
 const uint16_t SIZE = 4;
 
 #define CONNECT "cnct"
 #define RECEIVED "recv"
 #define RESPONSE "okay"
-#define SPECIAL "rqst"
 #define DISCONNECT "gbye"
 
+namespace seriallink {
 static std::vector<SerialPlugin *> PLUGINS;
 
 enum State {
@@ -50,10 +51,11 @@ void timeout_hack(void *params) {
  */
 [[noreturn]] void debug_input_task([[maybe_unused]] void *params) {
   // everything is static as we kill + re-run the task if the connection times out
-  std::ostringstream bufferFromProgram; // logs from the running program.
-  std::istringstream bufferToProgram; // input to be passed to the program.
-  std::streambuf *outputBuf = std::cout.rdbuf(bufferFromProgram.rdbuf()); // send data through the serial port
-  std::streambuf *inputBuf = std::cin.rdbuf(bufferToProgram.rdbuf()); // read data from the serial port
+  static std::ostringstream bufferFromProgram; // logs from the running program.
+  static std::istringstream bufferToProgram; // input to be passed to the program.
+  static std::streambuf
+      *outputBuf = std::cout.rdbuf(bufferFromProgram.rdbuf()); // send data through the seriallink port
+  static std::streambuf *inputBuf = std::cin.rdbuf(bufferToProgram.rdbuf()); // read data from the seriallink port
   bufferFromProgram.clear();
   bufferToProgram.clear();
   static char buf[4];
@@ -116,4 +118,5 @@ void add_plugin(SerialPlugin *plugin) {
 
 void create_debug_task() {
   pros::Task(debug_input_task, nullptr, "Debug Input Task");
+}
 }

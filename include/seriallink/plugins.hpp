@@ -1,12 +1,13 @@
-#ifndef ROBOT_DEBUG_HPP
-#define ROBOT_DEBUG_HPP
+#ifndef SERIALLINK_ROBOT_DEBUG_HPP
+#define SERIALLINK_ROBOT_DEBUG_HPP
 
 #include <vector>
 #include <streambuf>
 
-#include "debug.hpp"
+#include "seriallink.hpp"
 #include "robot.hpp"
 
+namespace seriallink {
 class RobotStatePlugin : public SerialPlugin {
 public:
   std::streambuf *outputBuf = nullptr; // do not delete these in the destructor, as they are shared between plugins
@@ -22,10 +23,10 @@ public:
   /**
   * Optionally handle I/O for this type of input. Be sure to read only and all of what you need, otherwise everything will be unaligned.
   */
-  bool handle(char type[4]) override;
+  bool handle(const char type[4]) override;
   /**
   * Called when the robot is gracefully disconnected from the computer.
-  * Not guarenteed to be called.
+  * Not guaranteed to be called.
   */
   void disconnected() override;
 };
@@ -46,12 +47,12 @@ public:
   /**
   * Optionally handle I/O for this type of input. Be sure to read only and all of what you need, otherwise everything will be unaligned.
   */
-  bool handle(char type[4]) override;
+  bool handle(const char type[4]) override;
   /**
   * Called when the robot is gracefully disconnected from the computer.
   * Not guarenteed to be called.
   */
   void disconnected() override;
 };
-
-#endif//ROBOT_DEBUG_HPP
+}
+#endif//SERIALLINK_ROBOT_DEBUG_HPP

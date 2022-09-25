@@ -17,17 +17,16 @@ add_executable(
         HotPackage
         include/config.hpp
         include/constants.hpp
-        include/debug.hpp
         include/error.hpp
         include/logger.hpp
         include/recording.hpp
         include/replay.hpp
         include/reset.hpp
         include/robot.hpp
-        include/robot_debug.hpp
         include/screen.hpp
         include/util.hpp
-        src/debug.cpp
+        include/seriallink/seriallink.hpp
+        include/seriallink/plugins.hpp
         src/error.cpp
         src/logger.cpp
         src/main.cpp
@@ -35,10 +34,17 @@ add_executable(
         src/replay.cpp
         src/reset.cpp
         src/robot.cpp
-        src/robot_debug.cpp
         src/screen.cpp
         src/util.cpp
+        src/seriallink/seriallink.cpp
+        src/seriallink/plugins.cpp
         ${Timestamp}
+)
+
+add_custom_target(
+        Upload
+        DEPENDS HotPackage ColdPackage
+        COMMAND pros upload
 )
 
 add_dependencies(HotPackage ColdPackage)
