@@ -50,10 +50,10 @@ void timeout_hack(void *params) {
  */
 [[noreturn]] void debug_input_task([[maybe_unused]] void *params) {
   // everything is static as we kill + re-run the task if the connection times out
-  static std::ostringstream bufferFromProgram; // logs from the running program.
-  static std::istringstream bufferToProgram; // input to be passed to the program.
-  static std::streambuf *outputBuf = std::cout.rdbuf(bufferFromProgram.rdbuf()); // send data through the serial port
-  static std::streambuf *inputBuf = std::cin.rdbuf(bufferToProgram.rdbuf()); // read data from the serial port
+  std::ostringstream bufferFromProgram; // logs from the running program.
+  std::istringstream bufferToProgram; // input to be passed to the program.
+  std::streambuf *outputBuf = std::cout.rdbuf(bufferFromProgram.rdbuf()); // send data through the serial port
+  std::streambuf *inputBuf = std::cin.rdbuf(bufferToProgram.rdbuf()); // read data from the serial port
   bufferFromProgram.clear();
   bufferToProgram.clear();
   static char buf[4];

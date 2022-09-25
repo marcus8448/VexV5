@@ -1,0 +1,8 @@
+{
+    "clangd.arguments": [
+		"--query-driver=**/arm-none-eabi-*",
+		"--compile-commands-dir=build"
+	],
+	"clang-tidy.buildPath": "build",
+    "clang-tidy.compilerArgs": ["-isystem/usr/arm-none-eabi/include/c++/12.2.0", "-isystem/usr/arm-none-eabi/include", "-isystem/usr/arm-none-eabi/include/c++/12.2.0/arm-none-eabi"]
+}

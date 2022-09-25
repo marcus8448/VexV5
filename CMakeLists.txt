@@ -68,11 +68,11 @@ target_link_options(
         PUBLIC -Wl,-T${FIRMWARE_DIR}/v5.ld,--gc-sections,--start-group,${FIRMWARE_DIR}/libc.a,${FIRMWARE_DIR}/libm.a,${FIRMWARE_DIR}/libpros.a,-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld
 )
 
-#add_custom_command(
-#        TARGET ColdPackage
-#        POST_BUILD
-#        COMMAND ${CMAKE_STRIP} -g ${BIN_DIR}/cold.package.elf
-#)
+add_custom_command(
+       TARGET ColdPackage
+       POST_BUILD
+       COMMAND ${CMAKE_STRIP} -g ${BIN_DIR}/cold.package.elf
+)
 
 add_custom_command(
         TARGET ColdPackage
@@ -80,11 +80,11 @@ add_custom_command(
         COMMAND ${CMAKE_OBJCOPY} -O binary -R .hot_init ${BIN_DIR}/cold.package.elf ${BIN_DIR}/cold.package.bin
 )
 
-#add_custom_command(
-#        TARGET HotPackage
-#        POST_BUILD
-#        COMMAND ${CMAKE_STRIP} -g ${BIN_DIR}/hot.package.elf
-#)
+add_custom_command(
+       TARGET HotPackage
+       POST_BUILD
+       COMMAND ${CMAKE_STRIP} -g ${BIN_DIR}/hot.package.elf
+)
 
 add_custom_command(
         TARGET HotPackage
