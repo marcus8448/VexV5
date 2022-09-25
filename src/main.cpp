@@ -16,8 +16,8 @@ void opcontrol(void);
 #include "robot.hpp"
 
 #ifdef SERIAL_LINK
-#include "seriallink/seriallink.hpp"
-#include "seriallink/plugins.hpp"
+#include "serial/serial.hpp"
+#include "serial_plugins.hpp"
 #endif
 
 #ifdef RECORD_MATCH
@@ -60,14 +60,14 @@ void initialize() {
           new Flywheel(
               new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, false, ENCODER_UNITS)
               ));
-#ifdef SERIAL_LINK
-  seriallink::add_plugin(new seriallink::RobotStatePlugin(robot));
-  seriallink::add_plugin(new seriallink::RobotCommandsPlugin(robot));
-  seriallink::create_debug_task();
-#endif //SERIAL_LINK
 #ifdef SCREEN
   screen::initialize(robot);
 #endif //SCREEN
+#ifdef SERIAL_LINK
+  serial::add_plugin(new serial::RobotStatePlugin(robot));
+  serial::add_plugin(new serial::RobotCommandsPlugin(robot));
+  serial::initialize();
+#endif //SERIAL_LINK
   logger::pop_section();
 }
 

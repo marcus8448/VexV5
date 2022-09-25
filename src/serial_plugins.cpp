@@ -1,10 +1,11 @@
-#include "seriallink/plugins.hpp"
+#include "serial_plugins.hpp"
 #include <cstring>
 
 #define ROBOT_STATE "R_ST"
 #define ROBOT_DEBUG "RDBG"
 
-namespace seriallink {
+using namespace serial;
+
 RobotStatePlugin::RobotStatePlugin(Robot *robot) : robot(robot) {
 }
 
@@ -57,7 +58,7 @@ bool RobotStatePlugin::handle(const char *type) {
   const uint32_t SIZE = CONTROLLER_SIZE + (MOTOR_SIZE * 4);
   static uint8_t buffer[SIZE] = {0};
 
-  if (strcmp(ROBOT_STATE, type) != 0) {
+  if (strcmp(ROBOT_STATE, type) == 0) {
     if (this->robot->controller->a_pressed())
       buffer[0] |= 0b00000001;
     if (this->robot->controller->b_pressed())
@@ -124,9 +125,9 @@ void RobotCommandsPlugin::disconnected() {
 bool RobotCommandsPlugin::handle(const char *type) {
   static char sizebuf[1];
 
-  if (strcmp(ROBOT_DEBUG, type) != 0) {
+  if (strcmp(ROBOT_DEBUG, type) == 0) {
     this->inputBuf->sgetn(sizebuf, 1);
-    auto len = static_cast<uint32_t>(sizebuf[0]);
+    char len = sizebuf[0];
     char *buf = new char[len];
     this->inputBuf->sgetn(sizebuf, len);
     for (uint32_t i = 0; buf[i]; i++)
@@ -160,10 +161,11 @@ bool RobotCommandsPlugin::handle(const char *type) {
 
           }
         }
+      } else if (vec[1] == "get") {
+
       }
     }
     return true;
   }
   return false;
-}
 }

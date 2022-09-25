@@ -3,7 +3,7 @@
 
 #include <streambuf>
 
-namespace seriallink {
+namespace serial {
 class SerialPlugin {
 public:
   virtual void clear_state() = 0;
@@ -21,6 +21,6 @@ public:
 
 void add_plugin(SerialPlugin *plugin);
 
-void create_debug_task();
+void initialize();
 }
 #endif//SERIALLINK_DEBUG_HPP

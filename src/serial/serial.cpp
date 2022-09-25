@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "pros/rtos.hpp"
-#include "seriallink/seriallink.hpp"
+#include "serial/serial.hpp"
 
 const uint16_t SIZE = 4;
 
@@ -15,8 +15,9 @@ const uint16_t SIZE = 4;
 #define RESPONSE "okay"
 #define DISCONNECT "gbye"
 
-namespace seriallink {
+namespace serial {
 static std::vector<SerialPlugin *> PLUGINS;
+static bool initialized = false;
 
 enum State {
   NOT_CONNECTED,
@@ -25,7 +26,7 @@ enum State {
 };
 
 State state = NOT_CONNECTED;
-int32_t lastTime = -1;
+uint32_t lastTime = 0;
 
 void timeout_hack(void *params) {
   auto task = static_cast<pros::Task>(params);
@@ -37,7 +38,7 @@ void timeout_hack(void *params) {
       if (pros::millis() - lastTime > TIMEOUT_LENGTH) {
         state = NOT_CONNECTED;
         task.remove(); // kill the task.
-        create_debug_task();
+        initialize();
         break;
       } else {
         pros::delay(pros::millis() - lastTime + 1);
@@ -53,9 +54,8 @@ void timeout_hack(void *params) {
   // everything is static as we kill + re-run the task if the connection times out
   static std::ostringstream bufferFromProgram; // logs from the running program.
   static std::istringstream bufferToProgram; // input to be passed to the program.
-  static std::streambuf
-      *outputBuf = std::cout.rdbuf(bufferFromProgram.rdbuf()); // send data through the seriallink port
-  static std::streambuf *inputBuf = std::cin.rdbuf(bufferToProgram.rdbuf()); // read data from the seriallink port
+  static std::streambuf *outputBuf = std::cout.rdbuf(bufferFromProgram.rdbuf()); // send data through the serial port
+  static std::streambuf *inputBuf = std::cin.rdbuf(bufferToProgram.rdbuf()); // read data from the serial port
   bufferFromProgram.clear();
   bufferToProgram.clear();
   static char buf[4];
@@ -71,7 +71,7 @@ void timeout_hack(void *params) {
     inputBuf->sgetn(buf, SIZE);
     switch (state) {
     case NOT_CONNECTED:
-      if (strcmp(CONNECT, buf) != 0) {
+      if (strcmp(CONNECT, buf) == 0) {
         outputBuf->sputn(RECEIVED, SIZE);
         state = AWAITING_RESPONSE;
       } else {
@@ -81,7 +81,7 @@ void timeout_hack(void *params) {
       }
       break;
     case AWAITING_RESPONSE:
-      if (strcmp(RESPONSE, buf) != 0) {
+      if (strcmp(RESPONSE, buf) == 0) {
         lastTime = pros::millis();
         outputBuf->sputn(RECEIVED, SIZE);
         state = ESTABLISHED;
@@ -91,7 +91,7 @@ void timeout_hack(void *params) {
       }
       break;
     case ESTABLISHED:
-      if (strcmp(DISCONNECT, buf) != 0) {
+      if (strcmp(DISCONNECT, buf) == 0) {
         state = NOT_CONNECTED;
         for (SerialPlugin *plugin : PLUGINS) {
           plugin->disconnected();
@@ -116,7 +116,8 @@ void add_plugin(SerialPlugin *plugin) {
   PLUGINS.push_back(plugin);
 }
 
-void create_debug_task() {
+void initialize() {
   pros::Task(debug_input_task, nullptr, "Debug Input Task");
+  initialized = true;
 }
 }

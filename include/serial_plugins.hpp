@@ -4,10 +4,10 @@
 #include <vector>
 #include <streambuf>
 
-#include "seriallink.hpp"
+#include "serial/serial.hpp"
 #include "robot.hpp"
 
-namespace seriallink {
+namespace serial {
 class RobotStatePlugin : public SerialPlugin {
 public:
   std::streambuf *outputBuf = nullptr; // do not delete these in the destructor, as they are shared between plugins

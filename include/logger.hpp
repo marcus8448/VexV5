@@ -19,23 +19,23 @@ std::string string_format(const char *format, Args ... args) {
 
 void info(const char *string);
 void info(const std::string &string);
-template<typename ... Args> void _info(const char *format, Args ... args) {
+template<typename ... Args> void info(const char *format, Args ... args) {
   info(string_format(format, args...));
 }
 
 void warn(const char *string);
 void warn(const std::string &string);
-template<typename ... Args> void _warn(const char *format, Args ... args) {
+template<typename ... Args> void warn(const char *format, Args ... args) {
   warn(string_format(format, args...));
 }
 void error(const char *string);
 void error(const std::string &string);
-template<typename ... Args> void _error(const char *format, Args ... args) {
+template<typename ... Args> void error(const char *format, Args ... args) {
   error(string_format(format, args...));
 }
 void debug(const char *string);
 void debug(const std::string &string);
-template<typename ... Args> void _debug(const char *format, Args ... args) {
+template<typename ... Args> void debug(const char *format, Args ... args) {
   debug(string_format(format, args...));
 }
 void push_section(const char *string);

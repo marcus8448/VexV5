@@ -24,9 +24,9 @@ add_executable(
         include/reset.hpp
         include/robot.hpp
         include/screen.hpp
+        include/serial_plugins.hpp
         include/util.hpp
-        include/seriallink/seriallink.hpp
-        include/seriallink/plugins.hpp
+        include/serial/serial.hpp
         src/error.cpp
         src/logger.cpp
         src/main.cpp
@@ -35,9 +35,9 @@ add_executable(
         src/reset.cpp
         src/robot.cpp
         src/screen.cpp
+        src/serial_plugins.cpp
         src/util.cpp
-        src/seriallink/seriallink.cpp
-        src/seriallink/plugins.cpp
+        src/serial/serial.cpp
         ${Timestamp}
 )
 
