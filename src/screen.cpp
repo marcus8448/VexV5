@@ -318,8 +318,12 @@ void drop_screen(uint16_t screen) {
     velMotorRF.clear();
     velMotorLB.clear();
     velMotorRB.clear();
+    lv_mem_free(drivetrainCanvasBuf);
+    drivetrainCanvasBuf = nullptr;
   } else if (screen == 2) {
     velFlywheel.clear();
+    lv_mem_free(flywheelCanvasBuf);
+    flywheelCanvasBuf = nullptr;
   }
 }
 
