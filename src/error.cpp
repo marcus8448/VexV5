@@ -5,7 +5,8 @@
 
 bool check_error() {
   if (errno != 0) {
-    logger::error("Error: ", strerror(errno));
+    if (errno == 19) return true; //ignore 19 - no such device.
+    logger::error("Error %i: %s", errno, strerror(errno));
     errno = 0;
     return false;
   }

@@ -1,5 +1,11 @@
+#include <cstddef>
+#include <cstdlib>
 #include <vector>
 #include <cmath>
+#include "display/lv_objx/lv_btn.h"
+#include "display/lv_objx/lv_canvas.h"
+#include "logger.hpp"
+#include "pros/rtos.hpp"
 #include "screen.hpp"
 #include "display/lvgl.h"
 
@@ -13,35 +19,34 @@ static const lv_color_t LV_GREEN = lv_color_hex(GREEN);
 static const lv_color_t LV_BLUE = lv_color_hex(BLUE);
 static const lv_color_t LV_YELLOW = lv_color_hex(YELLOW);
 
-static int16_t width;
-static int16_t height;
+static int16_t width = 0;
+static int16_t height = 0;
+
+static void *canvasBuffer;
 
 // screen 0
-static lv_obj_t *uptimeLabel;
-static lv_obj_t *motorLFLabel;
-static lv_obj_t *motorRFLabel;
-static lv_obj_t *motorLBLabel;
-static lv_obj_t *motorRBLabel;
-static lv_obj_t *flywheelLabel;
-static lv_obj_t *rollerLabel;
-static lv_obj_t *intakeLabel;
+static lv_obj_t *uptimeLabel = nullptr;
+static lv_obj_t *motorLFLabel = nullptr;
+static lv_obj_t *motorRFLabel = nullptr;
+static lv_obj_t *motorLBLabel = nullptr;
+static lv_obj_t *motorRBLabel = nullptr;
+static lv_obj_t *flywheelLabel = nullptr;
+static lv_obj_t *rollerLabel = nullptr;
+static lv_obj_t *intakeLabel = nullptr;
 
 // screen 1
-static std::vector<float> velMotorLF(100);
-static std::vector<float> velMotorRF(100);
-static std::vector<float> velMotorLB(100);
-static std::vector<float> velMotorRB(100);
-
-static lv_obj_t *drivetrainCanvas;
-static void *drivetrainCanvasBuf;
+static std::vector<float> velMotorLF;
+static std::vector<float> velMotorRF;
+static std::vector<float> velMotorLB;
+static std::vector<float> velMotorRB;
+static lv_obj_t *drivetrainCanvas = nullptr;
 
 // screen 2
 static std::vector<float> velFlywheel;
-static lv_obj_t *flywheelCanvas;
-static void *flywheelCanvasBuf;
+static lv_obj_t *flywheelCanvas = nullptr;
 
 // screen 3
-static lv_obj_t *logs;
+static lv_obj_t *logs = nullptr;
 
 void create_info_screen(lv_obj_t *screen);
 void create_drivetrain_screen(lv_obj_t *screen);
@@ -57,41 +62,64 @@ void drop_screen(uint16_t screen);
 void init_screen(uint16_t screen);
 void update(Robot *robot);
 [[noreturn]] void update_task(void *params);
+void create_prev_btn(lv_obj_t *obj);
+void create_next_btn(lv_obj_t *obj);
 
 void initialize(Robot *robot) {
   lv_init();
-  width = lv_obj_get_width(lv_scr_act());
-  height = lv_obj_get_height(lv_scr_act());
-  auto prevBtn = lv_btn_create(lv_scr_act(), nullptr);
-  lv_obj_set_pos(prevBtn, 0, (int16_t)(height - 40));
-  lv_obj_set_size(prevBtn, 40, 40);
-  lv_btn_set_action(prevBtn, LV_BTN_ACTION_CLICK, prev_page);
-
-  auto nextBtn = lv_btn_create(lv_scr_act(), nullptr);
-  lv_obj_set_pos(nextBtn, (int16_t)(width - 40), (int16_t)(height - 40));
-  lv_obj_set_size(nextBtn, 40, 40);
-  lv_btn_set_action(nextBtn, LV_BTN_ACTION_CLICK, next_page);
-
+  lv_obj_t *base_view = lv_scr_act();
+  width = lv_obj_get_width(base_view);
+  height = lv_obj_get_height(base_view);
+  canvasBuffer = calloc(((lv_img_color_format_get_px_size(LV_IMG_CF_TRUE_COLOR)) * width * (height - 40)), 1);
   activeScreen = 0;
+  lv_obj_t *screen_0 = lv_obj_create(base_view, nullptr);
+  lv_obj_t *screen_1 = lv_obj_create(base_view, nullptr);
+  lv_obj_t *screen_2 = lv_obj_create(base_view, nullptr);
+  lv_obj_t *screen_3 = lv_obj_create(base_view, nullptr);
+  lv_obj_set_size(screen_0, width, height);
+  lv_obj_set_size(screen_1, width, height);
+  lv_obj_set_size(screen_2, width, height);
+  lv_obj_set_size(screen_3, width, height);
+  lv_obj_set_hidden(screen_0, true);
+  lv_obj_set_hidden(screen_1, true);
+  lv_obj_set_hidden(screen_2, true);
+  lv_obj_set_hidden(screen_3, true);
 
-  lv_obj_t *screen_0 = lv_scr_act();
-  lv_obj_t *screen_1 = lv_obj_create(nullptr, lv_scr_act());
-  lv_obj_t *screen_2 = lv_obj_create(nullptr, lv_scr_act());
-  lv_obj_t *screen_3 = lv_obj_create(nullptr, lv_scr_act());
+  create_next_btn(screen_0);
+  create_prev_btn(screen_1);
+  create_next_btn(screen_1);
+  create_prev_btn(screen_2);
+  create_next_btn(screen_2);
+  create_prev_btn(screen_3);
 
-  screens.push_back(screen_0);
-  screens.push_back(screen_1);
-  screens.push_back(screen_2);
-  screens.push_back(screen_3);
+  screens[0] = screen_0;
+  screens[1] = screen_1;
+  screens[2] = screen_2;
+  screens[3] = screen_3;
+
 
   create_info_screen(screen_0);
   create_drivetrain_screen(screen_1);
   create_flywheel_screen(screen_2);
   create_log_screen(screen_3);
 
-  init_screen(0);
+  init_screen(activeScreen);
 
-  pros::Task(update_task, robot, TASK_PRIORITY_DEFAULT - 1, TASK_STACK_DEPTH_DEFAULT, "Screen Update");
+  pros::Task(update_task, robot, "Screen Update");
+}
+
+void create_prev_btn(lv_obj_t *obj) {
+  auto prevBtn = lv_btn_create(obj, nullptr);
+  lv_obj_set_pos(prevBtn, 0, (int16_t)(height - 40));
+  lv_obj_set_size(prevBtn, 40, 40);
+  lv_btn_set_action(prevBtn, LV_BTN_ACTION_CLICK, prev_page);
+}
+
+void create_next_btn(lv_obj_t *obj) {
+  auto nextBtn = lv_btn_create(obj, nullptr);
+  lv_obj_set_pos(nextBtn, (int16_t)(width - 40), (int16_t)(height - 40));
+  lv_obj_set_size(nextBtn, 40, 40);
+  lv_btn_set_action(nextBtn, LV_BTN_ACTION_CLICK, next_page);
 }
 
 [[noreturn]] void update_task(void* params) {
@@ -103,7 +131,7 @@ void initialize(Robot *robot) {
 }
 
 void update(Robot *robot) {
-  snprintf(buffer, 32, "Uptime: %lu", pros::millis());
+  snprintf(buffer, 32, "Uptime: %u", pros::millis());
   lv_label_set_text(uptimeLabel, buffer);
 
   if (activeScreen == 0) {
@@ -115,7 +143,8 @@ void update(Robot *robot) {
     update_motor_digital(rollerLabel, nullptr, false, "Roller");
     update_motor_digital(intakeLabel, nullptr, false, "Intake");
   } else if (activeScreen == 1) {
-    if (velMotorLF.capacity() == 0) {
+    if (velMotorLF.size() == 100) {
+      logger::debug("Dropping old motor data");
       velMotorLF.erase(velMotorLF.begin());
       velMotorRF.erase(velMotorRF.begin());
       velMotorLB.erase(velMotorLB.begin());
@@ -126,16 +155,22 @@ void update(Robot *robot) {
     auto prevRF = (float)robot->drivetrain->rightFront->get_actual_velocity();
     auto prevLB = (float)robot->drivetrain->leftBack->get_actual_velocity();
     auto prevRB = (float)robot->drivetrain->rightBack->get_actual_velocity();
+    if (prevLF == INFINITY || prevLF == -1) prevLF = 5;
+    if (prevRF == INFINITY || prevRF == -1) prevRF = 5;
+    if (prevLB == INFINITY || prevLB == -1) prevLB = 5;
+    if (prevRB == INFINITY || prevRB == -1) prevRB = 5;
     velMotorLF.push_back(prevLF);
     velMotorRF.push_back(prevRF);
     velMotorLB.push_back(prevLB);
     velMotorRB.push_back(prevRB);
-    float heightScale = ((float)height - 40.0f) / 200.0f;
+    float heightScale = ((float)height - 40.0f) / 100.0f;
     float widthScale = ((float)width) / 100.0f;
 
+    logger::debug("for, %i %i %f", velMotorLF.size(), height, heightScale);
     unsigned int x = 0;
     for (signed int i = (signed int)velMotorLF.size() - 2; i >= 0; --i) {
       float v = velMotorLF[i];
+
       lv_canvas_draw_line(drivetrainCanvas, lv_point_t {
           (int16_t) ((float)width - ((float)x * widthScale)),
           (int16_t) (prevLF * heightScale)
@@ -173,9 +208,11 @@ void update(Robot *robot) {
       prevRB = v;
       ++x;
     }
+    logger::debug("endn for");
   } else if (activeScreen == 2) {
     if (velFlywheel.capacity() == 0) velFlywheel.erase(velFlywheel.begin());
     auto prev = (float)robot->flywheel->motor->get_actual_velocity();
+    if (prev == INFINITY || prev == -1) prev = 5;
     velFlywheel.push_back(prev);
     float heightScale = ((float)height - 40.0f) / 600.0f;
     float widthScale = ((float)width) / 100.0f;
@@ -215,57 +252,68 @@ void update_motor(lv_obj_t *label, const char *name, int32_t voltage) {
   if (voltage == INT32_MAX) {
     snprintf(buffer, 32, "%s: Disconnected", name);
   } else {
-    snprintf(buffer, 32, "%s: %li", name, voltage);
+    snprintf(buffer, 32, "%s: %i", name, voltage);
   }
   lv_label_set_text(label, buffer);
 }
 
 void create_info_screen(lv_obj_t *screen) {
-  create_label(screen, 0, 45 * 0, 160, 45, "Build:" __DATE__ " " __TIME__);
-  uptimeLabel = create_label(screen, 160, 45 * 0, 160, 45);
+  create_label(screen, 0, 16 * 0, width / 2, 16, "Build: " __DATE__ " " __TIME__);
+  uptimeLabel = create_label(screen, width / 2, 16 * 0, width / 2, 16);
 
-//  create_label(screen, 0, 45 * 1, 160, 45, "");
-//  create_label(screen, 160, 45 * 1, 160, 45, "");
+//  create_label(screen, 0, 16 * 1, width / 2, 16, "");
+//  create_label(screen, width / 2, 16 * 1, width / 2, 16, "");
 
   // Port Statuses
-  motorLFLabel = create_label(screen, 0, 45 * 2, 160, 45);
-  motorRFLabel = create_label(screen, 160, 45 * 2, 160, 45);
-  motorLBLabel = create_label(screen, 0, 45 * 3, 160, 45);
-  motorRBLabel = create_label(screen, 160, 45 * 3, 160, 45);
-  flywheelLabel = create_label(screen, 0, 45 * 4, 160, 45);
-  rollerLabel = create_label(screen, 160, 45 * 4, 160, 45);
-  intakeLabel = create_label(screen, 0, 45 * 5, 160, 45);
-//  create_label(screen, 160, 45 * 5, 160, 45, "");
+  motorLFLabel = create_label(screen, 0, 16 * 2, width / 2, 16);
+  motorRFLabel = create_label(screen, width / 2, 16 * 2, width / 2, 16);
+  motorLBLabel = create_label(screen, 0, 16 * 3, width / 2, 16);
+  motorRBLabel = create_label(screen, width / 2, 16 * 3, width / 2, 16);
+  flywheelLabel = create_label(screen, 0, 16 * 4, width / 2, 16);
+  rollerLabel = create_label(screen, width / 2, 16 * 4, width / 2, 16);
+  intakeLabel = create_label(screen, 0, 16 * 5, width / 2, 16);
+//  create_label(screen, width / 2, 16 * 5, width / 2, 16, "");
 }
 
 void create_drivetrain_screen(lv_obj_t *screen) {
   drivetrainCanvas = lv_canvas_create(screen, nullptr);
+  velMotorLF.reserve(100);
+  velMotorRF.reserve(100);
+  velMotorLB.reserve(100);
+  velMotorRB.reserve(100);
   lv_obj_set_pos(drivetrainCanvas, 0, 0);
-  lv_obj_set_size(drivetrainCanvas, width, (int16_t)(height - 40));
+  lv_obj_set_size(drivetrainCanvas, width, height - 40);
+  lv_canvas_set_buffer(drivetrainCanvas, canvasBuffer, width, height - 40, LV_IMG_CF_TRUE_COLOR);
 }
 
 void create_flywheel_screen(lv_obj_t *screen) {
+  velFlywheel.reserve(100);
   flywheelCanvas = lv_canvas_create(screen, nullptr);
   lv_obj_set_pos(flywheelCanvas, 0, 0);
-  lv_obj_set_size(flywheelCanvas, width, (int16_t)(height - 40));
+  lv_obj_set_size(flywheelCanvas, width, height - 40);
+  lv_canvas_set_buffer(flywheelCanvas, canvasBuffer, width, height - 40, LV_IMG_CF_TRUE_COLOR);
 }
 
 void create_log_screen(lv_obj_t *screen) {
   logs = lv_list_create(screen, nullptr);
   lv_obj_set_pos(logs, 0, 0);
-  lv_obj_set_size(logs, width, (int16_t)(height - 40));
+  lv_obj_set_size(logs, width, height - 40);
 }
 
 void write_line(const char *string, Colour colour) {
-  if (lv_list_get_size(logs) >= 12) {
-    lv_list_remove(logs, 0);
-  }
+  if (logs != nullptr) {
+    if (lv_list_get_size(logs) >= 12) {
+      lv_list_remove(logs, 0);
+    }
 
-  lv_list_add(logs, nullptr, string, drop_log);
+    lv_list_add(logs, nullptr, string, drop_log);
+  }
 }
 
 void write_line(const std::string& string, Colour colour) {
-  write_line(string.c_str(), colour);
+  if (logs != nullptr) {
+    write_line(string.c_str(), colour);
+  }
 }
 
 lv_obj_t* create_label(lv_obj_t *screen, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h, const char* text) {
@@ -279,9 +327,7 @@ lv_obj_t* create_label(lv_obj_t *screen, lv_coord_t x, lv_coord_t y, lv_coord_t 
 lv_res_t prev_page(lv_obj_t *btn) {
   if (activeScreen != 0) {
     drop_screen(activeScreen);
-    activeScreen--;
-    lv_scr_load(screens[activeScreen]);
-    init_screen(activeScreen);
+    init_screen(--activeScreen);
   } else {
     lv_obj_invalidate(btn);
     return LV_RES_INV;
@@ -292,9 +338,7 @@ lv_res_t prev_page(lv_obj_t *btn) {
 lv_res_t next_page(lv_obj_t *btn) {
   if (activeScreen != screens.size() - 1) {
     drop_screen(activeScreen);
-    activeScreen++;
-    lv_scr_load(screens[activeScreen]);
-    init_screen(activeScreen);
+    init_screen(++activeScreen);
   } else {
     lv_obj_invalidate(btn);
     return LV_RES_INV;
@@ -303,28 +347,23 @@ lv_res_t next_page(lv_obj_t *btn) {
 }
 
 void init_screen(uint16_t screen) {
-  if (screen == 1) {
-    drivetrainCanvasBuf = lv_mem_alloc((lv_img_color_format_get_px_size(LV_IMG_CF_TRUE_COLOR) * width * (height - 40)) / 8);
-    lv_canvas_set_buffer(drivetrainCanvas, drivetrainCanvasBuf, (int16_t)width, (int16_t)(height - 40), LV_IMG_CF_TRUE_COLOR);
-  } else if (screen == 2) {
-    flywheelCanvasBuf = lv_mem_alloc((lv_img_color_format_get_px_size(LV_IMG_CF_TRUE_COLOR) * width * (height - 40)) / 8);
-    lv_canvas_set_buffer(flywheelCanvas, flywheelCanvasBuf, (int16_t)width, (int16_t)(height - 40), LV_IMG_CF_TRUE_COLOR);
-  }
+  logger::push_section("Init screen");
+  lv_obj_set_hidden(screens[screen], false);
+  logger::pop_section();
 }
 
 void drop_screen(uint16_t screen) {
+  logger::push_section("Drop screen");
+  lv_obj_set_hidden(screens[screen], true);
   if (screen == 1) {
     velMotorLF.clear();
     velMotorRF.clear();
     velMotorLB.clear();
     velMotorRB.clear();
-    lv_mem_free(drivetrainCanvasBuf);
-    drivetrainCanvasBuf = nullptr;
   } else if (screen == 2) {
     velFlywheel.clear();
-    lv_mem_free(flywheelCanvasBuf);
-    flywheelCanvasBuf = nullptr;
   }
+  logger::pop_section();
 }
 
 lv_res_t drop_log(lv_obj_t *obj) {
