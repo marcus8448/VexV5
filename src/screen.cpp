@@ -1,9 +1,13 @@
-#include <cstddef>
 #include <cstdlib>
 #include <vector>
 #include <cmath>
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wall"
 #include "display/lv_objx/lv_btn.h"
 #include "display/lv_objx/lv_canvas.h"
+#pragma clang diagnostic pop
+
 #include "logger.hpp"
 #include "pros/rtos.hpp"
 #include "screen.hpp"

@@ -61,7 +61,6 @@ target_link_libraries(ColdPackage PUBLIC ${LibC} ${LibM} ${LibPROS})
 
 target_link_options(
         HotPackage
-        PUBLIC -nostartfiles
         PUBLIC -Wl,-R,${BIN_DIR}/cold.package.elf
         PUBLIC -Wl,-T${FIRMWARE_DIR}/v5-hot.ld
         PUBLIC -Wl,--gc-sections,--start-group,${FIRMWARE_DIR}/libc.a,${FIRMWARE_DIR}/libm.a,-lgcc,-lstdc++,--end-group
