@@ -4,7 +4,8 @@
 #include <vector>
 
 #ifdef SCREEN
-#include "screen/screen.hpp"
+#include "screen/logs.hpp"
+#include "screen/colour.hpp"
 #endif
 
 namespace logger {
@@ -12,42 +13,54 @@ static std::vector<std::pair<const char *, uint32_t>> SECTIONS;
 
 void info(const char *string) {
 #ifdef SCREEN
-  screen::write_line(string, screen::WHITE);
+  if (screen::Logging::instance != nullptr) {
+    screen::Logging::instance->write_line(string, screen::colour::WHITE);
+  }
 #endif
   std::cout << string << std::endl;
 }
 
 void info(const std::string &string) {
 #ifdef SCREEN
-  screen::write_line(string, screen::WHITE);
+  if (screen::Logging::instance != nullptr) {
+    screen::Logging::instance->write_line(string, screen::colour::WHITE);
+  }
 #endif
   std::cout << string << std::endl;
 }
 
 void warn(const char *string) {
 #ifdef SCREEN
-  screen::write_line(string, screen::YELLOW);
+  if (screen::Logging::instance != nullptr) {
+    screen::Logging::instance->write_line(string, screen::colour::YELLOW);
+  }
 #endif
   std::cout << string << std::endl;
 }
 
 void warn(const std::string &string) {
 #ifdef SCREEN
-  screen::write_line(string, screen::YELLOW);
+  if (screen::Logging::instance != nullptr) {
+    screen::Logging::instance->write_line(string, screen::colour::YELLOW);
+  }
 #endif
   std::cout << string << std::endl;
 }
 
 void error(const char *string) {
 #ifdef SCREEN
-  screen::write_line(string, screen::RED);
+  if (screen::Logging::instance != nullptr) {
+    screen::Logging::instance->write_line(string, screen::colour::RED);
+  }
 #endif
   std::cout << string << std::endl;
 }
 
 void error(const std::string &string) {
 #ifdef SCREEN
-  screen::write_line(string, screen::RED);
+  if (screen::Logging::instance != nullptr) {
+    screen::Logging::instance->write_line(string, screen::colour::RED);
+  }
 #endif
   std::cout << string << std::endl;
 }
@@ -55,7 +68,9 @@ void error(const std::string &string) {
 void debug(const char *string) {
 #ifdef DEBUG_LOG
 #ifdef SCREEN
-  screen::write_line(string, screen::GREEN);
+  if (screen::Logging::instance != nullptr) {
+    screen::Logging::instance->write_line(string, screen::colour::GREEN);
+  }
 #endif
   std::cout << string << std::endl;
 #endif
@@ -64,7 +79,9 @@ void debug(const char *string) {
 void debug(const std::string &string) {
 #ifdef DEBUG_LOG
 #ifdef SCREEN
-  screen::write_line(string, screen::GREEN);
+  if (screen::Logging::instance != nullptr) {
+    screen::Logging::instance->write_line(string, screen::colour::GREEN);
+  }
 #endif
   std::cout << string << std::endl;
 #endif

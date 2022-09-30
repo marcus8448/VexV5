@@ -34,6 +34,11 @@ void opcontrol(void);
 
 #ifdef SCREEN
 #include "screen/screen.hpp"
+#include "screen/autonomous_select.hpp"
+#include "screen/drivetrain_chart.hpp"
+#include "screen/flywheel_chart.hpp"
+#include "screen/info.hpp"
+#include "screen/logs.hpp"
 #endif
 
 static Robot *robot = nullptr;
@@ -61,6 +66,10 @@ void initialize() {
           new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, false, ENCODER_UNITS)
       ));
 #ifdef SCREEN
+  screen::add_screen(new screen::Information());
+  screen::add_screen(new screen::DrivetrainChart());
+  screen::add_screen(new screen::FlywheelChart());
+  screen::add_screen(new screen::Logging());
   screen::initialize(robot);
 #endif //SCREEN
 #ifdef SERIAL_LINK

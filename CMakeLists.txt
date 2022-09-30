@@ -24,7 +24,12 @@ add_executable(
         include/reset.hpp
         include/robot.hpp
         include/screen/screen.hpp
+        include/screen/drivetrain_chart.hpp
+        include/screen/flywheel_chart.hpp
+        include/screen/autonomous_select.hpp
+        include/screen/logs.hpp
         include/screen/lvgl_util.hpp
+        include/screen/info.hpp
         include/serial_plugins.hpp
         include/util.hpp
         include/serial/serial.hpp
@@ -39,6 +44,11 @@ add_executable(
         src/serial_plugins.cpp
         src/util.cpp
         src/screen/lvgl_util.cpp
+        src/screen/info.cpp
+        src/screen/drivetrain_chart.cpp
+        src/screen/flywheel_chart.cpp
+        src/screen/autonomous_select.cpp
+        src/screen/logs.cpp
         src/serial/serial.cpp
         ${Timestamp}
 )

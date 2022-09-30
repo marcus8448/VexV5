@@ -1,0 +1,27 @@
+#ifndef SCREEN_DRIVETRAIN_CHART_HPP
+#define SCREEN_DRIVETRAIN_CHART_HPP
+
+#include "screen/screen.hpp"
+
+namespace screen {
+class DrivetrainChart : public Screen {
+private:
+  float canvasWidth = 0.0f;
+  float canvasHeight = 0.0f;
+
+  std::vector<float> velMotorLF;
+  std::vector<float> velMotorRF;
+  std::vector<float> velMotorLB;
+  std::vector<float> velMotorRB;
+  lv_obj_t *drivetrainCanvas = nullptr;
+public:
+  explicit DrivetrainChart();
+
+  void create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) override;
+  void initialize(lv_coord_t width, lv_coord_t height) override;
+  void update(Robot *robot) override;
+  void destroy(lv_obj_t *screen) override;
+};
+} // screen
+
+#endif //SCREEN_DRIVETRAIN_CHART_HPP
