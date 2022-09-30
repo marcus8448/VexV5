@@ -33,7 +33,7 @@ void opcontrol(void);
 #endif
 
 #ifdef SCREEN
-#include "screen.hpp"
+#include "screen/screen.hpp"
 #endif
 
 static Robot *robot = nullptr;
@@ -56,10 +56,10 @@ void initialize() {
           new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
           new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
           new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)
-          ),
-          new Flywheel(
-              new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, false, ENCODER_UNITS)
-              ));
+      ),
+      new Flywheel(
+          new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, false, ENCODER_UNITS)
+      ));
 #ifdef SCREEN
   screen::initialize(robot);
 #endif //SCREEN

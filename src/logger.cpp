@@ -4,11 +4,11 @@
 #include <vector>
 
 #ifdef SCREEN
-#include "screen.hpp"
+#include "screen/screen.hpp"
 #endif
 
 namespace logger {
-static std::vector<const char *> SECTIONS;
+static std::vector<std::pair<const char *, uint32_t>> SECTIONS;
 
 void info(const char *string) {
 #ifdef SCREEN
@@ -17,7 +17,7 @@ void info(const char *string) {
   std::cout << string << std::endl;
 }
 
-void info(const std::string& string) {
+void info(const std::string &string) {
 #ifdef SCREEN
   screen::write_line(string, screen::WHITE);
 #endif
@@ -31,7 +31,7 @@ void warn(const char *string) {
   std::cout << string << std::endl;
 }
 
-void warn(const std::string& string) {
+void warn(const std::string &string) {
 #ifdef SCREEN
   screen::write_line(string, screen::YELLOW);
 #endif
@@ -45,7 +45,7 @@ void error(const char *string) {
   std::cout << string << std::endl;
 }
 
-void error(const std::string& string) {
+void error(const std::string &string) {
 #ifdef SCREEN
   screen::write_line(string, screen::RED);
 #endif
@@ -61,7 +61,7 @@ void debug(const char *string) {
 #endif
 }
 
-void debug(const std::string& string) {
+void debug(const std::string &string) {
 #ifdef DEBUG_LOG
 #ifdef SCREEN
   screen::write_line(string, screen::GREEN);
@@ -72,17 +72,19 @@ void debug(const std::string& string) {
 
 void push_section(const char *string) {
 #ifdef DEBUG_LOG
-  SECTIONS.push_back(string);
+  SECTIONS.emplace_back(std::pair(string, pros::millis()));
   std::cout << "== BEGIN " << string << " ==" << std::endl;
 #endif
 }
 
 void pop_section() {
 #ifdef DEBUG_LOG
+  uint32_t millis = pros::millis();
   if (SECTIONS.empty()) {
-      error("Section stack underflow!");
+    error("Section stack underflow!");
   }
-  std::cout << "=== END " << SECTIONS.back() << " ===" << std::endl;
+  std::pair<const char *, uint32_t> &back = SECTIONS.back();
+  std::cout << "=== END " << back.first << " ===" << " (Took " << millis - back.second << " ms)" << std::endl;
   SECTIONS.pop_back();
 #endif
 }

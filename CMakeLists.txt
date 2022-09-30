@@ -23,7 +23,8 @@ add_executable(
         include/replay.hpp
         include/reset.hpp
         include/robot.hpp
-        include/screen.hpp
+        include/screen/screen.hpp
+        include/screen/lvgl_util.hpp
         include/serial_plugins.hpp
         include/util.hpp
         include/serial/serial.hpp
@@ -34,9 +35,10 @@ add_executable(
         src/replay.cpp
         src/reset.cpp
         src/robot.cpp
-        src/screen.cpp
+        src/screen/screen.cpp
         src/serial_plugins.cpp
         src/util.cpp
+        src/screen/lvgl_util.cpp
         src/serial/serial.cpp
         ${Timestamp}
 )

@@ -4,11 +4,12 @@
 #include "robot.hpp"
 
 namespace screen {
+#define BASE_HEIGHT static_cast<lv_coord_t>(40)
 
 enum Colour {
   WHITE = 0xFFFFFF,
   BLACK = 0x000000,
-  VEX_GREY = 0,
+  VEX_GREY = 0x000000, //fixme
   RED = 0xFF0000,
   ORANGE = 0xFFA600,
   YELLOW = 0xFFFF00,
@@ -25,6 +26,13 @@ enum Colour {
 void initialize(Robot *robot);
 void write_line(const char *string, Colour colour = Colour::WHITE);
 void write_line(const std::string &string, Colour colour = Colour::WHITE);
+
+void add_screen(
+    void (*createFun)(lv_obj_t *screen, lv_coord_t width, lv_coord_t height),
+    void (*updateFun)(Robot *robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height),
+    void (*initFun)(lv_obj_t *screen, lv_coord_t width, lv_coord_t height),
+    void (*dropFun)(lv_obj_t *screen)
+);
 
 }
 #endif //SCREEN_HPP
