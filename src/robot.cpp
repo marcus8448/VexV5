@@ -1,6 +1,7 @@
 #include "robot.hpp"
 #include "error.hpp"
 #include "logger.hpp"
+#include "pros/motors.h"
 #include "util.hpp"
 #include <cmath>
 
@@ -203,6 +204,19 @@ void OpController::update() {
     this->digital_speed(std::max(this->digital_speed() - 1, 127));
   }
 
+  if (a == 1) logger::debug("A pressed");
+  if (b == 1) logger::debug("B pressed");
+  if (x == 1) logger::debug("X pressed");
+  if (y == 1) logger::debug("Y pressed");
+  if (up == 1) logger::debug("Up pressed");
+  if (down == 1) logger::debug("Down pressed");
+  if (left == 1) logger::debug("Left pressed");
+  if (right == 1) logger::debug("Right pressed");
+  if (r1 == 1) logger::debug("R1 pressed");
+  if (r2 == 1) logger::debug("R2 pressed");
+  if (l1 == 1) logger::debug("L1 pressed");
+  if (l2 == 1) logger::debug("L2 pressed");
+
   if (this->up_pressed() || this->down_pressed()) {
     this->set_line(0, 0, ("Dig Spd: " + std::to_string(this->digital_speed()).append(
         " ")).c_str());//append ' ' to clear out buffer
@@ -334,8 +348,12 @@ void Robot::update() {
   if (this->drivetrain == nullptr) {
     logger::info("Drivetrain is null?");
   }
+  if (this->flywheel == nullptr) {
+    logger::info("Flywheel is null?");
+  }
   this->controller->update();
   this->drivetrain->update(this->controller);
+  this->flywheel->update(this->controller);
 }
 
 void Robot::reset() {
@@ -357,11 +375,11 @@ Robot::~Robot() {
 }
 
 Flywheel::Flywheel(pros::Motor *motor): motor(motor) {
-
+  motor->set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 }
 
 void Flywheel::engage() {
-  this->motor->move(127);
+  this->motor->move(-127);
   this->engaged = true;
 }
 
