@@ -14,9 +14,10 @@
 #include "screen/screen.hpp"
 
 namespace screen {
+extern void *canvasBuffer;
 
-static std::vector<Screen *> registry;
-static std::vector<lv_obj_t *> screens;
+static std::vector<Screen *> *registry = new std::vector<Screen *>();
+static std::vector<lv_obj_t *> *screens = new std::vector<lv_obj_t *>();
 static uint16_t activeScreen = -1;
 
 static size_t canvasSize = 0;
@@ -34,7 +35,6 @@ void create_next_btn(lv_obj_t *obj);
 lv_obj_t *create_screen(lv_obj_t *parent, bool beginning = false, bool end = false);
 
 void initialize(robot::Robot *robot) {
-  logger::push_section("Initialize Screen");
   logger::push_section("Initialize LVGL");
   lv_init();
   logger::pop_section();
@@ -48,25 +48,29 @@ void initialize(robot::Robot *robot) {
 
   logger::debug("Width: %i\nHeight: %i", width, height);
   logger::push_section("Create screens");
-  for (size_t i = 0; i < registry.size(); i++) {
-    screens[i] = create_screen(base_view, i == 0, i == registry.size() - 1);
-    registry[i]->create(screens[i], width, height);
+  for (size_t i = 0; i < registry->size(); i++) {
+    lv_obj_t *screen = create_screen(base_view, i == 0, i == registry->size() - 1);
+    screens->push_back(screen);
+    logger::debug("TE3");
+    registry->at(i)->create(screen, width, height);
+    logger::debug("TE5");
   }
   logger::pop_section();
 
   init_screen(activeScreen);
   pros::Task(update_task, robot, "Screen Update");
-  logger::pop_section();
 }
 
 lv_obj_t *create_screen(lv_obj_t *parent, bool beginning, bool end) {
   lv_obj_t *screen = lv_obj_create(parent, nullptr);
   lv_obj_set_size(screen, width, height);
   lv_obj_set_hidden(screen, true);
-  if (!end)
+  if (!end) {
     create_next_btn(screen);
-  if (!beginning)
+  }
+  if (!beginning) {
     create_prev_btn(screen);
+  }
   return screen;
 }
 
@@ -80,10 +84,10 @@ lv_obj_t *create_screen(lv_obj_t *parent, bool beginning, bool end) {
 
 void update(robot::Robot *robot) {
   memset(canvasBuffer, 0x00000000, canvasSize);
-  registry[activeScreen]->update(robot);
+  registry->at(activeScreen)->update(robot);
 }
 
-void add_screen(Screen *screen) { registry.push_back(screen); }
+void add_screen(Screen *screen) { registry->push_back(screen); }
 
 void create_prev_btn(lv_obj_t *obj) {
   auto prevBtn = lv_btn_create(obj, nullptr);
@@ -112,16 +116,16 @@ lv_res_t next_page(lv_obj_t *btn) {
 }
 
 void init_screen(uint16_t screen) {
-  logger::push_section("Create screen");
-  lv_obj_set_hidden(screens[screen], false);
-  registry[screen]->initialize(width, height);
+  logger::push_section("Init screen");
+  lv_obj_set_hidden(screens->at(screen), false);
+  registry->at(screen)->initialize(width, height);
   logger::pop_section();
 }
 
 void destroy_screen(uint16_t screen) {
   logger::push_section("Drop screen");
-  lv_obj_set_hidden(screens[screen], true);
-  registry[screen]->destroy(screens[screen]);
+  lv_obj_set_hidden(screens->at(screen), true);
+  registry->at(screen)->destroy(screens->at(screen));
   logger::pop_section();
 }
 } // namespace screen

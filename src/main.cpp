@@ -56,17 +56,21 @@ robot::Robot *get_robot();
  */
 void initialize() {
   logger::push_section("Initialize");
-  robot::Robot *bot = get_robot();
+  robot::Robot *robot = get_robot();
 #ifdef SCREEN
+  logger::push_section("Add Screens");
   screen::add_screen(new screen::Information());
   screen::add_screen(new screen::DrivetrainChart());
   screen::add_screen(new screen::FlywheelChart());
   screen::add_screen(new screen::Logging());
-  screen::initialize(bot);
+  logger::pop_section();
+  logger::push_section("Initialize Screen");
+  screen::initialize(robot);
+  logger::pop_section();
 #endif // SCREEN
 #ifdef SERIAL_LINK
-  serial::add_plugin(new serial::RobotStatePlugin(bot));
-  serial::add_plugin(new serial::RobotCommandsPlugin(bot));
+  serial::add_plugin(new serial::RobotStatePlugin(robot));
+  serial::add_plugin(new serial::RobotCommandsPlugin(robot));
   serial::initialize();
 #endif // SERIAL_LINK
   logger::pop_section();

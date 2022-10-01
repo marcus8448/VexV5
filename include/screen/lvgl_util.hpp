@@ -11,9 +11,6 @@
 
 namespace screen {
 #define CANVAS_COLOUR LV_IMG_CF_TRUE_COLOR
-
-static void *canvasBuffer;
-
 lv_obj_t *create_label(lv_obj_t *screen, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h,
                        const char *text = "<uninitialized>", lv_style_t *style = nullptr);
 

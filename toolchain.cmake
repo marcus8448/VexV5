@@ -7,7 +7,7 @@ set(CMAKE_CXX_COMPILER_TARGET ${TARGET_TRIPLE})
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 
-set(MFLAGS "-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp -g -Os")
+set(MFLAGS "-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp")
 set(CFLAGS "-D_POSIX_THREADS -D_UNIX98_THREAD_MUTEX_ATTRIBUTES")
 set(WARNFLAGS "-Wall -Wno-psabi")
 set(GCCFLAGS "-ffunction-sections -fdata-sections -fdiagnostics-color -funwind-tables")

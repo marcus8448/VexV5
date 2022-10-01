@@ -11,6 +11,8 @@
 #pragma GCC diagnostic pop
 
 namespace screen {
+extern void *canvasBuffer;
+
 FlywheelChart::FlywheelChart() = default;
 
 void FlywheelChart::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
@@ -21,9 +23,9 @@ void FlywheelChart::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height
   lv_canvas_set_buffer(this->flywheelCanvas, canvasBuffer, width, static_cast<lv_coord_t>(height - BASE_HEIGHT),
                        CANVAS_COLOUR);
 
-  create_label(screen, 32, static_cast<lv_coord_t>(height - 32), static_cast<lv_coord_t>(width / 4), 16, "Flywheel (+)",
+  create_label(screen, 90, static_cast<lv_coord_t>(height - 32 - 4), static_cast<lv_coord_t>(width / 3), 16, "Flywheel (+)",
                create_text_color_style(screen::colour::BLUE));
-  create_label(screen, 32, static_cast<lv_coord_t>(height - 16), static_cast<lv_coord_t>(width / 4), 16, "Flywheel (-)",
+  create_label(screen, 240, static_cast<lv_coord_t>(height - 32 - 4), static_cast<lv_coord_t>(width / 3), 16, "Flywheel (-)",
                create_text_color_style(screen::colour::ORANGE));
 }
 
