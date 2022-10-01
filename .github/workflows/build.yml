@@ -20,7 +20,7 @@ jobs:
 
       - name: Build with CMake
         run: |
-          cmake --build .
+          cmake --build build/
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
