@@ -56,8 +56,8 @@ add_executable(
         src/screen/autonomous_select.cpp
         src/screen/logs.cpp
         src/serial/serial.cpp
-        ${Timestamp}
         src/robot/drivetrain.cpp
+        $<TARGET_OBJECTS:Timestamp>
 )
 
 add_custom_target(
@@ -74,16 +74,14 @@ set_target_properties(
 )
 set_property(TARGET HotPackage PROPERTY OUTPUT_NAME hot.package.elf)
 set_property(TARGET ColdPackage PROPERTY OUTPUT_NAME cold.package.elf)
+target_compile_options(Timestamp PRIVATE -Wno-unused-const-variable)
 
 target_link_libraries(HotPackage PUBLIC ${LibC} ${LibM} ${LibPROS})
-target_link_libraries(ColdPackage PUBLIC ${LibC} ${LibM} ${LibPROS})
 
 target_link_options(
         HotPackage
         PUBLIC -Wl,-R,${BIN_DIR}/cold.package.elf
-        PUBLIC -Wl,-T${FIRMWARE_DIR}/v5-hot.ld
-        PUBLIC -Wl,--gc-sections,--start-group,${FIRMWARE_DIR}/libc.a,${FIRMWARE_DIR}/libm.a,-lgcc,-lstdc++,--end-group
-        PUBLIC -Wl,-T${FIRMWARE_DIR}/v5-common.ld
+        PUBLIC -Wl,-T${FIRMWARE_DIR}/v5-hot.ld,--gc-sections,--start-group,${FIRMWARE_DIR}/libc.a,${FIRMWARE_DIR}/libm.a,${FIRMWARE_DIR}/libpros.a,-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld
 )
 
 target_link_options(
@@ -92,10 +90,16 @@ target_link_options(
         PUBLIC -Wl,-T${FIRMWARE_DIR}/v5.ld,--gc-sections,--start-group,${FIRMWARE_DIR}/libc.a,${FIRMWARE_DIR}/libm.a,${FIRMWARE_DIR}/libpros.a,-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld
 )
 
+#add_custom_command(
+#       TARGET ColdPackage
+#       POST_BUILD
+#       COMMAND ${CMAKE_STRIP} -g ${BIN_DIR}/cold.package.elf
+#)
+
 add_custom_command(
-       TARGET ColdPackage
-       POST_BUILD
-       COMMAND ${CMAKE_STRIP} -g ${BIN_DIR}/cold.package.elf
+        TARGET ColdPackage
+        POST_BUILD
+        COMMAND ${CMAKE_OBJCOPY} --strip-symbol=install_hot_table --strip-symbol=__libc_init_array --strip-symbol=_PROS_COMPILE_DIRECTORY --strip-symbol=_PROS_COMPILE_TIMESTAMP ${BIN_DIR}/cold.package.elf ${BIN_DIR}/cold.package.elf
 )
 
 add_custom_command(
@@ -104,11 +108,11 @@ add_custom_command(
         COMMAND ${CMAKE_OBJCOPY} -O binary -R .hot_init ${BIN_DIR}/cold.package.elf ${BIN_DIR}/cold.package.bin
 )
 
-add_custom_command(
-       TARGET HotPackage
-       POST_BUILD
-       COMMAND ${CMAKE_STRIP} -g ${BIN_DIR}/hot.package.elf
-)
+#add_custom_command(
+#       TARGET HotPackage
+#       POST_BUILD
+#       COMMAND ${CMAKE_STRIP} -g ${BIN_DIR}/hot.package.elf
+#)
 
 add_custom_command(
         TARGET HotPackage

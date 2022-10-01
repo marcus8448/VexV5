@@ -1,10 +1,10 @@
 ARCHTUPLE=arm-none-eabi
 DEVICE=VEX EDR V5
 
-ARM_SYSROOT := $(shell arm-none-eabi-gcc $(MFLAGS) -print-sysroot)
-ARM_MULTI_DIR := $(shell arm-none-eabi-gcc $(MFLAGS) -print-multi-directory)
-ARM_LIB_GCC := $(shell arm-none-eabi-gcc $(MFLAGS) -print-libgcc-file-name)
-ARM_GCC_VERSION := $(shell arm-none-eabi-gcc $(MFLAGS) -dumpversion)
+ARM_SYSROOT := $(shell arm-none-eabi-gcc -print-sysroot)
+ARM_MULTI_DIR := $(shell arm-none-eabi-gcc -print-multi-directory)
+ARM_LIB_GCC := $(shell dirname $(shell arm-none-eabi-gcc -print-libgcc-file-name))
+ARM_GCC_VERSION := $(shell arm-none-eabi-gcc -dumpversion)
 
 MFLAGS=-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp -Os -g
 CPPFLAGS=-D_POSIX_THREADS -D_UNIX98_THREAD_MUTEX_ATTRIBUTES
@@ -26,12 +26,12 @@ LIBRARIES+=$(wildcard $(FWDIR)/*.a)
 EXCLUDE_COLD_LIBRARIES+=$(FWDIR)/libc.a $(FWDIR)/libm.a
 COLD_LIBRARIES=$(filter-out $(EXCLUDE_COLD_LIBRARIES), $(LIBRARIES))
 wlprefix=-Wl,$(subst $(SPACE),$(COMMA),$1)
-LNK_FLAGS=--gc-sections --start-group $(strip $(LIBRARIES)) -lgcc -lstdc++ --end-group -T$(FWDIR)/v5-common.ld
+LNK_FLAGS=--gc-sections --start-group $(strip $(LIBRARIES)) -lgcc -lstdc++ --end-group -T$(FWDIR)/v5-common.ld -no-enum-size-warning
 
 ASMFLAGS=$(MFLAGS) $(WARNFLAGS)
 CFLAGS=$(MFLAGS) $(CPPFLAGS) $(WARNFLAGS) $(GCCFLAGS) --std=gnu11
 CXXFLAGS=$(MFLAGS) $(CPPFLAGS) $(WARNFLAGS) $(GCCFLAGS) --std=gnu++17
-LDFLAGS=$(MFLAGS) $(WARNFLAGS) -nostdlib $(GCCFLAGS)
+LDFLAGS=$(MFLAGS) $(WARNFLAGS) -nostdlib $(GCCFLAGS) -Wnounused-command-line-argument
 SIZEFLAGS=-d --common
 NUMFMTFLAGS=--to=iec --format %.2f --suffix=B
 
@@ -39,7 +39,7 @@ AR:=llvm-ar
 AS:=clang --target=$(ARCHTUPLE) --sysroot=$(ARM_SYSROOT)
 CC:=clang --target=$(ARCHTUPLE) --sysroot=$(ARM_SYSROOT)
 CXX:=clang++ --target=$(ARCHTUPLE) --sysroot=$(ARM_SYSROOT) -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION) -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION)/$(ARCHTUPLE)/$(ARM_MULTI_DIR)
-LD:=$(CXX) $(ARM_LIB_GCC) -L/usr/lib/gcc/$(ARCHTUPLE)/$(ARM_GCC_VERSION) -fuse-ld=bfd
+LD:=$(CXX) -L$(ARM_LIB_GCC) -fuse-ld=bfd
 OBJCOPY:=llvm-objcopy
 SIZETOOL:=llvm-size
 READELF:=llvm-readelf
@@ -229,7 +229,7 @@ $(COLD_BIN): $(COLD_ELF)
 
 $(COLD_ELF): $(COLD_LIBRARIES)
 	$(VV)mkdir -p $(dir $@)
-	$(call test_output_2,Creating cold package with $(ARCHIVE_TEXT_LIST) ,$(LD) $(LDFLAGS) $(call wlprefix,--gc-keep-exported --whole-archive $^ -lstdc++ --no-whole-archive) $(call wlprefix,-T$(FWDIR)/v5.ld $(LNK_FLAGS) -o $@),$(OK_STRING))
+	$(call test_output_2,Creating cold package with $(ARCHIVE_TEXT_LIST) ,$(LD) $(LDFLAGS) $(call wlprefix,--gc-keep-exported --whole-archive $^ -lstdc++ --no-whole-archive) $(call wlprefix,-T$(FWDIR)/v5.ld $(LNK_FLAGS)) -o $@,$(OK_STRING))
 	$(call test_output_2,Stripping cold package ,$(OBJCOPY) --strip-symbol=install_hot_table --strip-symbol=__libc_init_array --strip-symbol=_PROS_COMPILE_DIRECTORY --strip-symbol=_PROS_COMPILE_TIMESTAMP $@ $@, $(DONE_STRING))
 	@echo Section sizes:
 	-$(VV)$(SIZETOOL) $(SIZEFLAGS) $@ $(SIZES_SED) $(SIZES_NUMFMT)
@@ -239,7 +239,7 @@ $(HOT_BIN): $(HOT_ELF) $(COLD_BIN)
 
 $(HOT_ELF): $(COLD_ELF) $(ELF_DEPS)
 	$(call _pros_ld_timestamp)
-	$(call test_output_2,Linking hot project with $(COLD_ELF) and $(ARCHIVE_TEXT_LIST) ,$(LD) -nostartfiles $(LDFLAGS) $(call wlprefix,-R $<) $(filter-out $<,$^) $(LDTIMEOBJ) $(LIBRARIES) $(call wlprefix,-T$(FWDIR)/v5-hot.ld $(LNK_FLAGS) -o $@),$(OK_STRING))
+	$(call test_output_2,Linking hot project with $(COLD_ELF) and $(ARCHIVE_TEXT_LIST) ,$(LD) $(LDFLAGS) $(call wlprefix,-R $<) $(filter-out $<,$^) $(LDTIMEOBJ) $(LIBRARIES) $(call wlprefix,-T$(FWDIR)/v5-hot.ld $(LNK_FLAGS)) -o $@,$(OK_STRING))
 	@printf "%s\n" "Section sizes:"
 	-$(VV)$(SIZETOOL) $(SIZEFLAGS) $@ $(SIZES_SED) $(SIZES_NUMFMT)
 

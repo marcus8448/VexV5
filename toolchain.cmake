@@ -34,8 +34,8 @@ set(CFLAGS "-D_POSIX_THREADS -D_UNIX98_THREAD_MUTEX_ATTRIBUTES")
 set(WARNFLAGS "-Wall -Wno-psabi")
 set(GCCFLAGS "-ffunction-sections -fdata-sections -fdiagnostics-color -funwind-tables")
 
-set(CMAKE_CXX_FLAGS "${CLANG_CXX_TARGET} ${MFLAGS} ${CFLAGS} ${WARNFLAGS} ${GCCFLAGS} -std=gnu++17")
-set(CMAKE_C_FLAGS "${CLANG_TARGET} ${MFLAGS} ${CFLAGS} ${WARNFLAGS} ${GCCFLAGS} -std=gnu11")
+set(CMAKE_CXX_FLAGS "${CLANG_CXX_TARGET} ${MFLAGS} ${CFLAGS} ${WARNFLAGS} ${GCCFLAGS}")
+set(CMAKE_C_FLAGS "${CLANG_TARGET} ${MFLAGS} ${CFLAGS} ${WARNFLAGS} ${GCCFLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "-nostdlib -Wnounused-command-line-argument -Wl,--no-enum-size-warning -L${ARM_LIBS}")
 
 set(CMAKE_C_LINK_EXECUTABLE "<CMAKE_LINKER> <FLAGS> <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
