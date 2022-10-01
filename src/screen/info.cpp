@@ -2,10 +2,10 @@
 #include "screen/lvgl_util.hpp"
 #include "screen/info.hpp"
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wall"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
 #include "display/lv_core/lv_obj.h"
-#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
 
 namespace screen {
 void update_motor_digital(lv_obj_t *label, pros::Motor *motor, bool engaged, const char *name);

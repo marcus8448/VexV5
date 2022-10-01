@@ -1,10 +1,10 @@
 #ifndef SCREEN_HPP
 #define SCREEN_HPP
 #include <string>
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wall"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
 #include "display/lv_core/lv_obj.h"
-#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
 #include "robot/robot.hpp"
 
 namespace screen {

@@ -2,11 +2,11 @@
 #include <cstring>
 #include <vector>
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wall"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
 #include "display/lv_core/lv_obj.h"
 #include "display/lv_objx/lv_btn.h"
-#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
 
 #include "logger.hpp"
 #include "pros/rtos.hpp"

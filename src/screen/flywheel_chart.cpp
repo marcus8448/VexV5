@@ -4,11 +4,11 @@
 #include "screen/flywheel_chart.hpp"
 #include "screen/colour.hpp"
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wall"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
 #include "display/lv_core/lv_obj.h"
 #include "display/lv_objx/lv_canvas.h"
-#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
 
 namespace screen {
 FlywheelChart::FlywheelChart() = default;

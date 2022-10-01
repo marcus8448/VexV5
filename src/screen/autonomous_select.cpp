@@ -1,10 +1,10 @@
 #include "screen/autonomous_select.hpp"
 #include "robot/robot.hpp"
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wall"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
 #include "display/lv_core/lv_obj.h"
-#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
 
 namespace screen {
 AutonomousSelect::AutonomousSelect() = default;

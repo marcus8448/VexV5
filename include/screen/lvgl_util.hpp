@@ -1,13 +1,13 @@
 #ifndef SCREEN_LVGL_UTIL_HPP
 #define SCREEN_LVGL_UTIL_HPP
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wall"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
 #include "display/lv_core/lv_obj.h"
 #include "display/lv_objx/lv_canvas.h"
 #include "display/lv_core/lv_style.h"
 #include "display/lv_objx/lv_label.h"
-#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
 
 namespace screen {
 #define CANVAS_COLOUR LV_IMG_CF_TRUE_COLOR

@@ -1,10 +1,10 @@
 #ifndef SCREEN_COLOUR_HPP
 #define SCREEN_COLOUR_HPP
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wall"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
 #include "display/lv_misc/lv_color.h"
-#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
 
 namespace screen::colour {
 static const lv_color_t WHITE = lv_color_hex(0xFFFFFF);

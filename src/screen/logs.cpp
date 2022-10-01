@@ -2,11 +2,11 @@
 #include "screen/lvgl_util.hpp"
 #include "screen/logs.hpp"
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wall"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
 #include "display/lv_core/lv_obj.h"
 #include "display/lv_objx/lv_list.h"
-#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
 
 namespace screen {
 lv_res_t drop_log(lv_obj_t *obj);
