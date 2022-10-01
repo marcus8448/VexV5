@@ -8,4 +8,4 @@
  */
 void reset_positions(robot::Robot *robot);
 
-#endif//RESET_HPP
+#endif // RESET_HPP

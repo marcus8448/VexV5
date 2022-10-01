@@ -1,10 +1,10 @@
 #ifndef ROBOT_DRIVETRAIN_HPP
 #define ROBOT_DRIVETRAIN_HPP
 
-#include <cstdint>
-#include "pros/motors.hpp"
 #include "attributes.hpp"
+#include "pros/motors.hpp"
 #include "robot/controller/controller.hpp"
+#include <cstdint>
 
 namespace robot {
 class Drivetrain : public Resettable, public Targeting, public Updatable {
@@ -31,6 +31,6 @@ public:
   void reset() override;
   void stop() override;
 };
-}
+} // namespace robot
 
-#endif //ROBOT_DRIVETRAIN_HPP
+#endif // ROBOT_DRIVETRAIN_HPP

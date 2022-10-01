@@ -8,19 +8,19 @@ class SerialPlugin {
 public:
   virtual void clear_state() = 0;
   /**
-  * Called when the robot successfully connects to the client computer.
-  */
+   * Called when the robot successfully connects to the client computer.
+   */
   virtual void initialize(std::streambuf *outputBuf, std::streambuf *inputBuf) = 0;
   virtual bool handle(const char type[4]) = 0;
   /**
-  * Called when the robot is gracefully disconnected from the computer.
-  * Not guaranteed to be called.
-  */
+   * Called when the robot is gracefully disconnected from the computer.
+   * Not guaranteed to be called.
+   */
   virtual void disconnected() = 0;
 };
 
 void add_plugin(SerialPlugin *plugin);
 
 void initialize();
-}
-#endif//SERIALLINK_DEBUG_HPP
+} // namespace serial
+#endif // SERIALLINK_DEBUG_HPP

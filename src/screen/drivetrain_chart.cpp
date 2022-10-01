@@ -1,8 +1,8 @@
-#include <cmath>
-#include "screen/screen.hpp"
-#include "screen/lvgl_util.hpp"
 #include "screen/drivetrain_chart.hpp"
 #include "screen/colour.hpp"
+#include "screen/lvgl_util.hpp"
+#include "screen/screen.hpp"
+#include <cmath>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wall"
@@ -24,65 +24,25 @@ void DrivetrainChart::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t heig
   lv_canvas_set_buffer(this->drivetrainCanvas, canvasBuffer, width, trueHeight, CANVAS_COLOUR);
 
   auto qtrWidth = static_cast<lv_coord_t>((width - 64) / 4);
-  create_label(screen,
-               32,
-               static_cast<lv_coord_t>(height - 32),
-               qtrWidth,
-               16,
-               "Left Front (+)",
+  create_label(screen, 32, static_cast<lv_coord_t>(height - 32), qtrWidth, 16, "Left Front (+)",
                create_text_color_style(screen::colour::RED));
-  create_label(screen,
-               32,
-               static_cast<lv_coord_t>(height - 16),
-               qtrWidth,
-               16,
-               "Left Front (-)",
+  create_label(screen, 32, static_cast<lv_coord_t>(height - 16), qtrWidth, 16, "Left Front (-)",
                create_text_color_style(screen::colour::BLUE));
 
-  create_label(screen,
-               static_cast<lv_coord_t>(32 + qtrWidth),
-               static_cast<lv_coord_t>(height - 32),
-               qtrWidth,
-               16,
-               "Right Front (+)",
-               create_text_color_style(screen::colour::ORANGE));
-  create_label(screen,
-               static_cast<lv_coord_t>(32 + qtrWidth),
-               static_cast<lv_coord_t>(height - 16),
-               qtrWidth,
-               16,
-               "Right Front (-)",
-               create_text_color_style(screen::colour::VIOLET));
+  create_label(screen, static_cast<lv_coord_t>(32 + qtrWidth), static_cast<lv_coord_t>(height - 32), qtrWidth, 16,
+               "Right Front (+)", create_text_color_style(screen::colour::ORANGE));
+  create_label(screen, static_cast<lv_coord_t>(32 + qtrWidth), static_cast<lv_coord_t>(height - 16), qtrWidth, 16,
+               "Right Front (-)", create_text_color_style(screen::colour::VIOLET));
 
-  create_label(screen,
-               static_cast<lv_coord_t>(32 + qtrWidth * 2),
-               static_cast<lv_coord_t>(height - 32),
-               qtrWidth,
-               16,
-               "Left Back (+)",
-               create_text_color_style(screen::colour::YELLOW));
-  create_label(screen,
-               static_cast<lv_coord_t>(32 + qtrWidth * 2),
-               static_cast<lv_coord_t>(height - 16),
-               qtrWidth,
-               16,
-               "Left Back (-)",
-               create_text_color_style(screen::colour::GREEN));
+  create_label(screen, static_cast<lv_coord_t>(32 + qtrWidth * 2), static_cast<lv_coord_t>(height - 32), qtrWidth, 16,
+               "Left Back (+)", create_text_color_style(screen::colour::YELLOW));
+  create_label(screen, static_cast<lv_coord_t>(32 + qtrWidth * 2), static_cast<lv_coord_t>(height - 16), qtrWidth, 16,
+               "Left Back (-)", create_text_color_style(screen::colour::GREEN));
 
-  create_label(screen,
-               static_cast<lv_coord_t>(32 + qtrWidth * 3),
-               static_cast<lv_coord_t>(height - 32),
-               qtrWidth,
-               16,
-               "Right Back (+)",
-               create_text_color_style(screen::colour::PINK));
-  create_label(screen,
-               static_cast<lv_coord_t>(32 + qtrWidth * 3),
-               static_cast<lv_coord_t>(height - 16),
-               qtrWidth,
-               16,
-               "Right Back (-)",
-               create_text_color_style(screen::colour::LIGHT_BLUE));
+  create_label(screen, static_cast<lv_coord_t>(32 + qtrWidth * 3), static_cast<lv_coord_t>(height - 32), qtrWidth, 16,
+               "Right Back (+)", create_text_color_style(screen::colour::PINK));
+  create_label(screen, static_cast<lv_coord_t>(32 + qtrWidth * 3), static_cast<lv_coord_t>(height - 16), qtrWidth, 16,
+               "Right Back (-)", create_text_color_style(screen::colour::LIGHT_BLUE));
 }
 
 void DrivetrainChart::initialize(lv_coord_t width, lv_coord_t height) {
@@ -98,10 +58,10 @@ void DrivetrainChart::update(robot::Robot *robot) {
     this->velMotorRB.erase(this->velMotorRB.begin());
   }
 
-  auto prevLF = (float) robot->drivetrain->leftFront->get_actual_velocity();
-  auto prevRF = (float) robot->drivetrain->rightFront->get_actual_velocity();
-  auto prevLB = (float) robot->drivetrain->leftBack->get_actual_velocity();
-  auto prevRB = (float) robot->drivetrain->rightBack->get_actual_velocity();
+  auto prevLF = (float)robot->drivetrain->leftFront->get_actual_velocity();
+  auto prevRF = (float)robot->drivetrain->rightFront->get_actual_velocity();
+  auto prevLB = (float)robot->drivetrain->leftBack->get_actual_velocity();
+  auto prevRB = (float)robot->drivetrain->rightBack->get_actual_velocity();
   if (prevLF == INFINITY || prevLF == -1)
     prevLF = 5;
   if (prevRF == INFINITY || prevRF == -1)
@@ -120,40 +80,37 @@ void DrivetrainChart::update(robot::Robot *robot) {
   float x = 0;
   for (int i = (int)this->velMotorLF.size() - 2; i >= 0; --i) {
     float v = this->velMotorLF[i];
-    lv_canvas_draw_line(this->drivetrainCanvas, lv_point_t{
-        static_cast<lv_coord_t>(this->canvasWidth - (x * widthScale)),
-        static_cast<lv_coord_t>(this->canvasHeight - std::fabs(prevLF * heightScale))
-    }, lv_point_t{
-        static_cast<lv_coord_t>(this->canvasWidth - ((x + 1) * widthScale)),
-        static_cast<lv_coord_t>(this->canvasHeight - BASE_HEIGHT - std::fabs(v * heightScale))
-    }, v >= 0 ? screen::colour::RED : screen::colour::BLUE);
+    lv_canvas_draw_line(
+        this->drivetrainCanvas,
+        lv_point_t{static_cast<lv_coord_t>(this->canvasWidth - (x * widthScale)),
+                   static_cast<lv_coord_t>(this->canvasHeight - std::fabs(prevLF * heightScale))},
+        lv_point_t{static_cast<lv_coord_t>(this->canvasWidth - ((x + 1) * widthScale)),
+                   static_cast<lv_coord_t>(this->canvasHeight - BASE_HEIGHT - std::fabs(v * heightScale))},
+        v >= 0 ? screen::colour::RED : screen::colour::BLUE);
     prevLF = v;
     v = this->velMotorRF[i];
-    lv_canvas_draw_line(this->drivetrainCanvas, lv_point_t{
-        static_cast<lv_coord_t>(this->canvasWidth - (x * widthScale)),
-        static_cast<lv_coord_t>(this->canvasHeight - std::fabs(prevRF * heightScale))
-    }, lv_point_t{
-        static_cast<lv_coord_t>(this->canvasWidth - ((x + 1.0f) * widthScale)),
-        static_cast<lv_coord_t>(this->canvasHeight - std::fabs(v * heightScale))
-    }, v >= 0 ? screen::colour::ORANGE : screen::colour::VIOLET);
+    lv_canvas_draw_line(this->drivetrainCanvas,
+                        lv_point_t{static_cast<lv_coord_t>(this->canvasWidth - (x * widthScale)),
+                                   static_cast<lv_coord_t>(this->canvasHeight - std::fabs(prevRF * heightScale))},
+                        lv_point_t{static_cast<lv_coord_t>(this->canvasWidth - ((x + 1.0f) * widthScale)),
+                                   static_cast<lv_coord_t>(this->canvasHeight - std::fabs(v * heightScale))},
+                        v >= 0 ? screen::colour::ORANGE : screen::colour::VIOLET);
     prevRF = v;
     v = this->velMotorLB[i];
-    lv_canvas_draw_line(this->drivetrainCanvas, lv_point_t{
-        static_cast<lv_coord_t>(this->canvasWidth - (x * widthScale)),
-        static_cast<lv_coord_t>(this->canvasHeight - std::fabs(prevLB * heightScale))
-    }, lv_point_t{
-        static_cast<lv_coord_t>(this->canvasWidth - ((x + 1) * widthScale)),
-        static_cast<lv_coord_t>(this->canvasHeight - std::fabs(v * heightScale))
-    }, v >= 0 ? screen::colour::YELLOW : screen::colour::GREEN);
+    lv_canvas_draw_line(this->drivetrainCanvas,
+                        lv_point_t{static_cast<lv_coord_t>(this->canvasWidth - (x * widthScale)),
+                                   static_cast<lv_coord_t>(this->canvasHeight - std::fabs(prevLB * heightScale))},
+                        lv_point_t{static_cast<lv_coord_t>(this->canvasWidth - ((x + 1) * widthScale)),
+                                   static_cast<lv_coord_t>(this->canvasHeight - std::fabs(v * heightScale))},
+                        v >= 0 ? screen::colour::YELLOW : screen::colour::GREEN);
     prevLB = v;
     v = this->velMotorRB[i];
-    lv_canvas_draw_line(this->drivetrainCanvas, lv_point_t{
-        static_cast<lv_coord_t>(this->canvasWidth - (x * widthScale)),
-        static_cast<lv_coord_t>(this->canvasHeight - std::fabs(prevRB * heightScale))
-    }, lv_point_t{
-        static_cast<lv_coord_t>(this->canvasWidth - ((x + 1) * widthScale)),
-        static_cast<lv_coord_t>(this->canvasHeight - std::fabs(v * heightScale))
-    }, v >= 0 ? screen::colour::PINK : screen::colour::LIGHT_BLUE);
+    lv_canvas_draw_line(this->drivetrainCanvas,
+                        lv_point_t{static_cast<lv_coord_t>(this->canvasWidth - (x * widthScale)),
+                                   static_cast<lv_coord_t>(this->canvasHeight - std::fabs(prevRB * heightScale))},
+                        lv_point_t{static_cast<lv_coord_t>(this->canvasWidth - ((x + 1) * widthScale)),
+                                   static_cast<lv_coord_t>(this->canvasHeight - std::fabs(v * heightScale))},
+                        v >= 0 ? screen::colour::PINK : screen::colour::LIGHT_BLUE);
     prevRB = v;
     ++x;
   }
@@ -166,4 +123,4 @@ void DrivetrainChart::destroy(lv_obj_t *screen) {
   this->velMotorLB.clear();
   this->velMotorRB.clear();
 }
-} // screen::info
+} // namespace screen

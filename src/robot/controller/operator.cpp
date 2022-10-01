@@ -1,110 +1,61 @@
 #include "robot/controller/operator.hpp"
-#include "logger.hpp"
 #include "error.hpp"
+#include "logger.hpp"
 
 namespace robot::controller {
-OpController::OpController(pros::Controller controller) : controller(controller) {
-}
+OpController::OpController(pros::Controller controller) : controller(controller) {}
 
-uint16_t OpController::a_pressed() {
-  return this->a;
-}
+uint16_t OpController::a_pressed() { return this->a; }
 
-uint16_t OpController::b_pressed() {
-  return this->b;
-}
+uint16_t OpController::b_pressed() { return this->b; }
 
-uint16_t OpController::x_pressed() {
-  return this->x;
-}
+uint16_t OpController::x_pressed() { return this->x; }
 
-uint16_t OpController::y_pressed() {
-  return this->y;
-}
+uint16_t OpController::y_pressed() { return this->y; }
 
-uint16_t OpController::up_pressed() {
-  return this->up;
-}
+uint16_t OpController::up_pressed() { return this->up; }
 
-uint16_t OpController::down_pressed() {
-  return this->down;
-}
+uint16_t OpController::down_pressed() { return this->down; }
 
-uint16_t OpController::left_pressed() {
-  return this->left;
-}
+uint16_t OpController::left_pressed() { return this->left; }
 
-uint16_t OpController::right_pressed() {
-  return this->right;
-}
+uint16_t OpController::right_pressed() { return this->right; }
 
-uint16_t OpController::l1_pressed() {
-  return this->l1;
-}
+uint16_t OpController::l1_pressed() { return this->l1; }
 
-uint16_t OpController::l2_pressed() {
-  return this->l2;
-}
+uint16_t OpController::l2_pressed() { return this->l2; }
 
-uint16_t OpController::r1_pressed() {
-  return this->r1;
-}
+uint16_t OpController::r1_pressed() { return this->r1; }
 
-uint16_t OpController::r2_pressed() {
-  return this->r2;
-}
+uint16_t OpController::r2_pressed() { return this->r2; }
 
-double OpController::left_stick_x() {
-  return this->leftStickX;
-}
+double OpController::left_stick_x() { return this->leftStickX; }
 
-double OpController::left_stick_y() {
-  return this->leftStickY;
-}
+double OpController::left_stick_y() { return this->leftStickY; }
 
-double OpController::right_stick_x() {
-  return this->rightStickX;
-}
+double OpController::right_stick_x() { return this->rightStickX; }
 
-double OpController::right_stick_y() {
-  return this->rightStickY;
-}
+double OpController::right_stick_y() { return this->rightStickY; }
 
-double OpController::prev_left_stick_x() {
-  return this->prevLeftStickX;
-}
+double OpController::prev_left_stick_x() { return this->prevLeftStickX; }
 
-double OpController::prev_left_stick_y() {
-  return this->prevLeftStickY;
-}
+double OpController::prev_left_stick_y() { return this->prevLeftStickY; }
 
-double OpController::prev_right_stick_x() {
-  return this->prevRightStickX;
-}
+double OpController::prev_right_stick_x() { return this->prevRightStickX; }
 
-double OpController::prev_right_stick_y() {
-  return this->prevRightStickY;
-}
+double OpController::prev_right_stick_y() { return this->prevRightStickY; }
 
-uint8_t OpController::digital_speed() {
-  return this->digitalSpeed;
-}
+uint8_t OpController::digital_speed() { return this->digitalSpeed; }
 
-void OpController::digital_speed(uint8_t speed) {
-  this->digitalSpeed = speed;
-}
+void OpController::digital_speed(uint8_t speed) { this->digitalSpeed = speed; }
 
 void OpController::set_line(uint8_t line, uint8_t col, const char *str) {
   check_error(this->controller.set_text(line, col, str));
 }
 
-void OpController::clear_line(uint8_t line) {
-  check_error(this->controller.clear_line(line));
-}
+void OpController::clear_line(uint8_t line) { check_error(this->controller.clear_line(line)); }
 
-void OpController::rumble(const char *str) {
-  check_error(this->controller.rumble(str));
-}
+void OpController::rumble(const char *str) { check_error(this->controller.rumble(str)); }
 
 void OpController::update() {
   if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))) {
@@ -223,8 +174,9 @@ void OpController::update() {
     logger::debug("L2 pressed");
 
   if (this->up_pressed() || this->down_pressed()) {
-    this->set_line(0, 0, ("Dig Spd: " + std::to_string(this->digital_speed()).append(
-        " ")).c_str());//append ' ' to clear out buffer
+    this->set_line(
+        0, 0,
+        ("Dig Spd: " + std::to_string(this->digital_speed()).append(" ")).c_str()); // append ' ' to clear out buffer
   }
 }
-}
+} // namespace robot::controller

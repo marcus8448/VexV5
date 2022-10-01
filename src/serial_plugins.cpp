@@ -6,20 +6,13 @@
 
 using namespace serial;
 
-RobotStatePlugin::RobotStatePlugin(robot::Robot *robot) : robot(robot) {
-}
+RobotStatePlugin::RobotStatePlugin(robot::Robot *robot) : robot(robot) {}
 
-void RobotStatePlugin::initialize(std::streambuf *out, std::streambuf *in) {
-  this->outputBuf = out;
-}
+void RobotStatePlugin::initialize(std::streambuf *out, std::streambuf *in) { this->outputBuf = out; }
 
-void RobotStatePlugin::clear_state() {
-  this->outputBuf = nullptr;
-}
+void RobotStatePlugin::clear_state() { this->outputBuf = nullptr; }
 
-void RobotStatePlugin::disconnected() {
-  this->outputBuf = nullptr;
-}
+void RobotStatePlugin::disconnected() { this->outputBuf = nullptr; }
 
 typedef double floating;
 
@@ -85,13 +78,13 @@ bool RobotStatePlugin::handle(const char *type) {
       buffer[1] |= 0b00001000;
     buffer[2] = this->robot->controller->digital_speed();
     float src;
-    src = (float) this->robot->controller->left_stick_x();
+    src = (float)this->robot->controller->left_stick_x();
     std::memcpy(&buffer[3 + sizeof(float) * 0], &src, sizeof(float));
-    src = (float) this->robot->controller->left_stick_y();
+    src = (float)this->robot->controller->left_stick_y();
     std::memcpy(&buffer[3 + sizeof(float) * 1], &src, sizeof(float));
-    src = (float) this->robot->controller->right_stick_x();
+    src = (float)this->robot->controller->right_stick_x();
     std::memcpy(&buffer[3 + sizeof(float) * 2], &src, sizeof(float));
-    src = (float) this->robot->controller->right_stick_y();
+    src = (float)this->robot->controller->right_stick_y();
     std::memcpy(&buffer[3 + sizeof(float) * 3], &src, sizeof(float));
 
     serialize_motor(&buffer[CONTROLLER_SIZE + MOTOR_SIZE * 0], this->robot->drivetrain->rightFront);
@@ -104,8 +97,7 @@ bool RobotStatePlugin::handle(const char *type) {
   return false;
 }
 
-RobotCommandsPlugin::RobotCommandsPlugin(robot::Robot *robot) : robot(robot) {
-}
+RobotCommandsPlugin::RobotCommandsPlugin(robot::Robot *robot) : robot(robot) {}
 
 void RobotCommandsPlugin::initialize(std::streambuf *out, std::streambuf *in) {
   this->outputBuf = out;
@@ -151,18 +143,15 @@ bool RobotCommandsPlugin::handle(const char *type) {
             } else if (vec[3] == "target_position") {
 
             } else if (vec[3] == "relative_target_position") {
-
             }
           } else if (vec[2] == "right_back") {
 
           } else if (vec[2] == "left_front") {
 
           } else if (vec[2] == "left_back") {
-
           }
         }
       } else if (vec[1] == "get") {
-
       }
     }
     return true;

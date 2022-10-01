@@ -21,6 +21,6 @@ public:
   void stop() override;
   ~Robot();
 };
-}
+} // namespace robot
 
-#endif//ROBOT_ROBOT_HPP
+#endif // ROBOT_ROBOT_HPP

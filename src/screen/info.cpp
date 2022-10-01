@@ -1,6 +1,6 @@
-#include "screen/screen.hpp"
-#include "screen/lvgl_util.hpp"
 #include "screen/info.hpp"
+#include "screen/lvgl_util.hpp"
+#include "screen/screen.hpp"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wall"
@@ -32,8 +32,7 @@ void Information::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) 
   this->digitalSpeedLabel = create_label(screen, halfWidth, 16 * 5, halfWidth, 16);
 }
 
-void Information::initialize(lv_coord_t width, lv_coord_t height) {
-}
+void Information::initialize(lv_coord_t width, lv_coord_t height) {}
 
 void Information::update(robot::Robot *robot) {
   set_label_text(this->uptimeLabel, "Uptime: %i", pros::millis());
@@ -47,9 +46,7 @@ void Information::update(robot::Robot *robot) {
   set_label_text(this->digitalSpeedLabel, "Digital Speed: %i", robot->controller->digital_speed());
 }
 
-void Information::destroy(lv_obj_t *screen) {
-
-}
+void Information::destroy(lv_obj_t *screen) {}
 
 void update_motor_digital(lv_obj_t *label, pros::Motor *motor, bool engaged, const char *name) {
   if (motor == nullptr || motor->get_voltage() == INT32_MAX) {
@@ -70,4 +67,4 @@ void update_motor(lv_obj_t *label, const char *name, int32_t voltage) {
     set_label_text(label, "%s: %i", name, voltage);
   }
 }
-} // screen::info
+} // namespace screen

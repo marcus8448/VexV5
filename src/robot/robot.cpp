@@ -3,8 +3,7 @@
 
 namespace robot {
 Robot::Robot(Drivetrain *drivetrain, Flywheel *flywheel)
-    : drivetrain(drivetrain), flywheel(flywheel), controller(nullptr) {
-}
+    : drivetrain(drivetrain), flywheel(flywheel), controller(nullptr) {}
 
 void Robot::update() {
   if (this->controller == nullptr) {
@@ -21,13 +20,9 @@ void Robot::update() {
   this->flywheel->update(this->controller);
 }
 
-void Robot::reset() {
-  this->drivetrain->reset();
-}
+void Robot::reset() { this->drivetrain->reset(); }
 
-void Robot::stop() {
-  this->drivetrain->stop();
-}
+void Robot::stop() { this->drivetrain->stop(); }
 
 Robot::~Robot() {
   logger::warn("Robot destructor called");
@@ -36,4 +31,4 @@ Robot::~Robot() {
   delete drivetrain;
   drivetrain = nullptr;
 }
-}
+} // namespace robot

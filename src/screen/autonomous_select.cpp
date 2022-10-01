@@ -16,4 +16,4 @@ void AutonomousSelect::initialize(lv_coord_t width, lv_coord_t height) {}
 void AutonomousSelect::update(robot::Robot *robot) {}
 
 void AutonomousSelect::destroy(lv_obj_t *screen) {}
-} // screen
+} // namespace screen

@@ -1,9 +1,9 @@
 #ifndef ROBOT_CONTROLLER_OPERATOR_HPP
 #define ROBOT_CONTROLLER_OPERATOR_HPP
 
-#include <cstdint>
-#include "pros/misc.hpp"
 #include "controller.hpp"
+#include "pros/misc.hpp"
+#include <cstdint>
 
 namespace robot::controller {
 class OpController : public Controller {
@@ -76,5 +76,5 @@ public:
 
   void update() override;
 };
-}
-#endif //ROBOT_CONTROLLER_OPERATOR_HPP
+} // namespace robot::controller
+#endif // ROBOT_CONTROLLER_OPERATOR_HPP

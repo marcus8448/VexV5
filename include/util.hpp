@@ -1,8 +1,8 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
-#include <string>
 #include "pros/motors.hpp"
+#include <string>
 
 #define PI 3.14159265358979323846
 #define WHEEL_SIZE 2.0625
@@ -20,4 +20,4 @@ double turn_to_rot(double degrees);
  */
 bool file_exists(const char *name);
 
-#endif//UTIL_HPP
+#endif // UTIL_HPP

@@ -14,6 +14,7 @@ private:
   std::vector<float> velMotorLB;
   std::vector<float> velMotorRB;
   lv_obj_t *drivetrainCanvas = nullptr;
+
 public:
   explicit DrivetrainChart();
 
@@ -22,6 +23,6 @@ public:
   void update(robot::Robot *robot) override;
   void destroy(lv_obj_t *screen) override;
 };
-} // screen
+} // namespace screen
 
-#endif //SCREEN_DRIVETRAIN_CHART_HPP
+#endif // SCREEN_DRIVETRAIN_CHART_HPP

@@ -4,9 +4,7 @@
 #include <cmath>
 
 namespace robot {
-robot::Drivetrain::Drivetrain(pros::Motor *rightFront,
-                              pros::Motor *leftFront,
-                              pros::Motor *rightBack,
+robot::Drivetrain::Drivetrain(pros::Motor *rightFront, pros::Motor *leftFront, pros::Motor *rightBack,
                               pros::Motor *leftBack)
     : rightFront(rightFront), leftFront(leftFront), rightBack(rightBack), leftBack(leftBack) {
   this->rightFront->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
@@ -23,17 +21,14 @@ robot::Drivetrain::~Drivetrain() {
 }
 
 bool robot::Drivetrain::is_offset_within(double distance) {
-  return
-      std::fabs(check_error(this->rightFront->get_position()) - check_error(this->rightFront->get_target_position())) <
-          distance &&
-          std::fabs(check_error(this->leftFront->get_position()) - check_error(this->leftFront->get_target_position()))
-              <
-                  distance &&
-          std::fabs(check_error(this->rightBack->get_position()) - check_error(this->rightBack->get_target_position()))
-              <
-                  distance &&
-          std::fabs(check_error(this->leftBack->get_position()) - check_error(this->leftBack->get_target_position())) <
-              distance;
+  return std::fabs(check_error(this->rightFront->get_position()) -
+                   check_error(this->rightFront->get_target_position())) < distance &&
+         std::fabs(check_error(this->leftFront->get_position()) - check_error(this->leftFront->get_target_position())) <
+             distance &&
+         std::fabs(check_error(this->rightBack->get_position()) - check_error(this->rightBack->get_target_position())) <
+             distance &&
+         std::fabs(check_error(this->leftBack->get_position()) - check_error(this->leftBack->get_target_position())) <
+             distance;
 }
 
 void robot::Drivetrain::move_for(double right_distance, double left_distance, int32_t max_rpm, bool block) {
@@ -78,8 +73,8 @@ void robot::Drivetrain::move_left(int32_t voltage) {
 }
 
 void robot::Drivetrain::update(Controller *controller) {
-  this->move_right((int) controller->right_stick_y());
-  this->move_left((int) controller->left_stick_y());
+  this->move_right((int)controller->right_stick_y());
+  this->move_left((int)controller->left_stick_y());
 }
 
 void robot::Drivetrain::stop() {
@@ -95,4 +90,4 @@ void robot::Drivetrain::reset() {
   this->rightBack->tare_position();
   this->leftBack->tare_position();
 }
-}
+} // namespace robot

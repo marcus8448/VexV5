@@ -22,13 +22,13 @@ RecordingController::RecordingController(pros::Controller controller, const char
   if (file_exists(fullPath)) {
     bool moved = false;
     for (char i = 0; i < 127; i++) {
-      auto name = std::string("/usd/").append(filename).append("_").append(std::to_string(i)).append(
-          ".v5r").c_str();
+      auto name = std::string("/usd/").append(filename).append("_").append(std::to_string(i)).append(".v5r").c_str();
       if (!file_exists(name)) {
         std::ofstream out(name, std::ios::out | std::ios::binary | std::ios::trunc);
         std::ifstream in(fullPath, std::ios::in | std::ios::binary);
         out << std::string((std::istreambuf_iterator<char>(in)),
-                           std::istreambuf_iterator<char>()); // apparently rename/copy is not supported
+                           std::istreambuf_iterator<char>()); // apparently rename/copy is not
+                                                              // supported
         out.close();
         in.close();
         moved = true;
@@ -47,61 +47,33 @@ RecordingController::RecordingController(pros::Controller controller, const char
   this->outf << '0';
 }
 
-uint16_t RecordingController::a_pressed() {
-  return this->a;
-}
+uint16_t RecordingController::a_pressed() { return this->a; }
 
-uint16_t RecordingController::b_pressed() {
-  return this->b;
-}
+uint16_t RecordingController::b_pressed() { return this->b; }
 
-uint16_t RecordingController::x_pressed() {
-  return this->x;
-}
+uint16_t RecordingController::x_pressed() { return this->x; }
 
-uint16_t RecordingController::y_pressed() {
-  return this->y;
-}
+uint16_t RecordingController::y_pressed() { return this->y; }
 
-uint16_t RecordingController::up_pressed() {
-  return this->up;
-}
+uint16_t RecordingController::up_pressed() { return this->up; }
 
-uint16_t RecordingController::down_pressed() {
-  return this->down;
-}
+uint16_t RecordingController::down_pressed() { return this->down; }
 
-uint16_t RecordingController::left_pressed() {
-  return this->left;
-}
+uint16_t RecordingController::left_pressed() { return this->left; }
 
-uint16_t RecordingController::right_pressed() {
-  return this->right;
-}
+uint16_t RecordingController::right_pressed() { return this->right; }
 
-uint16_t RecordingController::l1_pressed() {
-  return this->l1;
-}
+uint16_t RecordingController::l1_pressed() { return this->l1; }
 
-uint16_t RecordingController::l2_pressed() {
-  return this->l2;
-}
+uint16_t RecordingController::l2_pressed() { return this->l2; }
 
-uint16_t RecordingController::r1_pressed() {
-  return this->r1;
-}
+uint16_t RecordingController::r1_pressed() { return this->r1; }
 
-uint16_t RecordingController::r2_pressed() {
-  return this->r2;
-}
+uint16_t RecordingController::r2_pressed() { return this->r2; }
 
-uint8_t RecordingController::digital_speed() {
-  return this->digitalSpeed;
-}
+uint8_t RecordingController::digital_speed() { return this->digitalSpeed; }
 
-void RecordingController::digital_speed(uint8_t speed) {
-  this->digitalSpeed = speed;
-}
+void RecordingController::digital_speed(uint8_t speed) { this->digitalSpeed = speed; }
 
 void RecordingController::set_line(uint8_t line, uint8_t col, const char *str) {}
 
@@ -109,37 +81,21 @@ void RecordingController::clear_line(uint8_t line) {}
 
 void RecordingController::rumble(const char *str) {}
 
-double RecordingController::left_stick_x() {
-  return this->leftStickX;
-}
+double RecordingController::left_stick_x() { return this->leftStickX; }
 
-double RecordingController::left_stick_y() {
-  return this->leftStickY;
-}
+double RecordingController::left_stick_y() { return this->leftStickY; }
 
-double RecordingController::right_stick_x() {
-  return this->rightStickX;
-}
+double RecordingController::right_stick_x() { return this->rightStickX; }
 
-double RecordingController::right_stick_y() {
-  return this->rightStickY;
-}
+double RecordingController::right_stick_y() { return this->rightStickY; }
 
-double RecordingController::prev_left_stick_x() {
-  return this->prevLeftStickX;
-}
+double RecordingController::prev_left_stick_x() { return this->prevLeftStickX; }
 
-double RecordingController::prev_left_stick_y() {
-  return this->prevLeftStickY;
-}
+double RecordingController::prev_left_stick_y() { return this->prevLeftStickY; }
 
-double RecordingController::prev_right_stick_x() {
-  return this->prevRightStickX;
-}
+double RecordingController::prev_right_stick_x() { return this->prevRightStickX; }
 
-double RecordingController::prev_right_stick_y() {
-  return this->prevRightStickY;
-}
+double RecordingController::prev_right_stick_y() { return this->prevRightStickY; }
 
 void RecordingController::update() {
   if (check_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))) {
@@ -282,4 +238,4 @@ void RecordingController::update() {
   std::memcpy(&bits, &val, sizeof(val));
   this->outf << bits;
 }
-}
+} // namespace robot::controller

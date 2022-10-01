@@ -1,13 +1,14 @@
 #ifndef SCREEN_LOGS_HPP
 #define SCREEN_LOGS_HPP
 
-#include <string>
 #include "screen/screen.hpp"
+#include <string>
 
 namespace screen {
 class Logging : public Screen {
 private:
   lv_obj_t *logs = nullptr;
+
 public:
   explicit Logging();
 
@@ -21,5 +22,5 @@ public:
 };
 
 static Logging *logging = nullptr;
-} //screen
-#endif //SCREEN_LOGS_HPP
+} // namespace screen
+#endif // SCREEN_LOGS_HPP

@@ -1,6 +1,8 @@
 #ifndef SCREEN_INFO_HPP
 #define SCREEN_INFO_HPP
 
+#include "screen.hpp"
+
 namespace screen {
 class Information : public Screen {
 private:
@@ -13,6 +15,7 @@ private:
   lv_obj_t *rollerLabel = nullptr;
   lv_obj_t *intakeLabel = nullptr;
   lv_obj_t *digitalSpeedLabel = nullptr;
+
 public:
   explicit Information();
 
@@ -21,6 +24,6 @@ public:
   void update(robot::Robot *robot) override;
   void destroy(lv_obj_t *screen) override;
 };
-} // screen
+} // namespace screen
 
-#endif //SCREEN_INFO_HPP
+#endif // SCREEN_INFO_HPP

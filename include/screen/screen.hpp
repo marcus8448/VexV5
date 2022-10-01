@@ -20,5 +20,5 @@ public:
 
 void initialize(robot::Robot *robot);
 void add_screen(Screen *screen);
-}
-#endif //SCREEN_HPP
+} // namespace screen
+#endif // SCREEN_HPP

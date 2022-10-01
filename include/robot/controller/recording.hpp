@@ -1,8 +1,8 @@
 #ifndef ROBOT_CONTROLLER_RECORDING_HPP
 #define ROBOT_CONTROLLER_RECORDING_HPP
 
-#include <fstream>
 #include "controller.hpp"
+#include <fstream>
 
 namespace robot::controller {
 class RecordingController : public Controller {
@@ -69,6 +69,6 @@ public:
 
   void update() override;
 };
-}
+} // namespace robot::controller
 
-#endif//ROBOT_CONTROLLER_RECORDING_HPP
+#endif // ROBOT_CONTROLLER_RECORDING_HPP

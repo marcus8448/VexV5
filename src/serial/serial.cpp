@@ -19,11 +19,7 @@ namespace serial {
 static std::vector<SerialPlugin *> PLUGINS;
 static bool initialized = false;
 
-enum State {
-  NOT_CONNECTED,
-  AWAITING_RESPONSE,
-  ESTABLISHED
-};
+enum State { NOT_CONNECTED, AWAITING_RESPONSE, ESTABLISHED };
 
 State state = NOT_CONNECTED;
 uint32_t lastTime = 0;
@@ -51,11 +47,12 @@ void timeout_hack(void *params) {
  * Handles debug commands.
  */
 [[noreturn]] void debug_input_task([[maybe_unused]] void *params) {
-  // everything is static as we kill + re-run the task if the connection times out
-  static std::ostringstream bufferFromProgram; // logs from the running program.
-  static std::istringstream bufferToProgram; // input to be passed to the program.
+  // everything is static as we kill + re-run the task if the connection times
+  // out
+  static std::ostringstream bufferFromProgram;                                   // logs from the running program.
+  static std::istringstream bufferToProgram;                                     // input to be passed to the program.
   static std::streambuf *outputBuf = std::cout.rdbuf(bufferFromProgram.rdbuf()); // send data through the serial port
-  static std::streambuf *inputBuf = std::cin.rdbuf(bufferToProgram.rdbuf()); // read data from the serial port
+  static std::streambuf *inputBuf = std::cin.rdbuf(bufferToProgram.rdbuf());     // read data from the serial port
   bufferFromProgram.clear();
   bufferToProgram.clear();
   static char buf[4];
@@ -112,12 +109,10 @@ void timeout_hack(void *params) {
   }
 }
 
-void add_plugin(SerialPlugin *plugin) {
-  PLUGINS.push_back(plugin);
-}
+void add_plugin(SerialPlugin *plugin) { PLUGINS.push_back(plugin); }
 
 void initialize() {
   pros::Task(debug_input_task, nullptr, "Debug Input Task");
   initialized = true;
 }
-}
+} // namespace serial

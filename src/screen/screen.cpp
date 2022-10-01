@@ -10,8 +10,8 @@
 
 #include "logger.hpp"
 #include "pros/rtos.hpp"
-#include "screen/screen.hpp"
 #include "screen/lvgl_util.hpp"
+#include "screen/screen.hpp"
 
 namespace screen {
 
@@ -33,7 +33,6 @@ void create_prev_btn(lv_obj_t *obj);
 void create_next_btn(lv_obj_t *obj);
 lv_obj_t *create_screen(lv_obj_t *parent, bool beginning = false, bool end = false);
 
-
 void initialize(robot::Robot *robot) {
   logger::push_section("Initialize Screen");
   logger::push_section("Initialize LVGL");
@@ -50,7 +49,7 @@ void initialize(robot::Robot *robot) {
   logger::debug("Width: %i\nHeight: %i", width, height);
   logger::push_section("Create screens");
   for (size_t i = 0; i < registry.size(); i++) {
-    screens[i] = create_screen(base_view, i == 0, i == registry.size()-1);
+    screens[i] = create_screen(base_view, i == 0, i == registry.size() - 1);
     registry[i]->create(screens[i], width, height);
   }
   logger::pop_section();
@@ -64,8 +63,10 @@ lv_obj_t *create_screen(lv_obj_t *parent, bool beginning, bool end) {
   lv_obj_t *screen = lv_obj_create(parent, nullptr);
   lv_obj_set_size(screen, width, height);
   lv_obj_set_hidden(screen, true);
-  if (!end) create_next_btn(screen);
-  if (!beginning) create_prev_btn(screen);
+  if (!end)
+    create_next_btn(screen);
+  if (!beginning)
+    create_prev_btn(screen);
   return screen;
 }
 
@@ -82,9 +83,7 @@ void update(robot::Robot *robot) {
   registry[activeScreen]->update(robot);
 }
 
-void add_screen(Screen *screen) {
-  registry.push_back(screen);
-}
+void add_screen(Screen *screen) { registry.push_back(screen); }
 
 void create_prev_btn(lv_obj_t *obj) {
   auto prevBtn = lv_btn_create(obj, nullptr);
@@ -125,4 +124,4 @@ void destroy_screen(uint16_t screen) {
   registry[screen]->destroy(screens[screen]);
   logger::pop_section();
 }
-}
+} // namespace screen

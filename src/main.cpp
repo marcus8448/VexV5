@@ -13,8 +13,8 @@ void opcontrol(void);
 #include "config.hpp"
 #include "constants.hpp"
 #include "logger.hpp"
-#include "robot/robot.hpp"
 #include "robot/controller/operator.hpp"
+#include "robot/robot.hpp"
 
 #ifdef SERIAL_LINK
 #include "serial/serial.hpp"
@@ -34,12 +34,12 @@ void opcontrol(void);
 #endif
 
 #ifdef SCREEN
-#include "screen/screen.hpp"
 #include "screen/autonomous_select.hpp"
 #include "screen/drivetrain_chart.hpp"
 #include "screen/flywheel_chart.hpp"
 #include "screen/info.hpp"
 #include "screen/logs.hpp"
+#include "screen/screen.hpp"
 #endif
 
 robot::Robot *get_robot();
@@ -63,12 +63,12 @@ void initialize() {
   screen::add_screen(new screen::FlywheelChart());
   screen::add_screen(new screen::Logging());
   screen::initialize(bot);
-#endif //SCREEN
+#endif // SCREEN
 #ifdef SERIAL_LINK
   serial::add_plugin(new serial::RobotStatePlugin(bot));
   serial::add_plugin(new serial::RobotCommandsPlugin(bot));
   serial::initialize();
-#endif //SERIAL_LINK
+#endif // SERIAL_LINK
   logger::pop_section();
 }
 
@@ -77,7 +77,7 @@ void initialize() {
  */
 void autonomous() {
   logger::push_section("Autonomous Setup");
-  robot::Robot* bot = get_robot();
+  robot::Robot *bot = get_robot();
 #ifdef REPLAY_MATCH
   println("Replay match");
   bot->controller = new ReplayController();
@@ -91,11 +91,12 @@ void autonomous() {
 
 /**
  * Called when the robot is under driver control.
- * Will delegate to autonomous control if the "Force Autonomous" button is pressed.
+ * Will delegate to autonomous control if the "Force Autonomous" button is
+ * pressed.
  */
 void opcontrol() {
   logger::push_section("Opcontrol Setup");
-  robot::Robot* bot = get_robot();
+  robot::Robot *bot = get_robot();
 #ifdef RECORD_MATCH
   logger::info("Recording controller");
   bot->controller = new RecordingController();
@@ -116,15 +117,11 @@ robot::Robot *get_robot() {
   static robot::Robot *robot = nullptr;
   if (robot == nullptr) {
     robot = new robot::Robot(
-        new robot::Drivetrain(
-            new pros::Motor(RIGHT_FRONT_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
-            new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
-            new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
-            new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)
-        ),
-        new robot::Flywheel(
-            new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, false, ENCODER_UNITS)
-        ));
+        new robot::Drivetrain(new pros::Motor(RIGHT_FRONT_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
+                              new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
+                              new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
+                              new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)),
+        new robot::Flywheel(new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, false, ENCODER_UNITS)));
   }
   return robot;
 }

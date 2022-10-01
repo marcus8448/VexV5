@@ -45,7 +45,7 @@ public:
 
 class Updatable {
 public:
-  virtual void update(Controller *controller) {};
+  virtual void update(Controller *controller) = 0;
 };
 
-#endif //ROBOT_CONTROLLER_CONTROLLER_HPP
+#endif // ROBOT_CONTROLLER_CONTROLLER_HPP

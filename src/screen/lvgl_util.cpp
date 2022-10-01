@@ -1,12 +1,7 @@
 #include "screen/lvgl_util.hpp"
 
 namespace screen {
-lv_obj_t *create_label(lv_obj_t *screen,
-                       lv_coord_t x,
-                       lv_coord_t y,
-                       lv_coord_t w,
-                       lv_coord_t h,
-                       const char *text,
+lv_obj_t *create_label(lv_obj_t *screen, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h, const char *text,
                        lv_style_t *style) {
   auto label = lv_label_create(screen, nullptr);
   if (style != nullptr) {
@@ -24,4 +19,4 @@ lv_style_t *create_text_color_style(lv_color_t colour) {
   style->text.color = colour;
   return style;
 }
-}
+} // namespace screen

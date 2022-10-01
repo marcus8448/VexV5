@@ -5,4 +5,4 @@
 #define DEBUG_LOG
 // #define SERIAL_LINK
 
-#endif//CONFIG_HPP
+#endif // CONFIG_HPP

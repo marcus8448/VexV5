@@ -1,8 +1,8 @@
 #ifndef ROBOT_CONTROLLER_REPLAY_HPP
 #define ROBOT_CONTROLLER_REPLAY_HPP
 
-#include <fstream>
 #include "controller.hpp"
+#include <fstream>
 
 namespace robot::controller {
 class ReplayController : public Controller {
@@ -68,6 +68,6 @@ public:
 
   void update() override;
 };
-}
+} // namespace robot::controller
 
-#endif//ROBOT_CONTROLLER_REPLAY_HPP
+#endif // ROBOT_CONTROLLER_REPLAY_HPP

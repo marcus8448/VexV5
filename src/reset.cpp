@@ -1,5 +1,5 @@
-#include "pros/rtos.hpp"
 #include "logger.hpp"
+#include "pros/rtos.hpp"
 #include "robot/robot.hpp"
 
 void reset_positions(robot::Robot *robot) {

@@ -1,6 +1,8 @@
 #ifndef SCREEN_FLYWHEEL_CHART_HPP
 #define SCREEN_FLYWHEEL_CHART_HPP
 
+#include "screen.hpp"
+
 namespace screen {
 class FlywheelChart : public Screen {
 private:
@@ -9,6 +11,7 @@ private:
 
   std::vector<float> velFlywheel;
   lv_obj_t *flywheelCanvas = nullptr;
+
 public:
   explicit FlywheelChart();
 
@@ -17,6 +20,6 @@ public:
   void update(robot::Robot *robot) override;
   void destroy(lv_obj_t *screen) override;
 };
-} // screen
+} // namespace screen
 
-#endif //SCREEN_FLYWHEEL_CHART_HPP
+#endif // SCREEN_FLYWHEEL_CHART_HPP

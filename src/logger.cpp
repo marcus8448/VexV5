@@ -1,11 +1,11 @@
-#include "config.hpp"
 #include "logger.hpp"
+#include "config.hpp"
 #include <iostream>
 #include <vector>
 
 #ifdef SCREEN
-#include "screen/logs.hpp"
 #include "screen/colour.hpp"
+#include "screen/logs.hpp"
 #endif
 
 namespace logger {
@@ -101,8 +101,9 @@ void pop_section() {
     error("Section stack underflow!");
   }
   std::pair<const char *, uint32_t> &back = SECTIONS.back();
-  std::cout << "=== END " << back.first << " ===" << " (Took " << millis - back.second << " ms)" << std::endl;
+  std::cout << "=== END " << back.first << " ==="
+            << " (Took " << millis - back.second << " ms)" << std::endl;
   SECTIONS.pop_back();
 #endif
 }
-} //namespace logger
+} // namespace logger

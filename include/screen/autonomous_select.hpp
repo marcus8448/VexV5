@@ -14,5 +14,5 @@ public:
   void update(robot::Robot *robot) override;
   void destroy(lv_obj_t *screen) override;
 };
-} // screen
-#endif //SCREEN_AUTONOMOUS_SELECT_HPP
+} // namespace screen
+#endif // SCREEN_AUTONOMOUS_SELECT_HPP
