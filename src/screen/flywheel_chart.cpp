@@ -40,7 +40,7 @@ void FlywheelChart::initialize(lv_coord_t width, lv_coord_t height) {
   this->canvasHeight = static_cast<float>(height - BASE_HEIGHT);
 }
 
-void FlywheelChart::update(Robot *robot) {
+void FlywheelChart::update(robot::Robot *robot) {
   if (this->velFlywheel.size() == 100) {
     this->velFlywheel.erase(this->velFlywheel.begin());
   }

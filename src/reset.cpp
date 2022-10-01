@@ -1,8 +1,8 @@
 #include "pros/rtos.hpp"
 #include "logger.hpp"
-#include "robot.hpp"
+#include "robot/robot.hpp"
 
-void reset_positions(Robot *robot) {
+void reset_positions(robot::Robot *robot) {
   logger::push_section("Reset positions");
   robot->controller->set_line(0, 0, "Reset...");
 

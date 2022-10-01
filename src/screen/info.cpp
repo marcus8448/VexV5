@@ -35,7 +35,7 @@ void Information::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) 
 void Information::initialize(lv_coord_t width, lv_coord_t height) {
 }
 
-void Information::update(Robot *robot) {
+void Information::update(robot::Robot *robot) {
   set_label_text(this->uptimeLabel, "Uptime: %i", pros::millis());
   update_motor(this->motorLFLabel, "DT-LF", robot->drivetrain->leftFront->get_voltage());
   update_motor(this->motorRFLabel, "DT-RF", robot->drivetrain->rightFront->get_voltage());

@@ -1,11 +1,12 @@
-#ifndef DRIVETRAIN_HPP
-#define DRIVETRAIN_HPP
+#ifndef ROBOT_DRIVETRAIN_HPP
+#define ROBOT_DRIVETRAIN_HPP
 
 #include <cstdint>
 #include "pros/motors.hpp"
 #include "attributes.hpp"
-#include "controller.hpp"
+#include "robot/controller/controller.hpp"
 
+namespace robot {
 class Drivetrain : public Resettable, public Targeting, public Updatable {
 public:
   pros::Motor *rightFront;
@@ -30,5 +31,6 @@ public:
   void reset() override;
   void stop() override;
 };
+}
 
-#endif //DRIVETRAIN_HPP
+#endif //ROBOT_DRIVETRAIN_HPP

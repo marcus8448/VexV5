@@ -6,9 +6,10 @@
 
 #include "error.hpp"
 #include "logger.hpp"
-#include "recording.hpp"
+#include "robot/controller/recording.hpp"
 #include "util.hpp"
 
+namespace robot::controller {
 RecordingController::RecordingController(pros::Controller controller, const char *filename) : controller(controller) {
   while (!pros::usd::is_installed()) {
     this->controller.set_text(2, 0, "Missing microSD!");
@@ -280,4 +281,5 @@ void RecordingController::update() {
   val = this->right_stick_y();
   std::memcpy(&bits, &val, sizeof(val));
   this->outf << bits;
+}
 }

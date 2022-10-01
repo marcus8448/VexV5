@@ -5,15 +5,15 @@
 #include <streambuf>
 
 #include "serial/serial.hpp"
-#include "robot.hpp"
+#include "robot/robot.hpp"
 
 namespace serial {
 class RobotStatePlugin : public SerialPlugin {
 public:
   std::streambuf *outputBuf = nullptr; // do not delete these in the destructor, as they are shared between plugins
-  Robot *robot = nullptr;
+  robot::Robot *robot = nullptr;
 
-  explicit RobotStatePlugin(Robot *robot);
+  explicit RobotStatePlugin(robot::Robot *robot);
 
   void clear_state() override;
   /**
@@ -35,9 +35,9 @@ class RobotCommandsPlugin : public SerialPlugin {
 public:
   std::streambuf *outputBuf = nullptr; // do not delete these in the destructor, as they are shared between plugins
   std::streambuf *inputBuf = nullptr;
-  Robot *robot = nullptr;
+  robot::Robot *robot = nullptr;
 
-  explicit RobotCommandsPlugin(Robot *robot);
+  explicit RobotCommandsPlugin(robot::Robot *robot);
 
   void clear_state() override;
   /**

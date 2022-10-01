@@ -90,7 +90,7 @@ void DrivetrainChart::initialize(lv_coord_t width, lv_coord_t height) {
   this->canvasHeight = static_cast<float>(height - BASE_HEIGHT);
 }
 
-void DrivetrainChart::update(Robot *robot) {
+void DrivetrainChart::update(robot::Robot *robot) {
   if (this->velMotorLF.size() == 100) {
     this->velMotorLF.erase(this->velMotorLF.begin());
     this->velMotorRF.erase(this->velMotorRF.begin());

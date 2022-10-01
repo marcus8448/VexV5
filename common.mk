@@ -39,8 +39,7 @@ AR:=llvm-ar
 AS:=clang --target=$(ARCHTUPLE) --sysroot=$(ARM_SYSROOT)
 CC:=clang --target=$(ARCHTUPLE) --sysroot=$(ARM_SYSROOT)
 CXX:=clang++ --target=$(ARCHTUPLE) --sysroot=$(ARM_SYSROOT) -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION) -isystem $(ARM_SYSROOT)/include/c++/$(ARM_GCC_VERSION)/$(ARCHTUPLE)/$(ARM_MULTI_DIR)
-LD:=$(ARCHTUPLE)-g++
-#$(CXX) $(ARM_LIB_GCC) -L/usr/lib/gcc/$(ARCHTUPLE)/$(ARM_GCC_VERSION) -v
+LD:=$(CXX) $(ARM_LIB_GCC) -L/usr/lib/gcc/$(ARCHTUPLE)/$(ARM_GCC_VERSION) -fuse-ld=bfd
 OBJCOPY:=llvm-objcopy
 SIZETOOL:=llvm-size
 READELF:=llvm-readelf

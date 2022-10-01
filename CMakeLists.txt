@@ -19,12 +19,16 @@ add_executable(
         include/constants.hpp
         include/error.hpp
         include/logger.hpp
-        include/recording.hpp
-        include/replay.hpp
+        include/robot/controller/operator.hpp
+        include/robot/controller/recording.hpp
+        include/robot/controller/replay.hpp
         include/reset.hpp
-        include/robot.hpp
+        include/robot/robot.hpp
+        include/robot/flywheel.hpp
+        include/robot/drivetrain.hpp
         include/screen/screen.hpp
         include/screen/drivetrain_chart.hpp
+        include/screen/colour.hpp
         include/screen/flywheel_chart.hpp
         include/screen/autonomous_select.hpp
         include/screen/logs.hpp
@@ -36,10 +40,12 @@ add_executable(
         src/error.cpp
         src/logger.cpp
         src/main.cpp
-        src/recording.cpp
-        src/replay.cpp
+        src/robot/controller/operator.cpp
+        src/robot/controller/recording.cpp
+        src/robot/controller/replay.cpp
         src/reset.cpp
-        src/robot.cpp
+        src/robot/robot.cpp
+        src/robot/flywheel.cpp
         src/screen/screen.cpp
         src/serial_plugins.cpp
         src/util.cpp
@@ -51,7 +57,8 @@ add_executable(
         src/screen/logs.cpp
         src/serial/serial.cpp
         ${Timestamp}
-        src/drivetrain.cpp include/controller.hpp include/attributes.hpp src/opcontroller.cpp include/opcontroller.hpp include/flywheel.hpp)
+        src/robot/drivetrain.cpp
+)
 
 add_custom_target(
         Upload

@@ -1,10 +1,11 @@
-#ifndef FLYWHEEL_HPP
-#define FLYWHEEL_HPP
+#ifndef ROBOT_FLYWHEEL_HPP
+#define ROBOT_FLYWHEEL_HPP
 
 #include "pros/motors.hpp"
 #include "attributes.hpp"
-#include "controller.hpp"
+#include "robot/controller/controller.hpp"
 
+namespace robot {
 class Flywheel : public Updatable {
 public:
   pros::Motor *motor;
@@ -19,4 +20,5 @@ public:
   bool isEngaged();
   void update(Controller *controller) override;
 };
-#endif //FLYWHEEL_HPP
+}
+#endif //ROBOT_FLYWHEEL_HPP

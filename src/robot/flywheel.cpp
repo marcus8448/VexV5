@@ -1,5 +1,6 @@
-#include "flywheel.hpp"
+#include "robot/flywheel.hpp"
 
+namespace robot {
 Flywheel::Flywheel(pros::Motor *motor) : motor(motor) {
   motor->set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 }
@@ -24,4 +25,5 @@ void Flywheel::update(Controller *controller) {
   } else if (controller->r2_pressed()) {
     this->disengage();
   }
+}
 }

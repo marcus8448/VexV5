@@ -1,11 +1,11 @@
 #ifndef RESET_HPP
 #define RESET_HPP
 
-#include "robot.hpp"
+#include "robot/robot.hpp"
 
 /**
  * Resets all motors to their starting positions
  */
-void reset_positions(Robot *robot);
+void reset_positions(robot::Robot *robot);
 
 #endif//RESET_HPP

@@ -1,5 +1,5 @@
-#ifndef CONTROLLER_HPP
-#define CONTROLLER_HPP
+#ifndef ROBOT_CONTROLLER_CONTROLLER_HPP
+#define ROBOT_CONTROLLER_CONTROLLER_HPP
 
 #include <cstdint>
 
@@ -43,4 +43,9 @@ public:
   virtual void update() = 0;
 };
 
-#endif //CONTROLLER_HPP
+class Updatable {
+public:
+  virtual void update(Controller *controller) {};
+};
+
+#endif //ROBOT_CONTROLLER_CONTROLLER_HPP

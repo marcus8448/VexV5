@@ -1,9 +1,10 @@
-#include "replay.hpp"
+#include "robot/controller/replay.hpp"
 #include "pros/misc.hpp"
 #include "pros/rtos.hpp"
 #include <cstring>
 #include <fstream>
 
+namespace robot::controller {
 ReplayController::ReplayController(const char *filename) {
   auto controller = pros::Controller(pros::E_CONTROLLER_MASTER);
   while (!pros::usd::is_installed()) {
@@ -162,4 +163,5 @@ void ReplayController::update() {
   std::memcpy(&rightStickX, &value, sizeof(value));
   inf >> value;
   std::memcpy(&rightStickY, &value, sizeof(value));
+}
 }

@@ -1,12 +1,7 @@
-#include "robot.hpp"
-#include "error.hpp"
+#include "robot/robot.hpp"
 #include "logger.hpp"
-#include "pros/motors.h"
-#include "util.hpp"
-#include "drivetrain.hpp"
-#include "flywheel.hpp"
-#include <cmath>
 
+namespace robot {
 Robot::Robot(Drivetrain *drivetrain, Flywheel *flywheel)
     : drivetrain(drivetrain), flywheel(flywheel), controller(nullptr) {
 }
@@ -35,9 +30,10 @@ void Robot::stop() {
 }
 
 Robot::~Robot() {
-  logger::info("Robot destructor called");
+  logger::warn("Robot destructor called");
   delete controller;
   controller = nullptr;
   delete drivetrain;
   drivetrain = nullptr;
+}
 }

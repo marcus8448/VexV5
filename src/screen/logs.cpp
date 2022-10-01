@@ -12,7 +12,7 @@ namespace screen {
 lv_res_t drop_log(lv_obj_t *obj);
 
 Logging::Logging() {
-  instance = this;
+  screen::logging = this;
 }
 
 void Logging::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
@@ -24,7 +24,7 @@ void Logging::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
 void Logging::initialize(lv_coord_t width, lv_coord_t height) {
 }
 
-void Logging::update(Robot *robot) {
+void Logging::update(robot::Robot *robot) {
 }
 
 void Logging::destroy(lv_obj_t *screen) {

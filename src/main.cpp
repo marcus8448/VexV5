@@ -13,7 +13,8 @@ void opcontrol(void);
 #include "config.hpp"
 #include "constants.hpp"
 #include "logger.hpp"
-#include "robot.hpp"
+#include "robot/robot.hpp"
+#include "robot/controller/operator.hpp"
 
 #ifdef SERIAL_LINK
 #include "serial/serial.hpp"
@@ -21,11 +22,11 @@ void opcontrol(void);
 #endif
 
 #ifdef RECORD_MATCH
-#include "recording.hpp"
+#include "robot/controller/recording.hpp"
 #endif
 
 #if defined REPLAY_MATCH || defined TODO
-#include "replay.hpp"
+#include "robot/controller/replay.hpp"
 #endif
 
 #ifdef RESET_POSITIONS
@@ -39,12 +40,11 @@ void opcontrol(void);
 #include "screen/flywheel_chart.hpp"
 #include "screen/info.hpp"
 #include "screen/logs.hpp"
-#include "opcontroller.hpp"
 #endif
 
-Robot *get_robot();
+robot::Robot *get_robot();
 
-[[noreturn]] void main_loop(Robot *rbt) {
+[[noreturn]] void main_loop(robot::Robot *rbt) {
   while (true) {
     rbt->update();
     pros::delay(20);
@@ -56,17 +56,17 @@ Robot *get_robot();
  */
 void initialize() {
   logger::push_section("Initialize");
-  Robot* robot = get_robot();
+  robot::Robot *bot = get_robot();
 #ifdef SCREEN
   screen::add_screen(new screen::Information());
   screen::add_screen(new screen::DrivetrainChart());
   screen::add_screen(new screen::FlywheelChart());
   screen::add_screen(new screen::Logging());
-  screen::initialize(robot);
+  screen::initialize(bot);
 #endif //SCREEN
 #ifdef SERIAL_LINK
-  serial::add_plugin(new serial::RobotStatePlugin(robot));
-  serial::add_plugin(new serial::RobotCommandsPlugin(robot));
+  serial::add_plugin(new serial::RobotStatePlugin(bot));
+  serial::add_plugin(new serial::RobotCommandsPlugin(bot));
   serial::initialize();
 #endif //SERIAL_LINK
   logger::pop_section();
@@ -77,16 +77,16 @@ void initialize() {
  */
 void autonomous() {
   logger::push_section("Autonomous Setup");
-  Robot* robot = get_robot();
+  robot::Robot* bot = get_robot();
 #ifdef REPLAY_MATCH
   println("Replay match");
-  robot->controller = new ReplayController();
+  bot->controller = new ReplayController();
 #elif defined TODO
   println("Autonomous: TODO");
-  robot->controller = new ReplayController("test");
+  bot->controller = new ReplayController("test");
 #endif
   logger::pop_section();
-  main_loop(robot);
+  main_loop(bot);
 }
 
 /**
@@ -95,34 +95,34 @@ void autonomous() {
  */
 void opcontrol() {
   logger::push_section("Opcontrol Setup");
-  Robot* robot = get_robot();
+  robot::Robot* bot = get_robot();
 #ifdef RECORD_MATCH
   logger::info("Recording controller");
-  robot->controller = new RecordingController();
+  bot->controller = new RecordingController();
 #else
   logger::info("Normal controller");
-  robot->controller = new OpController();
+  bot->controller = new robot::controller::OpController();
 #endif
   logger::pop_section();
 
 #ifdef RESET_POSITIONS
-  reset_positions(robot);
+  reset_positions(bot);
 #else
-  main_loop(robot);
+  main_loop(bot);
 #endif
 }
 
-Robot *get_robot() {
-  static Robot *robot = nullptr;
+robot::Robot *get_robot() {
+  static robot::Robot *robot = nullptr;
   if (robot == nullptr) {
-    robot = new Robot(
-        new Drivetrain(
+    robot = new robot::Robot(
+        new robot::Drivetrain(
             new pros::Motor(RIGHT_FRONT_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
             new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
             new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
             new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)
         ),
-        new Flywheel(
+        new robot::Flywheel(
             new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, false, ENCODER_UNITS)
         ));
   }

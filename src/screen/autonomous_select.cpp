@@ -1,5 +1,5 @@
 #include "screen/autonomous_select.hpp"
-#include "robot.hpp"
+#include "robot/robot.hpp"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wall"
@@ -13,7 +13,7 @@ void AutonomousSelect::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t hei
 
 void AutonomousSelect::initialize(lv_coord_t width, lv_coord_t height) {}
 
-void AutonomousSelect::update(Robot *robot) {}
+void AutonomousSelect::update(robot::Robot *robot) {}
 
 void AutonomousSelect::destroy(lv_obj_t *screen) {}
 } // screen

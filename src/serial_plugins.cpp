@@ -6,7 +6,7 @@
 
 using namespace serial;
 
-RobotStatePlugin::RobotStatePlugin(Robot *robot) : robot(robot) {
+RobotStatePlugin::RobotStatePlugin(robot::Robot *robot) : robot(robot) {
 }
 
 void RobotStatePlugin::initialize(std::streambuf *out, std::streambuf *in) {
@@ -104,7 +104,7 @@ bool RobotStatePlugin::handle(const char *type) {
   return false;
 }
 
-RobotCommandsPlugin::RobotCommandsPlugin(Robot *robot) : robot(robot) {
+RobotCommandsPlugin::RobotCommandsPlugin(robot::Robot *robot) : robot(robot) {
 }
 
 void RobotCommandsPlugin::initialize(std::streambuf *out, std::streambuf *in) {

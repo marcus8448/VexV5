@@ -1,11 +1,12 @@
-#ifndef ROBOT_HPP
-#define ROBOT_HPP
+#ifndef ROBOT_ROBOT_HPP
+#define ROBOT_ROBOT_HPP
 
 #include "attributes.hpp"
-#include "controller.hpp"
+#include "controller/controller.hpp"
 #include "drivetrain.hpp"
 #include "flywheel.hpp"
 
+namespace robot {
 class Robot : public Resettable {
 public:
   Drivetrain *drivetrain;
@@ -20,5 +21,6 @@ public:
   void stop() override;
   ~Robot();
 };
+}
 
-#endif//ROBOT_HPP
+#endif//ROBOT_ROBOT_HPP

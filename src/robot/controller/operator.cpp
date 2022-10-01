@@ -1,7 +1,8 @@
-#include "opcontroller.hpp"
+#include "robot/controller/operator.hpp"
 #include "logger.hpp"
 #include "error.hpp"
 
+namespace robot::controller {
 OpController::OpController(pros::Controller controller) : controller(controller) {
 }
 
@@ -225,4 +226,5 @@ void OpController::update() {
     this->set_line(0, 0, ("Dig Spd: " + std::to_string(this->digital_speed()).append(
         " ")).c_str());//append ' ' to clear out buffer
   }
+}
 }
