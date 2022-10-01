@@ -51,7 +51,7 @@ add_executable(
         src/screen/logs.cpp
         src/serial/serial.cpp
         ${Timestamp}
-)
+        src/drivetrain.cpp include/controller.hpp include/attributes.hpp src/opcontroller.cpp include/opcontroller.hpp include/flywheel.hpp)
 
 add_custom_target(
         Upload

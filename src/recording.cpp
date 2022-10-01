@@ -281,11 +281,3 @@ void RecordingController::update() {
   std::memcpy(&bits, &val, sizeof(val));
   this->outf << bits;
 }
-
-void RecordingController::reset() {
-}
-
-void RecordingController::stop() {
-  this->outf.flush();
-  this->outf.close();
-}

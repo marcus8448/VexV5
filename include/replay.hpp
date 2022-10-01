@@ -2,7 +2,7 @@
 #define REPLAY_HPP
 
 #include <fstream>
-#include "robot.hpp"
+#include "controller.hpp"
 
 class ReplayController : public Controller {
   std::ifstream inf;
@@ -66,9 +66,6 @@ public:
   double prev_right_stick_y() override;
 
   void update() override;
-
-  void reset() override;
-  void stop() override;
 };
 
 #endif//REPLAY_HPP

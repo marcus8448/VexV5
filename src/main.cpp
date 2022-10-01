@@ -39,9 +39,10 @@ void opcontrol(void);
 #include "screen/flywheel_chart.hpp"
 #include "screen/info.hpp"
 #include "screen/logs.hpp"
+#include "opcontroller.hpp"
 #endif
 
-static Robot *robot = nullptr;
+Robot *get_robot();
 
 [[noreturn]] void main_loop(Robot *rbt) {
   while (true) {
@@ -55,16 +56,7 @@ static Robot *robot = nullptr;
  */
 void initialize() {
   logger::push_section("Initialize");
-  robot = new Robot(
-      new Drivetrain(
-          new pros::Motor(RIGHT_FRONT_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
-          new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
-          new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
-          new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)
-      ),
-      new Flywheel(
-          new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, false, ENCODER_UNITS)
-      ));
+  Robot* robot = get_robot();
 #ifdef SCREEN
   screen::add_screen(new screen::Information());
   screen::add_screen(new screen::DrivetrainChart());
@@ -85,6 +77,7 @@ void initialize() {
  */
 void autonomous() {
   logger::push_section("Autonomous Setup");
+  Robot* robot = get_robot();
 #ifdef REPLAY_MATCH
   println("Replay match");
   robot->controller = new ReplayController();
@@ -101,10 +94,8 @@ void autonomous() {
  * Will delegate to autonomous control if the "Force Autonomous" button is pressed.
  */
 void opcontrol() {
-  if (robot == nullptr) {
-    initialize();
-  }
   logger::push_section("Opcontrol Setup");
+  Robot* robot = get_robot();
 #ifdef RECORD_MATCH
   logger::info("Recording controller");
   robot->controller = new RecordingController();
@@ -119,6 +110,23 @@ void opcontrol() {
 #else
   main_loop(robot);
 #endif
+}
+
+Robot *get_robot() {
+  static Robot *robot = nullptr;
+  if (robot == nullptr) {
+    robot = new Robot(
+        new Drivetrain(
+            new pros::Motor(RIGHT_FRONT_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
+            new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
+            new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
+            new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)
+        ),
+        new Flywheel(
+            new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, false, ENCODER_UNITS)
+        ));
+  }
+  return robot;
 }
 
 void competition_initialize() {}

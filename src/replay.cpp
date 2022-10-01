@@ -1,4 +1,6 @@
 #include "replay.hpp"
+#include "pros/misc.hpp"
+#include "pros/rtos.hpp"
 #include <cstring>
 #include <fstream>
 
@@ -110,7 +112,7 @@ double ReplayController::prev_right_stick_y() {
 
 void ReplayController::update() {
   if (this->inf.peek() == std::char_traits<char>::eof()) {
-    reset();
+    return;
   }
 
   char c = '*';
@@ -160,11 +162,4 @@ void ReplayController::update() {
   std::memcpy(&rightStickX, &value, sizeof(value));
   inf >> value;
   std::memcpy(&rightStickY, &value, sizeof(value));
-}
-
-void ReplayController::reset() {
-}
-
-void ReplayController::stop() {
-  inf.close();
 }
