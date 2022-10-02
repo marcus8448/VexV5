@@ -9,6 +9,8 @@
 #pragma GCC diagnostic pop
 
 namespace screen {
+Logging *logging = nullptr;
+
 lv_res_t drop_log(lv_obj_t *obj);
 
 Logging::Logging() { screen::logging = this; }

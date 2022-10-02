@@ -51,9 +51,7 @@ void initialize(robot::Robot *robot) {
   for (size_t i = 0; i < registry->size(); i++) {
     lv_obj_t *screen = create_screen(base_view, i == 0, i == registry->size() - 1);
     screens->push_back(screen);
-    logger::debug("TE3");
     registry->at(i)->create(screen, width, height);
-    logger::debug("TE5");
   }
   logger::pop_section();
 

@@ -21,6 +21,6 @@ public:
   void write_line(const std::string &string, lv_color_t colour);
 };
 
-static Logging *logging = nullptr;
+extern Logging *logging;
 } // namespace screen
 #endif // SCREEN_LOGS_HPP
