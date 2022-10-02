@@ -61,16 +61,41 @@ add_executable(
 )
 
 add_custom_target(
-        Upload
-        DEPENDS HotPackage ColdPackage
-        COMMAND pros upload
+        Binaries
+        DEPENDS ${BIN_DIR}/hot.package.bin ${BIN_DIR}/cold.package.bin
 )
+
+if (NOT (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))
+    add_custom_command(
+            OUTPUT ${BIN_DIR}/hot.package.bin ${BIN_DIR}/cold.package.bin
+            DEPENDS ${BIN_DIR}/hot.package.elf ${BIN_DIR}/cold.package.elf
+            COMMAND ${CMAKE_STRIP} --strip-all --keep-symbol=_PROS_COMPILE_DIRECTORY --keep-symbol=_PROS_COMPILE_TIMESTAMP ${BIN_DIR}/hot.package.elf ${BIN_DIR}/cold.package.elf
+            COMMAND ${CMAKE_OBJCOPY} -O binary -R .hot_init --strip-symbol=install_hot_table --strip-symbol=__libc_init_array ${BIN_DIR}/cold.package.elf ${BIN_DIR}/cold.package.bin
+            COMMAND ${CMAKE_OBJCOPY} -O binary ${BIN_DIR}/hot.package.elf ${BIN_DIR}/hot.package.bin
+    )
+else()
+    add_custom_command(
+            OUTPUT ${BIN_DIR}/hot.package.bin ${BIN_DIR}/cold.package.bin
+            DEPENDS ${BIN_DIR}/hot.package.elf ${BIN_DIR}/cold.package.elf
+            COMMAND ${CMAKE_OBJCOPY} -O binary -R .hot_init --strip-symbol=install_hot_table --strip-symbol=__libc_init_array ${BIN_DIR}/cold.package.elf ${BIN_DIR}/cold.package.bin
+            COMMAND ${CMAKE_OBJCOPY} -O binary ${BIN_DIR}/hot.package.elf ${BIN_DIR}/hot.package.bin
+    )
+endif()
+
+if (ProsCLI)
+add_custom_target(
+        Upload
+        DEPENDS Binaries
+        COMMAND ${ProsCLI} upload
+)
+endif()
 
 add_dependencies(HotPackage ColdPackage)
 
-set_target_properties(
-        HotPackage ColdPackage Timestamp
-        PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR} PREFIX "" SUFFIX ""
+set_target_properties(HotPackage ColdPackage Timestamp PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR}
+        PREFIX ""
+        SUFFIX ""
 )
 set_property(TARGET HotPackage PROPERTY OUTPUT_NAME hot.package.elf)
 set_property(TARGET ColdPackage PROPERTY OUTPUT_NAME cold.package.elf)
@@ -88,34 +113,4 @@ target_link_options(
         ColdPackage
         PUBLIC -Wl,--gc-keep-exported,--whole-archive,${FIRMWARE_DIR}/libpros.a,-lstdc++,--no-whole-archive
         PUBLIC -Wl,-T${FIRMWARE_DIR}/v5.ld,--gc-sections,--start-group,${FIRMWARE_DIR}/libc.a,${FIRMWARE_DIR}/libm.a,${FIRMWARE_DIR}/libpros.a,-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld
-)
-
-#add_custom_command(
-#       TARGET ColdPackage
-#       POST_BUILD
-#       COMMAND ${CMAKE_STRIP} -g ${BIN_DIR}/cold.package.elf
-#)
-
-add_custom_command(
-        TARGET ColdPackage
-        POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} --strip-symbol=install_hot_table --strip-symbol=__libc_init_array --strip-symbol=_PROS_COMPILE_DIRECTORY --strip-symbol=_PROS_COMPILE_TIMESTAMP ${BIN_DIR}/cold.package.elf ${BIN_DIR}/cold.package.elf
-)
-
-add_custom_command(
-        TARGET ColdPackage
-        POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} -O binary -R .hot_init ${BIN_DIR}/cold.package.elf ${BIN_DIR}/cold.package.bin
-)
-
-#add_custom_command(
-#       TARGET HotPackage
-#       POST_BUILD
-#       COMMAND ${CMAKE_STRIP} -g ${BIN_DIR}/hot.package.elf
-#)
-
-add_custom_command(
-        TARGET HotPackage
-        POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} -O binary ${BIN_DIR}/hot.package.elf ${BIN_DIR}/hot.package.bin
 )
