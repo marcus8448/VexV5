@@ -20,7 +20,7 @@ execute_process(COMMAND ${TARGET_TRIPLE}-g++ -dumpversion OUTPUT_VARIABLE ARM_GC
 
 set(CMAKE_CXX_FLAGS "${MFLAGS} ${CFLAGS} ${WARNFLAGS} ${GCCFLAGS}")
 set(CMAKE_C_FLAGS "${MFLAGS} ${CFLAGS} ${WARNFLAGS} ${GCCFLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "-nostdlib -Wl,--no-enum-size-warning")
+set(CMAKE_EXE_LINKER_FLAGS "-nostdlib -Wl,--no-enum-size-warning -z noexecstack")
 
 if (ARM_SYSROOT STREQUAL "")
     set(CMAKE_AR ${TARGET_TRIPLE}-ar)
@@ -31,7 +31,7 @@ if (ARM_SYSROOT STREQUAL "")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable")
 else()
     set(CLANG_TARGET "-target ${TARGET_TRIPLE} --sysroot ${ARM_SYSROOT}")
-    set(CLANG_CXX_TARGET "${CLANG_TARGET} -isystem ${ARM_SYSROOT}/include/c++/${ARM_GCC_VERSION} -isystem ${ARM_SYSROOT}/include/c++/${ARM_GCC_VERSION}/${TARGET_TRIPLE}/${ARM_MULTI_DIR}")
+    set(CLANG_CXX_TARGET "${CLANG_TARGET}")
 
     set(CMAKE_AR llvm-ar)
     set(CMAKE_C_COMPILER clang)
@@ -41,9 +41,11 @@ else()
     set(CMAKE_C_LINK_FLAGS "-fuse-ld=bfd ${CLANG_TARGET}")
     set(CMAKE_CXX_LINK_FLAGS "-fuse-ld=bfd ${CLANG_CXX_TARGET}")
 
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${ARM_LIBS}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_CXX_TARGET}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CLANG_TARGET}")
+    link_directories(${ARM_LIBS})
+    include_directories(SYSTEM $<$<COMPILE_LANGUAGE:CXX>:${ARM_SYSROOT}/include/c++/${ARM_GCC_VERSION} ${ARM_SYSROOT}/include/c++/${ARM_GCC_VERSION}/${TARGET_TRIPLE}/${ARM_MULTI_DIR}>)
 endif()
 
 set(CMAKE_LINKER ${CMAKE_CXX_COMPILER})

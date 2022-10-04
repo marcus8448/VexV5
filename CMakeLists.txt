@@ -92,7 +92,7 @@ endif()
 
 add_dependencies(HotPackage ColdPackage)
 
-set_target_properties(HotPackage ColdPackage Timestamp PROPERTIES
+set_target_properties(HotPackage ColdPackage PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR}
         PREFIX ""
         SUFFIX ""
@@ -106,11 +106,11 @@ target_link_libraries(HotPackage PUBLIC ${LibC} ${LibM} ${LibPROS})
 target_link_options(
         HotPackage
         PUBLIC -Wl,-R,${BIN_DIR}/cold.package.elf
-        PUBLIC -Wl,-T${FIRMWARE_DIR}/v5-hot.ld,--gc-sections,--start-group,${FIRMWARE_DIR}/libc.a,${FIRMWARE_DIR}/libm.a,${FIRMWARE_DIR}/libpros.a,-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld
+        PUBLIC -Wl,-T${FIRMWARE_DIR}/v5-hot.ld,--gc-sections,--start-group,${LibC},${LibM},${LibPROS},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld
 )
 
 target_link_options(
         ColdPackage
-        PUBLIC -Wl,--gc-keep-exported,--whole-archive,${FIRMWARE_DIR}/libpros.a,-lstdc++,--no-whole-archive
-        PUBLIC -Wl,-T${FIRMWARE_DIR}/v5.ld,--gc-sections,--start-group,${FIRMWARE_DIR}/libc.a,${FIRMWARE_DIR}/libm.a,${FIRMWARE_DIR}/libpros.a,-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld
+        PUBLIC -Wl,--gc-keep-exported,--whole-archive,${LibPROS},-lstdc++,--no-whole-archive
+        PUBLIC -Wl,-T${FIRMWARE_DIR}/v5.ld,--gc-sections,--start-group,${LibC},${LibM},${LibPROS},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld
 )
