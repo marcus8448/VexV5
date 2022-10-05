@@ -11,52 +11,15 @@ include_directories(include)
 file(TOUCH ${BUILD_DIR}/empty.cpp)
 file(WRITE ${BUILD_DIR}/timestamp.cpp "char const * const _PROS_COMPILE_TIMESTAMP = __DATE__ \" \" __TIME__; char const * const _PROS_COMPILE_DIRECTORY = \"${CMAKE_SOURCE_DIR}\";")
 add_library(Timestamp ${BUILD_DIR}/timestamp.cpp)
+file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp)
+file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS include/*.hpp)
+list(FILTER HEADER_FILES EXCLUDE REGEX "(include/pros/*|include/display/*)")
 
 add_executable(ColdPackage ${BUILD_DIR}/empty.cpp)
 add_executable(
         HotPackage
-        include/config.hpp
-        include/constants.hpp
-        include/error.hpp
-        include/logger.hpp
-        include/robot/controller/operator.hpp
-        include/robot/controller/recording.hpp
-        include/robot/controller/replay.hpp
-        include/reset.hpp
-        include/robot/robot.hpp
-        include/robot/flywheel.hpp
-        include/robot/drivetrain.hpp
-        include/screen/screen.hpp
-        include/screen/drivetrain_chart.hpp
-        include/screen/colour.hpp
-        include/screen/flywheel_chart.hpp
-        include/screen/autonomous_select.hpp
-        include/screen/logs.hpp
-        include/screen/lvgl_util.hpp
-        include/screen/info.hpp
-        include/serial_plugins.hpp
-        include/util.hpp
-        include/serial/serial.hpp
-        src/error.cpp
-        src/logger.cpp
-        src/main.cpp
-        src/robot/controller/operator.cpp
-        src/robot/controller/recording.cpp
-        src/robot/controller/replay.cpp
-        src/reset.cpp
-        src/robot/robot.cpp
-        src/robot/flywheel.cpp
-        src/screen/screen.cpp
-        src/serial_plugins.cpp
-        src/util.cpp
-        src/screen/lvgl_util.cpp
-        src/screen/info.cpp
-        src/screen/drivetrain_chart.cpp
-        src/screen/flywheel_chart.cpp
-        src/screen/autonomous_select.cpp
-        src/screen/logs.cpp
-        src/serial/serial.cpp
-        src/robot/drivetrain.cpp
+        ${HEADER_FILES}
+        ${SOURCE_FILES}
         $<TARGET_OBJECTS:Timestamp>
 )
 
@@ -66,6 +29,15 @@ add_custom_target(
         Upload
         DEPENDS HotPackage
         COMMAND ${ProsCLI} upload
+)
+endif()
+
+if (ClangFormat)
+get_target_property(PROJECT_SOURCES HotPackage SOURCES)
+
+add_custom_target(
+        FormatCode
+        COMMAND cd ${CMAKE_SOURCE_DIR} && ${ClangFormat} -i ${PROJECT_SOURCES}
 )
 endif()
 
