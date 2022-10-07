@@ -1,4 +1,4 @@
-#include "screen/logs.hpp"
+#include "screen/logging.hpp"
 #include "screen/lvgl_util.hpp"
 #include "screen/screen.hpp"
 

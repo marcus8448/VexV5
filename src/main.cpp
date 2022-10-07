@@ -6,40 +6,48 @@ void competition_initialize(void);
 void opcontrol(void);
 }
 
+// CONFIG
+#define AUTONOMOUS
+#define SCREEN
+#define SCREEN_LOGGING
+#define SCREEN_DRIVETRAIN
+#define SCREEN_FLYWHEEL
+#define DEBUG_LOG
+// END CONFIG
+
 #include "pros/misc.hpp"
 #include "pros/motors.hpp"
 #include "pros/rtos.hpp"
 
-#include "config.hpp"
 #include "constants.hpp"
 #include "logger.hpp"
 #include "robot/controller/operator.hpp"
 #include "robot/robot.hpp"
+
+#ifdef AUTONOMOUS
+#include "robot/autonomous/autonomous.hpp"
+#endif 
 
 #ifdef SERIAL_LINK
 #include "serial/serial.hpp"
 #include "serial_plugins.hpp"
 #endif
 
-#ifdef RECORD_MATCH
-#include "robot/controller/recording.hpp"
-#endif
-
-#if defined REPLAY_MATCH || defined TODO
-#include "robot/controller/replay.hpp"
-#endif
-
-#ifdef RESET_POSITIONS
-#include "reset.hpp"
-#endif
-
 #ifdef SCREEN
-#include "screen/autonomous_select.hpp"
-#include "screen/drivetrain_chart.hpp"
-#include "screen/flywheel_chart.hpp"
-#include "screen/info.hpp"
-#include "screen/logs.hpp"
 #include "screen/screen.hpp"
+#ifdef AUTONOMOUS
+#include "screen/autonomous_select.hpp"
+#endif
+#ifdef SCREEN_DRIVETRAIN
+#include "screen/drivetrain_chart.hpp"
+#endif
+#ifdef SCREEN_FLYWHEEL
+#include "screen/flywheel_chart.hpp"
+#endif
+#include "screen/info.hpp"
+#ifdef SCREEN_LOGGING
+#include "screen/logging.hpp"
+#endif
 #endif
 
 robot::Robot *get_robot();
@@ -60,11 +68,16 @@ void initialize() {
 #ifdef SCREEN
   logger::push_section("Add Screens");
   screen::add_screen(new screen::Information());
+  #ifdef SCREEN_DRIVETRAIN
   screen::add_screen(new screen::DrivetrainChart());
+  #endif
+  #ifdef SCREEN_FLYWHEEL
   screen::add_screen(new screen::FlywheelChart());
+  #endif
+  #ifdef SCREEN_LOGGING
   screen::add_screen(new screen::Logging());
-  logger::pop_section();
-  logger::push_section("Initialize Screen");
+  #endif
+  logger::swap_section("Initialize Screen");
   screen::initialize(robot);
   logger::pop_section();
 #endif // SCREEN
@@ -80,17 +93,13 @@ void initialize() {
  * Called when the robot is in it's autonomous state in a competition.
  */
 void autonomous() {
+  #ifdef AUTONOMOUS
   logger::push_section("Autonomous Setup");
-  robot::Robot *bot = get_robot();
-#ifdef REPLAY_MATCH
-  println("Replay match");
-  bot->controller = new ReplayController();
-#elif defined TODO
-  println("Autonomous: TODO");
-  bot->controller = new ReplayController("test");
-#endif
+  robot::Robot *robot = get_robot();
   logger::pop_section();
-  main_loop(bot);
+  robot::autonomous::run(robot);
+  main_loop(robot);
+  #endif
 }
 
 /**

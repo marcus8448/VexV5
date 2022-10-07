@@ -14,6 +14,7 @@
 #include "screen/screen.hpp"
 
 namespace screen {
+extern bool *enableCanvas;
 extern void *canvasBuffer;
 
 static std::vector<Screen *> *registry = new std::vector<Screen *>();
@@ -43,7 +44,9 @@ void initialize(robot::Robot *robot) {
   width = lv_obj_get_width(base_view);
   height = lv_obj_get_height(base_view);
   canvasSize = lv_img_color_format_get_px_size(CANVAS_COLOUR) * width * (height - BASE_HEIGHT);
-  canvasBuffer = calloc(canvasSize, 1);
+  if (*enableCanvas) {
+    canvasBuffer = calloc(canvasSize, 1);
+  }
   activeScreen = 0;
 
   logger::debug("Width: %i\nHeight: %i", width, height);
@@ -81,7 +84,9 @@ lv_obj_t *create_screen(lv_obj_t *parent, bool beginning, bool end) {
 }
 
 void update(robot::Robot *robot) {
-  memset(canvasBuffer, 0x00000000, canvasSize);
+  if (*enableCanvas) {
+    memset(canvasBuffer, 0x00000000, canvasSize);
+  }
   registry->at(activeScreen)->update(robot);
 }
 

@@ -1,5 +1,5 @@
-#ifndef LOGGING_HPP
-#define LOGGING_HPP
+#ifndef LOGGER_HPP
+#define LOGGER_HPP
 
 #include <memory>
 #include <string>
@@ -30,6 +30,7 @@ void debug(const char *string);
 void debug(const std::string &string);
 template <typename... Args> void debug(const char *format, Args... args) { debug(string_format(format, args...)); }
 void push_section(const char *string);
+void swap_section(const char *string);
 void pop_section();
 } // namespace logger
-#endif // LOGGING_HPP
+#endif // LOGGER_HPP

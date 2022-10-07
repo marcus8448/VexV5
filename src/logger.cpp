@@ -1,88 +1,69 @@
 #include "logger.hpp"
-#include "config.hpp"
 #include <iostream>
 #include <vector>
 
-#ifdef SCREEN
 #include "screen/colour.hpp"
-#include "screen/logs.hpp"
-#endif
+#include "screen/logging.hpp"
 
 namespace logger {
 static std::vector<std::pair<const char *, uint32_t>> SECTIONS;
 
 void info(const char *string) {
-#ifdef SCREEN
   if (screen::logging != nullptr) {
     screen::logging->write_line(string, screen::colour::WHITE);
   }
-#endif
   std::cout << string << std::endl;
 }
 
 void info(const std::string &string) {
-#ifdef SCREEN
   if (screen::logging != nullptr) {
     screen::logging->write_line(string, screen::colour::WHITE);
   }
-#endif
   std::cout << string << std::endl;
 }
 
 void warn(const char *string) {
-#ifdef SCREEN
   if (screen::logging != nullptr) {
     screen::logging->write_line(string, screen::colour::YELLOW);
   }
-#endif
   std::cout << string << std::endl;
 }
 
 void warn(const std::string &string) {
-#ifdef SCREEN
   if (screen::logging != nullptr) {
     screen::logging->write_line(string, screen::colour::YELLOW);
   }
-#endif
   std::cout << string << std::endl;
 }
 
 void error(const char *string) {
-#ifdef SCREEN
   if (screen::logging != nullptr) {
     screen::logging->write_line(string, screen::colour::RED);
   }
-#endif
   std::cout << string << std::endl;
 }
 
 void error(const std::string &string) {
-#ifdef SCREEN
   if (screen::logging != nullptr) {
     screen::logging->write_line(string, screen::colour::RED);
   }
-#endif
   std::cout << string << std::endl;
 }
 
 void debug(const char *string) {
 #ifdef DEBUG_LOG
-#ifdef SCREEN
   if (screen::logging != nullptr) {
     screen::logging->write_line(string, screen::colour::GREEN);
   }
-#endif
   std::cout << string << std::endl;
 #endif
 }
 
 void debug(const std::string &string) {
 #ifdef DEBUG_LOG
-#ifdef SCREEN
   if (screen::logging != nullptr) {
     screen::logging->write_line(string, screen::colour::GREEN);
   }
-#endif
   std::cout << string << std::endl;
 #endif
 }
@@ -91,6 +72,13 @@ void push_section(const char *string) {
 #ifdef DEBUG_LOG
   SECTIONS.emplace_back(std::pair(string, pros::millis()));
   std::cout << "== BEGIN " << string << " ==" << std::endl;
+#endif
+}
+
+void swap_section(const char *string) {
+#ifdef DEBUG_LOG
+  pop_section();
+  push_section(string);
 #endif
 }
 

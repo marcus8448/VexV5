@@ -1,5 +1,5 @@
-#ifndef SCREEN_LOGS_HPP
-#define SCREEN_LOGS_HPP
+#ifndef SCREEN_LOGGING_HPP
+#define SCREEN_LOGGING_HPP
 
 #include "screen/screen.hpp"
 #include <string>
@@ -23,4 +23,4 @@ public:
 
 extern Logging *logging;
 } // namespace screen
-#endif // SCREEN_LOGS_HPP
+#endif // SCREEN_LOGGING_HPP
