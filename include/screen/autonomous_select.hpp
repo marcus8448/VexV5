@@ -6,9 +6,10 @@
 namespace screen {
 class AutonomousSelect : public Screen {
 private:
-lv_obj_t* selections;
-lv_obj_t* selected;
-uint32_t index;
+  lv_obj_t *selections;
+  lv_obj_t *selected;
+  uint32_t index;
+
 public:
   explicit AutonomousSelect();
 
@@ -17,7 +18,7 @@ public:
   void update(robot::Robot *robot) override;
   void destroy(lv_obj_t *screen) override;
 
-  void click(lv_obj_t* btn);
+  void click(lv_obj_t *btn);
 };
 } // namespace screen
 #endif // SCREEN_AUTONOMOUS_SELECT_HPP

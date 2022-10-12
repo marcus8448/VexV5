@@ -2,22 +2,30 @@
 #include "logger.hpp"
 
 namespace robot {
-Robot::Robot(Drivetrain *drivetrain, Flywheel *flywheel)
-    : drivetrain(drivetrain), flywheel(flywheel), controller(nullptr) {}
+Robot::Robot(Drivetrain *drivetrain, Intake *intake, Flywheel *flywheel)
+    : drivetrain(drivetrain), intake(intake), flywheel(flywheel), controller(nullptr) {}
 
 void Robot::update() {
-  if (this->controller == nullptr) {
-    logger::info("Controller is null?");
+  if (this->controller != nullptr) {
+    this->controller->update();
+    if (this->drivetrain != nullptr) {
+      this->drivetrain->update(this->controller);
+    } else {
+      logger::error("Drivetrain is null?");
+    }
+    if (this->intake != nullptr) {
+      this->intake->update(this->controller);
+    } else {
+      logger::error("Intake is null?");
+    }
+    if (this->flywheel != nullptr) {
+      this->flywheel->update(this->controller);
+    } else {
+      logger::error("Flywheel is null?");
+    }
+  } else {
+    logger::error("Controller is null!");
   }
-  if (this->drivetrain == nullptr) {
-    logger::info("Drivetrain is null?");
-  }
-  if (this->flywheel == nullptr) {
-    logger::info("Flywheel is null?");
-  }
-  this->controller->update();
-  this->drivetrain->update(this->controller);
-  this->flywheel->update(this->controller);
 }
 
 void Robot::reset() { this->drivetrain->reset(); }
@@ -30,5 +38,9 @@ Robot::~Robot() {
   controller = nullptr;
   delete drivetrain;
   drivetrain = nullptr;
+  delete intake;
+  intake = nullptr;
+  delete flywheel;
+  flywheel = nullptr;
 }
 } // namespace robot

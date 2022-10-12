@@ -1,7 +1,9 @@
 #include "robot/drivetrain.hpp"
+#include "configuration.hpp"
 #include "error.hpp"
 #include "util.hpp"
 #include <cmath>
+#include <cstdlib>
 
 namespace robot {
 robot::Drivetrain::Drivetrain(pros::Motor *rightFront, pros::Motor *leftFront, pros::Motor *rightBack,
@@ -14,10 +16,14 @@ robot::Drivetrain::Drivetrain(pros::Motor *rightFront, pros::Motor *leftFront, p
 }
 
 robot::Drivetrain::~Drivetrain() {
-  // delete this->rightFront;
-  // delete this->rightBack;
-  // delete this->leftFront;
-  // delete this->leftBack;
+  free(this->rightFront);
+  this->rightFront = nullptr;
+  free(this->rightBack);
+  this->rightBack = nullptr;
+  free(this->leftFront);
+  this->leftFront = nullptr;
+  free(this->leftBack);
+  this->leftBack = nullptr;
 }
 
 bool robot::Drivetrain::is_offset_within(double distance) {
@@ -73,8 +79,17 @@ void robot::Drivetrain::move_left(int32_t voltage) {
 }
 
 void robot::Drivetrain::update(Controller *controller) {
-  this->move_right((int)controller->right_stick_y());
-  this->move_left((int)controller->left_stick_y());
+  if (config::get_drivetrain_control_scheme() == config::DrivetrainControlScheme::ARCADE_DRIVE) {
+    int32_t joystickRotX = controller->right_stick_x();
+    int32_t joystickY = controller->left_stick_y();
+    int32_t joystickX = controller->left_stick_x();
+
+    this->move_right(joystickY - joystickRotX + joystickX);
+    this->move_left(joystickY + joystickRotX - joystickX);
+  } else {
+    this->move_right((int32_t)controller->right_stick_y());
+    this->move_left((int32_t)controller->left_stick_y());
+  }
 }
 
 void robot::Drivetrain::stop() {

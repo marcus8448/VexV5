@@ -15,9 +15,7 @@ namespace screen {
 extern bool *enableCanvas;
 extern void *canvasBuffer;
 
-DrivetrainChart::DrivetrainChart() {
-  *enableCanvas = true;
-};
+DrivetrainChart::DrivetrainChart() { *enableCanvas = true; };
 
 void DrivetrainChart::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
   auto trueHeight = static_cast<lv_coord_t>(height - BASE_HEIGHT);

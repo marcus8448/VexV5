@@ -9,7 +9,7 @@ set(BUILD_DIR ${CMAKE_SOURCE_DIR}/build)
 include_directories(include)
 
 file(TOUCH ${BUILD_DIR}/empty.cpp)
-file(WRITE ${BUILD_DIR}/timestamp.cpp "char const * const _PROS_COMPILE_TIMESTAMP = __DATE__ \" \" __TIME__; char const * const _PROS_COMPILE_DIRECTORY = \"${CMAKE_SOURCE_DIR}\";")
+file(WRITE ${BUILD_DIR}/timestamp.cpp "char const * const _PROS_COMPILE_TIMESTAMP = __DATE__ \" \" __TIME__; char const * const _PROS_COMPILE_DIRECTORY = \"${CMAKE_SOURCE_DIR}\";\n")
 add_library(Timestamp ${BUILD_DIR}/timestamp.cpp)
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp)
 file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS include/*.hpp)
@@ -33,6 +33,7 @@ add_custom_target(
 endif()
 
 if (ClangFormat)
+message(NOTICE "Clang-format found, adding utility target.")
 get_target_property(PROJECT_SOURCES HotPackage SOURCES)
 
 add_custom_target(
@@ -50,9 +51,12 @@ set_target_properties(HotPackage ColdPackage PROPERTIES
 )
 set_property(TARGET HotPackage PROPERTY OUTPUT_NAME hot.package.elf)
 set_property(TARGET ColdPackage PROPERTY OUTPUT_NAME cold.package.elf)
-target_compile_options(Timestamp PRIVATE -Wno-unused-const-variable)
+target_compile_options(Timestamp PRIVATE -Wno-unused-const-variable -Wno-reserved-identifier -Wno-date-time)
 
 target_link_libraries(HotPackage PUBLIC ${LibC} ${LibM} ${LibPROS})
+
+set_property(TARGET HotPackage PROPERTY LINK_DEPENDS ${FIRMWARE_DIR}/v5-common.ld ${FIRMWARE_DIR}/v5-hot.ld)
+set_property(TARGET ColdPackage PROPERTY LINK_DEPENDS ${FIRMWARE_DIR}/v5-common.ld ${FIRMWARE_DIR}/v5.ld)
 
 target_link_options(
         HotPackage

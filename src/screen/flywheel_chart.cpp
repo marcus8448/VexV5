@@ -14,9 +14,7 @@ namespace screen {
 extern bool *enableCanvas;
 extern void *canvasBuffer;
 
-FlywheelChart::FlywheelChart() {
-  *enableCanvas = true;
-};
+FlywheelChart::FlywheelChart() { *enableCanvas = true; };
 
 void FlywheelChart::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
   this->velFlywheel.reserve(100);

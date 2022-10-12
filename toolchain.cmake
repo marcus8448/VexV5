@@ -9,7 +9,7 @@ set(CMAKE_C_STANDARD 11)
 
 set(MFLAGS "-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp")
 set(CFLAGS "-D_POSIX_THREADS -D_UNIX98_THREAD_MUTEX_ATTRIBUTES")
-set(WARNFLAGS "-Wall -Wno-psabi")
+set(WARNFLAGS "-Wall -Wno-psabi -Wno-shadow-field-in-constructor")
 set(GCCFLAGS "-ffunction-sections -fdata-sections -fdiagnostics-color -funwind-tables")
 
 execute_process(COMMAND ${TARGET_TRIPLE}-g++ -print-sysroot OUTPUT_VARIABLE ARM_SYSROOT OUTPUT_STRIP_TRAILING_WHITESPACE)

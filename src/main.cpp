@@ -1,3 +1,4 @@
+#include "robot/intake.hpp"
 extern "C" {
 void autonomous(void);
 void initialize(void);
@@ -26,7 +27,7 @@ void opcontrol(void);
 
 #ifdef AUTONOMOUS
 #include "robot/autonomous/autonomous.hpp"
-#endif 
+#endif
 
 #ifdef SERIAL_LINK
 #include "serial/serial.hpp"
@@ -68,15 +69,15 @@ void initialize() {
 #ifdef SCREEN
   logger::push_section("Add Screens");
   screen::add_screen(new screen::Information());
-  #ifdef SCREEN_DRIVETRAIN
+#ifdef SCREEN_DRIVETRAIN
   screen::add_screen(new screen::DrivetrainChart());
-  #endif
-  #ifdef SCREEN_FLYWHEEL
+#endif
+#ifdef SCREEN_FLYWHEEL
   screen::add_screen(new screen::FlywheelChart());
-  #endif
-  #ifdef SCREEN_LOGGING
+#endif
+#ifdef SCREEN_LOGGING
   screen::add_screen(new screen::Logging());
-  #endif
+#endif
   logger::swap_section("Initialize Screen");
   screen::initialize(robot);
   logger::pop_section();
@@ -93,13 +94,13 @@ void initialize() {
  * Called when the robot is in it's autonomous state in a competition.
  */
 void autonomous() {
-  #ifdef AUTONOMOUS
+#ifdef AUTONOMOUS
   logger::push_section("Autonomous Setup");
   robot::Robot *robot = get_robot();
   logger::pop_section();
   robot::autonomous::run(robot);
   main_loop(robot);
-  #endif
+#endif
 }
 
 /**
@@ -134,7 +135,8 @@ robot::Robot *get_robot() {
                               new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
                               new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
                               new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)),
-        new robot::Flywheel(new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, false, ENCODER_UNITS)));
+        new robot::Intake(new pros::Motor(INTAKE_MOTOR, INTAKE_GEARSET, true, ENCODER_UNITS)),
+        new robot::Flywheel(new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, true, ENCODER_UNITS)));
   }
   return robot;
 }

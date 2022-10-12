@@ -5,9 +5,9 @@
 
 namespace robot::autonomous {
 class Autonomous {
-    public:
-    virtual void update(Robot *robot);
-    virtual const char *name();
+public:
+  virtual void update(Robot *robot);
+  virtual const char *name();
 };
 
 void register_autonomous(Autonomous *autonomous);
