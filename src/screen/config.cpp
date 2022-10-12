@@ -1,11 +1,11 @@
 #include "screen/config.hpp"
 #include "configuration.hpp"
-#include "display/lv_objx/lv_label.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wall"
 #include "display/lv_core/lv_obj.h"
 #include "display/lv_objx/lv_btn.h"
+#include "display/lv_objx/lv_label.h"
 #pragma GCC diagnostic pop
 
 namespace screen {

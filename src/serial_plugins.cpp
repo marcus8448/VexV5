@@ -1,5 +1,6 @@
 #include "serial_plugins.hpp"
 #include <cstring>
+#include <vector>
 
 #define ROBOT_STATE "R_ST"
 #define ROBOT_DEBUG "RDBG"

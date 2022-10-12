@@ -1,4 +1,5 @@
 #include "robot/intake.hpp"
+#include "screen/config.hpp"
 extern "C" {
 void autonomous(void);
 void initialize(void);
@@ -27,6 +28,10 @@ void opcontrol(void);
 
 #ifdef AUTONOMOUS
 #include "robot/autonomous/autonomous.hpp"
+#include "robot/autonomous/left_winpoint.hpp"
+#include "robot/autonomous/right_winpoint.hpp"
+#include "robot/autonomous/left_score.hpp"
+#include "robot/autonomous/right_score.hpp"
 #endif
 
 #ifdef SERIAL_LINK
@@ -66,8 +71,18 @@ robot::Robot *get_robot();
 void initialize() {
   logger::push_section("Initialize");
   robot::Robot *robot = get_robot();
+#ifdef AUTONOMOUS
+robot::autonomous::register_autonomous(new robot::autonomous::LeftWinpoint());
+robot::autonomous::register_autonomous(new robot::autonomous::RightWinpoint());
+robot::autonomous::register_autonomous(new robot::autonomous::LeftScore());
+robot::autonomous::register_autonomous(new robot::autonomous::RightScore());
+#endif
 #ifdef SCREEN
   logger::push_section("Add Screens");
+#ifdef AUTONOMOUS
+  screen::add_screen(new screen::AutonomousSelect());
+#endif
+  screen::add_screen(new screen::Configuration());
   screen::add_screen(new screen::Information());
 #ifdef SCREEN_DRIVETRAIN
   screen::add_screen(new screen::DrivetrainChart());

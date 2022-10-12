@@ -2,7 +2,6 @@
 #define SERIALLINK_ROBOT_DEBUG_HPP
 
 #include <streambuf>
-#include <vector>
 
 #include "robot/robot.hpp"
 #include "serial/serial.hpp"

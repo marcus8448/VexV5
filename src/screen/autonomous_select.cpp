@@ -1,5 +1,4 @@
 #include "screen/autonomous_select.hpp"
-#include "display/lv_objx/lv_btn.h"
 #include "robot/autonomous/autonomous.hpp"
 #include "robot/robot.hpp"
 #include "screen/screen.hpp"
@@ -7,6 +6,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wall"
 #include "display/lv_core/lv_obj.h"
+#include "display/lv_objx/lv_btn.h"
 #include "display/lv_objx/lv_list.h"
 #pragma GCC diagnostic pop
 

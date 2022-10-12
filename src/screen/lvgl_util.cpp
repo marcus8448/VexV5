@@ -1,6 +1,4 @@
 #include "screen/lvgl_util.hpp"
-#include "display/lv_core/lv_obj.h"
-#include "display/lv_core/lv_style.h"
 
 namespace screen {
 bool *enableCanvas = new bool;
