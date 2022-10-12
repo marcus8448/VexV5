@@ -1,8 +1,8 @@
 #include "robot/autonomous/autonomous.hpp"
 #include <vector>
 
-namespace robot::autonomous {
 std::vector<robot::autonomous::Autonomous *> *autonomousPrograms = new std::vector<robot::autonomous::Autonomous *>();
+namespace robot::autonomous {
 static int32_t program = 0;
 
 void register_autonomous(Autonomous *program) { autonomousPrograms->push_back(program); }

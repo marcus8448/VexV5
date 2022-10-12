@@ -10,8 +10,8 @@
 #include "display/lv_objx/lv_list.h"
 #pragma GCC diagnostic pop
 
-namespace screen {
 extern std::vector<robot::autonomous::Autonomous *> *autonomousPrograms;
+namespace screen {
 static AutonomousSelect *instance;
 
 lv_res_t drop(lv_obj_t *obj);
