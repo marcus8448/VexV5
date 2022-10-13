@@ -70,7 +70,7 @@ target_link_options(
         PUBLIC -Wl,-T${FIRMWARE_DIR}/v5.ld,--gc-sections,--start-group,${LibC},${LibM},${LibPROS},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld
 )
 
-if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+if (NOT (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))
 add_custom_command(
       TARGET ColdPackage
       POST_BUILD
@@ -90,7 +90,7 @@ add_custom_command(
         COMMAND ${CMAKE_OBJCOPY} -O binary -R .hot_init ${BIN_DIR}/cold.package.elf ${BIN_DIR}/cold.package.bin
 )
 
-if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+if (NOT (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))
 add_custom_command(
       TARGET HotPackage
       POST_BUILD

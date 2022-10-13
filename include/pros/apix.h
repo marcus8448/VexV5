@@ -23,7 +23,7 @@
 #ifndef _PROS_API_EXTENDED_H_
 #define _PROS_API_EXTENDED_H_
 
-#include "api.h"
+#include "pros/rtos.h"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wall"
 #include "display/lvgl.h"

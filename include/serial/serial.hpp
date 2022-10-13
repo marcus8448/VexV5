@@ -4,22 +4,24 @@
 #include <streambuf>
 
 namespace serial {
-class SerialPlugin {
+class SerialConnection {
+private:
+  std::streambuf *output;
+  std::streambuf *input;
 public:
-  virtual void clear_state() = 0;
-  /**
-   * Called when the robot successfully connects to the client computer.
-   */
-  virtual void initialize(std::streambuf *outputBuf, std::streambuf *inputBuf) = 0;
-  virtual bool handle(const char type[4]) = 0;
-  /**
-   * Called when the robot is gracefully disconnected from the computer.
-   * Not guaranteed to be called.
-   */
-  virtual void disconnected() = 0;
+  SerialConnection(std::streambuf *output, std::streambuf *input);
+
+  void send(const char id[4], void* data, uint16_t len);
+  uint16_t read(void* ptr, uint16_t len);
 };
 
-void add_plugin(SerialPlugin *plugin);
+class SerialPlugin {
+public:
+  virtual void initialize() = 0;
+  virtual void handle(SerialConnection *connection, void* buffer, size_t len) = 0;
+};
+
+void add_plugin(uint16_t id, SerialPlugin *plugin);
 
 void initialize();
 } // namespace serial
