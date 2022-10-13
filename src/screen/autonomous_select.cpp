@@ -1,7 +1,9 @@
 #include "screen/autonomous_select.hpp"
+#include "display/lv_objx/lv_label.h"
 #include "robot/autonomous/autonomous.hpp"
 #include "robot/robot.hpp"
 #include "screen/screen.hpp"
+#include <map>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wall"
@@ -10,7 +12,7 @@
 #include "display/lv_objx/lv_list.h"
 #pragma GCC diagnostic pop
 
-extern std::vector<robot::autonomous::Autonomous *> *autonomousPrograms;
+extern std::map<const char *, robot::autonomous::Autonomous *> *autonomousPrograms;
 namespace screen {
 static AutonomousSelect *instance;
 
@@ -26,8 +28,8 @@ void AutonomousSelect::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t hei
   this->selections = lv_list_create(screen, nullptr);
   lv_obj_set_pos(this->selections, 0, 0);
   lv_obj_set_size(this->selections, width, height - BASE_HEIGHT);
-  for (robot::autonomous::Autonomous *program : *autonomousPrograms) {
-    lv_obj_t *btn = lv_list_add(this->selections, nullptr, program->name(), drop);
+  for (auto const& [name, program] : *autonomousPrograms) {
+    lv_obj_t *btn = lv_list_add(this->selections, nullptr, name, drop);
     lv_btn_set_toggle(btn, true);
     lv_btn_set_action(btn, LV_BTN_ACTION_CLICK, ::screen::click);
   }
@@ -50,7 +52,7 @@ void AutonomousSelect::click(lv_obj_t *btn) {
   this->index = lv_list_get_btn_index(this->selections, btn);
   lv_btn_set_toggle(btn, true);
 
-  robot::autonomous::set_active(index);
+  robot::autonomous::set_active(lv_label_get_text(btn));
 }
 
 lv_res_t drop(lv_obj_t *obj) { return LV_RES_INV; }

@@ -4,8 +4,4 @@ namespace robot::autonomous {
 void LeftWinpoint::update(Robot *robot) {
     
 }
-
-const char* LeftWinpoint::name() {
-    return "Left Winpoint";
-}
 }

@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <map>
+#include <sys/_stdint.h>
 #include <vector>
 
 #include "pros/apix.h"
@@ -12,17 +13,21 @@
 
 const size_t SIZE = sizeof(uint16_t);
 
-#define RESERVED 0
-#define CONNECT 1
-#define RECEIVED 2
-#define RESPONSE 3
-#define DISCONNECT 4
-#define LOGGING 5
+#define RESERVED "RESERVED"
+#define CONNECT "CONNECT"
+#define RECEIVED "RECEIVED"
+#define RESPONSE "RESPONSE"
+#define DISCONNECT "DISCONNECT"
+#define LOGGING "LOGGING"
 
 namespace serial {
-static std::map<const uint16_t, SerialPlugin *> PLUGINS = {};
-static bool initialized = false;
+static std::map<const uint16_t, SerialPlugin *> *plugins = new std::map<const uint16_t, SerialPlugin *>();
+static std::ostringstream bufferFromProgram;  // logs from the running program.
+static std::istringstream bufferToProgram;    // input to be passed to the program.
+static IdRegistry *registry = new IdRegistry;
 static void* buffer;
+
+SerialConnection* create_serial_connection();
 
 enum State { NOT_CONNECTED, AWAITING_RESPONSE, ESTABLISHED };
 
@@ -52,57 +57,48 @@ void timeout_hack(void *params) {
  * Handles debug commands.
  */
 [[noreturn]] void debug_input_task([[maybe_unused]] void *params) {
-  static std::ostringstream bufferFromProgram;                                   // logs from the running program.
-  static std::istringstream bufferToProgram;                                     // input to be passed to the program.
-  static std::streambuf *outputBuf = std::cout.rdbuf(bufferFromProgram.rdbuf()); // send data through the serial port
-  static std::streambuf *inputBuf = std::cin.rdbuf(bufferToProgram.rdbuf());     // read data from the serial port
-  SerialConnection connection = SerialConnection(outputBuf, inputBuf);
-  bufferFromProgram.clear();
-  bufferToProgram.clear();
-  for (const auto &[k, v] : PLUGINS) {
+  SerialConnection *connection = create_serial_connection();
+  for (const auto &[k, v] : *plugins) {
     v->initialize();
   }
 
   pros::Task(timeout_hack, static_cast<void *>(pros::Task::current()), "Timeout hack");
 
   uint16_t cmd;
-  auto cmdc = reinterpret_cast<char *>(&cmd);
+  auto cmdc = reinterpret_cast<void *>(&cmd);
 
   while (true) {
-    outputBuf->pubsync();
+    connection->sync_output();
     lastTime = pros::millis();
-    inputBuf->sgetn(cmdc, SIZE);
+    connection->read_exact(cmdc, SIZE);
+    const char* command = registry->get_name(cmd);
     switch (state) {
     case NOT_CONNECTED:
-      if (cmd == CONNECT) {
-        outputBuf->sputn(reinterpret_cast<const char *>(RECEIVED), SIZE);
+      if (strcmp(CONNECT, command) == 0) {
+        connection->send_exact(registry->get_id(RECEIVED));
         state = AWAITING_RESPONSE;
       } else {
-        if (inputBuf->in_avail() > 0) { // delete all other chars
-          inputBuf->pubseekoff(0, std::ios_base::end);
-        }
+        connection->skip_to_end();
       }
       break;
     case AWAITING_RESPONSE:
-      if (cmd == RESPONSE) {
+      if (strcmp(RESPONSE, command) == 0) {
         lastTime = pros::millis();
-        outputBuf->sputn(reinterpret_cast<const char *>(RECEIVED), SIZE);
+        connection->send_exact(registry->get_id(RECEIVED));
         state = ESTABLISHED;
       }
       break;
     case ESTABLISHED:
-      if (cmd == DISCONNECT) {
+      if (strcmp(DISCONNECT, command) == 0) {
         state = NOT_CONNECTED;
-        if (inputBuf->in_avail() > 0) { // delete all other chars
-          inputBuf->pubseekoff(0, std::ios_base::end);
-        }
+        connection->skip_to_end();
       } else {
-        uint16_t len = connection.read(buffer, 512);
+        uint16_t len = connection->read_variable(buffer, 512);
         if (len == 0) {
           break;
         }
-        if (PLUGINS.count(cmd)) {
-          PLUGINS.at(cmd)->handle(&connection, buffer, len);
+        if (plugins->count(cmd)) {
+          plugins->at(cmd)->handle(connection, buffer, len);
           lastTime = pros::millis();
         }
       }
@@ -112,7 +108,8 @@ void timeout_hack(void *params) {
 }
 
 void add_plugin(const int16_t id, SerialPlugin *plugin) {
-  PLUGINS[id] = plugin;
+  (*plugins)[id] = plugin;
+  plugin->register_packets(registry);
 }
 
 void initialize() {
@@ -122,21 +119,82 @@ void initialize() {
   pros::Task(debug_input_task, nullptr, "Debug Input Task");
 }
 
-SerialConnection::SerialConnection(std::streambuf *output, std::streambuf *input) : output(output), input(input) {}
+SerialConnection* create_serial_connection() {
+  static std::streambuf *outputBuf = std::cout.rdbuf(bufferFromProgram.rdbuf()); // send data through the serial port
+  static std::streambuf *inputBuf = std::cin.rdbuf(bufferToProgram.rdbuf());     // read data from the serial port
+  static SerialConnection *connection = new SerialConnection(outputBuf, inputBuf, registry);
+  bufferFromProgram.clear();
+  bufferToProgram.clear();
+  connection->skip_to_end();
+  return connection;
+}
 
-uint16_t SerialConnection::read(void *ptr, uint16_t len) {
+IdRegistry::IdRegistry() : idToName(new std::map<const uint16_t, const char *>()), idToPlugin(new std::map<const uint16_t, SerialPlugin *>()), nameToId(new std::map<const char *, const uint16_t>()) {}
+
+const uint16_t IdRegistry::register_packet(const char *name, SerialPlugin *plugin) {
+  this->idToName->emplace(this->size, name);
+  this->idToPlugin->emplace(this->size, plugin);
+  this->nameToId->emplace(name, this->size);
+
+  return this->size++;
+}
+
+const char *IdRegistry::get_name(const uint16_t id) {
+  return this->idToName->at(id);
+}
+
+const uint16_t IdRegistry::get_id(const char *name) {
+  return this->nameToId->at(name);
+}
+
+SerialConnection::SerialConnection(std::streambuf *output, std::streambuf *input, IdRegistry *registry) : output(output), input(input), registry(registry) {}
+
+uint16_t SerialConnection::read_variable(void *ptr, const uint16_t len) {
   uint16_t length = 0;
   this->input->sgetn(reinterpret_cast<char *>(&length), sizeof(uint16_t));
-  if (length > len) {
+  if (length >= len) {
     return 0; //todo
   }
   this->input->sgetn(static_cast<char *>(ptr), length);
+  *(static_cast<char *>(ptr) + length) = '\0';
   return length;
 }
 
-void SerialConnection::send(const char *id, void *data, uint16_t len) {
-  this->output->sputn(id, 4);
+void SerialConnection::read_exact(void *ptr, const uint16_t size) {
+  this->input->sgetn(static_cast<char *>(ptr), size);
+}
+
+void SerialConnection::read_null_term(char *ptr, const uint16_t read) {
+  this->input->sgetn(ptr, read);
+  *(ptr + read) = '\0'; // ensure null-terminated
+}
+
+void SerialConnection::sync_output() {
+  this->output->pubsync();
+}
+
+int16_t SerialConnection::available() {
+  return this->input->in_avail();
+}
+
+void SerialConnection::skip_to_end() {
+  if (this->available() > 0) {
+    this->input->pubseekoff(0, std::ios_base::end);
+  }
+}
+
+void SerialConnection::send(const char *name, const void *data, const uint16_t len) {
+  auto id = this->registry->get_id(name);
+  this->output->sputn(reinterpret_cast<const char *>(&id), sizeof(uint16_t));
   this->output->sputn(reinterpret_cast<const char *>(&len), sizeof(uint16_t));
   this->output->sputn(static_cast<const char *>(data), len);
+}
+
+void SerialConnection::send_exact(const void *data, const uint16_t len) {
+  this->output->sputn(reinterpret_cast<const char *>(data), len);
+}
+
+void SerialConnection::send_exact(const uint16_t data) {
+  this->send_exact(&data, sizeof(uint16_t));
 }
 } // namespace serial

@@ -3,6 +3,11 @@
 #include <vector>
 
 namespace serial {
+#define SERIAL_RSTATE "ROBOT_STATE"
+#define SERIAL_RCOMMAND "ROBOT_STATE"
+#define SERIAL_RCOMMAND_RESPONSE "ROBOT_STATE"
+
+
 typedef double floating;
 
 RobotStatePlugin::RobotStatePlugin(robot::Robot *robot) : robot(robot) {}
@@ -83,7 +88,7 @@ void RobotStatePlugin::handle(serial::SerialConnection *connection, void *buffer
   serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 1], this->robot->drivetrain->leftFront);
   serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 2], this->robot->drivetrain->rightBack);
   serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 3], this->robot->drivetrain->leftBack);
-  connection->send(this->name(), &buf, SIZE);
+  connection->send(SERIAL_RSTATE, &buf, SIZE);
 }
 
 RobotCommandsPlugin::RobotCommandsPlugin(robot::Robot *robot) : robot(robot) {}
