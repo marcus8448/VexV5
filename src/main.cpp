@@ -28,10 +28,10 @@ void opcontrol(void);
 
 #ifdef AUTONOMOUS
 #include "robot/autonomous/autonomous.hpp"
-#include "robot/autonomous/left_winpoint.hpp"
-#include "robot/autonomous/right_winpoint.hpp"
 #include "robot/autonomous/left_score.hpp"
+#include "robot/autonomous/left_winpoint.hpp"
 #include "robot/autonomous/right_score.hpp"
+#include "robot/autonomous/right_winpoint.hpp"
 #endif
 
 #ifdef SERIAL_LINK
@@ -72,10 +72,10 @@ void initialize() {
   logger::push_section("Initialize");
   robot::Robot *robot = get_robot();
 #ifdef AUTONOMOUS
-robot::autonomous::register_autonomous(new robot::autonomous::LeftWinpoint());
-robot::autonomous::register_autonomous(new robot::autonomous::RightWinpoint());
-robot::autonomous::register_autonomous(new robot::autonomous::LeftScore());
-robot::autonomous::register_autonomous(new robot::autonomous::RightScore());
+  robot::autonomous::register_autonomous(new robot::autonomous::LeftWinpoint());
+  robot::autonomous::register_autonomous(new robot::autonomous::RightWinpoint());
+  robot::autonomous::register_autonomous(new robot::autonomous::LeftScore());
+  robot::autonomous::register_autonomous(new robot::autonomous::RightScore());
 #endif
 #ifdef SCREEN
   logger::push_section("Add Screens");

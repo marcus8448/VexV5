@@ -7,7 +7,6 @@ namespace serial {
 #define SERIAL_RCOMMAND "ROBOT_STATE"
 #define SERIAL_RCOMMAND_RESPONSE "ROBOT_STATE"
 
-
 typedef double floating;
 
 RobotStatePlugin::RobotStatePlugin(robot::Robot *robot) : robot(robot) {}
@@ -75,13 +74,13 @@ void RobotStatePlugin::handle(serial::SerialConnection *connection, void *buffer
     buf[1] |= 0b00001000;
   buf[2] = this->robot->controller->digital_speed();
   float src;
-  src = (float) this->robot->controller->left_stick_x();
+  src = (float)this->robot->controller->left_stick_x();
   std::memcpy(&buf[3 + sizeof(float) * 0], &src, sizeof(float));
-  src = (float) this->robot->controller->left_stick_y();
+  src = (float)this->robot->controller->left_stick_y();
   std::memcpy(&buf[3 + sizeof(float) * 1], &src, sizeof(float));
-  src = (float) this->robot->controller->right_stick_x();
+  src = (float)this->robot->controller->right_stick_x();
   std::memcpy(&buf[3 + sizeof(float) * 2], &src, sizeof(float));
-  src = (float) this->robot->controller->right_stick_y();
+  src = (float)this->robot->controller->right_stick_y();
   std::memcpy(&buf[3 + sizeof(float) * 3], &src, sizeof(float));
 
   serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 0], this->robot->drivetrain->rightFront);
@@ -138,9 +137,8 @@ void RobotCommandsPlugin::handle(serial::SerialConnection *connection, void *buf
       }
     } else if (vec[0] == "get") {
       if (points > 1) {
-
       }
     }
   }
 }
-}
+} // namespace serial

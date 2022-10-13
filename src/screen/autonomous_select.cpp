@@ -28,7 +28,7 @@ void AutonomousSelect::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t hei
   this->selections = lv_list_create(screen, nullptr);
   lv_obj_set_pos(this->selections, 0, 0);
   lv_obj_set_size(this->selections, width, height - BASE_HEIGHT);
-  for (auto const& [name, program] : *autonomousPrograms) {
+  for (auto const &[name, program] : *autonomousPrograms) {
     lv_obj_t *btn = lv_list_add(this->selections, nullptr, name, drop);
     lv_btn_set_toggle(btn, true);
     lv_btn_set_action(btn, LV_BTN_ACTION_CLICK, ::screen::click);

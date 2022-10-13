@@ -1,7 +1,5 @@
 #include "robot/autonomous/left_score.hpp"
 
 namespace robot::autonomous {
-void LeftScore::update(Robot *robot) {
-    
-}
-}
+void LeftScore::update(Robot *robot) {}
+} // namespace robot::autonomous

@@ -15,7 +15,7 @@ public:
   explicit RobotStatePlugin(robot::Robot *robot);
 
   void initialize() override;
-  void handle(SerialConnection *connection, void* buffer, size_t len) override;
+  void handle(SerialConnection *connection, void *buffer, size_t len) override;
   void register_packets(IdRegistry *registry) override;
 };
 
@@ -27,7 +27,7 @@ public:
   explicit RobotCommandsPlugin(robot::Robot *robot);
 
   void initialize() override;
-  void handle(SerialConnection *connection, void* buffer, size_t len) override;
+  void handle(SerialConnection *connection, void *buffer, size_t len) override;
   void register_packets(IdRegistry *registry) override;
 };
 } // namespace serial

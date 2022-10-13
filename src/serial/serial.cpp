@@ -1,9 +1,9 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
-#include <map>
 #include <sys/_stdint.h>
 #include <vector>
 
@@ -22,12 +22,12 @@ const size_t SIZE = sizeof(uint16_t);
 
 namespace serial {
 static std::map<const uint16_t, SerialPlugin *> *plugins = new std::map<const uint16_t, SerialPlugin *>();
-static std::ostringstream bufferFromProgram;  // logs from the running program.
-static std::istringstream bufferToProgram;    // input to be passed to the program.
+static std::ostringstream bufferFromProgram; // logs from the running program.
+static std::istringstream bufferToProgram;   // input to be passed to the program.
 static IdRegistry *registry = new IdRegistry;
-static void* buffer;
+static void *buffer;
 
-SerialConnection* create_serial_connection();
+SerialConnection *create_serial_connection();
 
 enum State { NOT_CONNECTED, AWAITING_RESPONSE, ESTABLISHED };
 
@@ -71,7 +71,7 @@ void timeout_hack(void *params) {
     connection->sync_output();
     lastTime = pros::millis();
     connection->read_exact(cmdc, SIZE);
-    const char* command = registry->get_name(cmd);
+    const char *command = registry->get_name(cmd);
     switch (state) {
     case NOT_CONNECTED:
       if (strcmp(CONNECT, command) == 0) {
@@ -119,7 +119,7 @@ void initialize() {
   pros::Task(debug_input_task, nullptr, "Debug Input Task");
 }
 
-SerialConnection* create_serial_connection() {
+SerialConnection *create_serial_connection() {
   static std::streambuf *outputBuf = std::cout.rdbuf(bufferFromProgram.rdbuf()); // send data through the serial port
   static std::streambuf *inputBuf = std::cin.rdbuf(bufferToProgram.rdbuf());     // read data from the serial port
   static SerialConnection *connection = new SerialConnection(outputBuf, inputBuf, registry);
@@ -129,7 +129,10 @@ SerialConnection* create_serial_connection() {
   return connection;
 }
 
-IdRegistry::IdRegistry() : idToName(new std::map<const uint16_t, const char *>()), idToPlugin(new std::map<const uint16_t, SerialPlugin *>()), nameToId(new std::map<const char *, const uint16_t>()) {}
+IdRegistry::IdRegistry()
+    : idToName(new std::map<const uint16_t, const char *>()),
+      idToPlugin(new std::map<const uint16_t, SerialPlugin *>()),
+      nameToId(new std::map<const char *, const uint16_t>()) {}
 
 const uint16_t IdRegistry::register_packet(const char *name, SerialPlugin *plugin) {
   this->idToName->emplace(this->size, name);
@@ -139,21 +142,18 @@ const uint16_t IdRegistry::register_packet(const char *name, SerialPlugin *plugi
   return this->size++;
 }
 
-const char *IdRegistry::get_name(const uint16_t id) {
-  return this->idToName->at(id);
-}
+const char *IdRegistry::get_name(const uint16_t id) { return this->idToName->at(id); }
 
-const uint16_t IdRegistry::get_id(const char *name) {
-  return this->nameToId->at(name);
-}
+const uint16_t IdRegistry::get_id(const char *name) { return this->nameToId->at(name); }
 
-SerialConnection::SerialConnection(std::streambuf *output, std::streambuf *input, IdRegistry *registry) : output(output), input(input), registry(registry) {}
+SerialConnection::SerialConnection(std::streambuf *output, std::streambuf *input, IdRegistry *registry)
+    : output(output), input(input), registry(registry) {}
 
 uint16_t SerialConnection::read_variable(void *ptr, const uint16_t len) {
   uint16_t length = 0;
   this->input->sgetn(reinterpret_cast<char *>(&length), sizeof(uint16_t));
   if (length >= len) {
-    return 0; //todo
+    return 0; // todo
   }
   this->input->sgetn(static_cast<char *>(ptr), length);
   *(static_cast<char *>(ptr) + length) = '\0';
@@ -169,13 +169,9 @@ void SerialConnection::read_null_term(char *ptr, const uint16_t read) {
   *(ptr + read) = '\0'; // ensure null-terminated
 }
 
-void SerialConnection::sync_output() {
-  this->output->pubsync();
-}
+void SerialConnection::sync_output() { this->output->pubsync(); }
 
-int16_t SerialConnection::available() {
-  return this->input->in_avail();
-}
+int16_t SerialConnection::available() { return this->input->in_avail(); }
 
 void SerialConnection::skip_to_end() {
   if (this->available() > 0) {
@@ -194,7 +190,5 @@ void SerialConnection::send_exact(const void *data, const uint16_t len) {
   this->output->sputn(reinterpret_cast<const char *>(data), len);
 }
 
-void SerialConnection::send_exact(const uint16_t data) {
-  this->send_exact(&data, sizeof(uint16_t));
-}
+void SerialConnection::send_exact(const uint16_t data) { this->send_exact(&data, sizeof(uint16_t)); }
 } // namespace serial
