@@ -15,6 +15,8 @@ void opcontrol(void);
 #define SCREEN_DRIVETRAIN
 #define SCREEN_FLYWHEEL
 #define DEBUG_LOG
+
+#define SERIAL_LINK
 // END CONFIG
 
 #include "pros/misc.hpp"
@@ -98,8 +100,8 @@ void initialize() {
   logger::pop_section();
 #endif // SCREEN
 #ifdef SERIAL_LINK
-  serial::add_plugin(new serial::RobotStatePlugin(robot));
-  serial::add_plugin(new serial::RobotCommandsPlugin(robot));
+  serial::add_plugin(0, new serial::RobotStatePlugin(robot));
+  serial::add_plugin(1, new serial::RobotCommandsPlugin(robot));
   serial::initialize();
 #endif // SERIAL_LINK
   logger::pop_section();

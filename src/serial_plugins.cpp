@@ -90,6 +90,10 @@ void RobotStatePlugin::handle(serial::SerialConnection *connection, void *buffer
   connection->send(SERIAL_RSTATE, &buf, SIZE);
 }
 
+void RobotStatePlugin::register_packets(IdRegistry *registry) {
+  registry->register_packet(SERIAL_RSTATE, this);
+}
+
 RobotCommandsPlugin::RobotCommandsPlugin(robot::Robot *robot) : robot(robot) {}
 
 void RobotCommandsPlugin::initialize() {}
@@ -140,5 +144,9 @@ void RobotCommandsPlugin::handle(serial::SerialConnection *connection, void *buf
       }
     }
   }
+}
+
+void RobotCommandsPlugin::register_packets(IdRegistry *registry) {
+  registry->register_packet(SERIAL_RCOMMAND, this);
 }
 } // namespace serial

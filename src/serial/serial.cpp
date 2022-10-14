@@ -22,8 +22,6 @@ const size_t SIZE = sizeof(uint16_t);
 
 namespace serial {
 static std::map<const uint16_t, SerialPlugin *> *plugins = new std::map<const uint16_t, SerialPlugin *>();
-static std::ostringstream bufferFromProgram; // logs from the running program.
-static std::istringstream bufferToProgram;   // input to be passed to the program.
 static IdRegistry *registry = new IdRegistry;
 static void *buffer;
 
@@ -108,7 +106,7 @@ void timeout_hack(void *params) {
 }
 
 void add_plugin(const int16_t id, SerialPlugin *plugin) {
-  (*plugins)[id] = plugin;
+  plugins->emplace(id, plugin);
   plugin->register_packets(registry);
 }
 
@@ -120,9 +118,13 @@ void initialize() {
 }
 
 SerialConnection *create_serial_connection() {
+  static std::ostringstream bufferFromProgram; // logs from the running program.
+  static std::istringstream bufferToProgram;   // input to be passed to the program.
+
   static std::streambuf *outputBuf = std::cout.rdbuf(bufferFromProgram.rdbuf()); // send data through the serial port
   static std::streambuf *inputBuf = std::cin.rdbuf(bufferToProgram.rdbuf());     // read data from the serial port
   static SerialConnection *connection = new SerialConnection(outputBuf, inputBuf, registry);
+  pros::c::serctl(SERCTL_DISABLE_COBS, nullptr);
   bufferFromProgram.clear();
   bufferToProgram.clear();
   connection->skip_to_end();
