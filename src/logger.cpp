@@ -6,7 +6,7 @@
 #include "screen/logging.hpp"
 
 namespace logger {
-static std::vector<std::pair<const char *, uint32_t>> SECTIONS;
+static std::vector<std::pair<const char *, uint32_t>> sections;
 
 void info(const char *string) {
   if (screen::logging != nullptr) {
@@ -70,7 +70,7 @@ void debug(const std::string &string) {
 
 void push_section(const char *string) {
 #ifdef DEBUG_LOG
-  SECTIONS.emplace_back(std::pair(string, pros::millis()));
+  sections.emplace_back(std::pair(string, pros::millis()));
   std::cout << "== BEGIN " << string << " ==" << std::endl;
 #endif
 }
@@ -85,13 +85,13 @@ void swap_section(const char *string) {
 void pop_section() {
 #ifdef DEBUG_LOG
   uint32_t millis = pros::millis();
-  if (SECTIONS.empty()) {
+  if (sections.empty()) {
     error("Section stack underflow!");
   }
-  std::pair<const char *, uint32_t> &back = SECTIONS.back();
+  std::pair<const char *, uint32_t> &back = sections.back();
   std::cout << "=== END " << back.first << " ==="
             << " (Took " << millis - back.second << " ms)" << std::endl;
-  SECTIONS.pop_back();
+  sections.pop_back();
 #endif
 }
 } // namespace logger

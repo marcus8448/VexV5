@@ -10,10 +10,8 @@ void register_autonomous(const char *name, Autonomous *program) { (*autonomousPr
 
 void set_active(const char *program) { robot::autonomous::program = program; }
 
-[[noreturn]] void run(Robot *robot) {
-  Autonomous *autonomous = (*autonomousPrograms)[program];
-  while (true) {
-    autonomous->update(robot);
-  }
+Autonomous *get_autonomous() {
+  return (*autonomousPrograms)[program];
 }
+
 } // namespace robot::autonomous

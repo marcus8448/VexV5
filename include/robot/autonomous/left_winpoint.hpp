@@ -6,7 +6,7 @@ namespace robot::autonomous {
 class LeftWinpoint : public Autonomous {
 private:
 public:
-  void update(Robot *robot) override;
+  void run(Robot *robot) override;
 };
 } // namespace robot::autonomous
 #endif // ROBOT_AUTONOMOUS_LEFT_WINPOINT_HPP

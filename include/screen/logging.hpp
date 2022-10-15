@@ -2,6 +2,7 @@
 #define SCREEN_LOGGING_HPP
 
 #include "screen/screen.hpp"
+#include <cstring>
 #include <string>
 
 namespace screen {

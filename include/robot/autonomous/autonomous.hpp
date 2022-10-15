@@ -6,12 +6,12 @@
 namespace robot::autonomous {
 class Autonomous {
 public:
-  virtual void update(Robot *robot) = 0;
+  virtual void run(Robot *robot) = 0;
 };
 
-void register_autonomous(Autonomous *autonomous);
+void register_autonomous(const char *name, Autonomous *autonomous);
 void set_active(const char *program);
 
-[[noreturn]] void run(Robot *robot);
+Autonomous *get_autonomous();
 } // namespace robot::autonomous
 #endif // ROBOT_AUTONOMOUS_AUTONOMOUS_HPP

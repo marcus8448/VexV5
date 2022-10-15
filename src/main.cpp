@@ -15,8 +15,6 @@ void opcontrol(void);
 #define SCREEN_DRIVETRAIN
 #define SCREEN_FLYWHEEL
 #define DEBUG_LOG
-
-#define SERIAL_LINK
 // END CONFIG
 
 #include "pros/misc.hpp"
@@ -58,26 +56,21 @@ void opcontrol(void);
 #endif
 #endif
 
-robot::Robot *get_robot();
+using namespace robot;
 
-[[noreturn]] void main_loop(robot::Robot *rbt) {
-  while (true) {
-    rbt->update();
-    pros::delay(20);
-  }
-}
+Robot *get_robot();
 
 /**
  * Called when the robot is first initialized.
  */
 void initialize() {
   logger::push_section("Initialize");
-  robot::Robot *robot = get_robot();
+  Robot *robot = get_robot();
 #ifdef AUTONOMOUS
-  robot::autonomous::register_autonomous(new robot::autonomous::LeftWinpoint());
-  robot::autonomous::register_autonomous(new robot::autonomous::RightWinpoint());
-  robot::autonomous::register_autonomous(new robot::autonomous::LeftScore());
-  robot::autonomous::register_autonomous(new robot::autonomous::RightScore());
+  autonomous::register_autonomous("Left Winpoint", new autonomous::LeftWinpoint());
+  autonomous::register_autonomous("Right Winpoint", new autonomous::RightWinpoint());
+  autonomous::register_autonomous("Left Score", new autonomous::LeftScore());
+  autonomous::register_autonomous("Right Score", new autonomous::RightScore());
 #endif
 #ifdef SCREEN
   logger::push_section("Add Screens");
@@ -113,10 +106,9 @@ void initialize() {
 void autonomous() {
 #ifdef AUTONOMOUS
   logger::push_section("Autonomous Setup");
-  robot::Robot *robot = get_robot();
+  Robot *robot = get_robot();
   logger::pop_section();
-  robot::autonomous::run(robot);
-  main_loop(robot);
+  autonomous::get_autonomous()->run(robot);
 #endif
 }
 
@@ -127,33 +119,36 @@ void autonomous() {
  */
 void opcontrol() {
   logger::push_section("Opcontrol Setup");
-  robot::Robot *bot = get_robot();
+  Robot *robot = get_robot();
 #ifdef RECORD_MATCH
   logger::info("Recording controller");
   bot->controller = new RecordingController();
 #else
   logger::info("Normal controller");
-  bot->controller = new robot::controller::OpController();
+  robot->controller = new controller::OpController();
 #endif
   logger::pop_section();
 
 #ifdef RESET_POSITIONS
   reset_positions(bot);
 #else
-  main_loop(bot);
+  while (true) {
+    robot->update();
+    pros::delay(20);
+  }
 #endif
 }
 
-robot::Robot *get_robot() {
-  static robot::Robot *robot = nullptr;
+Robot *get_robot() {
+  static Robot *robot = nullptr;
   if (robot == nullptr) {
-    robot = new robot::Robot(
-        new robot::Drivetrain(new pros::Motor(RIGHT_FRONT_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
+    robot = new Robot(
+        new Drivetrain(new pros::Motor(RIGHT_FRONT_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
                               new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
                               new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
                               new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)),
-        new robot::Intake(new pros::Motor(INTAKE_MOTOR, INTAKE_GEARSET, true, ENCODER_UNITS)),
-        new robot::Flywheel(new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, true, ENCODER_UNITS)));
+        new Intake(new pros::Motor(INTAKE_MOTOR, INTAKE_GEARSET, true, ENCODER_UNITS)),
+        new Flywheel(new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, true, ENCODER_UNITS)));
   }
   return robot;
 }
