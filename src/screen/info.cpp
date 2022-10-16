@@ -1,5 +1,5 @@
-#include "configuration.hpp"
 #include "screen/info.hpp"
+#include "configuration.hpp"
 #include "screen/lvgl_util.hpp"
 #include "screen/screen.hpp"
 

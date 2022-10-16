@@ -62,10 +62,10 @@ void DrivetrainChart::update(robot::Robot *robot) {
     this->velMotorRB.erase(this->velMotorRB.begin());
   }
 
-  auto prevLF = (float)robot->drivetrain->leftFront->get_actual_velocity();
-  auto prevRF = (float)robot->drivetrain->rightFront->get_actual_velocity();
-  auto prevLB = (float)robot->drivetrain->leftBack->get_actual_velocity();
-  auto prevRB = (float)robot->drivetrain->rightBack->get_actual_velocity();
+  auto prevLF = static_cast<float>(robot->drivetrain->leftFront->get_actual_velocity());
+  auto prevRF = static_cast<float>(robot->drivetrain->rightFront->get_actual_velocity());
+  auto prevLB = static_cast<float>(robot->drivetrain->leftBack->get_actual_velocity());
+  auto prevRB = static_cast<float>(robot->drivetrain->rightBack->get_actual_velocity());
   if (prevLF == INFINITY || prevLF == -1)
     prevLF = 5;
   if (prevRF == INFINITY || prevRF == -1)
@@ -82,7 +82,7 @@ void DrivetrainChart::update(robot::Robot *robot) {
   float widthScale = this->canvasWidth / 100.0f;
 
   float x = 0;
-  for (int i = (int)this->velMotorLF.size() - 2; i >= 0; --i) {
+  for (int i = static_cast<int32_t>(this->velMotorLF.size()) - 2; i >= 0; --i) {
     float v = this->velMotorLF[i];
     lv_canvas_draw_line(this->drivetrainCanvas,
                         lv_point_t{static_cast<lv_coord_t>(this->canvasWidth - (x * widthScale)),

@@ -14,7 +14,7 @@ void Flywheel::engage() {
   this->engaged = true;
 }
 
-void Flywheel::engage(double targetSpeed, bool block) {
+void Flywheel::spinUp(double targetSpeed, bool block) {
   this->motor->move_velocity(static_cast<int32_t>(targetSpeed));
   this->engaged = true;
 
@@ -38,15 +38,11 @@ void Flywheel::update(Controller *controller) {
   }
 }
 
-[[nodiscard]] pros::Motor *Flywheel::get_motor() const {
-  return this->motor;
-}
+[[nodiscard]] pros::Motor *Flywheel::get_motor() const { return this->motor; }
 
 double Flywheel::getVelocity() { return this->motor->get_actual_velocity(); }
 
-bool Flywheel::isUpToSpeed(double velocity) {
-  return this->motor->get_actual_velocity() >= velocity;
-}
+bool Flywheel::isUpToSpeed(double velocity) { return this->motor->get_actual_velocity() >= velocity; }
 
 void Flywheel::waitForSpeed(double velocity, int millis_timeout) {
   if (!this->engaged) {

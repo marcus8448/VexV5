@@ -36,7 +36,7 @@ public:
    */
   void engage();
 
-  void engage(double targetSpeed = MAX_SPEED, bool block = false);
+  void spinUp(double targetSpeed = MAX_SPEED, bool block = false);
 
   bool isUpToSpeed(double velocity = DEFAULT_TARGET_SPEED);
 

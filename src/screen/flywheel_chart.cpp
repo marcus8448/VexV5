@@ -40,7 +40,7 @@ void FlywheelChart::update(robot::Robot *robot) {
     this->velFlywheel.erase(this->velFlywheel.begin());
   }
 
-  auto prev = (float) robot->flywheel->getVelocity();
+  auto prev = static_cast<float>(robot->flywheel->getVelocity());
   if (prev == INFINITY || prev == -1) {
     prev = 5;
   }
@@ -49,7 +49,7 @@ void FlywheelChart::update(robot::Robot *robot) {
   float widthScale = this->canvasWidth / 100.0f;
 
   float x = 0;
-  for (signed int i = (signed int)this->velFlywheel.size() - 2; i >= 0; --i) {
+  for (signed int i = static_cast<int32_t>(this->velFlywheel.size()) - 2; i >= 0; --i) {
     float v = this->velFlywheel[i];
     lv_canvas_draw_line(flywheelCanvas,
                         lv_point_t{static_cast<lv_coord_t>(this->canvasWidth - (x * widthScale)),

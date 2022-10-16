@@ -1,6 +1,5 @@
 #include "serial/robot_state.hpp"
 #include <cstring>
-#include <vector>
 
 namespace serial {
 #define SERIAL_ROBOT_STATE "ROBOT_STATE"
@@ -72,13 +71,13 @@ void RobotStatePlugin::handle(serial::SerialConnection *connection, void *buffer
     buf[1] |= 0b00001000;
   buf[2] = this->robot->controller->digital_speed();
   float src;
-  src = (float)this->robot->controller->left_stick_x();
+  src = static_cast<float>(this->robot->controller->left_stick_x());
   std::memcpy(&buf[3 + sizeof(float) * 0], &src, sizeof(float));
-  src = (float)this->robot->controller->left_stick_y();
+  src = static_cast<float>(this->robot->controller->left_stick_y());
   std::memcpy(&buf[3 + sizeof(float) * 1], &src, sizeof(float));
-  src = (float)this->robot->controller->right_stick_x();
+  src = static_cast<float>(this->robot->controller->right_stick_x());
   std::memcpy(&buf[3 + sizeof(float) * 2], &src, sizeof(float));
-  src = (float)this->robot->controller->right_stick_y();
+  src = static_cast<float>(this->robot->controller->right_stick_y());
   std::memcpy(&buf[3 + sizeof(float) * 3], &src, sizeof(float));
 
   serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 0], this->robot->drivetrain->rightFront);

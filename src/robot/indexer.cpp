@@ -70,7 +70,5 @@ void Indexer::update(Controller *controller) {
   }
 }
 
-[[nodiscard]] pros::Motor *Indexer::get_motor() const {
-  return this->motor;
-}
+[[nodiscard]] pros::Motor *Indexer::get_motor() const { return this->motor; }
 } // namespace robot

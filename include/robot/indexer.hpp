@@ -15,6 +15,7 @@ private:
    */
   pros::Motor *motor;
   bool reset = false;
+
 public:
   /**
    * Creates a new indexer with the specified motor.
@@ -40,4 +41,4 @@ public:
   void update(Controller *controller) override;
 };
 } // namespace robot
-#endif //ROBOT_INDEXER_HPP
+#endif // ROBOT_INDEXER_HPP

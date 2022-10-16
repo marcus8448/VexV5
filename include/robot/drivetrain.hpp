@@ -115,5 +115,4 @@ private:
   void move_left(double distance, int32_t max_rpm = DEFAULT_MAX_RPM) const;
 };
 } // namespace robot
-
 #endif // ROBOT_DRIVETRAIN_HPP

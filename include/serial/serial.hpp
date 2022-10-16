@@ -1,5 +1,5 @@
-#ifndef SERIALLINK_DEBUG_HPP
-#define SERIALLINK_DEBUG_HPP
+#ifndef SERIAL_DEBUG_HPP
+#define SERIAL_DEBUG_HPP
 
 #include <map>
 #include <streambuf>
@@ -55,4 +55,4 @@ void add_plugin(uint16_t id, SerialPlugin *plugin);
 
 void initialize();
 } // namespace serial
-#endif // SERIALLINK_DEBUG_HPP
+#endif // SERIAL_DEBUG_HPP

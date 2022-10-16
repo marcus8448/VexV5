@@ -1,5 +1,5 @@
-#ifndef SERIALLINK_ROBOT_COMMAND_HPP
-#define SERIALLINK_ROBOT_COMMAND_HPP
+#ifndef SERIAL_ROBOT_COMMAND_HPP
+#define SERIAL_ROBOT_COMMAND_HPP
 
 #include <streambuf>
 
@@ -19,4 +19,4 @@ public:
   void register_packets(IdRegistry *registry) override;
 };
 } // namespace serial
-#endif // SERIALLINK_ROBOT_COMMAND_HPP
+#endif // SERIAL_ROBOT_COMMAND_HPP
