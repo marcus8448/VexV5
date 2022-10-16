@@ -29,6 +29,12 @@ public:
    */
   void push();
 
+  void cycle();
+
+  void awaitReady(int millis_timeout = 2500);
+
+  void awaitPush(int millis_timeout = 2500);
+
   [[nodiscard]] pros::Motor *get_motor() const;
 
   void update(Controller *controller) override;

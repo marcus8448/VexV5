@@ -40,7 +40,7 @@ void FlywheelChart::update(robot::Robot *robot) {
     this->velFlywheel.erase(this->velFlywheel.begin());
   }
 
-  auto prev = (float)robot->flywheel->get_velocity();
+  auto prev = (float) robot->flywheel->getVelocity();
   if (prev == INFINITY || prev == -1) {
     prev = 5;
   }

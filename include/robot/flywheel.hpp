@@ -4,6 +4,9 @@
 #include "pros/motors.hpp"
 #include "robot/controller/controller.hpp"
 
+#define MAX_SPEED 600.0
+#define DEFAULT_TARGET_SPEED (MAX_SPEED - 20.0)
+
 namespace robot {
 /**
  * Represents the flywheel of the robot.
@@ -33,6 +36,12 @@ public:
    */
   void engage();
 
+  void engage(double targetSpeed = MAX_SPEED, bool block = false);
+
+  bool isUpToSpeed(double velocity = DEFAULT_TARGET_SPEED);
+
+  void waitForSpeed(double velocity = DEFAULT_TARGET_SPEED, int millis_timeout = 5000);
+
   /**
    * Disengages the flywheel.
    * Stops providing power to run the motor. Does not immediately stop.
@@ -43,7 +52,7 @@ public:
    * Returns the current velocity of the flywheel.
    * @return the current velocity of the flywheel.
    */
-  double get_velocity();
+  double getVelocity();
 
   /**
    * Returns whether the flywheel is currently active.
