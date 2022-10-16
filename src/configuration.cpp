@@ -1,9 +1,9 @@
 #include "configuration.hpp"
 
 namespace config {
-static DrivetrainControlScheme scheme = DrivetrainControlScheme::TANK_DRIVE;
+static DrivetrainControlScheme controlScheme = DrivetrainControlScheme::TANK_DRIVE;
 
-DrivetrainControlScheme get_drivetrain_control_scheme() { return scheme; }
+[[nodiscard]] DrivetrainControlScheme get_drivetrain_control_scheme() { return controlScheme; }
 
-void set_drivetrain_control_scheme(DrivetrainControlScheme scheme) { config::scheme = scheme; }
+void set_drivetrain_control_scheme(DrivetrainControlScheme scheme) { controlScheme = scheme; }
 } // namespace config

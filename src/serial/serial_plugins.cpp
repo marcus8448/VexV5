@@ -1,11 +1,11 @@
-#include "serial_plugins.hpp"
+#include "serial/serial_plugins.hpp"
 #include <cstring>
 #include <vector>
 
 namespace serial {
-#define SERIAL_RSTATE "ROBOT_STATE"
-#define SERIAL_RCOMMAND "ROBOT_STATE"
-#define SERIAL_RCOMMAND_RESPONSE "ROBOT_STATE"
+#define SERIAL_ROBOT_STATE "ROBOT_STATE"
+#define SERIAL_ROBOT_COMMAND "ROBOT_STATE"
+#define SERIAL_ROBOT_COMMAND_RESPONSE "ROBOT_STATE"
 
 typedef double floating;
 
@@ -29,24 +29,24 @@ void serialize_motor(uint8_t *buffer, pros::Motor *motor) {
   std::memcpy(&buffer[sizeof(floating) * 5], &src, sizeof(floating));
   src = motor->get_torque();
   std::memcpy(&buffer[sizeof(floating) * 6], &src, sizeof(floating));
-  uint32_t isrc;
-  isrc = motor->get_target_velocity();
-  std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 0], &isrc, sizeof(int));
-  isrc = motor->get_current_draw();
-  std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 1], &isrc, sizeof(int));
-  isrc = motor->get_voltage();
-  std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 2], &isrc, sizeof(int));
-  isrc = motor->get_current_limit();
-  std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 3], &isrc, sizeof(int));
-  isrc = motor->get_voltage_limit();
-  std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 4], &isrc, sizeof(int));
+  uint32_t i_src;
+  i_src = motor->get_target_velocity();
+  std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 0], &i_src, sizeof(int));
+  i_src = motor->get_current_draw();
+  std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 1], &i_src, sizeof(int));
+  i_src = motor->get_voltage();
+  std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 2], &i_src, sizeof(int));
+  i_src = motor->get_current_limit();
+  std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 3], &i_src, sizeof(int));
+  i_src = motor->get_voltage_limit();
+  std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 4], &i_src, sizeof(int));
 }
 
 void RobotStatePlugin::handle(serial::SerialConnection *connection, void *buffer, size_t len) {
   const uint32_t CONTROLLER_SIZE = 3 + (sizeof(float) * 4);
   const uint32_t MOTOR_SIZE = (sizeof(floating) * 7) + (sizeof(int) * 5);
   const uint32_t SIZE = CONTROLLER_SIZE + (MOTOR_SIZE * 4);
-  static uint8_t buf[SIZE] = {0};
+  static uint8_t buf[SIZE];
 
   if (this->robot->controller->a_pressed())
     buf[0] |= 0b00000001;
@@ -87,12 +87,10 @@ void RobotStatePlugin::handle(serial::SerialConnection *connection, void *buffer
   serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 1], this->robot->drivetrain->leftFront);
   serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 2], this->robot->drivetrain->rightBack);
   serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 3], this->robot->drivetrain->leftBack);
-  connection->send(SERIAL_RSTATE, &buf, SIZE);
+  connection->send(SERIAL_ROBOT_STATE, &buf, SIZE);
 }
 
-void RobotStatePlugin::register_packets(IdRegistry *registry) {
-  registry->register_packet(SERIAL_RSTATE, this);
-}
+void RobotStatePlugin::register_packets(IdRegistry *registry) { registry->register_packet(SERIAL_ROBOT_STATE, this); }
 
 RobotCommandsPlugin::RobotCommandsPlugin(robot::Robot *robot) : robot(robot) {}
 
@@ -147,6 +145,6 @@ void RobotCommandsPlugin::handle(serial::SerialConnection *connection, void *buf
 }
 
 void RobotCommandsPlugin::register_packets(IdRegistry *registry) {
-  registry->register_packet(SERIAL_RCOMMAND, this);
+  registry->register_packet(SERIAL_ROBOT_COMMAND, this);
 }
 } // namespace serial

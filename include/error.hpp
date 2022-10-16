@@ -3,15 +3,15 @@
 
 /**
  * Tests for a PROS error and prints out errno if one is found.
- * \return the same return_code parameter passed.
+ * @return whether an error was found.
  */
 bool check_error();
 
 /**
  * Tests for a PROS error and prints out errno if one is found.
- * \return the same value as the parameter passed.
+ * @return the same value as the parameter passed.
  */
-template <class T> T check_error(T value) {
+template <class T> T print_error(T value) {
   check_error();
   return value;
 }

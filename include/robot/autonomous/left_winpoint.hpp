@@ -3,6 +3,10 @@
 #include "robot/autonomous/autonomous.hpp"
 
 namespace robot::autonomous {
+
+/**
+ * Autonomous run to be used when trying to earn the autonomous win point when starting on the left side.
+ */
 class LeftWinpoint : public Autonomous {
 private:
 public:

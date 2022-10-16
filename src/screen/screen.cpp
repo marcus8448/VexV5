@@ -22,11 +22,11 @@ static std::vector<lv_obj_t *> *screens = new std::vector<lv_obj_t *>();
 static uint16_t activeScreen = -1;
 
 static size_t canvasSize = 0;
-static int16_t width = 0;
-static int16_t height = 0;
+static lv_coord_t width = 0;
+static lv_coord_t height = 0;
 
-lv_res_t prev_page(lv_obj_t *btn);
-lv_res_t next_page(lv_obj_t *btn);
+lv_res_t prev_page([[maybe_unused]] lv_obj_t *btn);
+lv_res_t next_page([[maybe_unused]] lv_obj_t *btn);
 void destroy_screen(uint16_t screen);
 void init_screen(uint16_t screen);
 void update(robot::Robot *robot);
@@ -36,9 +36,9 @@ void create_next_btn(lv_obj_t *obj);
 lv_obj_t *create_screen(lv_obj_t *parent, bool beginning = false, bool end = false);
 
 void initialize(robot::Robot *robot) {
-  logger::push_section("Initialize LVGL");
+  logger::push("Initialize LVGL");
   lv_init();
-  logger::pop_section();
+  logger::pop();
 
   lv_obj_t *base_view = lv_scr_act();
   width = lv_obj_get_width(base_view);
@@ -50,13 +50,13 @@ void initialize(robot::Robot *robot) {
   activeScreen = 0;
 
   logger::debug("Width: %i\nHeight: %i", width, height);
-  logger::push_section("Create screens");
+  logger::push("Create screens");
   for (size_t i = 0; i < registry->size(); i++) {
     lv_obj_t *screen = create_screen(base_view, i == 0, i == registry->size() - 1);
     screens->push_back(screen);
     registry->at(i)->create(screen, width, height);
   }
-  logger::pop_section();
+  logger::pop();
 
   init_screen(activeScreen);
   pros::Task(update_task, robot, "Screen Update");
@@ -106,29 +106,29 @@ void create_next_btn(lv_obj_t *obj) {
   lv_btn_set_action(nextBtn, LV_BTN_ACTION_CLICK, next_page);
 }
 
-lv_res_t prev_page(lv_obj_t *btn) {
+lv_res_t prev_page([[maybe_unused]] lv_obj_t *btn) {
   destroy_screen(activeScreen);
   init_screen(--activeScreen);
   return LV_RES_OK;
 }
 
-lv_res_t next_page(lv_obj_t *btn) {
+lv_res_t next_page([[maybe_unused]] lv_obj_t *btn) {
   destroy_screen(activeScreen);
   init_screen(++activeScreen);
   return LV_RES_OK;
 }
 
 void init_screen(uint16_t screen) {
-  logger::push_section("Init screen");
+  logger::push("Init screen");
   lv_obj_set_hidden(screens->at(screen), false);
   registry->at(screen)->initialize(width, height);
-  logger::pop_section();
+  logger::pop();
 }
 
 void destroy_screen(uint16_t screen) {
-  logger::push_section("Drop screen");
+  logger::push("Drop screen");
   lv_obj_set_hidden(screens->at(screen), true);
   registry->at(screen)->destroy(screens->at(screen));
-  logger::pop_section();
+  logger::pop();
 }
 } // namespace screen

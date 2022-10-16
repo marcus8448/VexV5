@@ -4,14 +4,20 @@
 std::map<const char *, robot::autonomous::Autonomous *> *autonomousPrograms =
     new std::map<const char *, robot::autonomous::Autonomous *>();
 namespace robot::autonomous {
-static const char *program = 0;
+static const char *activeProgram = nullptr;
 
-void register_autonomous(const char *name, Autonomous *program) { (*autonomousPrograms)[name] = program; }
+void register_autonomous(const char *name, Autonomous *program) {
+  if (activeProgram == nullptr)
+    activeProgram = name;
+  (*autonomousPrograms)[name] = program;
+}
 
-void set_active(const char *program) { robot::autonomous::program = program; }
+void set_active(const char *program) { activeProgram = program; }
 
 Autonomous *get_autonomous() {
-  return (*autonomousPrograms)[program];
+  if (activeProgram == nullptr)
+    return nullptr;
+  return (*autonomousPrograms)[activeProgram];
 }
 
 } // namespace robot::autonomous

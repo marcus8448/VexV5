@@ -17,7 +17,7 @@ void update_label(lv_obj_t *btn);
 void Configuration::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
   auto halfWidth = static_cast<lv_coord_t>(width / 2);
   lv_obj_t *btn = lv_btn_create(screen, nullptr);
-  lv_obj_set_pos(btn, halfWidth * 0, 48 * 0);
+  lv_obj_set_pos(btn, 0, 48 * 0);
   lv_obj_set_size(btn, halfWidth, 48);
   lv_btn_set_toggle(btn, true);
   lv_btn_set_action(btn, LV_BTN_ACTION_CLICK, switch_scheme);

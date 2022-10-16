@@ -27,4 +27,6 @@ void Flywheel::update(Controller *controller) {
     this->disengage();
   }
 }
+
+double Flywheel::get_velocity() { return this->motor->get_actual_velocity(); }
 } // namespace robot

@@ -16,9 +16,9 @@ private:
 public:
   IdRegistry();
 
-  const uint16_t register_packet(const char *name, SerialPlugin *plugin);
-  const char *get_name(const uint16_t id);
-  const uint16_t get_id(const char *name);
+  uint16_t register_packet(const char *name, SerialPlugin *plugin);
+  const char *get_name(uint16_t id);
+  uint16_t get_id(const char *name);
 };
 
 class SerialConnection {
@@ -30,18 +30,18 @@ private:
 public:
   SerialConnection(std::streambuf *output, std::streambuf *input, IdRegistry *registry);
 
-  void send(const char *name, const void *data, const uint16_t len);
-  void send_exact(const void *data, const uint16_t len);
-  void send_exact(const uint16_t id);
+  void send(const char *name, const void *data, uint16_t len);
+  void send_exact(const void *data, uint16_t len);
+  void send_exact(uint16_t id);
 
-  void read_exact(void *ptr, const uint16_t size);
-  void read_null_term(char *ptr, const uint16_t size);
+  void read_exact(void *ptr, uint16_t size);
+  void read_null_term(char *ptr, uint16_t size);
 
   void sync_output();
-  int16_t available();
+  size_t available();
   void skip_to_end();
 
-  uint16_t read_variable(void *ptr, const uint16_t len);
+  uint16_t read_variable(void *ptr, uint16_t len);
 };
 
 class SerialPlugin {

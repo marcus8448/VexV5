@@ -282,7 +282,7 @@ class Task {
 
 	/**
 	 * Utilizes task notifications to wait until specified task is complete and deleted,
-	 * then continues to execute the program. Analogous to std::thread::join in C++.
+	 * then continues to execute the activeProgram. Analogous to std::thread::join in C++.
 	 *
 	 * See https://pros.cs.purdue.edu/v5/tutorials/topical/notifications.html for
 	 * details.

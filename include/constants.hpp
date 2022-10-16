@@ -1,3 +1,5 @@
+/// Miscellaneous constant values, stored in this header for convenience
+
 #ifndef CONSTANTS_HPP
 #define CONSTANTS_HPP
 

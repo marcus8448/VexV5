@@ -16,8 +16,8 @@ extern std::map<const char *, robot::autonomous::Autonomous *> *autonomousProgra
 namespace screen {
 static AutonomousSelect *instance;
 
-lv_res_t drop(lv_obj_t *obj);
-lv_res_t click(lv_obj_t *obj);
+lv_res_t drop([[maybe_unused]] lv_obj_t *obj);
+lv_res_t click(lv_obj_t *btn);
 
 AutonomousSelect::AutonomousSelect() = default;
 
@@ -27,7 +27,7 @@ void AutonomousSelect::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t hei
   }
   this->selections = lv_list_create(screen, nullptr);
   lv_obj_set_pos(this->selections, 0, 0);
-  lv_obj_set_size(this->selections, width, height - BASE_HEIGHT);
+  lv_obj_set_size(this->selections, width, static_cast<lv_coord_t>(height - BASE_HEIGHT));
   for (auto const &[name, program] : *autonomousPrograms) {
     lv_obj_t *btn = lv_list_add(this->selections, nullptr, name, drop);
     lv_btn_set_toggle(btn, true);
@@ -49,16 +49,15 @@ void AutonomousSelect::click(lv_obj_t *btn) {
     lv_btn_set_toggle(this->selected, false);
   }
   this->selected = btn;
-  this->index = lv_list_get_btn_index(this->selections, btn);
   lv_btn_set_toggle(btn, true);
 
   robot::autonomous::set_active(lv_label_get_text(btn));
 }
 
-lv_res_t drop(lv_obj_t *obj) { return LV_RES_INV; }
+lv_res_t drop([[maybe_unused]] lv_obj_t *obj) { return LV_RES_INV; }
 
-lv_res_t click(lv_obj_t *obj) {
-  instance->click(obj);
+lv_res_t click(lv_obj_t *btn) {
+  instance->click(btn);
   return LV_RES_OK;
 }
 

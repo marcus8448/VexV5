@@ -5,7 +5,7 @@ namespace robot {
 Robot::Robot(Drivetrain *drivetrain, Intake *intake, Flywheel *flywheel)
     : drivetrain(drivetrain), intake(intake), flywheel(flywheel), controller(nullptr) {}
 
-void Robot::update() {
+void Robot::update() const {
   if (this->controller != nullptr) {
     this->controller->update();
     if (this->drivetrain != nullptr) {

@@ -5,15 +5,25 @@
 #define WHEEL_SIZE 2.0625
 #define WHEEL_CIRCUMFERENCE (WHEEL_SIZE * 2.0 * PI)
 
-double in_to_rot(double inches);
+/**
+ * Converts inches to encoder unit rotations.
+ * @param inches the number of inches to convert.
+ * @return the number of encoder units equivalent to the number of inches.
+ */
+double in_to_e_units(double inches);
 
-double turn_to_rot(double degrees);
+/**
+ * Converts degrees turning into encoder unit rotations.
+ * @param degrees the number of degrees to convert.
+ * @return the number of encoder units equivalent to the number of degrees.
+ */
+double turn_to_e_units(double degrees);
 
 /**
  * Tests if a file exists on the microSD filesystem.
- * All files must exist under "/usd/", otherwise VexOS will block the call.
- * \param name the name of the file
- * \return whether the file exists
+ * Only files under `/usd` are accessible.
+ * @param name the name of the file
+ * @return whether the file exists
  */
 bool file_exists(const char *name);
 

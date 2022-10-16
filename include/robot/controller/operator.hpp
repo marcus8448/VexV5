@@ -6,11 +6,14 @@
 #include <cstdint>
 
 namespace robot::controller {
+/**
+ * The default type of controller.
+ * Updates the controller state based on the V5 controller input.
+ */
 class OpController : public Controller {
-public:
+private:
   pros::Controller controller;
 
-private:
   uint16_t a = 0;
   uint16_t b = 0;
   uint16_t x = 0;
@@ -41,32 +44,32 @@ private:
 public:
   explicit OpController(pros::Controller controller = pros::Controller(pros::E_CONTROLLER_MASTER));
 
-  uint16_t a_pressed() override;
-  uint16_t b_pressed() override;
-  uint16_t x_pressed() override;
-  uint16_t y_pressed() override;
+  [[nodiscard]] uint16_t a_pressed() const override;
+  [[nodiscard]] uint16_t b_pressed() const override;
+  [[nodiscard]] uint16_t x_pressed() const override;
+  [[nodiscard]] uint16_t y_pressed() const override;
 
-  uint16_t up_pressed() override;
-  uint16_t down_pressed() override;
-  uint16_t left_pressed() override;
-  uint16_t right_pressed() override;
+  [[nodiscard]] uint16_t up_pressed() const override;
+  [[nodiscard]] uint16_t down_pressed() const override;
+  [[nodiscard]] uint16_t left_pressed() const override;
+  [[nodiscard]] uint16_t right_pressed() const override;
 
-  uint16_t l1_pressed() override;
-  uint16_t l2_pressed() override;
-  uint16_t r1_pressed() override;
-  uint16_t r2_pressed() override;
+  [[nodiscard]] uint16_t l1_pressed() const override;
+  [[nodiscard]] uint16_t l2_pressed() const override;
+  [[nodiscard]] uint16_t r1_pressed() const override;
+  [[nodiscard]] uint16_t r2_pressed() const override;
 
-  double left_stick_x() override;
-  double left_stick_y() override;
-  double right_stick_x() override;
-  double right_stick_y() override;
+  [[nodiscard]] double left_stick_x() const override;
+  [[nodiscard]] double left_stick_y() const override;
+  [[nodiscard]] double right_stick_x() const override;
+  [[nodiscard]] double right_stick_y() const override;
 
-  double prev_left_stick_x() override;
-  double prev_left_stick_y() override;
-  double prev_right_stick_x() override;
-  double prev_right_stick_y() override;
+  [[nodiscard]] double prev_left_stick_x() const override;
+  [[nodiscard]] double prev_left_stick_y() const override;
+  [[nodiscard]] double prev_right_stick_x() const override;
+  [[nodiscard]] double prev_right_stick_y() const override;
 
-  uint8_t digital_speed() override;
+  [[nodiscard]] uint8_t digital_speed() const override;
   void digital_speed(uint8_t speed) override;
 
   void set_line(uint8_t line, uint8_t col, const char *str) override;

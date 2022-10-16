@@ -70,33 +70,11 @@ target_link_options(
         PUBLIC -Wl,-T${FIRMWARE_DIR}/v5.ld,--gc-sections,--start-group,${LibC},${LibM},${LibPROS},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld
 )
 
-# if (NOT (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))
-# add_custom_command(
-#       TARGET ColdPackage
-#       POST_BUILD
-#       COMMAND ${CMAKE_STRIP} --strip-debug --strip-all --strip-unneeded ${BIN_DIR}/cold.package.elf
-# )
-# endif()
-
 add_custom_command(
         TARGET ColdPackage
         POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} --strip-symbol=install_hot_table --strip-symbol=__libc_init_array --strip-symbol=_PROS_COMPILE_DIRECTORY --strip-symbol=_PROS_COMPILE_TIMESTAMP ${BIN_DIR}/cold.package.elf ${BIN_DIR}/cold.package.elf
+        COMMAND ${CMAKE_OBJCOPY} -O binary -R .hot_init --strip-symbol=install_hot_table --strip-symbol=__libc_init_array --strip-symbol=_PROS_COMPILE_DIRECTORY --strip-symbol=_PROS_COMPILE_TIMESTAMP ${BIN_DIR}/cold.package.elf ${BIN_DIR}/cold.package.bin
 )
-
-add_custom_command(
-        TARGET ColdPackage
-        POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} -O binary -R .hot_init ${BIN_DIR}/cold.package.elf ${BIN_DIR}/cold.package.bin
-)
-
-# if (NOT (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))
-# add_custom_command(
-#       TARGET HotPackage
-#       POST_BUILD
-#       COMMAND ${CMAKE_STRIP} --strip-debug --strip-all --strip-unneeded ${BIN_DIR}/hot.package.elf
-# )
-# endif()
 
 add_custom_command(
         TARGET HotPackage

@@ -14,7 +14,7 @@ namespace screen {
 extern bool *enableCanvas;
 extern void *canvasBuffer;
 
-FlywheelChart::FlywheelChart() { *enableCanvas = true; };
+FlywheelChart::FlywheelChart() { *enableCanvas = true; }
 
 void FlywheelChart::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
   this->velFlywheel.reserve(100);
@@ -40,7 +40,7 @@ void FlywheelChart::update(robot::Robot *robot) {
     this->velFlywheel.erase(this->velFlywheel.begin());
   }
 
-  auto prev = (float)robot->flywheel->motor->get_actual_velocity();
+  auto prev = (float)robot->flywheel->get_velocity();
   if (prev == INFINITY || prev == -1) {
     prev = 5;
   }

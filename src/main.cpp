@@ -1,11 +1,9 @@
-#include "robot/intake.hpp"
-#include "screen/config.hpp"
 extern "C" {
-void autonomous(void);
-void initialize(void);
-void disabled(void);
-void competition_initialize(void);
-void opcontrol(void);
+[[maybe_unused]] void autonomous(void);
+[[maybe_unused]] void initialize(void);
+[[maybe_unused]] void disabled(void);
+[[maybe_unused]] void competition_initialize(void);
+[[maybe_unused]] [[noreturn]] void opcontrol(void);
 }
 
 // CONFIG
@@ -40,6 +38,7 @@ void opcontrol(void);
 #endif
 
 #ifdef SCREEN
+#include "screen/config.hpp"
 #include "screen/screen.hpp"
 #ifdef AUTONOMOUS
 #include "screen/autonomous_select.hpp"
@@ -58,22 +57,26 @@ void opcontrol(void);
 
 using namespace robot;
 
-Robot *get_robot();
+Robot *get_or_create_robot();
 
 /**
  * Called when the robot is first initialized.
  */
-void initialize() {
-  logger::push_section("Initialize");
-  Robot *robot = get_robot();
+[[maybe_unused]] void initialize() {
+  logger::push("Initialize");
+  Robot *robot = get_or_create_robot();
+  // Optionally disable autonomous for builds
 #ifdef AUTONOMOUS
+  // Register the different types of autonomous-es
   autonomous::register_autonomous("Left Winpoint", new autonomous::LeftWinpoint());
   autonomous::register_autonomous("Right Winpoint", new autonomous::RightWinpoint());
   autonomous::register_autonomous("Left Score", new autonomous::LeftScore());
   autonomous::register_autonomous("Right Score", new autonomous::RightScore());
 #endif
+  // Optionally enable extra screen functionality
 #ifdef SCREEN
-  logger::push_section("Add Screens");
+  logger::push("Add Screens");
+  // Optionally register the different screens
 #ifdef AUTONOMOUS
   screen::add_screen(new screen::AutonomousSelect());
 #endif
@@ -88,27 +91,32 @@ void initialize() {
 #ifdef SCREEN_LOGGING
   screen::add_screen(new screen::Logging());
 #endif
-  logger::swap_section("Initialize Screen");
-  screen::initialize(robot);
-  logger::pop_section();
+  logger::pop_push("Initialize Screen");
+  screen::initialize(robot); // initialize the screen
+  logger::pop();
 #endif // SCREEN
 #ifdef SERIAL_LINK
   serial::add_plugin(0, new serial::RobotStatePlugin(robot));
   serial::add_plugin(1, new serial::RobotCommandsPlugin(robot));
   serial::initialize();
 #endif // SERIAL_LINK
-  logger::pop_section();
+  logger::pop();
 }
 
 /**
  * Called when the robot is in it's autonomous state in a competition.
  */
-void autonomous() {
+[[maybe_unused]] void autonomous() {
 #ifdef AUTONOMOUS
-  logger::push_section("Autonomous Setup");
-  Robot *robot = get_robot();
-  logger::pop_section();
-  autonomous::get_autonomous()->run(robot);
+  logger::push("Autonomous Setup");
+  Robot *robot = get_or_create_robot();
+  logger::pop();
+  Autonomous *autonomous = autonomous::get_autonomous();
+  if (autonomous != nullptr) {
+    autonomous->run(robot); // run the autonomous code
+  } else {
+    logger::error("Missing autonomous run!");
+  }
 #endif
 }
 
@@ -117,41 +125,43 @@ void autonomous() {
  * Will delegate to autonomous control if the "Force Autonomous" button is
  * pressed.
  */
-void opcontrol() {
-  logger::push_section("Opcontrol Setup");
-  Robot *robot = get_robot();
-#ifdef RECORD_MATCH
-  logger::info("Recording controller");
-  bot->controller = new RecordingController();
-#else
-  logger::info("Normal controller");
-  robot->controller = new controller::OpController();
-#endif
-  logger::pop_section();
+[[maybe_unused]] [[noreturn]] void opcontrol() {
+  logger::push("Opcontrol Setup");
+  Robot *robot = get_or_create_robot();
+  robot->controller = new controller::OpController(); // set the robot controller to the default operator based one.
+  logger::pop();
 
-#ifdef RESET_POSITIONS
-  reset_positions(bot);
-#else
+  // infinitely run opcontrol - pros will kill the task when it's over.
   while (true) {
     robot->update();
     pros::delay(20);
   }
-#endif
 }
 
-Robot *get_robot() {
-  static Robot *robot = nullptr;
-  if (robot == nullptr) {
-    robot = new Robot(
-        new Drivetrain(new pros::Motor(RIGHT_FRONT_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
-                              new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
-                              new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
-                              new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)),
-        new Intake(new pros::Motor(INTAKE_MOTOR, INTAKE_GEARSET, true, ENCODER_UNITS)),
-        new Flywheel(new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, true, ENCODER_UNITS)));
+/**
+ * Returns the current robot instance, or creates one if it has not been made yet.
+ * @return the robot instance
+ */
+Robot *get_or_create_robot() {
+  static Robot *robot = nullptr; // stored forever
+  if (robot == nullptr) {        // check if robot exists
+    // create the robot
+    robot = new Robot(new Drivetrain(new pros::Motor(RIGHT_FRONT_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
+                                     new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
+                                     new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
+                                     new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)),
+                      new Intake(new pros::Motor(INTAKE_MOTOR, INTAKE_GEARSET, true, ENCODER_UNITS)),
+                      new Flywheel(new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, true, ENCODER_UNITS)));
   }
   return robot;
 }
 
-void competition_initialize() {}
-void disabled() {}
+/**
+ * Called when the robot is at an official competition.
+ */
+[[maybe_unused]] void competition_initialize() {}
+
+/**
+ * Called when the robot should be stopped during a competition
+ */
+[[maybe_unused]] void disabled() {}

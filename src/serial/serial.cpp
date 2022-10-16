@@ -11,14 +11,12 @@
 #include "pros/rtos.hpp"
 #include "serial/serial.hpp"
 
-const size_t SIZE = sizeof(uint16_t);
-
-#define RESERVED "RESERVED"
-#define CONNECT "CONNECT"
-#define RECEIVED "RECEIVED"
-#define RESPONSE "RESPONSE"
-#define DISCONNECT "DISCONNECT"
-#define LOGGING "LOGGING"
+#define SERIAL_RESERVED "SERIAL_RESERVED"
+#define SERIAL_CONNECT "SERIAL_CONNECT"
+#define SERIAL_RECEIVED "SERIAL_RECEIVED"
+#define SERIAL_RESPONSE "SERIAL_RESPONSE"
+#define SERIAL_DISCONNECT "SERIAL_DISCONNECT"
+#define SERIAL_LOGGING "SERIAL_LOGGING"
 
 namespace serial {
 static std::map<const uint16_t, SerialPlugin *> *plugins = new std::map<const uint16_t, SerialPlugin *>();
@@ -63,31 +61,31 @@ void timeout_hack(void *params) {
   pros::Task(timeout_hack, static_cast<void *>(pros::Task::current()), "Timeout hack");
 
   uint16_t cmd;
-  auto cmdc = reinterpret_cast<void *>(&cmd);
+  auto cmd_ptr = reinterpret_cast<void *>(&cmd);
 
   while (true) {
     connection->sync_output();
     lastTime = pros::millis();
-    connection->read_exact(cmdc, SIZE);
+    connection->read_exact(cmd_ptr, sizeof(uint16_t));
     const char *command = registry->get_name(cmd);
     switch (state) {
     case NOT_CONNECTED:
-      if (strcmp(CONNECT, command) == 0) {
-        connection->send_exact(registry->get_id(RECEIVED));
+      if (strcmp(SERIAL_CONNECT, command) == 0) {
+        connection->send_exact(registry->get_id(SERIAL_RECEIVED));
         state = AWAITING_RESPONSE;
       } else {
         connection->skip_to_end();
       }
       break;
     case AWAITING_RESPONSE:
-      if (strcmp(RESPONSE, command) == 0) {
+      if (strcmp(SERIAL_RESPONSE, command) == 0) {
         lastTime = pros::millis();
-        connection->send_exact(registry->get_id(RECEIVED));
+        connection->send_exact(registry->get_id(SERIAL_RECEIVED));
         state = ESTABLISHED;
       }
       break;
     case ESTABLISHED:
-      if (strcmp(DISCONNECT, command) == 0) {
+      if (strcmp(SERIAL_DISCONNECT, command) == 0) {
         state = NOT_CONNECTED;
         connection->skip_to_end();
       } else {
@@ -118,12 +116,12 @@ void initialize() {
 }
 
 SerialConnection *create_serial_connection() {
-  static std::ostringstream bufferFromProgram; // logs from the running program.
-  static std::istringstream bufferToProgram;   // input to be passed to the program.
+  static std::ostringstream bufferFromProgram; // logs from the running activeProgram.
+  static std::istringstream bufferToProgram;   // input to be passed to the activeProgram.
 
   static std::streambuf *outputBuf = std::cout.rdbuf(bufferFromProgram.rdbuf()); // send data through the serial port
   static std::streambuf *inputBuf = std::cin.rdbuf(bufferToProgram.rdbuf());     // read data from the serial port
-  static SerialConnection *connection = new SerialConnection(outputBuf, inputBuf, registry);
+  static auto *connection = new SerialConnection(outputBuf, inputBuf, registry);
   pros::c::serctl(SERCTL_DISABLE_COBS, nullptr);
   bufferFromProgram.clear();
   bufferToProgram.clear();
@@ -136,7 +134,7 @@ IdRegistry::IdRegistry()
       idToPlugin(new std::map<const uint16_t, SerialPlugin *>()),
       nameToId(new std::map<const char *, const uint16_t>()) {}
 
-const uint16_t IdRegistry::register_packet(const char *name, SerialPlugin *plugin) {
+uint16_t IdRegistry::register_packet(const char *name, SerialPlugin *plugin) {
   this->idToName->emplace(this->size, name);
   this->idToPlugin->emplace(this->size, plugin);
   this->nameToId->emplace(name, this->size);
@@ -146,14 +144,14 @@ const uint16_t IdRegistry::register_packet(const char *name, SerialPlugin *plugi
 
 const char *IdRegistry::get_name(const uint16_t id) { return this->idToName->at(id); }
 
-const uint16_t IdRegistry::get_id(const char *name) { return this->nameToId->at(name); }
+uint16_t IdRegistry::get_id(const char *name) { return this->nameToId->at(name); }
 
 SerialConnection::SerialConnection(std::streambuf *output, std::streambuf *input, IdRegistry *registry)
     : output(output), input(input), registry(registry) {}
 
 uint16_t SerialConnection::read_variable(void *ptr, const uint16_t len) {
   uint16_t length = 0;
-  this->input->sgetn(reinterpret_cast<char *>(&length), sizeof(uint16_t));
+  this->input->sgetn(static_cast<char *>(static_cast<void *>(&length)), sizeof(uint16_t));
   if (length >= len) {
     return 0; // todo
   }
@@ -173,7 +171,7 @@ void SerialConnection::read_null_term(char *ptr, const uint16_t read) {
 
 void SerialConnection::sync_output() { this->output->pubsync(); }
 
-int16_t SerialConnection::available() { return this->input->in_avail(); }
+size_t SerialConnection::available() { return this->input->in_avail(); }
 
 void SerialConnection::skip_to_end() {
   if (this->available() > 0) {
