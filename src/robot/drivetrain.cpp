@@ -28,7 +28,7 @@ robot::Drivetrain::~Drivetrain() {
 
 bool robot::Drivetrain::is_offset_within(double distance) const {
   return std::fabs(print_error(this->rightFront->get_position()) -
-      print_error(this->rightFront->get_target_position())) < distance &&
+                   print_error(this->rightFront->get_target_position())) < distance &&
          std::fabs(print_error(this->leftFront->get_position()) - print_error(this->leftFront->get_target_position())) <
              distance &&
          std::fabs(print_error(this->rightBack->get_position()) - print_error(this->rightBack->get_target_position())) <

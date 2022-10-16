@@ -28,5 +28,9 @@ void Flywheel::update(Controller *controller) {
   }
 }
 
+[[nodiscard]] pros::Motor *Flywheel::get_motor() const {
+  return this->motor;
+}
+
 double Flywheel::get_velocity() { return this->motor->get_actual_velocity(); }
 } // namespace robot

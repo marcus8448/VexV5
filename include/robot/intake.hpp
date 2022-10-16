@@ -46,6 +46,8 @@ public:
    */
   [[nodiscard]] bool isEngaged() const;
 
+  [[nodiscard]] pros::Motor *get_motor() const;
+
   void update(Controller *controller) override;
 };
 } // namespace robot

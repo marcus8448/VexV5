@@ -111,7 +111,7 @@ Robot *get_or_create_robot();
   logger::push("Autonomous Setup");
   Robot *robot = get_or_create_robot();
   logger::pop();
-  Autonomous *autonomous = autonomous::get_autonomous();
+  autonomous::Autonomous *autonomous = autonomous::get_autonomous();
   if (autonomous != nullptr) {
     autonomous->run(robot); // run the autonomous code
   } else {
@@ -151,6 +151,7 @@ Robot *get_or_create_robot() {
                                      new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
                                      new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)),
                       new Intake(new pros::Motor(INTAKE_MOTOR, INTAKE_GEARSET, true, ENCODER_UNITS)),
+                      new Indexer(new pros::Motor(INDEXER_MOTOR, INDEXER_GEARSET, true, ENCODER_UNITS)),
                       new Flywheel(new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, true, ENCODER_UNITS)));
   }
   return robot;

@@ -21,6 +21,10 @@ void Intake::disengage() {
 
 [[nodiscard]] bool Intake::isEngaged() const { return this->engaged; }
 
+[[nodiscard]] pros::Motor *Intake::get_motor() const {
+  return this->motor;
+}
+
 void Intake::update(Controller *controller) {
   if (controller->r1_pressed()) {
     this->engage();

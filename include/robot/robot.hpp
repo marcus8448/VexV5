@@ -5,6 +5,7 @@
 #include "drivetrain.hpp"
 #include "flywheel.hpp"
 #include "intake.hpp"
+#include "indexer.hpp"
 
 namespace robot {
 /**
@@ -12,7 +13,8 @@ namespace robot {
  */
 class Robot {
 public:
-  /**
+  Robot(Drivetrain *drivetrain, Intake *intake, Indexer *indexer, Flywheel *flywheel);
+/**
    * The robot's drivetrain.
    */
   Drivetrain *drivetrain;
@@ -20,6 +22,10 @@ public:
    * The robot's intake.
    */
   Intake *intake;
+  /**
+   * The robot's indexer.
+   */
+  Indexer *indexer;
   /**
    * The robot's flywheel.
    */
@@ -35,8 +41,9 @@ public:
    * @param drivetrain The robot's drivetrain.
    * @param intake The robot's intake.
    * @param flywheel The robot's flywheel.
+   * @param indexer The robot's indexer.
    */
-  explicit Robot(Drivetrain *drivetrain, Intake *intake, Flywheel *flywheel);
+  explicit Robot(Drivetrain *drivetrain, Intake *intake, Flywheel *flywheel, Indexer *indexer);
   ~Robot();
 
   /**

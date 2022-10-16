@@ -1,3 +1,4 @@
+#include "configuration.hpp"
 #include "screen/info.hpp"
 #include "screen/lvgl_util.hpp"
 #include "screen/screen.hpp"
@@ -18,6 +19,7 @@ void Information::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) 
 
   create_label(screen, 0, 16 * 0, halfWidth, 16, "Build: " __DATE__ " " __TIME__);
   this->uptimeLabel = create_label(screen, halfWidth, 16 * 0, halfWidth, 16);
+  this->controlSchemeLabel = create_label(screen, 0, 16 * 1, halfWidth, 16);
 
   // Port Statuses
   this->motorLFLabel = create_label(screen, 0, 16 * 2, halfWidth, 16);
@@ -25,7 +27,7 @@ void Information::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) 
   this->motorLBLabel = create_label(screen, 0, 16 * 3, halfWidth, 16);
   this->motorRBLabel = create_label(screen, halfWidth, 16 * 3, halfWidth, 16);
   this->flywheelLabel = create_label(screen, 0, 16 * 4, halfWidth, 16);
-  this->rollerLabel = create_label(screen, halfWidth, 16 * 4, halfWidth, 16);
+  this->indexerLabel = create_label(screen, halfWidth, 16 * 4, halfWidth, 16);
   this->intakeLabel = create_label(screen, 0, 16 * 5, halfWidth, 16);
 
   // special
@@ -36,13 +38,14 @@ void Information::initialize(lv_coord_t width, lv_coord_t height) {}
 
 void Information::update(robot::Robot *robot) {
   set_label_text(this->uptimeLabel, "Uptime: %i", pros::millis());
+  set_label_text(this->controlSchemeLabel, "Control Scheme: %s", config::name(config::get_drivetrain_control_scheme()));
   update_motor(this->motorLFLabel, "DT-LF", robot->drivetrain->leftFront->get_voltage());
   update_motor(this->motorRFLabel, "DT-RF", robot->drivetrain->rightFront->get_voltage());
   update_motor(this->motorLBLabel, "DT-LB", robot->drivetrain->leftBack->get_voltage());
   update_motor(this->motorRBLabel, "DT-RB", robot->drivetrain->rightBack->get_voltage());
-  update_motor_digital(this->flywheelLabel, robot->flywheel->motor, robot->flywheel->isEngaged(), "Flywheel");
-  update_motor_digital(this->rollerLabel, nullptr, false, "Roller");
-  update_motor_digital(this->intakeLabel, nullptr, false, "Intake");
+  update_motor_digital(this->flywheelLabel, robot->flywheel->get_motor(), robot->flywheel->isEngaged(), "Flywheel");
+  update_motor_digital(this->indexerLabel, robot->indexer->get_motor(), false, "Indexer");
+  update_motor_digital(this->intakeLabel, robot->intake->get_motor(), false, "Intake");
   set_label_text(this->digitalSpeedLabel, "Digital Speed: %i", robot->controller->digital_speed());
 }
 

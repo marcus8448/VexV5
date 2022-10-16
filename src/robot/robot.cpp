@@ -2,8 +2,22 @@
 #include "logger.hpp"
 
 namespace robot {
-Robot::Robot(Drivetrain *drivetrain, Intake *intake, Flywheel *flywheel)
-    : drivetrain(drivetrain), intake(intake), flywheel(flywheel), controller(nullptr) {}
+Robot::Robot(Drivetrain *drivetrain, Intake *intake, Indexer *indexer, Flywheel *flywheel)
+    : drivetrain(drivetrain), intake(intake), indexer(indexer), flywheel(flywheel), controller(nullptr) {}
+
+Robot::~Robot() {
+  logger::warn("Robot destructor called");
+  delete controller;
+  controller = nullptr;
+  delete drivetrain;
+  drivetrain = nullptr;
+  delete intake;
+  intake = nullptr;
+  delete indexer;
+  indexer = nullptr;
+  delete flywheel;
+  flywheel = nullptr;
+}
 
 void Robot::update() const {
   if (this->controller != nullptr) {
@@ -26,21 +40,5 @@ void Robot::update() const {
   } else {
     logger::error("Controller is null!");
   }
-}
-
-void Robot::reset() { this->drivetrain->reset(); }
-
-void Robot::stop() { this->drivetrain->stop(); }
-
-Robot::~Robot() {
-  logger::warn("Robot destructor called");
-  delete controller;
-  controller = nullptr;
-  delete drivetrain;
-  drivetrain = nullptr;
-  delete intake;
-  intake = nullptr;
-  delete flywheel;
-  flywheel = nullptr;
 }
 } // namespace robot
