@@ -8,7 +8,7 @@ static const char *activeProgram = nullptr;
 
 void register_autonomous(const char *name, Autonomous *program) {
   if (activeProgram == nullptr)
-    activeProgram = name;
+    activeProgram = name; // set the default program to the first one registered
   (*autonomousPrograms)[name] = program;
 }
 

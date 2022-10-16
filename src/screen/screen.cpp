@@ -43,7 +43,7 @@ void initialize(robot::Robot *robot) {
   lv_obj_t *base_view = lv_scr_act();
   width = lv_obj_get_width(base_view);
   height = lv_obj_get_height(base_view);
-  canvasSize = lv_img_color_format_get_px_size(CANVAS_COLOUR) * width * (height - BASE_HEIGHT);
+  canvasSize = (lv_img_color_format_get_px_size(CANVAS_COLOUR) * width * (height - BASE_HEIGHT)) / 8;
   if (*enableCanvas) {
     canvasBuffer = calloc(canvasSize, 1);
   }

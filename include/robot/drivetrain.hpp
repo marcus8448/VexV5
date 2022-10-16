@@ -82,6 +82,7 @@ public:
 
   /**
    * Resets the all of the motors' absolute position trackers.
+   * Also resets the target position of the robot.
    */
   void tare() const;
 

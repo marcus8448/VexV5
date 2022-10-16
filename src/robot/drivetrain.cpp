@@ -41,12 +41,10 @@ void robot::Drivetrain::move(double right_distance, double left_distance, int32_
   this->move_right(right_distance, max_rpm);
   this->move_left(left_distance, max_rpm);
   if (block) {
-    while (!this->is_offset_within(5.0)) {
+    while (!this->is_offset_within(2.0)) {
       pros::delay(50);
     }
-    do {
-      pros::delay(25);
-    } while (!this->is_offset_within(1.0));
+    pros::delay(25);
   }
 }
 
@@ -99,9 +97,13 @@ void robot::Drivetrain::stop() const {
 
 void robot::Drivetrain::tare() const {
   this->rightFront->tare_position();
+  this->rightFront->move_absolute(0.0, DEFAULT_MAX_RPM);
   this->leftFront->tare_position();
+  this->leftFront->move_absolute(0.0, DEFAULT_MAX_RPM);
   this->rightBack->tare_position();
+  this->rightBack->move_absolute(0.0, DEFAULT_MAX_RPM);
   this->leftBack->tare_position();
+  this->leftBack->move_absolute(0.0, DEFAULT_MAX_RPM);
 }
 
 void Drivetrain::move_right(double distance, int32_t max_rpm) const {

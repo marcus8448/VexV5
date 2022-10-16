@@ -175,8 +175,7 @@ void OpController::update() {
 
   if (this->up_pressed() || this->down_pressed()) {
     this->set_line(
-        0, 0,
-        ("Dig Spd: " + std::to_string(this->digital_speed()).append(" ")).c_str()); // append ' ' to clear out buffer
+        0, 0, logger::string_format("Dig Spd: %i  ", this->digital_speed()).c_str()); // append ' ' to clear out buffer
   }
 }
 } // namespace robot::controller
