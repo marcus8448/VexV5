@@ -1,11 +1,3 @@
-extern "C" {
-[[maybe_unused]] void autonomous(void);
-[[maybe_unused]] void initialize(void);
-[[maybe_unused]] void disabled(void);
-[[maybe_unused]] void competition_initialize(void);
-[[maybe_unused]] [[noreturn]] void opcontrol(void);
-}
-
 // CONFIG
 #define AUTONOMOUS
 #define SCREEN
@@ -14,6 +6,11 @@ extern "C" {
 #define SCREEN_FLYWHEEL
 #define DEBUG_LOG
 // END CONFIG
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
+#include "main.h"
+#pragma GCC diagnostic pop
 
 #include "pros/misc.hpp"
 #include "pros/motors.hpp"

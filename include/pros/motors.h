@@ -84,7 +84,7 @@ int32_t motor_brake(uint8_t port);
  * the position when it was most recently reset with motor_set_zero_position().
  *
  * \note This function simply sets the target for the motor, it does not block
- * activeProgram execution until the movement finishes.
+ * program execution until the movement finishes.
  *
  * This function uses the following values of errno when an error state is
  * reached:
@@ -112,7 +112,7 @@ int32_t motor_move_absolute(uint8_t port, const double position, const int32_t v
  * is.
  *
  * \note This function simply sets the target for the motor, it does not block
- * activeProgram execution until the movement finishes.
+ * program execution until the movement finishes.
  *
  * This function uses the following values of errno when an error state is
  * reached:

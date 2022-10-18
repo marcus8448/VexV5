@@ -14,7 +14,7 @@
 
 extern std::map<const char *, robot::autonomous::Autonomous *> *autonomousPrograms;
 namespace screen {
-static AutonomousSelect *instance;
+static AutonomousSelect *instance = nullptr;
 
 lv_res_t drop([[maybe_unused]] lv_obj_t *obj);
 lv_res_t click(lv_obj_t *btn);

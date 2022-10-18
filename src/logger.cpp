@@ -8,7 +8,7 @@
 #define DEBUG_LOG
 
 namespace logger {
-static std::vector<std::pair<const char *, uint32_t>> sections; // stores the name and timestamp of sections.
+static std::vector<std::pair<const char *, uint32_t>> *sections = new std::vector<std::pair<const char *, uint32_t>>(); // stores the name and timestamp of sections.
 
 void info(const char *string) {
   if (screen::logging != nullptr) {
@@ -72,7 +72,7 @@ void debug(const std::string &string) {
 
 void push(const char *string) {
 #ifdef DEBUG_LOG
-  sections.emplace_back(std::pair(string, pros::millis()));
+  sections->emplace_back(std::pair(string, pros::millis()));
   std::cout << "== BEGIN " << string << " ==" << std::endl;
 #endif
 }
@@ -87,13 +87,13 @@ void pop_push(const char *string) {
 void pop() {
 #ifdef DEBUG_LOG
   uint32_t millis = pros::millis();
-  if (sections.empty()) {
+  if (sections->empty()) {
     error("Section stack underflow!");
   }
-  std::pair<const char *, uint32_t> &back = sections.back();
+  std::pair<const char *, uint32_t> &back = sections->back();
   std::cout << "=== END " << back.first << " ==="
             << " (Took " << millis - back.second << " ms)" << std::endl;
-  sections.pop_back();
+  sections->pop_back();
 #endif
 }
 } // namespace logger

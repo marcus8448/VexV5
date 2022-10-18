@@ -18,7 +18,7 @@ lv_obj_t *create_label(lv_obj_t *screen, lv_coord_t x, lv_coord_t y, lv_coord_t 
 lv_style_t *create_text_color_style(lv_color_t colour);
 
 template <typename... Args> void set_label_text(lv_obj_t *label, const char *format, Args... args) {
-  static char *buffer = static_cast<char *>(malloc(64));
+  static char *buffer = new char[64];
   snprintf(buffer, 64, format, args...);
   lv_label_set_text(label, buffer);
 }

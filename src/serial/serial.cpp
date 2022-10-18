@@ -4,7 +4,6 @@
 #include <map>
 #include <sstream>
 #include <string>
-#include <sys/_stdint.h>
 #include <vector>
 
 #include "pros/apix.h"

@@ -108,7 +108,7 @@ class Motor {
 	 * pros::Motor::set_zero_position().
 	 *
 	 * \note This function simply sets the target for the motor, it does not block
-	 * activeProgram execution until the movement finishes.
+	 * program execution until the movement finishes.
 	 *
 	 * This function uses the following values of errno when an error state is
 	 * reached:
@@ -133,7 +133,7 @@ class Motor {
 	 * current position is.
 	 *
 	 * \note This function simply sets the target for the motor, it does not block
-	 * activeProgram execution until the movement finishes.
+	 * program execution until the movement finishes.
 	 *
 	 * This function uses the following values of errno when an error state is
 	 * reached:
@@ -915,7 +915,7 @@ class Motor_Group {
 	 * pros::Motor::set_zero_position().
 	 *
 	 * \note This function simply sets the target for the motors, it does not block
-	 * activeProgram execution until the movement finishes.
+	 * program execution until the movement finishes.
 	 *
 	 * This function uses the following values of errno when an error state is
 	 * reached:
@@ -941,7 +941,7 @@ class Motor_Group {
 	 * current position is.
 	 *
 	 * \note This function simply sets the target for the motor, it does not block
-	 * activeProgram execution until the movement finishes.
+	 * program execution until the movement finishes.
 	 *
 	 * This function uses the following values of errno when an error state is
 	 * reached:
