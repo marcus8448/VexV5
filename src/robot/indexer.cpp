@@ -1,4 +1,5 @@
 #include "robot/indexer.hpp"
+#include "logger.hpp"
 
 namespace robot {
 Indexer::Indexer(pros::Motor *motor) : motor(motor) { motor->set_brake_mode(pros::E_MOTOR_BRAKE_COAST); }
@@ -34,7 +35,6 @@ void Indexer::awaitReady(int millis_timeout) {
       }
       pros::delay(50);
     }
-    this->motor->brake();
     this->reset = false;
   }
 }
@@ -60,7 +60,6 @@ void Indexer::update(Controller *controller) {
   if (this->reset) {
     this->motor->move_absolute(0.0, 150);
     if (this->motor->get_position() < 1.0) {
-      this->motor->brake();
       this->reset = false;
     }
   } else {

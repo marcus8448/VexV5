@@ -9,10 +9,10 @@
 #pragma GCC diagnostic pop
 
 namespace screen {
-Configuration::Configuration() = default;
-
 lv_res_t switch_scheme(lv_obj_t *btn);
 void update_label(lv_obj_t *btn);
+
+Configuration::Configuration() = default;
 
 void Configuration::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
   auto halfWidth = static_cast<lv_coord_t>(width / 2);

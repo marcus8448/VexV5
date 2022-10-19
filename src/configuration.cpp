@@ -5,13 +5,14 @@ static DrivetrainControlScheme controlScheme = DrivetrainControlScheme::TANK_DRI
 
 [[nodiscard]] DrivetrainControlScheme get_drivetrain_control_scheme() { return controlScheme; }
 
-[[nodiscard]] const char *name(DrivetrainControlScheme scheme) {
+[[nodiscard]] const char *get_scheme_name(DrivetrainControlScheme scheme) {
   switch (scheme) {
   case TANK_DRIVE:
     return "Tank";
   case ARCADE_DRIVE:
     return "Arcade";
   }
+  return "";
 }
 
 void set_drivetrain_control_scheme(DrivetrainControlScheme scheme) { controlScheme = scheme; }

@@ -4,9 +4,11 @@
 #define SCREEN_LOGGING
 #define SCREEN_DRIVETRAIN
 #define SCREEN_FLYWHEEL
-#define DEBUG_LOG
+// #define DEBUG_LOG
 // END CONFIG
 
+#include <cstdio>
+#include <iostream>
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wall"
 #include "main.h"
@@ -35,7 +37,7 @@
 #endif
 
 #ifdef SCREEN
-#include "screen/config.hpp"
+// #include "screen/config.hpp"
 #include "screen/screen.hpp"
 #ifdef AUTONOMOUS
 #include "screen/autonomous_select.hpp"
@@ -59,9 +61,12 @@ Robot *get_or_create_robot();
 /**
  * Called when the robot is first initialized.
  */
-[[maybe_unused]] void initialize() {
+void initialize() {
+  std::cout << "ASJAOSIJIOSAOAIS" << std::endl;
   logger::push("Initialize");
   Robot *robot = get_or_create_robot();
+    std::cout << robot << std::endl;
+
   // Optionally disable autonomous for builds
 #ifdef AUTONOMOUS
   // Register the different types of autonomous-es
@@ -77,7 +82,7 @@ Robot *get_or_create_robot();
 #ifdef AUTONOMOUS
   screen::add_screen(new screen::AutonomousSelect());
 #endif
-  screen::add_screen(new screen::Configuration());
+  // screen::add_screen(new screen::Configuration());
   screen::add_screen(new screen::Information());
 #ifdef SCREEN_DRIVETRAIN
   screen::add_screen(new screen::DrivetrainChart());
@@ -103,7 +108,7 @@ Robot *get_or_create_robot();
 /**
  * Called when the robot is in it's autonomous state in a competition.
  */
-[[maybe_unused]] void autonomous() {
+void autonomous() {
 #ifdef AUTONOMOUS
   logger::push("Autonomous Setup");
   Robot *robot = get_or_create_robot();
@@ -122,7 +127,7 @@ Robot *get_or_create_robot();
  * Will delegate to autonomous control if the "Force Autonomous" button is
  * pressed.
  */
-[[maybe_unused]] [[noreturn]] void opcontrol() {
+void opcontrol() {
   logger::push("Opcontrol Setup");
   Robot *robot = get_or_create_robot();
   robot->controller = new controller::OpController(); // set the robot controller to the default operator based one.
@@ -157,9 +162,9 @@ Robot *get_or_create_robot() {
 /**
  * Called when the robot is at an official competition.
  */
-[[maybe_unused]] void competition_initialize() {}
+void competition_initialize() {}
 
 /**
  * Called when the robot should be stopped during a competition
  */
-[[maybe_unused]] void disabled() {}
+void disabled() {}

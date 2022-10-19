@@ -32,6 +32,11 @@ void Robot::update() const {
     } else {
       logger::error("Intake is null?");
     }
+    if (this->indexer != nullptr) {
+      this->indexer->update(this->controller);
+    } else {
+      logger::error("Indexer is null?");
+    }
     if (this->flywheel != nullptr) {
       this->flywheel->update(this->controller);
     } else {

@@ -30,7 +30,7 @@ enum DrivetrainControlScheme {
  */
 [[nodiscard]] DrivetrainControlScheme get_drivetrain_control_scheme();
 
-[[nodiscard]] const char *name(DrivetrainControlScheme scheme);
+[[nodiscard]] const char *get_scheme_name(DrivetrainControlScheme scheme);
 /**
  * Sets the drivetrain control scheme to the specified value.
  * @param scheme The drivetrain control scheme to use.
