@@ -10,7 +10,7 @@ Flywheel::~Flywheel() {
 }
 
 void Flywheel::engage() {
-  this->motor->move(127);
+  this->motor->move(-127);
   this->engaged = true;
 }
 
@@ -25,6 +25,7 @@ void Flywheel::spinUp(double targetSpeed, bool block) {
 
 void Flywheel::disengage() {
   this->engaged = false;
+  this->motor->move(0);
   this->motor->brake();
 }
 

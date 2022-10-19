@@ -10,7 +10,7 @@ Intake::~Intake() {
 }
 
 void Intake::engage() {
-  this->motor->move(95);
+  this->motor->move(-95);
   this->engaged = true;
 }
 

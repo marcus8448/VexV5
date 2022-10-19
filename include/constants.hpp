@@ -3,7 +3,7 @@
 #ifndef CONSTANTS_HPP
 #define CONSTANTS_HPP
 
-#define FLYWHEEL_MOTOR 2
+#define FLYWHEEL_MOTOR 3
 #define INTAKE_MOTOR 1
 #define INDEXER_MOTOR 19
 
