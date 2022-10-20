@@ -1,3 +1,10 @@
+extern "C" {
+void autonomous(void);
+void initialize(void);
+void disabled(void);
+void competition_initialize(void);
+void opcontrol(void);
+}
 // CONFIG
 #define AUTONOMOUS
 #define SCREEN
@@ -7,12 +14,7 @@
 // #define DEBUG_LOG
 // END CONFIG
 
-#include <cstdio>
 #include <iostream>
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wall"
-#include "main.h"
-#pragma GCC diagnostic pop
 
 #include "pros/misc.hpp"
 #include "pros/motors.hpp"
@@ -62,7 +64,6 @@ Robot *get_or_create_robot();
  * Called when the robot is first initialized.
  */
 void initialize() {
-  std::cout << "ASJAOSIJIOSAOAIS" << std::endl;
   logger::push("Initialize");
   Robot *robot = get_or_create_robot();
     std::cout << robot << std::endl;
@@ -154,7 +155,9 @@ Robot *get_or_create_robot() {
                                      new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)),
                       new Intake(new pros::Motor(INTAKE_MOTOR, INTAKE_GEARSET, false, ENCODER_UNITS)),
                       new Indexer(new pros::Motor(INDEXER_MOTOR, INDEXER_GEARSET, true, ENCODER_UNITS)),
-                      new Flywheel(new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, true, ENCODER_UNITS)));
+                      new Flywheel(new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, true, ENCODER_UNITS)),
+                      new Roller(new pros::Motor(ROLLER_MOTOR, ROLLER_GEARSET, false, ENCODER_UNITS),
+                                 new pros::Optical(ROLLER_OPTICAL)));
   }
   return robot;
 }

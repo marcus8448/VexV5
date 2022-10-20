@@ -41,14 +41,15 @@ public:
   void disengage();
 
   /**
-   * Returns whether the flywheel is currently engaged (running).
-   * @return whether the flywheel is currently engaged (running).
+   * Returns whether the intake is currently engaged (running).
+   * @return whether the intake is currently engaged (running).
    */
   [[nodiscard]] bool isEngaged() const;
 
   [[nodiscard]] pros::Motor *get_motor() const;
 
   void update(Controller *controller) override;
+  void reverse();
 };
 } // namespace robot
 #endif // ROBOT_INTAKE_HPP

@@ -20,4 +20,8 @@ Autonomous *get_autonomous() {
   return (*autonomousPrograms)[activeProgram];
 }
 
+void Autonomous::wait(const uint32_t millis) {
+  pros::delay(millis)
+}
+
 } // namespace robot::autonomous

@@ -6,6 +6,7 @@
 #include "flywheel.hpp"
 #include "indexer.hpp"
 #include "intake.hpp"
+#include "roller.hpp"
 
 namespace robot {
 /**
@@ -30,6 +31,10 @@ public:
    */
   Flywheel *flywheel;
   /**
+   * The robot's roller.
+   */
+  Roller *roller;
+  /**
    * The robot's controller. Used during operator control.
    */
   Controller *controller;
@@ -41,8 +46,9 @@ public:
    * @param intake The robot's intake.
    * @param flywheel The robot's flywheel.
    * @param indexer The robot's indexer.
+   * @param roller The robot's roller.
    */
-  explicit Robot(Drivetrain *drivetrain, Intake *intake, Indexer *indexer, Flywheel *flywheel);
+  explicit Robot(Drivetrain *drivetrain, Intake *intake, Indexer *indexer, Flywheel *flywheel, Roller *roller);
   ~Robot();
 
   /**

@@ -6,6 +6,11 @@
  * Can be changed via the V5 brain's screen.
  */
 namespace config {
+enum AllianceColour {
+  RED,
+  BLUE
+};
+
 /**
  * The different control schemes for the drivetrain
  */
@@ -36,5 +41,15 @@ enum DrivetrainControlScheme {
  * @param scheme The drivetrain control scheme to use.
  */
 void set_drivetrain_control_scheme(DrivetrainControlScheme scheme);
+
+[[nodiscard]] AllianceColour get_alliance_colour();
+
+[[nodiscard]] const char *get_alliance_colour_name(AllianceColour colour);
+
+/**
+ * Sets the alliance colour to the specified value.
+ * @param colour The drivetrain control scheme to use.
+ */
+void set_alliance_colour(AllianceColour colour);
 } // namespace config
 #endif // CONFIGURATION_HPP

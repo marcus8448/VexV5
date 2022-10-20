@@ -14,6 +14,11 @@ void Intake::engage() {
   this->engaged = true;
 }
 
+void Intake::reverse() {
+  this->motor->move(127);
+  this->engaged = true;
+}
+
 void Intake::disengage() {
   this->engaged = false;
   this->motor->brake();
@@ -24,7 +29,9 @@ void Intake::disengage() {
 [[nodiscard]] pros::Motor *Intake::get_motor() const { return this->motor; }
 
 void Intake::update(Controller *controller) {
-  if (controller->l1_pressed()) {
+  if (controller->l1_pressed() && controller->l2_pressed()) {
+    this->reverse();
+  } else if (controller->l1_pressed()) {
     this->engage();
   } else if (controller->l2_pressed()) {
     this->disengage();
