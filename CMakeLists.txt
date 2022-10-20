@@ -61,7 +61,7 @@ set_property(TARGET ColdPackage PROPERTY LINK_DEPENDS ${FIRMWARE_DIR}/v5-common.
 target_link_options(
         HotPackage
         PUBLIC -Wl,-R,${BIN_DIR}/cold.package.elf
-        PUBLIC -Wl,-T${FIRMWARE_DIR}/v5-hot.ld,--gc-sections,--start-group,${LibC},${LibM},${LibPROS},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld
+        PUBLIC -nostartfiles -Wl,-T${FIRMWARE_DIR}/v5-hot.ld,--gc-sections,--start-group,${LibC},${LibM},${LibPROS},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld
 )
 
 target_link_options(

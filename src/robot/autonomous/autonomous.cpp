@@ -21,7 +21,7 @@ Autonomous *get_autonomous() {
 }
 
 void Autonomous::wait(const uint32_t millis) {
-  pros::delay(millis)
+  pros::delay(millis);
 }
 
 } // namespace robot::autonomous
