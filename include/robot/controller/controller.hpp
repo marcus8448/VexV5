@@ -86,13 +86,13 @@ public:
    * Returns the current speed motors should run at when activated by a button (digital input).
    * @return the current speed motors should run at when activated by a button (digital input).
    */
-  [[nodiscard]] virtual uint8_t digital_speed() const = 0;
+  [[nodiscard]] virtual double flywheel_speed() const = 0;
 
   /**
    * Sets the speed motors should run at when activated by a button (digital input).
-   * @param digitalSpeed the speed motors should run at when activated by a button (digital input).
+   * @param flywheelSpeed the speed motors should run at when activated by a button (digital input).
    */
-  virtual void digital_speed(uint8_t digitalSpeed) = 0;
+  virtual void flywheel_speed(double flywheelSpeed) = 0;
 
   /**
    * Sets the row on the V5 controller to the specified text.

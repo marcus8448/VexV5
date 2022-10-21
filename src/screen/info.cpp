@@ -29,6 +29,7 @@ void Information::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) 
   this->flywheelLabel = create_label(screen, 0, 16 * 4, halfWidth, 16);
   this->indexerLabel = create_label(screen, halfWidth, 16 * 4, halfWidth, 16);
   this->intakeLabel = create_label(screen, 0, 16 * 5, halfWidth, 16);
+  this->flywheelTempLabel = create_label(screen, halfWidth, 16 * 6, halfWidth, 16);
 
   // special
   this->digitalSpeedLabel = create_label(screen, halfWidth, 16 * 5, halfWidth, 16);
@@ -44,10 +45,11 @@ void Information::update(robot::Robot *robot) {
   update_motor(this->motorRFLabel, "DT-RF", robot->drivetrain->rightFront->get_position());
   update_motor(this->motorLBLabel, "DT-LB", robot->drivetrain->leftBack->get_position());
   update_motor(this->motorRBLabel, "DT-RB", robot->drivetrain->rightBack->get_position());
-  update_motor_digital(this->flywheelLabel, robot->flywheel->get_motor(), robot->flywheel->isEngaged(), "Flywheel");
+  update_motor(this->flywheelLabel, "Flywheel", robot->flywheel->get_motor()->get_actual_velocity());
+  update_motor(this->flywheelTempLabel, "Flywheel Temp", robot->flywheel->get_motor()->get_temperature());
   update_motor_digital(this->indexerLabel, robot->indexer->get_motor(), false, "Indexer");
   update_motor_digital(this->intakeLabel, robot->intake->get_motor(), false, "Intake/Roller");
-  set_label_text(this->digitalSpeedLabel, "Digital Speed: %i", robot->controller->digital_speed());
+  set_label_text(this->digitalSpeedLabel, "Flywheel Speed: %i", (int32_t)robot->controller->flywheel_speed());
 }
 
 void Information::destroy(lv_obj_t *screen) {}

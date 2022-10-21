@@ -1,7 +1,7 @@
 #include "configuration.hpp"
 
 namespace config {
-static DrivetrainControlScheme controlScheme = DrivetrainControlScheme::ARCADE_DRIVE;
+static DrivetrainControlScheme controlScheme = DrivetrainControlScheme::TANK_DRIVE;
 static AllianceColour allianceColour = AllianceColour::RED;
 
 [[nodiscard]] DrivetrainControlScheme get_drivetrain_control_scheme() { return controlScheme; }

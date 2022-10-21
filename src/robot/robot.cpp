@@ -2,8 +2,9 @@
 #include "logger.hpp"
 
 namespace robot {
-Robot::Robot(Drivetrain *drivetrain, Intake *intake, Indexer *indexer, Flywheel *flywheel)
-    : drivetrain(drivetrain), intake(intake), indexer(indexer), flywheel(flywheel), controller(nullptr) {}
+Robot::Robot(Drivetrain *drivetrain, Intake *intake, Indexer *indexer, Flywheel *flywheel, Expansion *expansion)
+    : drivetrain(drivetrain), intake(intake), indexer(indexer), flywheel(flywheel), expansion(expansion),
+      controller(nullptr) {}
 
 Robot::~Robot() {
   logger::warn("Robot destructor called");
@@ -15,6 +16,8 @@ Robot::~Robot() {
   indexer = nullptr;
   delete flywheel;
   flywheel = nullptr;
+  delete expansion;
+  expansion = nullptr;
   delete controller;
   controller = nullptr;
 }
@@ -22,9 +25,12 @@ Robot::~Robot() {
 void Robot::update() const {
   if (this->controller != nullptr) {
     this->controller->update();
-    if (this->controller->a_pressed()) {
-      this->drivetrain->turn_right(1800);
-    }
+    // if (this->controller->a_pressed()) {
+    //   this->drivetrain->turn_right(1800);
+    // }
+    // if (this->controller->x_pressed()) {
+    //   this->drivetrain->forwards(48);
+    // }
     if (this->drivetrain != nullptr) {
       this->drivetrain->update(this->controller);
     } else {
@@ -44,6 +50,11 @@ void Robot::update() const {
       this->flywheel->update(this->controller);
     } else {
       logger::error("Flywheel is null?");
+    }
+    if (this->expansion != nullptr) {
+      this->expansion->update(this->controller);
+    } else {
+      logger::error("Expansion is null?");
     }
   } else {
     logger::error("Controller is null!");

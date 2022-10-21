@@ -12,7 +12,6 @@ void opcontrol(void);
 #define SCREEN_LOGGING
 #define SCREEN_DRIVETRAIN
 #define SCREEN_FLYWHEEL
-// #define DEBUG_LOG
 // END CONFIG
 
 #include <iostream>
@@ -30,6 +29,7 @@ void opcontrol(void);
 #include "robot/autonomous/autonomous.hpp"
 #include "robot/autonomous/left_score.hpp"
 #include "robot/autonomous/left_winpoint.hpp"
+#include "robot/autonomous/none.hpp"
 #include "robot/autonomous/right_score.hpp"
 #include "robot/autonomous/right_winpoint.hpp"
 #endif
@@ -74,6 +74,7 @@ void initialize() {
   // Optionally disable autonomous for builds
 #ifdef AUTONOMOUS
   // Register the different types of autonomous-es
+  autonomous::register_autonomous("None", new autonomous::None());
   autonomous::register_autonomous("Left Winpoint", new autonomous::LeftWinpoint());
   autonomous::register_autonomous("Right Winpoint", new autonomous::RightWinpoint());
   autonomous::register_autonomous("Left Score", new autonomous::LeftScore());
@@ -119,6 +120,7 @@ void autonomous() {
   logger::push("Autonomous Setup");
   Robot *robot = get_or_create_robot();
   logger::pop();
+  autonomous::set_active("Left Winpoint");
   autonomous::Autonomous *autonomous = autonomous::get_autonomous();
   if (autonomous != nullptr) {
     autonomous->run(robot); // run the autonomous code
@@ -139,6 +141,7 @@ void opcontrol() {
   robot->controller = new controller::OpController(); // set the robot controller to the default operator based one.
   logger::pop();
 
+  robot->expansion->charge();
   // infinitely run opcontrol - pros will kill the task when it's over.
   while (true) {
     robot->update();
@@ -153,14 +156,16 @@ void opcontrol() {
 Robot *get_or_create_robot() {
   static Robot *robot = nullptr; // stored forever
   if (robot == nullptr) {        // check if robot exists
-    // create the robot
+    // otherwise, create the robot
     robot = new Robot(new Drivetrain(new pros::Motor(RIGHT_FRONT_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
                                      new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
                                      new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
                                      new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)),
-                      new Intake(new pros::Motor(INTAKE_MOTOR, INTAKE_GEARSET, false, ENCODER_UNITS), new pros::Optical(ROLLER_OPTICAL)),
+                      new Intake(new pros::Motor(INTAKE_MOTOR, INTAKE_GEARSET, false, ENCODER_UNITS),
+                                 new pros::Optical(ROLLER_OPTICAL)),
                       new Indexer(new pros::Motor(INDEXER_MOTOR, INDEXER_GEARSET, true, ENCODER_UNITS)),
-                      new Flywheel(new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, true, ENCODER_UNITS)));
+                      new Flywheel(new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, true, ENCODER_UNITS)),
+                      new Expansion(new pros::Motor(EXPANSION_MOTOR, EXPANSION_GEARSET, false, ENCODER_UNITS)));
   }
   return robot;
 }

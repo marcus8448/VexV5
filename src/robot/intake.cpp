@@ -1,6 +1,6 @@
 #include "robot/intake.hpp"
-#include "pros/optical.hpp"
 #include "logger.hpp"
+#include "pros/optical.hpp"
 
 namespace robot {
 
@@ -32,6 +32,11 @@ void Intake::disengage() {
 }
 
 void Intake::spin_until_colour(config::AllianceColour teamColour, uint32_t timeout) {
+  if (true) {
+    this->motor->move(50);
+    pros::delay(300);
+    return;
+  }
   if (!looking_at_roller()) {
     logger::warn("Spinning roller while not in view?");
   }

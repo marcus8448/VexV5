@@ -13,6 +13,7 @@ private:
   lv_obj_t *motorLBLabel = nullptr;
   lv_obj_t *motorRBLabel = nullptr;
   lv_obj_t *flywheelLabel = nullptr;
+  lv_obj_t *flywheelTempLabel = nullptr;
   lv_obj_t *indexerLabel = nullptr;
   lv_obj_t *intakeLabel = nullptr;
   lv_obj_t *digitalSpeedLabel = nullptr;

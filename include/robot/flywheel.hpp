@@ -5,7 +5,7 @@
 #include "robot/controller/controller.hpp"
 
 #define MAX_SPEED 600.0
-#define DEFAULT_TARGET_SPEED (MAX_SPEED - 20.0)
+#define DEFAULT_TARGET_SPEED 330.0
 
 namespace robot {
 /**
@@ -21,6 +21,7 @@ private:
    * Whether the flywheel is currently active.
    */
   bool engaged = false;
+  int8_t speedFor = 0;
 
 public:
   /**
@@ -34,13 +35,13 @@ public:
    * Engages the flywheel.
    * Sets the motor to run at max speed.
    */
-  void engage();
+  void engage(double flywheelSpeed = 600.0);
 
-  void spinUp(double targetSpeed = MAX_SPEED, bool block = false);
+  void spinUp(bool block = false);
 
-  bool isUpToSpeed(double velocity = DEFAULT_TARGET_SPEED);
+  bool isUpToSpeed();
 
-  void waitForSpeed(double velocity = DEFAULT_TARGET_SPEED, int millis_timeout = 5000);
+  void waitForSpeed(int millis_timeout = 5000);
 
   /**
    * Disengages the flywheel.

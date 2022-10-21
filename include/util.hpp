@@ -1,6 +1,8 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
+#include "pros/motors.hpp"
+
 #define PI 3.14159265358979323846
 #define WHEEL_SIZE 2.0625
 #define WHEEL_CIRCUMFERENCE (WHEEL_SIZE * 2.0 * PI)
@@ -18,6 +20,8 @@ double in_to_e_units(double inches);
  * @return the number of encoder units equivalent to the number of degrees.
  */
 double turn_to_e_units(double degrees);
+
+double get_gearset_max_rpm(const pros::motor_gearset_e_t gearset);
 
 /**
  * Tests if a file exists on the microSD filesystem.

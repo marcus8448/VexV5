@@ -3,6 +3,7 @@
 
 #include "controller/controller.hpp"
 #include "drivetrain.hpp"
+#include "expansion.hpp"
 #include "flywheel.hpp"
 #include "indexer.hpp"
 #include "intake.hpp"
@@ -30,6 +31,10 @@ public:
    */
   Flywheel *flywheel;
   /**
+   * The robot's expansion.
+   */
+  Expansion *expansion;
+  /**
    * The robot's controller. Used during operator control.
    */
   Controller *controller;
@@ -40,10 +45,11 @@ public:
    * @param drivetrain The robot's drivetrain.
    * @param intake The robot's intake.
    * @param flywheel The robot's flywheel.
+   * @param expansion The robot's expansion.
    * @param indexer The robot's indexer.
    * @param roller The robot's roller.
    */
-  explicit Robot(Drivetrain *drivetrain, Intake *intake, Indexer *indexer, Flywheel *flywheel);
+  explicit Robot(Drivetrain *drivetrain, Intake *intake, Indexer *indexer, Flywheel *flywheel, Expansion *expansion);
   ~Robot();
 
   /**

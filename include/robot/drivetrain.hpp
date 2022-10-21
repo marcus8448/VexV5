@@ -5,7 +5,7 @@
 #include "robot/controller/controller.hpp"
 #include <cstdint>
 
-#define DEFAULT_MAX_RPM 100
+#define DRIVETRAIN_MAX_RPM 100
 
 namespace robot {
 /**
@@ -35,7 +35,7 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while moving.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void forwards(double distance, int32_t max_rpm = DEFAULT_MAX_RPM, bool block = true);
+  void forwards(double distance, int32_t max_rpm = DRIVETRAIN_MAX_RPM, bool block = true);
 
   /**
    * Drives the robot backwards by the specified distance.
@@ -43,7 +43,7 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while moving.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void backwards(double distance, int32_t max_rpm = DEFAULT_MAX_RPM, bool block = true);
+  void backwards(double distance, int32_t max_rpm = DRIVETRAIN_MAX_RPM, bool block = true);
 
   /**
    * Turns the robot to the right by spinning by the specified number of degrees.
@@ -51,7 +51,7 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while turning.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void turn_right(double degrees, int32_t max_rpm = DEFAULT_MAX_RPM, bool block = true);
+  void turn_right(double degrees, int32_t max_rpm = DRIVETRAIN_MAX_RPM, bool block = true);
 
   /**
    * Turns the robot to the left by spinning by the specified number of degrees.
@@ -59,7 +59,7 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while turning.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void turn_left(double degrees, int32_t max_rpm = DEFAULT_MAX_RPM, bool block = true);
+  void turn_left(double degrees, int32_t max_rpm = DRIVETRAIN_MAX_RPM, bool block = true);
 
   /**
    * Moves the two right motors of the drivetrain at the specified voltage.
@@ -101,19 +101,19 @@ private:
    * @param max_rpm The maximum allowable RPM for the motor to run at while moving.
    * @param block Whether this function should wait for the robot to move or exit immediately.
    */
-  void move(double right_distance, double left_distance, int32_t max_rpm = DEFAULT_MAX_RPM, bool block = true) const;
+  void move(double right_distance, double left_distance, int32_t max_rpm = DRIVETRAIN_MAX_RPM, bool block = true) const;
 
   /**
    * Moves the two right motors of the drivetrain by the specified distance.
    * @param distance The distance in ENCODER UNITS to move the right motors by.
    */
-  void move_right(double distance, int32_t max_rpm = DEFAULT_MAX_RPM) const;
+  void move_right(double distance, int32_t max_rpm = DRIVETRAIN_MAX_RPM) const;
 
   /**
    * Moves the two left motors of the drivetrain by the specified distance.
    * @param distance The distance in ENCODER UNITS to move the right motors by.
    */
-  void move_left(double distance, int32_t max_rpm = DEFAULT_MAX_RPM) const;
+  void move_left(double distance, int32_t max_rpm = DRIVETRAIN_MAX_RPM) const;
 };
 } // namespace robot
 #endif // ROBOT_DRIVETRAIN_HPP

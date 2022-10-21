@@ -69,7 +69,7 @@ void RobotStatePlugin::handle(serial::SerialConnection *connection, void *buffer
     buf[1] |= 0b00000100;
   if (this->robot->controller->r2_pressed())
     buf[1] |= 0b00001000;
-  buf[2] = this->robot->controller->digital_speed();
+  // buf[2] = this->robot->controller->flywheel_speed(); todo
   float src;
   src = static_cast<float>(this->robot->controller->left_stick_x());
   std::memcpy(&buf[3 + sizeof(float) * 0], &src, sizeof(float));

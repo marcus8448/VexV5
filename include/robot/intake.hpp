@@ -1,10 +1,10 @@
 #ifndef ROBOT_INTAKE_HPP
 #define ROBOT_INTAKE_HPP
 
+#include "configuration.hpp"
 #include "pros/motors.hpp"
 #include "pros/optical.hpp"
 #include "robot/controller/controller.hpp"
-#include "configuration.hpp"
 
 namespace robot {
 /**

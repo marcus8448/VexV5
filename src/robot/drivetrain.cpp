@@ -1,11 +1,14 @@
 #include "robot/drivetrain.hpp"
 #include "configuration.hpp"
+#include "constants.hpp"
 #include "error.hpp"
 #include "logger.hpp"
 #include "util.hpp"
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
+
+#define MAX_MOTOR_VOLTAGE 122
 
 namespace robot {
 robot::Drivetrain::Drivetrain(pros::Motor *rightFront, pros::Motor *leftFront, pros::Motor *rightBack,
@@ -91,16 +94,16 @@ void robot::Drivetrain::update(Controller *controller) {
     auto left = static_cast<int32_t>(joystickY + joystickRotX);
     int32_t rOver = 0;
     int32_t lOver = 0;
-    if (right < -127) {
-      rOver = right + 127;
-    } else {
-      rOver = right - 127;
+    if (right < -MAX_MOTOR_VOLTAGE) {
+      rOver = right + MAX_MOTOR_VOLTAGE;
+    } else if (right > MAX_MOTOR_VOLTAGE) {
+      rOver = right - MAX_MOTOR_VOLTAGE;
     }
 
-    if (left < -127) {
-      lOver = left + 127;
-    } else {
-      lOver = left - 127;
+    if (left < -MAX_MOTOR_VOLTAGE) {
+      lOver = left + MAX_MOTOR_VOLTAGE;
+    } else if (left > MAX_MOTOR_VOLTAGE) {
+      lOver = left - MAX_MOTOR_VOLTAGE;
     }
     int32_t over = std::max(rOver, lOver);
     if (over > 0) {
@@ -114,7 +117,6 @@ void robot::Drivetrain::update(Controller *controller) {
       } else {
         right += over;
       }
-      logger::error("Over: %i", over);
     }
 
     this->move_right(right);
@@ -134,21 +136,27 @@ void robot::Drivetrain::stop() const {
 
 void robot::Drivetrain::tare() const {
   this->rightFront->tare_position();
-  this->rightFront->move_absolute(0.0, DEFAULT_MAX_RPM);
+  this->rightFront->move_absolute(0.0, DRIVETRAIN_MAX_RPM);
   this->leftFront->tare_position();
-  this->leftFront->move_absolute(0.0, DEFAULT_MAX_RPM);
+  this->leftFront->move_absolute(0.0, DRIVETRAIN_MAX_RPM);
   this->rightBack->tare_position();
-  this->rightBack->move_absolute(0.0, DEFAULT_MAX_RPM);
+  this->rightBack->move_absolute(0.0, DRIVETRAIN_MAX_RPM);
   this->leftBack->tare_position();
-  this->leftBack->move_absolute(0.0, DEFAULT_MAX_RPM);
+  this->leftBack->move_absolute(0.0, DRIVETRAIN_MAX_RPM);
 }
 
 void Drivetrain::move_right(double distance, int32_t max_rpm) const {
+  if (max_rpm > get_gearset_max_rpm(DRIVETRAIN_GEARSET)) {
+    max_rpm = get_gearset_max_rpm(DRIVETRAIN_GEARSET);
+  }
   print_error(this->rightFront->move_relative(distance, max_rpm));
   print_error(this->rightBack->move_relative(distance, max_rpm));
 }
 
 void Drivetrain::move_left(double distance, int32_t max_rpm) const {
+  if (max_rpm > get_gearset_max_rpm(DRIVETRAIN_GEARSET)) {
+    max_rpm = get_gearset_max_rpm(DRIVETRAIN_GEARSET);
+  }
   print_error(this->leftFront->move_relative(distance, max_rpm));
   print_error(this->leftBack->move_relative(distance, max_rpm));
 }

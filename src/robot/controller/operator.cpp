@@ -45,9 +45,9 @@ double OpController::prev_right_stick_x() const { return this->prevRightStickX; 
 
 double OpController::prev_right_stick_y() const { return this->prevRightStickY; }
 
-uint8_t OpController::digital_speed() const { return this->digitalSpeed; }
+double OpController::flywheel_speed() const { return this->flywheelSpeed; }
 
-void OpController::digital_speed(uint8_t speed) { this->digitalSpeed = speed; }
+void OpController::flywheel_speed(double speed) { this->flywheelSpeed = speed; }
 
 void OpController::set_line(uint8_t line, uint8_t col, const char *str) {
   print_error(this->controller.set_text(line, col, str));
@@ -142,10 +142,10 @@ void OpController::update() {
   this->prevRightStickY = this->rightStickY;
   this->rightStickY = print_error(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
 
-  if (this->up_pressed()) {
-    this->digital_speed(std::min(this->digital_speed() + 1, 127));
-  } else if (this->down_pressed()) {
-    this->digital_speed(std::max(this->digital_speed() - 1, 127));
+  if (this->right_pressed()) {
+    this->flywheel_speed(std::min(this->flywheel_speed() + 1.0, 600.0));
+  } else if (this->left_pressed()) {
+    this->flywheel_speed(std::max(this->flywheel_speed() - 1.0, 0.0));
   }
 
   if (this->a == 1)
@@ -173,9 +173,9 @@ void OpController::update() {
   if (this->l2 == 1)
     logger::debug("L2 pressed");
 
-  if (this->up_pressed() || this->down_pressed()) {
+  if (this->left_pressed() || this->right_pressed()) {
     this->set_line(
-        0, 0, logger::string_format("Dig Spd: %i  ", this->digital_speed()).c_str()); // append ' ' to clear out buffer
+        0, 0, logger::string_format("Fly Spd: %i  ", (int32_t)this->flywheel_speed()).c_str()); // append ' ' to clear out buffer
   }
 }
 } // namespace robot::controller

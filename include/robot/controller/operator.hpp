@@ -39,7 +39,7 @@ private:
   double prevRightStickX = 0.0;
   double prevRightStickY = 0.0;
 
-  uint8_t digitalSpeed = 127;
+  double flywheelSpeed = 375.0;
 
 public:
   explicit OpController(pros::Controller controller = pros::Controller(pros::E_CONTROLLER_MASTER));
@@ -69,8 +69,8 @@ public:
   [[nodiscard]] double prev_right_stick_x() const override;
   [[nodiscard]] double prev_right_stick_y() const override;
 
-  [[nodiscard]] uint8_t digital_speed() const override;
-  void digital_speed(uint8_t speed) override;
+  [[nodiscard]] double flywheel_speed() const override;
+  void flywheel_speed(double speed) override;
 
   void set_line(uint8_t line, uint8_t col, const char *str) override;
   void clear_line(uint8_t line) override;
