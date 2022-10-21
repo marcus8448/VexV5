@@ -1,7 +1,9 @@
 #include "robot/drivetrain.hpp"
 #include "configuration.hpp"
 #include "error.hpp"
+#include "logger.hpp"
 #include "util.hpp"
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 
@@ -65,6 +67,13 @@ void robot::Drivetrain::turn_left(double degrees, int32_t max_rpm, bool block) {
 }
 
 void robot::Drivetrain::move_right(int32_t voltage) const {
+  if (voltage > 127) {
+    logger::error("Voltage is over? %i", voltage);
+    voltage = 127;
+  } else if (voltage < -127) {
+    logger::error("Voltage is over? %i", voltage);
+    voltage = -127;
+  }
   print_error(this->rightFront->move(voltage));
   print_error(this->rightBack->move(voltage));
 }
@@ -78,10 +87,38 @@ void robot::Drivetrain::update(Controller *controller) {
   if (config::get_drivetrain_control_scheme() == config::DrivetrainControlScheme::ARCADE_DRIVE) {
     double joystickRotX = controller->right_stick_x();
     double joystickY = controller->left_stick_y();
-    double joystickX = controller->left_stick_x();
+    auto right = static_cast<int32_t>(joystickY - joystickRotX);
+    auto left = static_cast<int32_t>(joystickY + joystickRotX);
+    int32_t rOver = 0;
+    int32_t lOver = 0;
+    if (right < -127) {
+      rOver = right + 127;
+    } else {
+      rOver = right - 127;
+    }
 
-    this->move_right(static_cast<int32_t>(joystickY - joystickRotX + joystickX));
-    this->move_left(static_cast<int32_t>(joystickY + joystickRotX - joystickX));
+    if (left < -127) {
+      lOver = left + 127;
+    } else {
+      lOver = left - 127;
+    }
+    int32_t over = std::max(rOver, lOver);
+    if (over > 0) {
+      if (left > 0) {
+        left -= over;
+      } else {
+        left += over;
+      }
+      if (right > 0) {
+        right -= over;
+      } else {
+        right += over;
+      }
+      logger::error("Over: %i", over);
+    }
+
+    this->move_right(right);
+    this->move_left(left);
   } else {
     this->move_right(static_cast<int32_t>(controller->right_stick_y()));
     this->move_left(static_cast<int32_t>(controller->left_stick_y()));
