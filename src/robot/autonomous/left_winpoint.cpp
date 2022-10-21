@@ -2,10 +2,10 @@
 
 namespace robot::autonomous {
 void LeftWinpoint::run(Robot *robot) {
-  robot->drivetrain->forwards(1.5);
-  robot->roller->spin_until_colour(config::get_alliance_colour(), 5000);
-  robot->drivetrain->backwards(3.0);
-  robot->drivetrain->turn_right(90.0);
+  robot->drivetrain->backwards(1.5);
+  robot->intake->spin_until_colour(config::get_alliance_colour(), 5000);
+  robot->drivetrain->forwards(3.0);
+  robot->drivetrain->turn_left(90.0);
   robot->drivetrain->backwards(27.2);
   robot->drivetrain->turn_left(90.0);
   robot->drivetrain->backwards(14);

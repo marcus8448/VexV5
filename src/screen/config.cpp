@@ -26,9 +26,7 @@ void Configuration::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height
 
 void Configuration::initialize(lv_coord_t width, lv_coord_t height) {}
 
-void Configuration::update(robot::Robot *robot) {
-
-}
+void Configuration::update(robot::Robot *robot) {}
 
 void Configuration::destroy(lv_obj_t *screen) {}
 

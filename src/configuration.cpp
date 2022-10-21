@@ -1,7 +1,7 @@
 #include "configuration.hpp"
 
 namespace config {
-static DrivetrainControlScheme controlScheme = DrivetrainControlScheme::TANK_DRIVE;
+static DrivetrainControlScheme controlScheme = DrivetrainControlScheme::ARCADE_DRIVE;
 static AllianceColour allianceColour = AllianceColour::RED;
 
 [[nodiscard]] DrivetrainControlScheme get_drivetrain_control_scheme() { return controlScheme; }
@@ -18,9 +18,7 @@ static AllianceColour allianceColour = AllianceColour::RED;
 
 void set_drivetrain_control_scheme(DrivetrainControlScheme scheme) { controlScheme = scheme; }
 
-AllianceColour get_alliance_colour() {
-  return allianceColour;
-}
+AllianceColour get_alliance_colour() { return allianceColour; }
 
 const char *get_alliance_colour_name(AllianceColour colour) {
   switch (colour) {
@@ -32,7 +30,5 @@ const char *get_alliance_colour_name(AllianceColour colour) {
   return "";
 }
 
-void set_alliance_colour(AllianceColour colour) {
-  allianceColour = colour;
-}
+void set_alliance_colour(AllianceColour colour) { allianceColour = colour; }
 } // namespace config

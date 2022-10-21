@@ -10,7 +10,7 @@
 
 namespace screen {
 void update_motor_digital(lv_obj_t *label, pros::Motor *motor, bool engaged, const char *name);
-void update_motor(lv_obj_t *label, const char *name, int32_t voltage);
+void update_motor(lv_obj_t *label, const char *name, double position);
 
 Information::Information() = default;
 
@@ -38,14 +38,15 @@ void Information::initialize(lv_coord_t width, lv_coord_t height) {}
 
 void Information::update(robot::Robot *robot) {
   set_label_text(this->uptimeLabel, "Uptime: %i", pros::millis());
-  set_label_text(this->controlSchemeLabel, "Control Scheme: %s", config::get_scheme_name(config::get_drivetrain_control_scheme()));
-  update_motor(this->motorLFLabel, "DT-LF", robot->drivetrain->leftFront->get_voltage());
-  update_motor(this->motorRFLabel, "DT-RF", robot->drivetrain->rightFront->get_voltage());
-  update_motor(this->motorLBLabel, "DT-LB", robot->drivetrain->leftBack->get_voltage());
-  update_motor(this->motorRBLabel, "DT-RB", robot->drivetrain->rightBack->get_voltage());
+  set_label_text(this->controlSchemeLabel, "Control Scheme: %s",
+                 config::get_scheme_name(config::get_drivetrain_control_scheme()));
+  update_motor(this->motorLFLabel, "DT-LF", robot->drivetrain->leftFront->get_position());
+  update_motor(this->motorRFLabel, "DT-RF", robot->drivetrain->rightFront->get_position());
+  update_motor(this->motorLBLabel, "DT-LB", robot->drivetrain->leftBack->get_position());
+  update_motor(this->motorRBLabel, "DT-RB", robot->drivetrain->rightBack->get_position());
   update_motor_digital(this->flywheelLabel, robot->flywheel->get_motor(), robot->flywheel->isEngaged(), "Flywheel");
   update_motor_digital(this->indexerLabel, robot->indexer->get_motor(), false, "Indexer");
-  update_motor_digital(this->intakeLabel, robot->intake->get_motor(), false, "Intake");
+  update_motor_digital(this->intakeLabel, robot->intake->get_motor(), false, "Intake/Roller");
   set_label_text(this->digitalSpeedLabel, "Digital Speed: %i", robot->controller->digital_speed());
 }
 
@@ -63,11 +64,11 @@ void update_motor_digital(lv_obj_t *label, pros::Motor *motor, bool engaged, con
   }
 }
 
-void update_motor(lv_obj_t *label, const char *name, int32_t voltage) {
-  if (voltage == INT32_MAX) {
+void update_motor(lv_obj_t *label, const char *name, double position) {
+  if (position == INT32_MAX) {
     set_label_text(label, "%s: Disconnected", name);
   } else {
-    set_label_text(label, "%s: %i", name, voltage);
+    set_label_text(label, "%s: %f", name, position);
   }
 }
 } // namespace screen

@@ -7,31 +7,20 @@
 #define DEBUG_LOG
 
 namespace logger {
-static std::vector<std::pair<const char *, uint32_t>> *sections = new std::vector<std::pair<const char *, uint32_t>>(); // stores the name and timestamp of sections.
+static std::vector<std::pair<const char *, uint32_t>> *sections =
+    new std::vector<std::pair<const char *, uint32_t>>(); // stores the name and timestamp of sections.
 
-void info(const char *string) {
-  std::cout << string << std::endl;
-}
+void info(const char *string) { std::cout << string << std::endl; }
 
-void info(const std::string &string) {
-  std::cout << string << std::endl;
-}
+void info(const std::string &string) { std::cout << string << std::endl; }
 
-void warn(const char *string) {
-  std::cout << string << std::endl;
-}
+void warn(const char *string) { std::cout << string << std::endl; }
 
-void warn(const std::string &string) {
-  std::cout << string << std::endl;
-}
+void warn(const std::string &string) { std::cout << string << std::endl; }
 
-void error(const char *string) {
-  std::cout << string << std::endl;
-}
+void error(const char *string) { std::cout << string << std::endl; }
 
-void error(const std::string &string) {
-  std::cout << string << std::endl;
-}
+void error(const std::string &string) { std::cout << string << std::endl; }
 
 void debug(const char *string) {
 #ifdef DEBUG_LOG

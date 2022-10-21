@@ -2,18 +2,22 @@
 #define ROBOT_INTAKE_HPP
 
 #include "pros/motors.hpp"
+#include "pros/optical.hpp"
 #include "robot/controller/controller.hpp"
+#include "configuration.hpp"
 
 namespace robot {
 /**
  * Represents the intake on the robot.
+ * Also controls the roller.
  */
 class Intake : public Updatable {
 private:
   /**
-   * The motor of the intake.
+   * The motor of the intake/roller.
    */
   pros::Motor *motor;
+  pros::Optical *optical;
 
   /**
    * Whether the intake is currently running.
@@ -25,7 +29,7 @@ public:
    * Creates a new intake with the specified motor.
    * @param motor the intake's motor.
    */
-  explicit Intake(pros::Motor *motor);
+  explicit Intake(pros::Motor *motor, pros::Optical *optical);
   virtual ~Intake();
 
   /**
@@ -39,6 +43,10 @@ public:
    * Stops providing power to run the motor. Does not immediately stop.
    */
   void disengage();
+
+  bool looking_at_roller();
+
+  void spin_until_colour(config::AllianceColour teamColour, uint32_t timeout);
 
   /**
    * Returns whether the intake is currently engaged (running).

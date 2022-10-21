@@ -8,6 +8,7 @@ void opcontrol(void);
 // CONFIG
 #define AUTONOMOUS
 #define SCREEN
+// #define SCREEN_CONFIG
 #define SCREEN_LOGGING
 #define SCREEN_DRIVETRAIN
 #define SCREEN_FLYWHEEL
@@ -39,8 +40,10 @@ void opcontrol(void);
 #endif
 
 #ifdef SCREEN
-// #include "screen/config.hpp"
 #include "screen/screen.hpp"
+#ifdef SCREEN_CONFIG
+#include "screen/config.hpp"
+#endif
 #ifdef AUTONOMOUS
 #include "screen/autonomous_select.hpp"
 #endif
@@ -66,7 +69,7 @@ Robot *get_or_create_robot();
 void initialize() {
   logger::push("Initialize");
   Robot *robot = get_or_create_robot();
-    std::cout << robot << std::endl;
+  std::cout << robot << std::endl;
 
   // Optionally disable autonomous for builds
 #ifdef AUTONOMOUS
@@ -83,7 +86,9 @@ void initialize() {
 #ifdef AUTONOMOUS
   screen::add_screen(new screen::AutonomousSelect());
 #endif
-  // screen::add_screen(new screen::Configuration());
+#ifdef SCREEN_CONFIG
+  screen::add_screen(new screen::Configuration());
+#endif
   screen::add_screen(new screen::Information());
 #ifdef SCREEN_DRIVETRAIN
   screen::add_screen(new screen::DrivetrainChart());
@@ -153,11 +158,9 @@ Robot *get_or_create_robot() {
                                      new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
                                      new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
                                      new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)),
-                      new Intake(new pros::Motor(INTAKE_MOTOR, INTAKE_GEARSET, false, ENCODER_UNITS)),
+                      new Intake(new pros::Motor(INTAKE_MOTOR, INTAKE_GEARSET, false, ENCODER_UNITS), new pros::Optical(ROLLER_OPTICAL)),
                       new Indexer(new pros::Motor(INDEXER_MOTOR, INDEXER_GEARSET, true, ENCODER_UNITS)),
-                      new Flywheel(new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, true, ENCODER_UNITS)),
-                      new Roller(new pros::Motor(ROLLER_MOTOR, ROLLER_GEARSET, false, ENCODER_UNITS),
-                                 new pros::Optical(ROLLER_OPTICAL)));
+                      new Flywheel(new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, true, ENCODER_UNITS)));
   }
   return robot;
 }

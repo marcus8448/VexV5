@@ -6,10 +6,7 @@
  * Can be changed via the V5 brain's screen.
  */
 namespace config {
-enum AllianceColour {
-  RED,
-  BLUE
-};
+enum AllianceColour { RED, BLUE };
 
 /**
  * The different control schemes for the drivetrain

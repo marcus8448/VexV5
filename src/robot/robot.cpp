@@ -2,13 +2,11 @@
 #include "logger.hpp"
 
 namespace robot {
-Robot::Robot(Drivetrain *drivetrain, Intake *intake, Indexer *indexer, Flywheel *flywheel, Roller * roller)
-    : drivetrain(drivetrain), intake(intake), indexer(indexer), flywheel(flywheel), roller(roller), controller(nullptr) {}
+Robot::Robot(Drivetrain *drivetrain, Intake *intake, Indexer *indexer, Flywheel *flywheel)
+    : drivetrain(drivetrain), intake(intake), indexer(indexer), flywheel(flywheel), controller(nullptr) {}
 
 Robot::~Robot() {
   logger::warn("Robot destructor called");
-  delete controller;
-  controller = nullptr;
   delete drivetrain;
   drivetrain = nullptr;
   delete intake;
@@ -17,13 +15,16 @@ Robot::~Robot() {
   indexer = nullptr;
   delete flywheel;
   flywheel = nullptr;
-  delete roller;
-  roller = nullptr;
+  delete controller;
+  controller = nullptr;
 }
 
 void Robot::update() const {
   if (this->controller != nullptr) {
     this->controller->update();
+    if (this->controller->a_pressed()) {
+      this->drivetrain->turn_right(1800);
+    }
     if (this->drivetrain != nullptr) {
       this->drivetrain->update(this->controller);
     } else {
@@ -43,11 +44,6 @@ void Robot::update() const {
       this->flywheel->update(this->controller);
     } else {
       logger::error("Flywheel is null?");
-    }
-    if (this->roller != nullptr) {
-      this->roller->update(this->controller);
-    } else {
-      logger::error("Roller is null?");
     }
   } else {
     logger::error("Controller is null!");
