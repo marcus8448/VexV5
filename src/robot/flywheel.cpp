@@ -37,6 +37,7 @@ void Flywheel::disengage() {
 }
 
 void Flywheel::update(Controller *controller) {
+  logger::info("%f", this->motor->get_actual_velocity());
   if (controller->r1_pressed()) {
     this->engage(controller->flywheel_speed());
   } else if (controller->r2_pressed()) {
@@ -50,7 +51,7 @@ void Flywheel::update(Controller *controller) {
     }
   }
   if (this->state == State::AT_SPEED) {
-    if (std::abs(std::abs(this->motor->get_actual_velocity()) - std::abs(this->motor->get_target_velocity())) > 75.0) {
+    if (std::abs(std::abs(this->motor->get_actual_velocity()) - std::abs(this->motor->get_target_velocity())) > 40.0) {
       this->state = State::SPINNING_UP;
     }
   }

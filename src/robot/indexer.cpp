@@ -69,14 +69,15 @@ void Indexer::update(Controller *controller) {
     this->push();
   }
   if (this->state == PUSHING) {
-    if (std::abs(this->motor->get_target_position() - this->motor->get_position()) < 3.0) {
+    this->motor->move_absolute(90.0, 150);
+    if (std::abs(90.0 - this->motor->get_position()) < 3.0) {
       this->state = PUSHED;
-      this->motor->move(0);
+      this->charge();
     }
   } else if (this->state == PUSHED) {
     this->charge();
   } else if (this->state == State::CHARGING) {
-    if (this->ticksInState > 10) {
+    if (this->ticksInState > 15) {
       if (this->motor->get_efficiency() < 1.0) {
         this->set_state(State::CHARGED);
         this->motor->tare_position();

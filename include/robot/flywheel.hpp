@@ -1,9 +1,10 @@
 #ifndef ROBOT_FLYWHEEL_HPP
 #define ROBOT_FLYWHEEL_HPP
 
-#include "constants.hpp"
 #include "pros/motors.hpp"
 #include "robot/controller/controller.hpp"
+
+#define FLYWHEEL_TARGET_SPEED 300
 
 namespace robot {
 /**

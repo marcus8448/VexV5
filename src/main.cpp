@@ -1,10 +1,3 @@
-extern "C" {
-void autonomous(void);
-void initialize(void);
-void disabled(void);
-void competition_initialize(void);
-void opcontrol(void);
-}
 // CONFIG
 #define AUTONOMOUS
 #define SCREEN
@@ -20,10 +13,10 @@ void opcontrol(void);
 #include "pros/motors.hpp"
 #include "pros/rtos.hpp"
 
+#include "main.hpp"
 #include "constants.hpp"
 #include "logger.hpp"
 #include "robot/controller/operator.hpp"
-#include "robot/robot.hpp"
 
 #ifdef AUTONOMOUS
 #include "robot/autonomous/autonomous.hpp"
@@ -60,8 +53,6 @@ void opcontrol(void);
 #endif
 
 using namespace robot;
-
-Robot *get_or_create_robot();
 
 /**
  * Called when the robot is first initialized.

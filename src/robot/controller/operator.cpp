@@ -143,7 +143,7 @@ void OpController::update() {
   this->rightStickY = print_error(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
 
   if (this->right_pressed()) {
-    this->flywheel_speed(std::min(this->flywheel_speed() + 1, static_cast<int32_t>(360)));
+    this->flywheel_speed(std::min(this->flywheel_speed() + 1, static_cast<int32_t>(400)));
   } else if (this->left_pressed()) {
     this->flywheel_speed(std::max(this->flywheel_speed() - 1, static_cast<int32_t>(0)));
   }
