@@ -17,7 +17,6 @@ private:
    * The motor of the intake/roller.
    */
   pros::Motor *motor;
-  pros::Optical *optical;
 
   /**
    * Whether the intake is currently running.
@@ -29,7 +28,7 @@ public:
    * Creates a new intake with the specified motor.
    * @param motor the intake's motor.
    */
-  explicit Intake(pros::Motor *motor, pros::Optical *optical);
+  explicit Intake(pros::Motor *motor);
   virtual ~Intake();
 
   /**
@@ -44,9 +43,7 @@ public:
    */
   void disengage();
 
-  bool looking_at_roller();
-
-  void spin_until_colour(config::AllianceColour teamColour, uint32_t timeout);
+  void hopefully_flip_state(config::AllianceColour teamColour, uint32_t timeout);
 
   /**
    * Returns whether the intake is currently engaged (running).

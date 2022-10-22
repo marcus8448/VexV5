@@ -161,8 +161,7 @@ Robot *get_or_create_robot() {
                                      new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
                                      new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
                                      new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)),
-                      new Intake(new pros::Motor(INTAKE_MOTOR, INTAKE_GEARSET, false, ENCODER_UNITS),
-                                 new pros::Optical(ROLLER_OPTICAL)),
+                      new Intake(new pros::Motor(INTAKE_MOTOR, INTAKE_GEARSET, false, ENCODER_UNITS)),
                       new Indexer(new pros::Motor(INDEXER_MOTOR, INDEXER_GEARSET, true, ENCODER_UNITS)),
                       new Flywheel(new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, true, ENCODER_UNITS)),
                       new Expansion(new pros::Motor(EXPANSION_MOTOR, EXPANSION_GEARSET, false, ENCODER_UNITS)));

@@ -9,56 +9,50 @@ Flywheel::~Flywheel() {
   this->motor = nullptr;
 }
 
-void Flywheel::engage(double flywheelSpeed) {
+void Flywheel::engage(int32_t flywheelSpeed, bool block) {
   this->motor->move_velocity(-flywheelSpeed);
-  this->engaged = true;
-  this->speedFor = 0;
-}
-
-void Flywheel::spinUp(bool block) {
-  this->motor->move_velocity(static_cast<int32_t>(MAX_SPEED));
-  this->engaged = true;
-
+  double actual = std::abs(this->motor->get_actual_velocity());
+  if (actual > flywheelSpeed) {
+    if (std::abs(actual - flywheelSpeed) < 10.0) {
+      this->state = State::AT_SPEED;
+    } else {
+      this->state = State::SPINNING_DOWN;
+    }
+  } else {
+    if (std::abs(actual - flywheelSpeed) < 10.0) {
+      this->state = State::AT_SPEED;
+    } else {
+      this->state = State::SPINNING_UP;
+    }
+  }
   if (block) {
     this->waitForSpeed();
   }
 }
 
 void Flywheel::disengage() {
-  this->engaged = false;
-  this->speedFor = 0;
+  this->state = State::IDLE;
   this->motor->move(0);
   this->motor->brake();
 }
 
-[[nodiscard]] bool Flywheel::isEngaged() const { return this->engaged; }
-
 void Flywheel::update(Controller *controller) {
-  if (this->isEngaged()) {
-    if (this->motor->get_target_velocity() != controller->flywheel_speed()) {
-      this->engage(controller->flywheel_speed());
-    }
-    if (this->speedFor != -1) {
-      if (this->speedFor == 10) {
-        controller->rumble("-");
-        controller->rumble("");
-        this->speedFor = -1;
-      }
-      if (this->isUpToSpeed()) {
-        this->speedFor++;
-      } else {
-        this->speedFor = 0;
-      }
-    } else {
-      if (this->motor->get_actual_velocity() > -290.0) {
-        this->speedFor = 0;
-      }
-    }
-  }
   if (controller->r1_pressed()) {
     this->engage(controller->flywheel_speed());
   } else if (controller->r2_pressed()) {
     this->disengage();
+  }
+  if (this->state == SPINNING_UP || this->state == SPINNING_DOWN) {
+    if (this->isUpToSpeed()) {
+      this->state = State::AT_SPEED;
+      controller->rumble("-");
+      controller->rumble("");
+    }
+  }
+  if (this->state == State::AT_SPEED) {
+    if (std::abs(std::abs(this->motor->get_actual_velocity()) - std::abs(this->motor->get_target_velocity())) > 75.0) {
+      this->state = State::SPINNING_UP;
+    }
   }
 }
 
@@ -66,19 +60,24 @@ void Flywheel::update(Controller *controller) {
 
 double Flywheel::getVelocity() { return this->motor->get_actual_velocity(); }
 
-bool Flywheel::isUpToSpeed() { return this->motor->get_actual_velocity() <= -DEFAULT_TARGET_SPEED; }
+bool Flywheel::isUpToSpeed() {
+  return std::abs(std::abs(this->motor->get_actual_velocity()) - std::abs(this->motor->get_target_velocity())) < 10.0;
+}
 
 void Flywheel::waitForSpeed(int millis_timeout) {
-  if (!this->engaged) {
-    logger::warn("Waiting for flywheel to speed up while it's off!");
+  if (this->state == State::IDLE) {
+    logger::error("Waiting for flywheel to speed up while it's off!");
+    return;
   }
   millis_timeout /= 50;
   int i = 0;
-  while (this->motor->get_actual_velocity() > -DEFAULT_TARGET_SPEED) {
+  int32_t target = std::abs(this->motor->get_target_velocity());
+  while (target - std::abs(this->motor->get_actual_velocity()) > 10.0) {
     if (i++ == millis_timeout) {
       break;
     }
-    pros::delay(50);
+    pros::delay(20);
   }
+  this->state = State::AT_SPEED;
 }
 } // namespace robot

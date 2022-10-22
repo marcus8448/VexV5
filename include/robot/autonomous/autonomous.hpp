@@ -16,9 +16,6 @@ public:
    * @param robot
    */
   virtual void run(Robot *robot) = 0;
-
-protected:
-  void wait(uint32_t millis);
 };
 
 /**

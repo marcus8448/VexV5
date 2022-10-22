@@ -1,6 +1,5 @@
 #include "robot/expansion.hpp"
 #include "logger.hpp"
-#include "pros/rtos.hpp"
 
 namespace robot {
 Expansion::Expansion(pros::Motor *motor) : motor(motor) { motor->set_brake_mode(pros::E_MOTOR_BRAKE_HOLD); }

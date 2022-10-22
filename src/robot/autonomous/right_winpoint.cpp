@@ -7,15 +7,18 @@ void RightWinpoint::run(Robot *robot) {
   robot->drivetrain->forwards(27.0);
   robot->drivetrain->turn_right(90.0);
   robot->drivetrain->forwards(2.0);
-  robot->drivetrain->forwards(1, DRIVETRAIN_MAX_RPM / 2.0, false);
-  robot->intake->spin_until_colour(config::get_alliance_colour(), 5000);
+  robot->drivetrain->forwards(2.0, DRIVETRAIN_DEFAULT_RPM / 2.0, false);
+  robot->intake->hopefully_flip_state(config::get_alliance_colour(), 5000);
+  robot->drivetrain->stop();
+  robot->drivetrain->tare();
   robot->flywheel->engage();
   robot->drivetrain->backwards(2.0);
   robot->drivetrain->turn_left(100.0);
-  this->wait(2000);
+  robot->flywheel->waitForSpeed();
   robot->indexer->cycle();
   robot->flywheel->waitForSpeed();
   robot->indexer->cycle();
-  this->wait(500);
+  pros::delay(500);
+  robot->flywheel->disengage();
 }
 } // namespace robot::autonomous

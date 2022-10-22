@@ -21,7 +21,7 @@ double in_to_e_units(double inches);
  */
 double turn_to_e_units(double degrees);
 
-double get_gearset_max_rpm(const pros::motor_gearset_e_t gearset);
+int32_t get_gearset_max_rpm(pros::motor_gearset_e_t gearset);
 
 /**
  * Tests if a file exists on the microSD filesystem.

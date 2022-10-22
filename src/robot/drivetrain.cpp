@@ -8,7 +8,7 @@
 #include <cmath>
 #include <cstdlib>
 
-#define MAX_MOTOR_VOLTAGE 122
+#define SAFE_MAX_MOTOR_VOLTAGE 125
 
 namespace robot {
 robot::Drivetrain::Drivetrain(pros::Motor *rightFront, pros::Motor *leftFront, pros::Motor *rightBack,
@@ -94,16 +94,16 @@ void robot::Drivetrain::update(Controller *controller) {
     auto left = static_cast<int32_t>(joystickY + joystickRotX);
     int32_t rOver = 0;
     int32_t lOver = 0;
-    if (right < -MAX_MOTOR_VOLTAGE) {
-      rOver = right + MAX_MOTOR_VOLTAGE;
-    } else if (right > MAX_MOTOR_VOLTAGE) {
-      rOver = right - MAX_MOTOR_VOLTAGE;
+    if (right < -SAFE_MAX_MOTOR_VOLTAGE) {
+      rOver = right + SAFE_MAX_MOTOR_VOLTAGE;
+    } else if (right > SAFE_MAX_MOTOR_VOLTAGE) {
+      rOver = right - SAFE_MAX_MOTOR_VOLTAGE;
     }
 
-    if (left < -MAX_MOTOR_VOLTAGE) {
-      lOver = left + MAX_MOTOR_VOLTAGE;
-    } else if (left > MAX_MOTOR_VOLTAGE) {
-      lOver = left - MAX_MOTOR_VOLTAGE;
+    if (left < -SAFE_MAX_MOTOR_VOLTAGE) {
+      lOver = left + SAFE_MAX_MOTOR_VOLTAGE;
+    } else if (left > SAFE_MAX_MOTOR_VOLTAGE) {
+      lOver = left - SAFE_MAX_MOTOR_VOLTAGE;
     }
     int32_t over = std::max(rOver, lOver);
     if (over > 0) {
@@ -136,13 +136,9 @@ void robot::Drivetrain::stop() const {
 
 void robot::Drivetrain::tare() const {
   this->rightFront->tare_position();
-  this->rightFront->move_absolute(0.0, DRIVETRAIN_MAX_RPM);
   this->leftFront->tare_position();
-  this->leftFront->move_absolute(0.0, DRIVETRAIN_MAX_RPM);
   this->rightBack->tare_position();
-  this->rightBack->move_absolute(0.0, DRIVETRAIN_MAX_RPM);
   this->leftBack->tare_position();
-  this->leftBack->move_absolute(0.0, DRIVETRAIN_MAX_RPM);
 }
 
 void Drivetrain::move_right(double distance, int32_t max_rpm) const {

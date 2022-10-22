@@ -1,11 +1,9 @@
 #ifndef ROBOT_FLYWHEEL_HPP
 #define ROBOT_FLYWHEEL_HPP
 
+#include "constants.hpp"
 #include "pros/motors.hpp"
 #include "robot/controller/controller.hpp"
-
-#define MAX_SPEED 600.0
-#define DEFAULT_TARGET_SPEED 330.0
 
 namespace robot {
 /**
@@ -13,6 +11,7 @@ namespace robot {
  */
 class Flywheel : public Updatable {
 private:
+  enum State { IDLE, SPINNING_UP, SPINNING_DOWN, AT_SPEED };
   /**
    * The motor of the flywheel.
    */
@@ -20,8 +19,7 @@ private:
   /**
    * Whether the flywheel is currently active.
    */
-  bool engaged = false;
-  int8_t speedFor = 0;
+  State state = State::IDLE;
 
 public:
   /**
@@ -35,9 +33,7 @@ public:
    * Engages the flywheel.
    * Sets the motor to run at max speed.
    */
-  void engage(double flywheelSpeed = 600.0);
-
-  void spinUp(bool block = false);
+  void engage(int32_t flywheelSpeed = FLYWHEEL_TARGET_SPEED, bool block = false);
 
   bool isUpToSpeed();
 
@@ -54,12 +50,6 @@ public:
    * @return the current velocity of the flywheel.
    */
   double getVelocity();
-
-  /**
-   * Returns whether the flywheel is currently active.
-   * @return whether the flywheel is currently active.
-   */
-  [[nodiscard]] bool isEngaged() const;
 
   [[nodiscard]] pros::Motor *get_motor() const;
 

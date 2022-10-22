@@ -2,23 +2,27 @@
 
 namespace robot::autonomous {
 void LeftWinpoint::run(Robot *robot) {
-  robot->drivetrain->backwards(1.5);
-  robot->intake->spin_until_colour(config::get_alliance_colour(), 5000);
+  robot->drivetrain->backwards(2.5);
+  robot->drivetrain->backwards(2.0, DRIVETRAIN_DEFAULT_RPM / 2, false);
+  robot->intake->hopefully_flip_state(config::get_alliance_colour(), 5000);
+  robot->drivetrain->stop();
+  robot->drivetrain->tare();
   robot->drivetrain->forwards(3.0);
   robot->drivetrain->turn_left(90.0);
   robot->drivetrain->backwards(27.2);
   robot->drivetrain->turn_left(90.0);
   robot->drivetrain->backwards(14);
   robot->intake->engage();
-  robot->drivetrain->backwards(12.8, 50.0);
-  robot->drivetrain->turn_right(180.0 - 25.7, DRIVETRAIN_MAX_RPM, false);
   robot->flywheel->engage();
-  this->wait(3000);
-  robot->indexer->cycle();
+  robot->drivetrain->backwards(12.8, 50.0);
+  robot->drivetrain->turn_right(180.0 - 25.7, DRIVETRAIN_DEFAULT_RPM, false);
   robot->flywheel->waitForSpeed();
   robot->indexer->cycle();
   robot->flywheel->waitForSpeed();
   robot->indexer->cycle();
-  this->wait(500);
+  robot->flywheel->waitForSpeed();
+  robot->indexer->cycle();
+  pros::delay(500);
+  robot->flywheel->disengage();
 }
 } // namespace robot::autonomous
