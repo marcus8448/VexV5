@@ -1,12 +1,26 @@
 #include "configuration.hpp"
 
 namespace config {
-static DrivetrainControlScheme controlScheme = DrivetrainControlScheme::TANK_DRIVE;
-static AllianceColour allianceColour = AllianceColour::RED;
+static Configuration *instance = new Configuration(AllianceColour::RED, DrivetrainControlScheme::TANK_DRIVE);
 
-[[nodiscard]] DrivetrainControlScheme get_drivetrain_control_scheme() { return controlScheme; }
+Configuration *get_instance() { return instance; }
 
-[[nodiscard]] const char *get_scheme_name(DrivetrainControlScheme scheme) {
+Configuration::Configuration(AllianceColour color, DrivetrainControlScheme scheme)
+    : allianceColour(color), drivetrainControlScheme(scheme) {}
+
+[[nodiscard]] DrivetrainControlScheme Configuration::get_drivetrain_control_scheme() {
+  return this->drivetrainControlScheme;
+}
+
+void Configuration::set_drivetrain_control_scheme(DrivetrainControlScheme scheme) {
+  this->drivetrainControlScheme = scheme;
+}
+
+AllianceColour Configuration::get_alliance_colour() { return this->allianceColour; }
+
+void Configuration::set_alliance_colour(AllianceColour colour) { this->allianceColour = colour; }
+
+[[nodiscard]] const char *get_drive_scheme_name(DrivetrainControlScheme scheme) {
   switch (scheme) {
   case TANK_DRIVE:
     return "Tank";
@@ -15,10 +29,6 @@ static AllianceColour allianceColour = AllianceColour::RED;
   }
   return "";
 }
-
-void set_drivetrain_control_scheme(DrivetrainControlScheme scheme) { controlScheme = scheme; }
-
-AllianceColour get_alliance_colour() { return allianceColour; }
 
 const char *get_alliance_colour_name(AllianceColour colour) {
   switch (colour) {
@@ -29,6 +39,4 @@ const char *get_alliance_colour_name(AllianceColour colour) {
   }
   return "";
 }
-
-void set_alliance_colour(AllianceColour colour) { allianceColour = colour; }
 } // namespace config

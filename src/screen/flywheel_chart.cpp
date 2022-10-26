@@ -17,22 +17,19 @@ extern void *canvasBuffer;
 FlywheelChart::FlywheelChart() { *enableCanvas = true; }
 
 void FlywheelChart::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
+  this->canvasWidth = static_cast<float>(width);
+  auto trueHeight = static_cast<lv_coord_t>(height - BASE_HEIGHT);
+  this->canvasHeight = static_cast<float>(trueHeight);
   this->velFlywheel.reserve(100);
   this->flywheelCanvas = lv_canvas_create(screen, nullptr);
   lv_obj_set_pos(this->flywheelCanvas, 0, 0);
-  lv_obj_set_size(this->flywheelCanvas, width, static_cast<lv_coord_t>(height - BASE_HEIGHT));
-  lv_canvas_set_buffer(this->flywheelCanvas, canvasBuffer, width, static_cast<lv_coord_t>(height - BASE_HEIGHT),
-                       CANVAS_COLOUR);
+  lv_obj_set_size(this->flywheelCanvas, width, trueHeight);
+  lv_canvas_set_buffer(this->flywheelCanvas, canvasBuffer, width, trueHeight, CANVAS_COLOUR);
 
   create_label(screen, 90, static_cast<lv_coord_t>(height - 32 - 4), static_cast<lv_coord_t>(width / 3), 16,
                "Flywheel (+)", create_text_color_style(screen::colour::BLUE));
   create_label(screen, 240, static_cast<lv_coord_t>(height - 32 - 4), static_cast<lv_coord_t>(width / 3), 16,
                "Flywheel (-)", create_text_color_style(screen::colour::ORANGE));
-}
-
-void FlywheelChart::initialize(lv_coord_t width, lv_coord_t height) {
-  this->canvasWidth = static_cast<float>(width);
-  this->canvasHeight = static_cast<float>(height - BASE_HEIGHT);
 }
 
 void FlywheelChart::update(robot::Robot *robot) {
@@ -62,6 +59,4 @@ void FlywheelChart::update(robot::Robot *robot) {
   }
   lv_obj_invalidate(this->flywheelCanvas);
 }
-
-void FlywheelChart::destroy(lv_obj_t *screen) { this->velFlywheel.clear(); }
 } // namespace screen

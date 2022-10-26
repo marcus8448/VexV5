@@ -1,21 +1,19 @@
 // CONFIG
 #define AUTONOMOUS
 #define SCREEN
-// #define SCREEN_CONFIG
+#define SCREEN_CONFIG
 #define SCREEN_LOGGING
 #define SCREEN_DRIVETRAIN
 #define SCREEN_FLYWHEEL
 // END CONFIG
 
-#include <iostream>
-
 #include "pros/misc.hpp"
 #include "pros/motors.hpp"
 #include "pros/rtos.hpp"
 
-#include "main.hpp"
 #include "constants.hpp"
 #include "logger.hpp"
+#include "main.hpp"
 #include "robot/controller/operator.hpp"
 
 #ifdef AUTONOMOUS
@@ -35,7 +33,7 @@
 #ifdef SCREEN
 #include "screen/screen.hpp"
 #ifdef SCREEN_CONFIG
-#include "screen/config.hpp"
+#include "screen/config_screen.hpp"
 #endif
 #ifdef AUTONOMOUS
 #include "screen/autonomous_select.hpp"
@@ -60,8 +58,6 @@ using namespace robot;
 void initialize() {
   logger::push("Initialize");
   Robot *robot = get_or_create_robot();
-  std::cout << robot << std::endl;
-
   // Optionally disable autonomous for builds
 #ifdef AUTONOMOUS
   // Register the different types of autonomous-es
@@ -79,7 +75,7 @@ void initialize() {
   screen::add_screen(new screen::AutonomousSelect());
 #endif
 #ifdef SCREEN_CONFIG
-  screen::add_screen(new screen::Configuration());
+  screen::add_screen(new screen::ConfigurationScreen());
 #endif
   screen::add_screen(new screen::Information());
 #ifdef SCREEN_DRIVETRAIN

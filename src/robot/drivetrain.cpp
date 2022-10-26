@@ -87,7 +87,7 @@ void robot::Drivetrain::move_left(int32_t voltage) const {
 }
 
 void robot::Drivetrain::update(Controller *controller) {
-  if (config::get_drivetrain_control_scheme() == config::DrivetrainControlScheme::ARCADE_DRIVE) {
+  if (config::get_instance()->get_drivetrain_control_scheme() == config::DrivetrainControlScheme::ARCADE_DRIVE) {
     double joystickRotX = controller->right_stick_x();
     double joystickY = controller->left_stick_y();
     auto right = static_cast<int32_t>(joystickY - joystickRotX);

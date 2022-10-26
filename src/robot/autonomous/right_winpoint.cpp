@@ -1,4 +1,5 @@
 #include "robot/autonomous/right_winpoint.hpp"
+#include "configuration.hpp"
 
 namespace robot::autonomous {
 void RightWinpoint::run(Robot *robot) {
@@ -8,7 +9,7 @@ void RightWinpoint::run(Robot *robot) {
   robot->drivetrain->turn_right(90.0);
   robot->drivetrain->forwards(2.0);
   robot->drivetrain->forwards(2.0, DRIVETRAIN_DEFAULT_RPM / 2.0, false);
-  robot->intake->hopefully_flip_state(config::get_alliance_colour(), 5000);
+  robot->intake->hopefully_flip_state(config::get_instance()->get_alliance_colour(), 5000);
   robot->drivetrain->stop();
   robot->drivetrain->tare();
   robot->flywheel->engage();

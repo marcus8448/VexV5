@@ -4,7 +4,7 @@ namespace robot::autonomous {
 void LeftWinpoint::run(Robot *robot) {
   robot->drivetrain->backwards(2.5);
   robot->drivetrain->backwards(2.0, DRIVETRAIN_DEFAULT_RPM / 2, false);
-  robot->intake->hopefully_flip_state(config::get_alliance_colour(), 5000);
+  robot->intake->hopefully_flip_state(config::get_instance()->get_alliance_colour(), 5000);
   robot->drivetrain->stop();
   robot->drivetrain->tare();
   robot->drivetrain->forwards(3.0);

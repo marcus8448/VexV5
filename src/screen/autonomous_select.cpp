@@ -14,7 +14,7 @@
 #include "display/lv_objx/lv_list.h"
 #pragma GCC diagnostic pop
 
-extern std::map<const char *, robot::autonomous::Autonomous *> *autonomousPrograms;
+extern std::map<const std::string, robot::autonomous::Autonomous *> *autonomousPrograms;
 namespace screen {
 static AutonomousSelect *instance = nullptr;
 static lv_style_t *default_style = nullptr;
@@ -39,7 +39,7 @@ void AutonomousSelect::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t hei
   lv_style_copy(default_style, &lv_style_btn_rel);
   bool init = false;
   for (auto const &[name, program] : *autonomousPrograms) {
-    lv_obj_t *btn = lv_list_add(this->selections, nullptr, name, drop);
+    lv_obj_t *btn = lv_list_add(this->selections, nullptr, name.c_str(), drop);
     lv_btn_set_action(btn, LV_BTN_ACTION_CLICK, ::screen::click);
     if (!init) {
       init = true;
@@ -53,11 +53,7 @@ void AutonomousSelect::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t hei
   instance = this;
 }
 
-void AutonomousSelect::initialize(lv_coord_t width, lv_coord_t height) {}
-
 void AutonomousSelect::update(robot::Robot *robot) {}
-
-void AutonomousSelect::destroy(lv_obj_t *screen) {}
 
 void AutonomousSelect::click(lv_obj_t *btn) {
   if (this->selected != btn) {

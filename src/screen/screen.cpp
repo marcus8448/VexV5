@@ -119,16 +119,14 @@ lv_res_t next_page([[maybe_unused]] lv_obj_t *btn) {
 }
 
 void init_screen(uint16_t screen) {
-  logger::push("Init screen");
+  logger::push("Show screen");
   lv_obj_set_hidden(screens->at(screen), false);
-  registry->at(screen)->initialize(width, height);
   logger::pop();
 }
 
 void destroy_screen(uint16_t screen) {
   logger::push("Drop screen");
   lv_obj_set_hidden(screens->at(screen), true);
-  registry->at(screen)->destroy(screens->at(screen));
   logger::pop();
 }
 } // namespace screen

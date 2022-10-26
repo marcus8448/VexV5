@@ -37,7 +37,6 @@ void Flywheel::disengage() {
 }
 
 void Flywheel::update(Controller *controller) {
-  logger::info("%f", this->motor->get_actual_velocity());
   if (controller->r1_pressed()) {
     this->engage(controller->flywheel_speed());
   } else if (controller->r2_pressed()) {

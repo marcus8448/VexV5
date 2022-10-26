@@ -17,7 +17,9 @@ extern void *canvasBuffer;
 DrivetrainChart::DrivetrainChart() { *enableCanvas = true; }
 
 void DrivetrainChart::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
+  this->canvasWidth = static_cast<float>(width);
   auto trueHeight = static_cast<lv_coord_t>(height - BASE_HEIGHT);
+  this->canvasHeight = static_cast<float>(trueHeight);
   this->drivetrainCanvas = lv_canvas_create(screen, nullptr);
   this->velMotorLF.reserve(100);
   this->velMotorRF.reserve(100);
@@ -47,11 +49,6 @@ void DrivetrainChart::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t heig
                qtrWidth, 16, "RB (+)", create_text_color_style(screen::colour::PINK));
   create_label(screen, static_cast<lv_coord_t>(16 + 32 + qtrWidth * 3), static_cast<lv_coord_t>(height - 16 - 6),
                qtrWidth, 16, "RB (-)", create_text_color_style(screen::colour::LIGHT_BLUE));
-}
-
-void DrivetrainChart::initialize(lv_coord_t width, lv_coord_t height) {
-  this->canvasWidth = static_cast<float>(width);
-  this->canvasHeight = static_cast<float>(height - BASE_HEIGHT);
 }
 
 void DrivetrainChart::update(robot::Robot *robot) {
@@ -118,12 +115,5 @@ void DrivetrainChart::update(robot::Robot *robot) {
     ++x;
   }
   lv_obj_invalidate(this->drivetrainCanvas);
-}
-
-void DrivetrainChart::destroy(lv_obj_t *screen) {
-  this->velMotorLF.clear();
-  this->velMotorRF.clear();
-  this->velMotorLB.clear();
-  this->velMotorRB.clear();
 }
 } // namespace screen

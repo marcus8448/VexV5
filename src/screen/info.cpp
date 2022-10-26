@@ -35,12 +35,10 @@ void Information::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) 
   this->digitalSpeedLabel = create_label(screen, halfWidth, 16 * 5, halfWidth, 16);
 }
 
-void Information::initialize(lv_coord_t width, lv_coord_t height) {}
-
 void Information::update(robot::Robot *robot) {
   set_label_text(this->uptimeLabel, "Uptime: %i", pros::millis());
   set_label_text(this->controlSchemeLabel, "Control Scheme: %s",
-                 config::get_scheme_name(config::get_drivetrain_control_scheme()));
+                 config::get_drive_scheme_name(config::get_instance()->get_drivetrain_control_scheme()));
   update_motor(this->motorLFLabel, "DT-LF", robot->drivetrain->leftFront->get_position());
   update_motor(this->motorRFLabel, "DT-RF", robot->drivetrain->rightFront->get_position());
   update_motor(this->motorLBLabel, "DT-LB", robot->drivetrain->leftBack->get_position());
@@ -51,8 +49,6 @@ void Information::update(robot::Robot *robot) {
   update_motor_digital(this->intakeLabel, robot->intake->get_motor(), false, "Intake/Roller");
   set_label_text(this->digitalSpeedLabel, "Flywheel Speed: %i", (int32_t)robot->controller->flywheel_speed());
 }
-
-void Information::destroy(lv_obj_t *screen) {}
 
 void update_motor_digital(lv_obj_t *label, pros::Motor *motor, bool engaged, const char *name) {
   if (motor == nullptr || motor->get_voltage() == INT32_MAX) {
