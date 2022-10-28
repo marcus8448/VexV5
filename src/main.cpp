@@ -1,10 +1,13 @@
 // CONFIG
 #define AUTONOMOUS
+
 #define SCREEN
 #define SCREEN_CONFIG
 #define SCREEN_LOGGING
 #define SCREEN_DRIVETRAIN
 #define SCREEN_FLYWHEEL
+
+// #define SERIAL_LINK
 // END CONFIG
 
 #include "pros/misc.hpp"
@@ -25,9 +28,12 @@
 #include "robot/autonomous/right_winpoint.hpp"
 #endif
 
+#include "pros/apix.h"
+
 #ifdef SERIAL_LINK
 #include "serial/serial.hpp"
-#include "serial_plugins.hpp"
+#include "serial/robot_command.hpp"
+#include "serial/robot_state.hpp"
 #endif
 
 #ifdef SCREEN

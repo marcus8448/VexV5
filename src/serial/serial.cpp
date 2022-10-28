@@ -102,7 +102,7 @@ void timeout_hack(void *params) {
   }
 }
 
-void add_plugin(const int16_t id, SerialPlugin *plugin) {
+void add_plugin(const uint16_t id, SerialPlugin *plugin) {
   plugins->emplace(id, plugin);
   plugin->register_packets(registry);
 }

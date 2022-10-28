@@ -51,7 +51,7 @@ public:
   virtual void register_packets(IdRegistry *registry) = 0;
 };
 
-void add_plugin(uint16_t id, SerialPlugin *plugin);
+void add_plugin(const uint16_t id, SerialPlugin *plugin);
 
 void initialize();
 } // namespace serial
