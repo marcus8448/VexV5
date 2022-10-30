@@ -19,6 +19,9 @@ public:
   uint16_t register_packet(const char *name, SerialPlugin *plugin);
   const char *get_name(uint16_t id);
   uint16_t get_id(const char *name);
+
+private:
+  uint16_t register_internal(const char *name);
 };
 
 class SerialConnection {
@@ -40,6 +43,9 @@ public:
   void sync_output();
   size_t available();
   void skip_to_end();
+
+  void send_header();
+  void send_suffix();
 
   uint16_t read_variable(void *ptr, uint16_t len);
 };

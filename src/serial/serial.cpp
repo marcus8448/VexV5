@@ -1,7 +1,10 @@
 #include <cstring>
 #include <fstream>
+#include <ios>
 #include <iostream>
+#include <iterator>
 #include <map>
+#include <ostream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -51,8 +54,8 @@ void timeout_hack(void *params) {
 /**
  * Handles debug commands.
  */
-[[noreturn]] void debug_input_task([[maybe_unused]] void *params) {
-  SerialConnection *connection = create_serial_connection();
+[[noreturn]] void debug_input_task(void *params) {
+  auto *connection = static_cast<SerialConnection *>(params);
   for (const auto &[k, v] : *plugins) {
     v->initialize();
   }
@@ -111,19 +114,15 @@ void initialize() {
   if (buffer == nullptr) {
     buffer = malloc(512);
   }
-  pros::Task(debug_input_task, nullptr, "Debug Input Task");
+  pros::Task(debug_input_task, create_serial_connection(), "Debug Input Task");
 }
 
 SerialConnection *create_serial_connection() {
-  static std::ostringstream bufferFromProgram; // logs from the running activeProgram.
-  static std::istringstream bufferToProgram;   // input to be passed to the activeProgram.
-
-  static std::streambuf *outputBuf = std::cout.rdbuf(bufferFromProgram.rdbuf()); // send data through the serial port
-  static std::streambuf *inputBuf = std::cin.rdbuf(bufferToProgram.rdbuf());     // read data from the serial port
-  static auto *connection = new SerialConnection(outputBuf, inputBuf, registry);
+  static SerialConnection *connection = nullptr;
   pros::c::serctl(SERCTL_DISABLE_COBS, nullptr);
-  bufferFromProgram.clear();
-  bufferToProgram.clear();
+  if (connection == nullptr) {
+    connection = new SerialConnection(std::cout.rdbuf(), std::cin.rdbuf(), registry);
+  }
   connection->skip_to_end();
   return connection;
 }
@@ -131,11 +130,25 @@ SerialConnection *create_serial_connection() {
 IdRegistry::IdRegistry()
     : idToName(new std::map<const uint16_t, const char *>()),
       idToPlugin(new std::map<const uint16_t, SerialPlugin *>()),
-      nameToId(new std::map<const char *, const uint16_t>()) {}
+      nameToId(new std::map<const char *, const uint16_t>()) {
+  this->register_internal(SERIAL_RESERVED);
+  this->register_internal(SERIAL_CONNECT);
+  this->register_internal(SERIAL_RECEIVED);
+  this->register_internal(SERIAL_RESPONSE);
+  this->register_internal(SERIAL_DISCONNECT);
+}
 
 uint16_t IdRegistry::register_packet(const char *name, SerialPlugin *plugin) {
   this->idToName->emplace(this->size, name);
   this->idToPlugin->emplace(this->size, plugin);
+  this->nameToId->emplace(name, this->size);
+
+  return this->size++;
+}
+
+uint16_t IdRegistry::register_internal(const char *name) {
+  this->idToName->emplace(this->size, name);
+  this->idToPlugin->emplace(this->size, nullptr);
   this->nameToId->emplace(name, this->size);
 
   return this->size++;
@@ -170,6 +183,10 @@ void SerialConnection::read_null_term(char *ptr, const uint16_t read) {
 
 void SerialConnection::sync_output() { this->output->pubsync(); }
 
+void SerialConnection::send_suffix() {
+  this->output->sputn("#\n", 3);
+}
+
 size_t SerialConnection::available() { return this->input->in_avail(); }
 
 void SerialConnection::skip_to_end() {
@@ -178,16 +195,26 @@ void SerialConnection::skip_to_end() {
   }
 }
 
+void SerialConnection::send_header() {
+  this->output->sputn("^#", 2);
+}
+
 void SerialConnection::send(const char *name, const void *data, const uint16_t len) {
   auto id = this->registry->get_id(name);
+  this->send_header();
   this->output->sputn(reinterpret_cast<const char *>(&id), sizeof(uint16_t));
   this->output->sputn(reinterpret_cast<const char *>(&len), sizeof(uint16_t));
   this->output->sputn(static_cast<const char *>(data), len);
+  this->send_suffix();
 }
 
 void SerialConnection::send_exact(const void *data, const uint16_t len) {
+  this->send_header();
   this->output->sputn(reinterpret_cast<const char *>(data), len);
+  this->send_suffix();
 }
 
-void SerialConnection::send_exact(const uint16_t data) { this->send_exact(&data, sizeof(uint16_t)); }
+void SerialConnection::send_exact(const uint16_t data) {
+   this->send_exact(&data, sizeof(uint16_t));
+    }
 } // namespace serial

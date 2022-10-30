@@ -64,6 +64,12 @@ using namespace robot;
 void initialize() {
   logger::push("Initialize");
   Robot *robot = get_or_create_robot();
+#ifdef SERIAL_LINK
+  logger::warn("Initializing serial connection...");
+  serial::add_plugin(6, new serial::RobotStatePlugin(robot));
+  serial::add_plugin(7, new serial::RobotCommandsPlugin(robot));
+  serial::initialize();
+#endif // SERIAL_LINK
   // Optionally disable autonomous for builds
 #ifdef AUTONOMOUS
   // Register the different types of autonomous-es
@@ -97,11 +103,6 @@ void initialize() {
   screen::initialize(robot); // initialize the screen
   logger::pop();
 #endif // SCREEN
-#ifdef SERIAL_LINK
-  serial::add_plugin(0, new serial::RobotStatePlugin(robot));
-  serial::add_plugin(1, new serial::RobotCommandsPlugin(robot));
-  serial::initialize();
-#endif // SERIAL_LINK
   logger::pop();
 }
 

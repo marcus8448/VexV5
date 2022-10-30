@@ -81,3 +81,9 @@ add_custom_command(
         POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} -O binary ${BIN_DIR}/hot.package.elf ${BIN_DIR}/hot.package.bin
 )
+
+add_custom_command(
+        TARGET HotPackage
+        POST_BUILD
+        COMMAND ${CMAKE_STRIP} --strip-symbol=_PROS_COMPILE_DIRECTORY --strip-symbol=_PROS_COMPILE_TIMESTAMP --strip-symbol=_PROS_COMPILE_TIMESTAMP_INT ${BIN_DIR}/hot.package.elf
+)
