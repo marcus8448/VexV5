@@ -30,8 +30,8 @@ void Intake::disengage() {
 
 void Intake::hopefully_flip_state(config::AllianceColour teamColour, uint32_t timeout) {
   this->motor->move(50);
-  pros::delay(500);
-  return;
+  pros::delay(750);
+  this->motor->move(0);
   //  if (!looking_at_roller()) {
   //    logger::warn("Spinning roller while not in view?");
   //  }

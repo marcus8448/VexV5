@@ -8,10 +8,8 @@ void RightWinpoint::run(Robot *robot) {
   robot->drivetrain->forwards(27.0);
   robot->drivetrain->turn_right(90.0);
   robot->drivetrain->forwards(2.0);
-  robot->drivetrain->forwards(2.0, DRIVETRAIN_DEFAULT_RPM / 2.0, false);
+  robot->drivetrain->forwards(5.0, DRIVETRAIN_DEFAULT_RPM / 2.0, false);
   robot->intake->hopefully_flip_state(config::get_instance()->get_alliance_colour(), 5000);
-  robot->drivetrain->stop();
-  robot->drivetrain->tare();
   robot->flywheel->engage();
   robot->drivetrain->backwards(2.0);
   robot->drivetrain->turn_left(100.0);

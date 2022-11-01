@@ -46,7 +46,7 @@ void robot::Drivetrain::move(double right_distance, double left_distance, int32_
   this->move_right(right_distance, max_rpm);
   this->move_left(left_distance, max_rpm);
   if (block) {
-    while (!this->is_offset_within(2.0)) {
+    while (!this->is_offset_within(5.0)) {
       pros::delay(50);
     }
     pros::delay(25);
