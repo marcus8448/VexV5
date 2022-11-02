@@ -1,5 +1,4 @@
 #include "util.hpp"
-#include "pros/motors.h"
 #include <cstdio>
 
 double in_to_e_units(double inches) { return inches / WHEEL_CIRCUMFERENCE * 360.0; }

@@ -6,6 +6,7 @@
 #include <cstdint>
 
 #define DRIVETRAIN_DEFAULT_RPM 100
+#define DRIVETRAIN_DEFAULT_TIMEOUT 5000
 
 namespace robot {
 /**
@@ -35,7 +36,7 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while moving.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void forwards(double distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM, bool block = true);
+  void forwards(double distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM);
 
   /**
    * Drives the robot backwards by the specified distance.
@@ -43,7 +44,7 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while moving.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void backwards(double distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM, bool block = true);
+  void backwards(double distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM);
 
   /**
    * Turns the robot to the right by spinning by the specified number of degrees.
@@ -51,7 +52,7 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while turning.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void turn_right(double degrees, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM, bool block = true);
+  void turn_right(double degrees, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM);
 
   /**
    * Turns the robot to the left by spinning by the specified number of degrees.
@@ -59,26 +60,15 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while turning.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void turn_left(double degrees, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM, bool block = true);
+  void turn_left(double degrees, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM);
 
-  /**
-   * Moves the two right motors of the drivetrain at the specified voltage.
-   * @param voltage The voltage to run at [-127 - 127]
-   */
-  void move_right(double percent);
-
-  /**
-   * Moves the two left motors of the drivetrain at the specified voltage.
-   * @param voltage The voltage to run at [-127 - 127]
-   */
-  void move_left(double percent);
+  void await_move(int16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT) const;
 
   /**
    * Checks if the distance between the drivetrain's target position and actual position is within a specific distance.
-   * @param distance The maximum allowable offset from the target position.
    * @return Whether the distance between the drivetrain's target position and actual position is in the desired range.
    */
-  [[nodiscard]] bool is_at_target(double distance) const;
+  [[nodiscard]] bool is_at_target() const;
 
   /**
    * Resets the all of the motors' absolute position trackers.
@@ -100,19 +90,31 @@ private:
    * @param max_rpm The maximum allowable RPM for the motor to run at while moving.
    * @param block Whether this function should wait for the robot to move or exit immediately.
    */
-  void move(double right_distance, double left_distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM, bool block = true);
+  void move(double right_distance, double left_distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM);
+
+  /**
+   * Moves the two right motors of the drivetrain at the specified voltage.
+   * @param voltage The voltage to run at [-127 - 127]
+   */
+  void power_right(double percent);
+
+  /**
+   * Moves the two left motors of the drivetrain at the specified voltage.
+   * @param voltage The voltage to run at [-127 - 127]
+   */
+  void power_left(double percent);
 
   /**
    * Moves the two right motors of the drivetrain by the specified distance.
    * @param distance The distance in ENCODER UNITS to move the right motors by.
    */
-  void move_right_distance(double distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM);
+  void move_right_distance(double distance, int32_t max_rpm);
 
   /**
    * Moves the two left motors of the drivetrain by the specified distance.
    * @param distance The distance in ENCODER UNITS to move the right motors by.
    */
-  void move_left_distance(double distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM);
+  void move_left_distance(double distance, int32_t max_rpm);
 };
 } // namespace robot
 #endif // ROBOT_DRIVETRAIN_HPP

@@ -1,8 +1,8 @@
 #ifndef ROBOT_FLYWHEEL_HPP
 #define ROBOT_FLYWHEEL_HPP
 
-#include "pros/motors.hpp"
 #include "robot/controller/controller.hpp"
+#include "robot/device/motor.hpp"
 
 #define FLYWHEEL_TARGET_SPEED 300
 
@@ -16,7 +16,7 @@ private:
   /**
    * The motor of the flywheel.
    */
-  pros::Motor *motor;
+  device::Motor motor;
   /**
    * Whether the flywheel is currently active.
    */
@@ -27,7 +27,7 @@ public:
    * Creates a new flywheel with the specified motor.
    * @param motor The motor of the flywheel.
    */
-  explicit Flywheel(pros::Motor *motor);
+  explicit Flywheel(uint8_t port);
   virtual ~Flywheel();
 
   /**
@@ -52,7 +52,7 @@ public:
    */
   double getVelocity();
 
-  [[nodiscard]] pros::Motor *get_motor() const;
+  [[nodiscard]] device::Motor get_motor() const;
 
   void update(Controller *controller) override;
 };

@@ -2,8 +2,8 @@
 #define ROBOT_EXPANSION_HPP
 
 #include "configuration.hpp"
-#include "robot/device/motor.hpp"
 #include "robot/controller/controller.hpp"
+#include "robot/device/motor.hpp"
 
 namespace robot {
 /**

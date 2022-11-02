@@ -1,4 +1,14 @@
 // CONFIG
+#define FLYWHEEL_MOTOR 3
+#define INTAKE_MOTOR 1
+#define INDEXER_MOTOR 19
+
+#define RIGHT_FRONT_MOTOR 4
+#define LEFT_FRONT_MOTOR 12
+#define RIGHT_BACK_MOTOR 9
+#define LEFT_BACK_MOTOR 20
+#define EXPANSION_MOTOR 6
+
 #define AUTONOMOUS
 
 #define SCREEN
@@ -10,13 +20,8 @@
 // #define SERIAL_LINK
 // END CONFIG
 
-#include "pros/misc.hpp"
-#include "pros/motors.hpp"
-#include "pros/rtos.hpp"
-
-#include "constants.hpp"
-#include "logger.hpp"
 #include "main.hpp"
+#include "logger.hpp"
 #include "robot/controller/operator.hpp"
 
 #ifdef AUTONOMOUS
@@ -152,9 +157,7 @@ Robot *get_or_create_robot() {
   if (robot == nullptr) {        // check if robot exists
     // otherwise, create the robot
     robot = new Robot(new Drivetrain(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR),
-                      new Intake(INTAKE_MOTOR),
-                      new Indexer(INDEXER_MOTOR),
-                      new Flywheel(new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, true, ENCODER_UNITS)),
+                      new Intake(INTAKE_MOTOR), new Indexer(INDEXER_MOTOR), new Flywheel(FLYWHEEL_MOTOR),
                       new Expansion(EXPANSION_MOTOR));
   }
   return robot;

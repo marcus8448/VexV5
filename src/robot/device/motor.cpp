@@ -13,7 +13,7 @@
 #define MOTOR_ENCODER_UNITS pros::E_MOTOR_ENCODER_DEGREES
 
 namespace robot::device {
-Motor::Motor(const pros::Motor motor)
+Motor::Motor(pros::Motor motor)
     : motor(std::move(motor)), gearset(this->motor.get_gearing()), maxVelocity(get_gearset_max_velocity(this->gearset)),
       brakeMode(this->motor.get_brake_mode()), reversed(this->motor.is_reversed()), port(this->motor.get_port()) {
   if (this->motor.get_encoder_units() != MOTOR_ENCODER_UNITS) {
@@ -36,7 +36,7 @@ Motor::Motor(const uint8_t port, bool reversed)
   this->motor.set_brake_mode(DEFAULT_MOTOR_BRAKE);
 }
 
-Motor::~Motor() {}
+Motor::~Motor() = default;
 
 void Motor::move_velocity(int32_t target_velocity) {
   if (target_velocity > this->maxVelocity) {
@@ -57,7 +57,7 @@ void Motor::move_millivolts(const int16_t target_voltage) {
     this->target = target_voltage;
     this->targetType = TargetType::VOLTAGE;
     this->targetPosition = INFINITY;
-    this->motor.move(target_voltage);
+    this->motor.move_voltage(target_voltage);
   }
 }
 
@@ -67,7 +67,7 @@ void Motor::move_percentage(double percent) {
   } else if (percent < -100.0) {
     percent = -100.0;
   }
-  this->move_millivolts(static_cast<int32_t>(percent * MAX_MILLIVOLTS));
+  this->move_millivolts(static_cast<int16_t>(percent * MAX_MILLIVOLTS));
 }
 
 void Motor::move_absolute(double target_position, int32_t target_velocity) {
@@ -85,7 +85,7 @@ void Motor::move_absolute(double target_position, int32_t target_velocity) {
   }
 }
 
-void Motor::move_realative(double target_position, int32_t target_velocity) {
+void Motor::move_relative(double target_position, int32_t target_velocity) {
   if (target_velocity > this->maxVelocity) {
     target_velocity = this->maxVelocity;
   } else if (target_velocity < -this->maxVelocity) {
@@ -100,7 +100,7 @@ void Motor::move_realative(double target_position, int32_t target_velocity) {
   }
 }
 
-void Motor::move_realative_target(double target_position, int32_t target_velocity) {
+void Motor::move_relative_target(double target_position, int32_t target_velocity) {
   if (target_velocity > this->maxVelocity) {
     target_velocity = this->maxVelocity;
   } else if (target_velocity < -this->maxVelocity) {
@@ -136,14 +136,14 @@ void Motor::await_velocity(int32_t target_velocity, int16_t timeout_millis) cons
 
 [[nodiscard]] int32_t Motor::get_target_velocity() const {
   if (this->targetType != TargetType::VELOCITY) {
-    logger::error("Requested target velocity while motor is targetting voltage!");
+    logger::error("Requested target velocity while motor is targeting voltage!");
   }
   return this->target;
 }
 
 [[nodiscard]] int32_t Motor::get_target_voltage() const {
   if (this->targetType != TargetType::VOLTAGE) {
-    logger::error("Requested target voltage while motor is targetting velocity!");
+    logger::error("Requested target voltage while motor is targeting velocity!");
   }
   return this->target;
 }
@@ -159,6 +159,8 @@ void Motor::await_velocity(int32_t target_velocity, int16_t timeout_millis) cons
 [[nodiscard]] bool Motor::is_reversed() const { return this->reversed; }
 
 [[nodiscard]] uint8_t Motor::get_port() const { return this->port; }
+
+double Motor::get_temperature() const { return this->motor.get_temperature(); }
 
 void Motor::await_target(int16_t timeout_millis) const {
   for (uint16_t i = 0; i < timeout_millis / TEST_FREQUENCY; i++) {
@@ -182,7 +184,7 @@ void Motor::stop() { this->move_millivolts(0); }
 
 [[nodiscard]] Motor::TargetType Motor::get_target_type() const { return this->targetType; }
 
-const pros::Motor Motor::get_raw_motor() const { return this->motor; }
+pros::Motor Motor::get_raw_motor() const { return this->motor; }
 
 int32_t get_gearset_max_velocity(const pros::motor_gearset_e_t gearset) {
   switch (gearset) {

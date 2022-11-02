@@ -1,9 +1,10 @@
-#include "logger.hpp"
 #include "robot/expansion.hpp"
+#include "logger.hpp"
 #include "robot/device/motor.hpp"
 
 namespace robot {
-Expansion::Expansion(uint8_t port) : motor(device::Motor(port, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, false)) {}
+Expansion::Expansion(uint8_t port)
+    : motor(device::Motor(port, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, false)) {}
 
 Expansion::~Expansion() = default;
 

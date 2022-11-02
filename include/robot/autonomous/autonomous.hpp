@@ -24,9 +24,7 @@ public:
  * @param autonomous The autonomous run
  */
 void register_autonomous(const char *name, Autonomous *autonomous);
-void register_autonomous(const std::string name, Autonomous *autonomous);
 void set_active(const char *program);
-void set_active(const std::string program);
 
 /**
  * Returns the selected autonomous run.

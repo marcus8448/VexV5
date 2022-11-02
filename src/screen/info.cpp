@@ -43,8 +43,8 @@ void Information::update(robot::Robot *robot) {
   update_motor(this->motorRFLabel, "DT-RF", robot->drivetrain->rightFront.get_position());
   update_motor(this->motorLBLabel, "DT-LB", robot->drivetrain->leftBack.get_position());
   update_motor(this->motorRBLabel, "DT-RB", robot->drivetrain->rightBack.get_position());
-  update_motor(this->flywheelLabel, "Flywheel", robot->flywheel->get_motor()->get_actual_velocity());
-  update_motor(this->flywheelTempLabel, "Flywheel Temp", robot->flywheel->get_motor()->get_temperature());
+  update_motor(this->flywheelLabel, "Flywheel", robot->flywheel->get_motor().get_velocity());
+  update_motor(this->flywheelTempLabel, "Flywheel Temp", robot->flywheel->get_motor().get_temperature());
   update_motor_digital(this->indexerLabel, robot->indexer->get_motor().get_raw_motor(), false, "Indexer");
   update_motor_digital(this->intakeLabel, robot->intake->get_motor().get_raw_motor(), false, "Intake/Roller");
   set_label_text(this->digitalSpeedLabel, "Flywheel Speed: %i", (int32_t)robot->controller->flywheel_speed());

@@ -1,5 +1,4 @@
 #include "robot/intake.hpp"
-#include "logger.hpp"
 #include "pros/optical.hpp"
 #include "robot/device/motor.hpp"
 

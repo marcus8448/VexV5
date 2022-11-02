@@ -5,47 +5,47 @@
 namespace robot::controller {
 OpController::OpController(pros::Controller controller) : controller(controller) {}
 
-uint16_t OpController::a_pressed() const { return this->a; }
+[[nodiscard]] uint16_t OpController::a_pressed() const { return this->a; }
 
-uint16_t OpController::b_pressed() const { return this->b; }
+[[nodiscard]] uint16_t OpController::b_pressed() const { return this->b; }
 
-uint16_t OpController::x_pressed() const { return this->x; }
+[[nodiscard]] uint16_t OpController::x_pressed() const { return this->x; }
 
-uint16_t OpController::y_pressed() const { return this->y; }
+[[nodiscard]] uint16_t OpController::y_pressed() const { return this->y; }
 
-uint16_t OpController::up_pressed() const { return this->up; }
+[[nodiscard]] uint16_t OpController::up_pressed() const { return this->up; }
 
-uint16_t OpController::down_pressed() const { return this->down; }
+[[nodiscard]] uint16_t OpController::down_pressed() const { return this->down; }
 
-uint16_t OpController::left_pressed() const { return this->left; }
+[[nodiscard]] uint16_t OpController::left_pressed() const { return this->left; }
 
-uint16_t OpController::right_pressed() const { return this->right; }
+[[nodiscard]] uint16_t OpController::right_pressed() const { return this->right; }
 
-uint16_t OpController::l1_pressed() const { return this->l1; }
+[[nodiscard]] uint16_t OpController::l1_pressed() const { return this->l1; }
 
-uint16_t OpController::l2_pressed() const { return this->l2; }
+[[nodiscard]] uint16_t OpController::l2_pressed() const { return this->l2; }
 
-uint16_t OpController::r1_pressed() const { return this->r1; }
+[[nodiscard]] uint16_t OpController::r1_pressed() const { return this->r1; }
 
-uint16_t OpController::r2_pressed() const { return this->r2; }
+[[nodiscard]] uint16_t OpController::r2_pressed() const { return this->r2; }
 
-double OpController::left_stick_x() const { return this->leftStickX; }
+[[nodiscard]] double OpController::left_stick_x() const { return this->leftStickX; }
 
-double OpController::left_stick_y() const { return this->leftStickY; }
+[[nodiscard]] double OpController::left_stick_y() const { return this->leftStickY; }
 
-double OpController::right_stick_x() const { return this->rightStickX; }
+[[nodiscard]] double OpController::right_stick_x() const { return this->rightStickX; }
 
-double OpController::right_stick_y() const { return this->rightStickY; }
+[[nodiscard]] double OpController::right_stick_y() const { return this->rightStickY; }
 
-double OpController::prev_left_stick_x() const { return this->prevLeftStickX; }
+[[nodiscard]] double OpController::prev_left_stick_x() const { return this->prevLeftStickX; }
 
-double OpController::prev_left_stick_y() const { return this->prevLeftStickY; }
+[[nodiscard]] double OpController::prev_left_stick_y() const { return this->prevLeftStickY; }
 
-double OpController::prev_right_stick_x() const { return this->prevRightStickX; }
+[[nodiscard]] double OpController::prev_right_stick_x() const { return this->prevRightStickX; }
 
-double OpController::prev_right_stick_y() const { return this->prevRightStickY; }
+[[nodiscard]] double OpController::prev_right_stick_y() const { return this->prevRightStickY; }
 
-int32_t OpController::flywheel_speed() const { return this->flywheelSpeed; }
+[[nodiscard]] int32_t OpController::flywheel_speed() const { return this->flywheelSpeed; }
 
 void OpController::flywheel_speed(int32_t speed) { this->flywheelSpeed = speed; }
 

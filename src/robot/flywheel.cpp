@@ -2,16 +2,14 @@
 #include "logger.hpp"
 
 namespace robot {
-Flywheel::Flywheel(pros::Motor *motor) : motor(motor) { motor->set_brake_mode(pros::E_MOTOR_BRAKE_COAST); }
+Flywheel::Flywheel(uint8_t port)
+    : motor(device::Motor(port, pros::E_MOTOR_GEARSET_36, pros::E_MOTOR_BRAKE_COAST, true)) {}
 
-Flywheel::~Flywheel() {
-  free(this->motor);
-  this->motor = nullptr;
-}
+Flywheel::~Flywheel() = default;
 
 void Flywheel::engage(int32_t flywheelSpeed, bool block) {
-  this->motor->move_velocity(-flywheelSpeed);
-  double actual = std::abs(this->motor->get_actual_velocity());
+  this->motor.move_velocity(flywheelSpeed);
+  double actual = std::abs(this->motor.get_velocity());
   if (actual > flywheelSpeed) {
     if (std::abs(actual - flywheelSpeed) < 10.0) {
       this->state = State::AT_SPEED;
@@ -25,6 +23,7 @@ void Flywheel::engage(int32_t flywheelSpeed, bool block) {
       this->state = State::SPINNING_UP;
     }
   }
+
   if (block) {
     this->waitForSpeed();
   }
@@ -32,8 +31,7 @@ void Flywheel::engage(int32_t flywheelSpeed, bool block) {
 
 void Flywheel::disengage() {
   this->state = State::IDLE;
-  this->motor->move(0);
-  this->motor->brake();
+  this->motor.stop();
 }
 
 void Flywheel::update(Controller *controller) {
@@ -50,18 +48,18 @@ void Flywheel::update(Controller *controller) {
     }
   }
   if (this->state == State::AT_SPEED) {
-    if (std::abs(std::abs(this->motor->get_actual_velocity()) - std::abs(this->motor->get_target_velocity())) > 40.0) {
+    if (std::abs(std::abs(this->motor.get_velocity()) - std::abs(this->motor.get_target_velocity())) > 40.0) {
       this->state = State::SPINNING_UP;
     }
   }
 }
 
-[[nodiscard]] pros::Motor *Flywheel::get_motor() const { return this->motor; }
+[[nodiscard]] device::Motor Flywheel::get_motor() const { return this->motor; }
 
-double Flywheel::getVelocity() { return this->motor->get_actual_velocity(); }
+double Flywheel::getVelocity() { return this->motor.get_velocity(); }
 
 bool Flywheel::isUpToSpeed() {
-  return std::abs(std::abs(this->motor->get_actual_velocity()) - std::abs(this->motor->get_target_velocity())) < 10.0;
+  return std::abs(std::abs(this->motor.get_velocity()) - std::abs(this->motor.get_target_velocity())) < 10.0;
 }
 
 void Flywheel::waitForSpeed(int millis_timeout) {
@@ -71,8 +69,8 @@ void Flywheel::waitForSpeed(int millis_timeout) {
   }
   millis_timeout /= 50;
   int i = 0;
-  int32_t target = std::abs(this->motor->get_target_velocity());
-  while (target - std::abs(this->motor->get_actual_velocity()) > 10.0) {
+  int32_t target = std::abs(this->motor.get_target_velocity());
+  while (target - std::abs(this->motor.get_velocity()) > 10.0) {
     if (i++ == millis_timeout) {
       break;
     }

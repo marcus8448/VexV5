@@ -1,5 +1,6 @@
 #include "screen/config_screen.hpp"
 #include "configuration.hpp"
+#include "logger.hpp"
 #include "screen/colour.hpp"
 #include "screen/lvgl_util.hpp"
 
@@ -36,14 +37,11 @@ void ConfigurationScreen::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t 
 void ConfigurationScreen::update(robot::Robot *robot) {}
 
 void ConfigurationScreen::update_drive_scheme_label() {
-  switch (config::get_instance()->get_drivetrain_control_scheme()) {
-  case config::DrivetrainControlScheme::ARCADE_DRIVE:
-    lv_label_set_text(this->driveSchemeBtnLbl, "Control Scheme: Arcade");
-    break;
-  case config::DrivetrainControlScheme::TANK_DRIVE:
-    lv_label_set_text(this->driveSchemeBtnLbl, "Control Scheme: Tank");
-    break;
-  }
+  lv_label_set_text(
+      this->driveSchemeBtnLbl,
+      logger::string_format("Control Scheme: %s",
+                            config::get_drive_scheme_name(config::get_instance()->get_drivetrain_control_scheme()))
+          .c_str());
 }
 
 void ConfigurationScreen::update_alliance_colour_label() {

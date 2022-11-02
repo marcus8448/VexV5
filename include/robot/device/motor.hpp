@@ -11,7 +11,7 @@ class Motor {
   enum TargetType { VOLTAGE, VELOCITY };
 
 private:
-  const pros::Motor motor;
+  pros::Motor motor;
 
   TargetType targetType = TargetType::VOLTAGE;
   int32_t target = 0;
@@ -26,7 +26,7 @@ private:
   const uint8_t port;
 
 public:
-  explicit Motor(const pros::Motor motor);
+  explicit Motor(pros::Motor motor);
   explicit Motor(uint8_t port, pros::motor_gearset_e_t gearset = pros::E_MOTOR_GEARSET_18,
                  pros::motor_brake_mode_e_t brake_mode = pros::E_MOTOR_BRAKE_BRAKE, bool reversed = false);
   explicit Motor(uint8_t port, bool reversed = false);
@@ -38,10 +38,10 @@ public:
   void move_percentage(double percent);
 
   void move_absolute(double target_position, int32_t target_velocity);
-  void move_realative(double target_position, int32_t target_velocity);
-  void move_realative_target(double target_position, int32_t target_velocity);
+  void move_relative(double target_position, int32_t target_velocity);
+  void move_relative_target(double target_position, int32_t target_velocity);
 
-  bool is_at_velocity(int32_t target_velocity) const;
+  [[nodiscard]] bool is_at_velocity(int32_t target_velocity) const;
   void await_velocity(int32_t target_velocity, int16_t timeout_millis = MOTOR_TIMEOUT_MILLIS) const;
 
   [[nodiscard]] double get_velocity() const;
@@ -57,6 +57,8 @@ public:
   [[nodiscard]] bool is_reversed() const;
   [[nodiscard]] uint8_t get_port() const;
 
+  [[nodiscard]] double get_temperature() const;
+
   void await_target(int16_t timeout_millis = MOTOR_TIMEOUT_MILLIS) const;
   [[nodiscard]] bool is_at_target() const;
 
@@ -64,7 +66,7 @@ public:
   void stop();
 
   [[nodiscard]] Motor::TargetType get_target_type() const;
-  const pros::Motor get_raw_motor() const;
+  [[nodiscard]] pros::Motor get_raw_motor() const;
 };
 
 int32_t get_gearset_max_velocity(pros::motor_gearset_e_t gearset);
