@@ -1,25 +1,21 @@
-#include "robot/expansion.hpp"
 #include "logger.hpp"
+#include "robot/expansion.hpp"
+#include "robot/device/motor.hpp"
 
 namespace robot {
-Expansion::Expansion(pros::Motor *motor) : motor(motor) { motor->set_brake_mode(pros::E_MOTOR_BRAKE_HOLD); }
+Expansion::Expansion(uint8_t port) : motor(device::Motor(port, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, false)) {}
 
-Expansion::~Expansion() {
-  free(this->motor);
-  this->motor = nullptr;
-}
+Expansion::~Expansion() = default;
 
 void Expansion::launch() {
   logger::info("launching expansion");
-  motor->set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-  this->motor->move_absolute(0.0, 250.0);
+  this->motor.move_absolute(0.0, 250.0);
   this->charged = false;
 }
 
 void Expansion::charge() {
   logger::info("charging expansion");
-  motor->set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-  this->motor->move_absolute(155.0, 25.0);
+  this->motor.move_absolute(155.0, 25.0);
   this->charged = true;
 }
 
@@ -29,11 +25,10 @@ void Expansion::update(Controller *controller) {
   if (controller->y_pressed()) {
     this->launch();
   }
-  if (!this->charged && this->motor->get_position() < 0.0) {
-    this->motor->move(0);
-    this->motor->brake();
+  if (!this->charged && this->motor.get_position() < 0.0) {
+    this->motor.stop();
   }
 }
 
-[[nodiscard]] pros::Motor *Expansion::get_motor() const { return this->motor; }
+[[nodiscard]] device::Motor Expansion::get_motor() const { return this->motor; }
 } // namespace robot

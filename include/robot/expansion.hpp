@@ -2,7 +2,7 @@
 #define ROBOT_EXPANSION_HPP
 
 #include "configuration.hpp"
-#include "pros/motors.hpp"
+#include "robot/device/motor.hpp"
 #include "robot/controller/controller.hpp"
 
 namespace robot {
@@ -15,7 +15,7 @@ private:
   /**
    * The motor of the expansion/roller.
    */
-  pros::Motor *motor;
+  device::Motor motor;
 
   /**
    * Whether the mechanism has been released.
@@ -27,7 +27,7 @@ public:
    * Creates a new expansion with the specified motor.
    * @param motor the expansion's motor.
    */
-  explicit Expansion(pros::Motor *motor);
+  explicit Expansion(uint8_t port);
   virtual ~Expansion();
 
   void launch();
@@ -36,7 +36,7 @@ public:
 
   [[nodiscard]] bool has_launched() const;
 
-  [[nodiscard]] pros::Motor *get_motor() const;
+  [[nodiscard]] device::Motor get_motor() const;
 
   void update(Controller *controller) override;
 };

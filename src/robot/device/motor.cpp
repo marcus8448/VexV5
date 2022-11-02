@@ -7,27 +7,43 @@
 
 #define TEST_FREQUENCY 50
 
+#define MAX_MILLIVOLTS 12000
+#define DEFAULT_MOTOR_GEARSET pros::E_MOTOR_GEARSET_18
+#define DEFAULT_MOTOR_BRAKE pros::E_MOTOR_BRAKE_BRAKE
+#define MOTOR_ENCODER_UNITS pros::E_MOTOR_ENCODER_DEGREES
+
 namespace robot::device {
-Motor::Motor(const pros::Motor motor): motor(std::move(motor)), gearset(this->motor.get_gearing()), brakeMode(this->motor.get_brake_mode()), reversed(this->motor.is_reversed()), port(this->motor.get_port()) {
-  if (this->motor.get_encoder_units() != pros::E_MOTOR_ENCODER_DEGREES) {
+Motor::Motor(const pros::Motor motor)
+    : motor(std::move(motor)), gearset(this->motor.get_gearing()), maxVelocity(get_gearset_max_velocity(this->gearset)),
+      brakeMode(this->motor.get_brake_mode()), reversed(this->motor.is_reversed()), port(this->motor.get_port()) {
+  if (this->motor.get_encoder_units() != MOTOR_ENCODER_UNITS) {
     logger::error("Converting motor to degrees encoder units!");
-    this->motor.set_encoder_units(pros::E_MOTOR_ENCODER_DEGREES);
+    this->motor.set_encoder_units(MOTOR_ENCODER_UNITS);
   }
 }
 
 Motor::Motor(const uint8_t port, const pros::motor_gearset_e_t gearset, const pros::motor_brake_mode_e_t brake_mode,
-             bool reversed): motor(pros::Motor(static_cast<int8_t>(port), gearset, reversed, pros::E_MOTOR_ENCODER_DEGREES)), gearset(gearset), brakeMode(brake_mode), reversed(reversed), port(port) {
+             bool reversed)
+    : motor(pros::Motor(static_cast<int8_t>(port), gearset, reversed, MOTOR_ENCODER_UNITS)), gearset(gearset),
+      maxVelocity(get_gearset_max_velocity(this->gearset)), brakeMode(brake_mode), reversed(reversed), port(port) {
   this->motor.set_brake_mode(brake_mode);
 }
 
-Motor::Motor(const uint8_t port, bool reversed): motor(pros::Motor(static_cast<int8_t>(port), pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, pros::E_MOTOR_ENCODER_DEGREES)), gearset(pros::E_MOTOR_GEARSET_18), brakeMode(pros::E_MOTOR_BRAKE_BRAKE), reversed(reversed), port(port) {
-  this->motor.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+Motor::Motor(const uint8_t port, bool reversed)
+    : motor(pros::Motor(static_cast<int8_t>(port), DEFAULT_MOTOR_GEARSET, DEFAULT_MOTOR_BRAKE, MOTOR_ENCODER_UNITS)),
+      gearset(DEFAULT_MOTOR_GEARSET), maxVelocity(get_gearset_max_velocity(this->gearset)),
+      brakeMode(DEFAULT_MOTOR_BRAKE), reversed(reversed), port(port) {
+  this->motor.set_brake_mode(DEFAULT_MOTOR_BRAKE);
 }
 
-Motor::~Motor() {
-}
+Motor::~Motor() {}
 
-void Motor::move_velocity(const int32_t target_velocity) {
+void Motor::move_velocity(int32_t target_velocity) {
+  if (target_velocity > this->maxVelocity) {
+    target_velocity = this->maxVelocity;
+  } else if (target_velocity < -this->maxVelocity) {
+    target_velocity = -this->maxVelocity;
+  }
   if (this->targetType != TargetType::VELOCITY && this->target != target_velocity) {
     this->target = target_velocity;
     this->targetType = TargetType::VELOCITY;
@@ -36,16 +52,31 @@ void Motor::move_velocity(const int32_t target_velocity) {
   }
 }
 
-void Motor::move_voltage(const int32_t target_voltage) {
+void Motor::move_millivolts(const int16_t target_voltage) {
   if (this->targetType != TargetType::VOLTAGE && this->target != target_voltage) {
     this->target = target_voltage;
     this->targetType = TargetType::VOLTAGE;
     this->targetPosition = INFINITY;
-    this->motor.move_voltage(target_voltage);
+    this->motor.move(target_voltage);
   }
 }
 
+void Motor::move_percentage(double percent) {
+  if (percent > 100.0) {
+    percent = 100.0;
+  } else if (percent < -100.0) {
+    percent = -100.0;
+  }
+  this->move_millivolts(static_cast<int32_t>(percent * MAX_MILLIVOLTS));
+}
+
 void Motor::move_absolute(double target_position, int32_t target_velocity) {
+  if (target_velocity > this->maxVelocity) {
+    target_velocity = this->maxVelocity;
+  } else if (target_velocity < -this->maxVelocity) {
+    target_velocity = -this->maxVelocity;
+  }
+
   if (this->targetPosition != target_position) {
     this->targetType = TargetType::VELOCITY;
     this->target = target_velocity;
@@ -55,6 +86,12 @@ void Motor::move_absolute(double target_position, int32_t target_velocity) {
 }
 
 void Motor::move_realative(double target_position, int32_t target_velocity) {
+  if (target_velocity > this->maxVelocity) {
+    target_velocity = this->maxVelocity;
+  } else if (target_velocity < -this->maxVelocity) {
+    target_velocity = -this->maxVelocity;
+  }
+
   if (this->targetPosition != target_position) {
     this->targetType = TargetType::VELOCITY;
     this->target = target_velocity;
@@ -64,6 +101,12 @@ void Motor::move_realative(double target_position, int32_t target_velocity) {
 }
 
 void Motor::move_realative_target(double target_position, int32_t target_velocity) {
+  if (target_velocity > this->maxVelocity) {
+    target_velocity = this->maxVelocity;
+  } else if (target_velocity < -this->maxVelocity) {
+    target_velocity = -this->maxVelocity;
+  }
+
   if (this->targetPosition != target_position) {
     this->targetType = TargetType::VELOCITY;
     this->target = target_velocity;
@@ -81,18 +124,15 @@ bool Motor::is_at_velocity(int32_t target_velocity) const {
 
 void Motor::await_velocity(int32_t target_velocity, int16_t timeout_millis) const {
   for (uint16_t i = 0; i < timeout_millis / TEST_FREQUENCY; i++) {
-    if (this->is_at_velocity(target_velocity)) break;
+    if (this->is_at_velocity(target_velocity))
+      break;
     pros::delay(TEST_FREQUENCY);
   }
 }
 
-[[nodiscard]] double Motor::get_velocity() const {
-  return this->motor.get_actual_velocity();
-}
+[[nodiscard]] double Motor::get_velocity() const { return this->motor.get_actual_velocity(); }
 
-[[nodiscard]] double Motor::get_efficiency() const {
-  return this->motor.get_efficiency();
-}
+[[nodiscard]] double Motor::get_efficiency() const { return this->motor.get_efficiency(); }
 
 [[nodiscard]] int32_t Motor::get_target_velocity() const {
   if (this->targetType != TargetType::VELOCITY) {
@@ -108,33 +148,22 @@ void Motor::await_velocity(int32_t target_velocity, int16_t timeout_millis) cons
   return this->target;
 }
 
-[[nodiscard]] double Motor::get_position() const {
-  return this->motor.get_position();
-}
+[[nodiscard]] double Motor::get_position() const { return this->motor.get_position(); }
 
-[[nodiscard]] double Motor::get_target_position() const {
-  return this->targetPosition;
-}
+[[nodiscard]] double Motor::get_target_position() const { return this->targetPosition; }
 
-[[nodiscard]] pros::motor_brake_mode_e_t Motor::get_brake_mode() const {
-  return this->brakeMode;
-}
+[[nodiscard]] pros::motor_brake_mode_e_t Motor::get_brake_mode() const { return this->brakeMode; }
 
-[[nodiscard]] pros::motor_gearset_e_t Motor::get_gearset() const {
-  return this->gearset;
-}
+[[nodiscard]] pros::motor_gearset_e_t Motor::get_gearset() const { return this->gearset; }
 
-[[nodiscard]] bool Motor::is_reversed() const {
-  return this->reversed;
-}
+[[nodiscard]] bool Motor::is_reversed() const { return this->reversed; }
 
-[[nodiscard]] uint8_t Motor::get_port() const {
-  return this->port;
-}
+[[nodiscard]] uint8_t Motor::get_port() const { return this->port; }
 
 void Motor::await_target(int16_t timeout_millis) const {
   for (uint16_t i = 0; i < timeout_millis / TEST_FREQUENCY; i++) {
-    if (this->is_at_target()) break;
+    if (this->is_at_target())
+      break;
     pros::delay(TEST_FREQUENCY);
   }
 }
@@ -147,19 +176,25 @@ void Motor::await_target(int16_t timeout_millis) const {
   }
 }
 
-void Motor::tare() {
-  this->motor.tare_position();
-}
+void Motor::tare() { this->motor.tare_position(); }
 
-void Motor::stop() {
-  this->move_voltage(0);
-}
+void Motor::stop() { this->move_millivolts(0); }
 
-[[nodiscard]] TargetType Motor::get_target_type() const {
-  return this->targetType;
-}
+[[nodiscard]] Motor::TargetType Motor::get_target_type() const { return this->targetType; }
 
-const pros::Motor Motor::get_raw_motor() const {
-  return this->motor;
+const pros::Motor Motor::get_raw_motor() const { return this->motor; }
+
+int32_t get_gearset_max_velocity(const pros::motor_gearset_e_t gearset) {
+  switch (gearset) {
+  case pros::E_MOTOR_GEARSET_36:
+    return 100;
+  case pros::E_MOTOR_GEARSET_18:
+    return 200;
+  case pros::E_MOTOR_GEARSET_06:
+    return 600;
+  case pros::E_MOTOR_GEARSET_INVALID:
+    return 0;
+  }
+  return 0;
 }
 } // namespace robot::device

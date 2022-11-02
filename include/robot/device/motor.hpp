@@ -7,12 +7,9 @@
 #define MOTOR_TIMEOUT_MILLIS 4000
 
 namespace robot::device {
-enum TargetType {
-  VOLTAGE,
-  VELOCITY
-};
-
 class Motor {
+  enum TargetType { VOLTAGE, VELOCITY };
+
 private:
   const pros::Motor motor;
 
@@ -22,19 +19,23 @@ private:
   double prev_target = INFINITY;
 
   const pros::motor_gearset_e_t gearset;
+  const int32_t maxVelocity;
   pros::motor_brake_mode_e_t brakeMode;
   bool reversed;
 
   const uint8_t port;
+
 public:
   explicit Motor(const pros::Motor motor);
-  explicit Motor(uint8_t port, pros::motor_gearset_e_t gearset = pros::E_MOTOR_GEARSET_18, pros::motor_brake_mode_e_t brake_mode = pros::E_MOTOR_BRAKE_BRAKE, bool reversed = false);
+  explicit Motor(uint8_t port, pros::motor_gearset_e_t gearset = pros::E_MOTOR_GEARSET_18,
+                 pros::motor_brake_mode_e_t brake_mode = pros::E_MOTOR_BRAKE_BRAKE, bool reversed = false);
   explicit Motor(uint8_t port, bool reversed = false);
 
   ~Motor();
 
   void move_velocity(int32_t target_velocity);
-  void move_voltage(int32_t target_voltage);
+  void move_millivolts(int16_t target_voltage);
+  void move_percentage(double percent);
 
   void move_absolute(double target_position, int32_t target_velocity);
   void move_realative(double target_position, int32_t target_velocity);
@@ -62,8 +63,10 @@ public:
   void tare();
   void stop();
 
-  [[nodiscard]] TargetType get_target_type() const;
+  [[nodiscard]] Motor::TargetType get_target_type() const;
   const pros::Motor get_raw_motor() const;
 };
+
+int32_t get_gearset_max_velocity(pros::motor_gearset_e_t gearset);
 } // namespace robot::device
 #endif // VEXV5_ROBOT_DEVICE_MOTOR_HPP

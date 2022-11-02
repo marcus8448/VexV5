@@ -33,8 +33,7 @@ void ConfigurationScreen::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t 
   instance = this;
 }
 
-void ConfigurationScreen::update(robot::Robot *robot) {
-}
+void ConfigurationScreen::update(robot::Robot *robot) {}
 
 void ConfigurationScreen::update_drive_scheme_label() {
   switch (config::get_instance()->get_drivetrain_control_scheme()) {
@@ -76,10 +75,9 @@ lv_res_t switch_drive_scheme(lv_obj_t *btn) {
 }
 
 lv_res_t switch_alliance_colour(lv_obj_t *btn) {
-  config::get_instance()->set_alliance_colour(config::get_instance()->get_alliance_colour() ==
-                                                                config::AllianceColour::RED
-                                                            ? config::AllianceColour::BLUE
-                                                            : config::AllianceColour::RED);
+  config::get_instance()->set_alliance_colour(
+      config::get_instance()->get_alliance_colour() == config::AllianceColour::RED ? config::AllianceColour::BLUE
+                                                                                   : config::AllianceColour::RED);
   instance->update_alliance_colour_label();
   return LV_RES_INV;
 }

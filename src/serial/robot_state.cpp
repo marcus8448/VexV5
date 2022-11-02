@@ -10,32 +10,32 @@ RobotStatePlugin::RobotStatePlugin(robot::Robot *robot) : robot(robot) {}
 
 void RobotStatePlugin::initialize() {}
 
-void serialize_motor(uint8_t *buffer, pros::Motor *motor) {
+void serialize_motor(uint8_t *buffer, const pros::Motor motor) {
   floating src;
-  src = motor->get_target_position();
+  src = motor.get_target_position();
   std::memcpy(&buffer[sizeof(floating) * 0], &src, sizeof(floating));
-  src = motor->get_actual_velocity();
+  src = motor.get_actual_velocity();
   std::memcpy(&buffer[sizeof(floating) * 1], &src, sizeof(floating));
-  src = motor->get_position();
+  src = motor.get_position();
   std::memcpy(&buffer[sizeof(floating) * 2], &src, sizeof(floating));
-  src = motor->get_efficiency();
+  src = motor.get_efficiency();
   std::memcpy(&buffer[sizeof(floating) * 3], &src, sizeof(floating));
-  src = motor->get_power();
+  src = motor.get_power();
   std::memcpy(&buffer[sizeof(floating) * 4], &src, sizeof(floating));
-  src = motor->get_temperature();
+  src = motor.get_temperature();
   std::memcpy(&buffer[sizeof(floating) * 5], &src, sizeof(floating));
-  src = motor->get_torque();
+  src = motor.get_torque();
   std::memcpy(&buffer[sizeof(floating) * 6], &src, sizeof(floating));
   uint32_t i_src;
-  i_src = motor->get_target_velocity();
+  i_src = motor.get_target_velocity();
   std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 0], &i_src, sizeof(int));
-  i_src = motor->get_current_draw();
+  i_src = motor.get_current_draw();
   std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 1], &i_src, sizeof(int));
-  i_src = motor->get_voltage();
+  i_src = motor.get_voltage();
   std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 2], &i_src, sizeof(int));
-  i_src = motor->get_current_limit();
+  i_src = motor.get_current_limit();
   std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 3], &i_src, sizeof(int));
-  i_src = motor->get_voltage_limit();
+  i_src = motor.get_voltage_limit();
   std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 4], &i_src, sizeof(int));
 }
 
@@ -80,10 +80,10 @@ void RobotStatePlugin::handle(serial::SerialConnection *connection, void *buffer
   src = static_cast<float>(this->robot->controller->right_stick_y());
   std::memcpy(&buf[3 + sizeof(float) * 3], &src, sizeof(float));
 
-  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 0], this->robot->drivetrain->rightFront);
-  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 1], this->robot->drivetrain->leftFront);
-  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 2], this->robot->drivetrain->rightBack);
-  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 3], this->robot->drivetrain->leftBack);
+  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 0], this->robot->drivetrain->rightFront.get_raw_motor());
+  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 1], this->robot->drivetrain->leftFront.get_raw_motor());
+  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 2], this->robot->drivetrain->rightBack.get_raw_motor());
+  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 3], this->robot->drivetrain->leftBack.get_raw_motor());
   connection->send(SERIAL_ROBOT_STATE, &buf, SIZE);
 }
 

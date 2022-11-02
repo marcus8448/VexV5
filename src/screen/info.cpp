@@ -9,7 +9,7 @@
 #pragma GCC diagnostic pop
 
 namespace screen {
-void update_motor_digital(lv_obj_t *label, pros::Motor *motor, bool engaged, const char *name);
+void update_motor_digital(lv_obj_t *label, const pros::Motor motor, bool engaged, const char *name);
 void update_motor(lv_obj_t *label, const char *name, double position);
 
 Information::Information() = default;
@@ -39,19 +39,19 @@ void Information::update(robot::Robot *robot) {
   set_label_text(this->uptimeLabel, "Uptime: %i", pros::millis());
   set_label_text(this->controlSchemeLabel, "Control Scheme: %s",
                  config::get_drive_scheme_name(config::get_instance()->get_drivetrain_control_scheme()));
-  update_motor(this->motorLFLabel, "DT-LF", robot->drivetrain->leftFront->get_position());
-  update_motor(this->motorRFLabel, "DT-RF", robot->drivetrain->rightFront->get_position());
-  update_motor(this->motorLBLabel, "DT-LB", robot->drivetrain->leftBack->get_position());
-  update_motor(this->motorRBLabel, "DT-RB", robot->drivetrain->rightBack->get_position());
+  update_motor(this->motorLFLabel, "DT-LF", robot->drivetrain->leftFront.get_position());
+  update_motor(this->motorRFLabel, "DT-RF", robot->drivetrain->rightFront.get_position());
+  update_motor(this->motorLBLabel, "DT-LB", robot->drivetrain->leftBack.get_position());
+  update_motor(this->motorRBLabel, "DT-RB", robot->drivetrain->rightBack.get_position());
   update_motor(this->flywheelLabel, "Flywheel", robot->flywheel->get_motor()->get_actual_velocity());
   update_motor(this->flywheelTempLabel, "Flywheel Temp", robot->flywheel->get_motor()->get_temperature());
-  update_motor_digital(this->indexerLabel, robot->indexer->get_motor(), false, "Indexer");
-  update_motor_digital(this->intakeLabel, robot->intake->get_motor(), false, "Intake/Roller");
+  update_motor_digital(this->indexerLabel, robot->indexer->get_motor().get_raw_motor(), false, "Indexer");
+  update_motor_digital(this->intakeLabel, robot->intake->get_motor().get_raw_motor(), false, "Intake/Roller");
   set_label_text(this->digitalSpeedLabel, "Flywheel Speed: %i", (int32_t)robot->controller->flywheel_speed());
 }
 
-void update_motor_digital(lv_obj_t *label, pros::Motor *motor, bool engaged, const char *name) {
-  if (motor == nullptr || motor->get_voltage() == INT32_MAX) {
+void update_motor_digital(lv_obj_t *label, const pros::Motor motor, bool engaged, const char *name) {
+  if (motor.get_voltage() == INT32_MAX) {
     set_label_text(label, "%s: Disconnected", name);
   } else {
     if (engaged) {

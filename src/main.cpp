@@ -31,9 +31,9 @@
 #include "pros/apix.h"
 
 #ifdef SERIAL_LINK
-#include "serial/serial.hpp"
 #include "serial/robot_command.hpp"
 #include "serial/robot_state.hpp"
+#include "serial/serial.hpp"
 #endif
 
 #ifdef SCREEN
@@ -151,14 +151,11 @@ Robot *get_or_create_robot() {
   static Robot *robot = nullptr; // stored forever
   if (robot == nullptr) {        // check if robot exists
     // otherwise, create the robot
-    robot = new Robot(new Drivetrain(new pros::Motor(RIGHT_FRONT_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
-                                     new pros::Motor(LEFT_FRONT_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS),
-                                     new pros::Motor(RIGHT_BACK_MOTOR, DRIVETRAIN_GEARSET, false, ENCODER_UNITS),
-                                     new pros::Motor(LEFT_BACK_MOTOR, DRIVETRAIN_GEARSET, true, ENCODER_UNITS)),
-                      new Intake(new pros::Motor(INTAKE_MOTOR, INTAKE_GEARSET, false, ENCODER_UNITS)),
-                      new Indexer(new pros::Motor(INDEXER_MOTOR, INDEXER_GEARSET, true, ENCODER_UNITS)),
+    robot = new Robot(new Drivetrain(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR),
+                      new Intake(INTAKE_MOTOR),
+                      new Indexer(INDEXER_MOTOR),
                       new Flywheel(new pros::Motor(FLYWHEEL_MOTOR, FLYWHEEL_GEARSET, true, ENCODER_UNITS)),
-                      new Expansion(new pros::Motor(EXPANSION_MOTOR, EXPANSION_GEARSET, false, ENCODER_UNITS)));
+                      new Expansion(EXPANSION_MOTOR));
   }
   return robot;
 }

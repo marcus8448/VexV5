@@ -1,37 +1,33 @@
 #include "robot/intake.hpp"
 #include "logger.hpp"
 #include "pros/optical.hpp"
+#include "robot/device/motor.hpp"
 
 namespace robot {
 
-Intake::Intake(pros::Motor *motor) : motor(motor) { this->motor->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE); }
+Intake::Intake(uint8_t port) : motor(device::Motor(port, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, false)) {}
 
-Intake::~Intake() {
-  free(this->motor);
-  this->motor = nullptr;
-  //  free(this->optical);
-  //  this->optical = nullptr;
-}
+Intake::~Intake() = default;
 
 void Intake::engage() {
-  this->motor->move(-127);
+  this->motor.move_millivolts(12000);
   this->engaged = true;
 }
 
 void Intake::reverse() {
-  this->motor->move(127);
+  this->motor.move_millivolts(-12000);
   this->engaged = true;
 }
 
 void Intake::disengage() {
   this->engaged = false;
-  this->motor->brake();
+  this->motor.stop();
 }
 
 void Intake::hopefully_flip_state(config::AllianceColour teamColour, uint32_t timeout) {
-  this->motor->move(50);
+  this->motor.move_millivolts(-4800);
   pros::delay(750);
-  this->motor->move(0);
+  this->motor.stop();
   //  if (!looking_at_roller()) {
   //    logger::warn("Spinning roller while not in view?");
   //  }
@@ -61,7 +57,7 @@ void Intake::hopefully_flip_state(config::AllianceColour teamColour, uint32_t ti
 
 [[nodiscard]] bool Intake::isEngaged() const { return this->engaged; }
 
-[[nodiscard]] pros::Motor *Intake::get_motor() const { return this->motor; }
+[[nodiscard]] device::Motor Intake::get_motor() const { return this->motor; }
 
 void Intake::update(Controller *controller) {
   if (controller->l1_pressed() && controller->l2_pressed()) {

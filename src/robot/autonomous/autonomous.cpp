@@ -8,9 +8,7 @@ std::map<const std::string, robot::autonomous::Autonomous *> *autonomousPrograms
 namespace robot::autonomous {
 static const char *activeProgram = nullptr;
 
-void register_autonomous(const char *name, Autonomous *program) {
-  register_autonomous(std::string(name), program);
-}
+void register_autonomous(const char *name, Autonomous *program) { register_autonomous(std::string(name), program); }
 
 void register_autonomous(const std::string name, Autonomous *program) {
   logger::info("Registering autonomous '%s'.", name);

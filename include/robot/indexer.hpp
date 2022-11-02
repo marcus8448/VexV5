@@ -1,8 +1,8 @@
 #ifndef ROBOT_INDEXER_HPP
 #define ROBOT_INDEXER_HPP
 
-#include "pros/motors.hpp"
 #include "robot/controller/controller.hpp"
+#include "robot/device/motor.hpp"
 
 namespace robot {
 
@@ -17,7 +17,7 @@ private:
   /**
    * The motor of the flywheel.
    */
-  pros::Motor *motor;
+  device::Motor motor;
   State state = State::CHARGED;
   int32_t ticksInState = 0;
 
@@ -26,7 +26,7 @@ public:
    * Creates a new indexer with the specified motor.
    * @param motor The motor of the flywheel.
    */
-  explicit Indexer(pros::Motor *motor);
+  explicit Indexer(uint8_t port);
   virtual ~Indexer();
 
   /**
@@ -39,11 +39,11 @@ public:
 
   void cycle();
 
-  void awaitReady(int millis_timeout = 2500);
+  void awaitReady(int16_t millis_timeout = 2500);
 
-  void awaitPush(int millis_timeout = 2500);
+  void awaitPush(int16_t millis_timeout = 2500);
 
-  [[nodiscard]] pros::Motor *get_motor() const;
+  [[nodiscard]] device::Motor get_motor() const;
 
   void update(Controller *controller) override;
 

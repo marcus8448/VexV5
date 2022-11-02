@@ -1,23 +1,22 @@
 #include "robot/indexer.hpp"
 #include "logger.hpp"
+#include "pros/motors.h"
+#include "robot/device/motor.hpp"
 
 namespace robot {
-Indexer::Indexer(pros::Motor *motor) : motor(motor) { motor->set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE); }
+Indexer::Indexer(uint8_t port) : motor(device::Motor(port, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, true)) {}
 
-Indexer::~Indexer() {
-  free(this->motor);
-  this->motor = nullptr;
-}
+Indexer::~Indexer() = default;
 
 void Indexer::push() {
   if (this->state == CHARGED) {
-    this->motor->move_absolute(90.0, 150);
+    this->motor.move_absolute(90.0, 150);
     this->set_state(State::PUSHING);
   }
 }
 
 void Indexer::charge() {
-  this->motor->move(-80);
+  this->motor.move_millivolts(-7200);
   this->set_state(CHARGING);
 }
 
@@ -32,33 +31,26 @@ void Indexer::cycle() {
   this->awaitReady();
 }
 
-void Indexer::awaitReady(int millis_timeout) {
+void Indexer::awaitReady(int16_t timeout_millis) {
   if (this->state == CHARGING) {
-    millis_timeout /= 50;
+    timeout_millis /= 50;
     int i = 0;
     pros::delay(250);
     do {
-      if (i++ == millis_timeout) {
+      if (i++ == timeout_millis) {
         break;
       }
       pros::delay(50);
-    } while (this->motor->get_efficiency() > 1.0);
-    this->motor->move(0);
-    this->motor->tare_position();
+    } while (this->motor.get_efficiency() > 1.0);
+    this->motor.stop();
+    this->motor.tare();
     this->set_state(State::CHARGED);
   }
 }
 
-void Indexer::awaitPush(int millis_timeout) {
+void Indexer::awaitPush(int16_t timeout_millis) {
   if (this->state == PUSHING) {
-    millis_timeout /= 50;
-    int i = 0;
-    while (std::abs(this->motor->get_target_position() - this->motor->get_position()) > 3.0) {
-      if (i++ == millis_timeout) {
-        break;
-      }
-      pros::delay(50);
-    }
+    this->motor.await_target(timeout_millis);
     this->set_state(PUSHED);
   }
 }
@@ -69,8 +61,8 @@ void Indexer::update(Controller *controller) {
     this->push();
   }
   if (this->state == PUSHING) {
-    this->motor->move_absolute(90.0, 150);
-    if (std::abs(90.0 - this->motor->get_position()) < 3.0) {
+    this->motor.move_absolute(90.0, 150);
+    if (std::abs(90.0 - this->motor.get_position()) < 3.0) {
       this->state = PUSHED;
       this->charge();
     }
@@ -78,16 +70,16 @@ void Indexer::update(Controller *controller) {
     this->charge();
   } else if (this->state == State::CHARGING) {
     if (this->ticksInState > 15) {
-      if (this->motor->get_efficiency() < 1.0) {
+      if (this->motor.get_efficiency() < 1.0) {
         this->set_state(State::CHARGED);
-        this->motor->tare_position();
-        this->motor->move(0);
+        this->motor.tare();
+        this->motor.stop();
       }
     }
   }
 }
 
-[[nodiscard]] pros::Motor *Indexer::get_motor() const { return this->motor; }
+[[nodiscard]] device::Motor Indexer::get_motor() const { return this->motor; }
 
 void Indexer::set_state(Indexer::State value) {
   this->state = value;

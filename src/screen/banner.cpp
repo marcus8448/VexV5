@@ -21,6 +21,5 @@ void Banner::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
   lv_obj_set_hidden(this->imageCanvas, true);
 }
 
-void Banner::update(robot::Robot *robot) {
-}
+void Banner::update(robot::Robot *robot) {}
 } // namespace screen

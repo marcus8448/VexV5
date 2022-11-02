@@ -183,9 +183,7 @@ void SerialConnection::read_null_term(char *ptr, const uint16_t read) {
 
 void SerialConnection::sync_output() { this->output->pubsync(); }
 
-void SerialConnection::send_suffix() {
-  this->output->sputn("#\n", 3);
-}
+void SerialConnection::send_suffix() { this->output->sputn("#\n", 3); }
 
 size_t SerialConnection::available() { return this->input->in_avail(); }
 
@@ -195,9 +193,7 @@ void SerialConnection::skip_to_end() {
   }
 }
 
-void SerialConnection::send_header() {
-  this->output->sputn("^#", 2);
-}
+void SerialConnection::send_header() { this->output->sputn("^#", 2); }
 
 void SerialConnection::send(const char *name, const void *data, const uint16_t len) {
   auto id = this->registry->get_id(name);
@@ -214,7 +210,5 @@ void SerialConnection::send_exact(const void *data, const uint16_t len) {
   this->send_suffix();
 }
 
-void SerialConnection::send_exact(const uint16_t data) {
-   this->send_exact(&data, sizeof(uint16_t));
-    }
+void SerialConnection::send_exact(const uint16_t data) { this->send_exact(&data, sizeof(uint16_t)); }
 } // namespace serial

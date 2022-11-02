@@ -2,9 +2,9 @@
 #define ROBOT_INTAKE_HPP
 
 #include "configuration.hpp"
-#include "pros/motors.hpp"
 #include "pros/optical.hpp"
 #include "robot/controller/controller.hpp"
+#include "robot/device/motor.hpp"
 
 namespace robot {
 /**
@@ -16,7 +16,7 @@ private:
   /**
    * The motor of the intake/roller.
    */
-  pros::Motor *motor;
+  device::Motor motor;
 
   /**
    * Whether the intake is currently running.
@@ -28,7 +28,7 @@ public:
    * Creates a new intake with the specified motor.
    * @param motor the intake's motor.
    */
-  explicit Intake(pros::Motor *motor);
+  explicit Intake(uint8_t port);
   virtual ~Intake();
 
   /**
@@ -51,7 +51,7 @@ public:
    */
   [[nodiscard]] bool isEngaged() const;
 
-  [[nodiscard]] pros::Motor *get_motor() const;
+  [[nodiscard]] device::Motor get_motor() const;
 
   void update(Controller *controller) override;
   void reverse();

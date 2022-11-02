@@ -1,8 +1,8 @@
 #ifndef ROBOT_DRIVETRAIN_HPP
 #define ROBOT_DRIVETRAIN_HPP
 
-#include "pros/motors.hpp"
 #include "robot/controller/controller.hpp"
+#include "robot/device/motor.hpp"
 #include <cstdint>
 
 #define DRIVETRAIN_DEFAULT_RPM 100
@@ -13,10 +13,10 @@ namespace robot {
  */
 class Drivetrain : public Updatable {
 public:
-  pros::Motor *rightFront;
-  pros::Motor *leftFront;
-  pros::Motor *rightBack;
-  pros::Motor *leftBack;
+  device::Motor rightFront;
+  device::Motor leftFront;
+  device::Motor rightBack;
+  device::Motor leftBack;
 
 public:
   /**
@@ -26,7 +26,7 @@ public:
    * @param rightBack The motor on the back of the robot and the right side.
    * @param leftBack The motor on the back of the robot and the left side.
    */
-  Drivetrain(pros::Motor *rightFront, pros::Motor *leftFront, pros::Motor *rightBack, pros::Motor *leftBack);
+  Drivetrain(uint8_t rightFront, uint8_t leftFront, uint8_t rightBack, uint8_t leftBack);
   virtual ~Drivetrain();
 
   /**
@@ -65,30 +65,30 @@ public:
    * Moves the two right motors of the drivetrain at the specified voltage.
    * @param voltage The voltage to run at [-127 - 127]
    */
-  void move_right(int32_t voltage) const;
+  void move_right(double percent);
 
   /**
    * Moves the two left motors of the drivetrain at the specified voltage.
    * @param voltage The voltage to run at [-127 - 127]
    */
-  void move_left(int32_t voltage) const;
+  void move_left(double percent);
 
   /**
    * Checks if the distance between the drivetrain's target position and actual position is within a specific distance.
    * @param distance The maximum allowable offset from the target position.
    * @return Whether the distance between the drivetrain's target position and actual position is in the desired range.
    */
-  [[nodiscard]] bool is_offset_within(double distance) const;
+  [[nodiscard]] bool is_at_target(double distance) const;
 
   /**
    * Resets the all of the motors' absolute position trackers.
    */
-  void tare() const;
+  void tare();
 
   /**
    * Engages the brakes of all of the motors.
    */
-  void stop() const;
+  void stop();
 
   void update(Controller *controller) override;
 
@@ -100,20 +100,19 @@ private:
    * @param max_rpm The maximum allowable RPM for the motor to run at while moving.
    * @param block Whether this function should wait for the robot to move or exit immediately.
    */
-  void move(double right_distance, double left_distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM,
-            bool block = true) const;
+  void move(double right_distance, double left_distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM, bool block = true);
 
   /**
    * Moves the two right motors of the drivetrain by the specified distance.
    * @param distance The distance in ENCODER UNITS to move the right motors by.
    */
-  void move_right(double distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM) const;
+  void move_right_distance(double distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM);
 
   /**
    * Moves the two left motors of the drivetrain by the specified distance.
    * @param distance The distance in ENCODER UNITS to move the right motors by.
    */
-  void move_left(double distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM) const;
+  void move_left_distance(double distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM);
 };
 } // namespace robot
 #endif // ROBOT_DRIVETRAIN_HPP
