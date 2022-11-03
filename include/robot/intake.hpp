@@ -51,7 +51,7 @@ public:
    */
   [[nodiscard]] bool isEngaged() const;
 
-  [[nodiscard]] device::Motor get_motor() const;
+  [[nodiscard]] const device::Motor &get_motor() const;
 
   void update(Controller *controller) override;
   void reverse();

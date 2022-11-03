@@ -184,7 +184,7 @@ void Motor::stop() { this->move_millivolts(0); }
 
 [[nodiscard]] Motor::TargetType Motor::get_target_type() const { return this->targetType; }
 
-pros::Motor Motor::get_raw_motor() const { return this->motor; }
+const pros::Motor &Motor::get_raw_motor() const { return this->motor; }
 
 int32_t get_gearset_max_velocity(const pros::motor_gearset_e_t gearset) {
   switch (gearset) {

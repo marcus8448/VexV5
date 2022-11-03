@@ -79,7 +79,7 @@ void Indexer::update(Controller *controller) {
   }
 }
 
-[[nodiscard]] device::Motor Indexer::get_motor() const { return this->motor; }
+[[nodiscard]] const device::Motor &Indexer::get_motor() const { return this->motor; }
 
 void Indexer::set_state(Indexer::State value) {
   this->state = value;

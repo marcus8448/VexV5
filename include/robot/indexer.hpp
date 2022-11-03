@@ -43,7 +43,7 @@ public:
 
   void awaitPush(int16_t millis_timeout = 2500);
 
-  [[nodiscard]] device::Motor get_motor() const;
+  [[nodiscard]] const device::Motor &get_motor() const;
 
   void update(Controller *controller) override;
 

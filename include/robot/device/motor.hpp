@@ -26,6 +26,7 @@ private:
   const uint8_t port;
 
 public:
+  explicit Motor(const Motor &motor) = delete;
   explicit Motor(pros::Motor motor);
   explicit Motor(uint8_t port, pros::motor_gearset_e_t gearset = pros::E_MOTOR_GEARSET_18,
                  pros::motor_brake_mode_e_t brake_mode = pros::E_MOTOR_BRAKE_BRAKE, bool reversed = false);
@@ -66,7 +67,7 @@ public:
   void stop();
 
   [[nodiscard]] Motor::TargetType get_target_type() const;
-  [[nodiscard]] pros::Motor get_raw_motor() const;
+  [[nodiscard]] const pros::Motor &get_raw_motor() const;
 };
 
 int32_t get_gearset_max_velocity(pros::motor_gearset_e_t gearset);

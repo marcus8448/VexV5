@@ -31,5 +31,5 @@ void Expansion::update(Controller *controller) {
   }
 }
 
-[[nodiscard]] device::Motor Expansion::get_motor() const { return this->motor; }
+[[nodiscard]] const device::Motor &Expansion::get_motor() const { return this->motor; }
 } // namespace robot

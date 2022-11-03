@@ -54,7 +54,7 @@ void Flywheel::update(Controller *controller) {
   }
 }
 
-[[nodiscard]] device::Motor Flywheel::get_motor() const { return this->motor; }
+[[nodiscard]] const device::Motor &Flywheel::get_motor() const { return this->motor; }
 
 double Flywheel::getVelocity() { return this->motor.get_velocity(); }
 

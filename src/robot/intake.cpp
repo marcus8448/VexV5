@@ -56,7 +56,7 @@ void Intake::hopefully_flip_state(config::AllianceColour teamColour, uint32_t ti
 
 [[nodiscard]] bool Intake::isEngaged() const { return this->engaged; }
 
-[[nodiscard]] device::Motor Intake::get_motor() const { return this->motor; }
+[[nodiscard]] const device::Motor &Intake::get_motor() const { return this->motor; }
 
 void Intake::update(Controller *controller) {
   if (controller->l1_pressed() && controller->l2_pressed()) {
