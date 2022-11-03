@@ -8,14 +8,13 @@
 
 # PROS
 bin/
-.vscode/**
+.vscode/
 .cache/
 compile_commands.json
 temp.log
 temp.errors
 *.ini
 .d/
-!.vscode/settings.json
 
 .idea/
 build/
