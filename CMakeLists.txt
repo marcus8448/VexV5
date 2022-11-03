@@ -73,7 +73,13 @@ target_link_options(
 add_custom_command(
         TARGET ColdPackage
         POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} -O binary -R .hot_init --strip-symbol=install_hot_table --strip-symbol=__libc_init_array --strip-symbol=_PROS_COMPILE_DIRECTORY --strip-symbol=_PROS_COMPILE_TIMESTAMP ${BIN_DIR}/cold.package.elf ${BIN_DIR}/cold.package.bin
+        COMMAND ${CMAKE_OBJCOPY} --strip-symbol=install_hot_table --strip-symbol=__libc_init_array --strip-symbol=_PROS_COMPILE_DIRECTORY --strip-symbol=_PROS_COMPILE_TIMESTAMP --strip-symbol=_PROS_COMPILE_TIMESTAMP_INT ${BIN_DIR}/cold.package.elf
+)
+
+add_custom_command(
+        TARGET ColdPackage
+        POST_BUILD
+        COMMAND ${CMAKE_OBJCOPY} -O binary -R .hot_init ${BIN_DIR}/cold.package.elf ${BIN_DIR}/cold.package.bin
 )
 
 add_custom_command(
