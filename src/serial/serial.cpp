@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "base85/base85.h"
 #include "pros/apix.h"
 #include "pros/rtos.hpp"
 #include "serial/serial.hpp"

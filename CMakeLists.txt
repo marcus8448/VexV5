@@ -53,7 +53,7 @@ set_property(TARGET HotPackage PROPERTY OUTPUT_NAME hot.package.elf)
 set_property(TARGET ColdPackage PROPERTY OUTPUT_NAME cold.package.elf)
 target_compile_options(Timestamp PRIVATE -Wno-unused-const-variable -Wno-reserved-identifier -Wno-date-time)
 
-target_link_libraries(HotPackage PUBLIC ${LibC} ${LibM} ${LibPROS})
+target_link_libraries(HotPackage PUBLIC ${LibC} ${LibM} ${LibPROS} ${LibBase85})
 
 set_property(TARGET HotPackage PROPERTY LINK_DEPENDS ${FIRMWARE_DIR}/v5-common.ld ${FIRMWARE_DIR}/v5-hot.ld)
 set_property(TARGET ColdPackage PROPERTY LINK_DEPENDS ${FIRMWARE_DIR}/v5-common.ld ${FIRMWARE_DIR}/v5.ld)
@@ -61,13 +61,13 @@ set_property(TARGET ColdPackage PROPERTY LINK_DEPENDS ${FIRMWARE_DIR}/v5-common.
 target_link_options(
         HotPackage
         PUBLIC -Wl,-R,${BIN_DIR}/cold.package.elf
-        PUBLIC -nostartfiles -Wl,-T${FIRMWARE_DIR}/v5-hot.ld,--gc-sections,--start-group,${LibC},${LibM},${LibPROS},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld
+        PUBLIC -nostartfiles -Wl,-T${FIRMWARE_DIR}/v5-hot.ld,--gc-sections,--start-group,${LibC},${LibM},${LibPROS},${LibBase85},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld
 )
 
 target_link_options(
         ColdPackage
         PUBLIC -Wl,--gc-keep-exported,--whole-archive,${LibPROS},-lstdc++,--no-whole-archive
-        PUBLIC -Wl,-T${FIRMWARE_DIR}/v5.ld,--gc-sections,--start-group,${LibC},${LibM},${LibPROS},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld
+        PUBLIC -Wl,-T${FIRMWARE_DIR}/v5.ld,--gc-sections,--start-group,${LibC},${LibM},${LibPROS},${LibBase85},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld
 )
 
 add_custom_command(

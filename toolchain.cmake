@@ -54,6 +54,8 @@ set(CMAKE_LINKER ${CMAKE_CXX_COMPILER})
 find_library(LibC NAMES c PATHS ${CMAKE_SOURCE_DIR}/firmware NO_DEFAULT_PATH REQUIRED)
 find_library(LibM NAMES m PATHS ${CMAKE_SOURCE_DIR}/firmware NO_DEFAULT_PATH REQUIRED)
 find_library(LibPROS NAMES pros PATHS ${CMAKE_SOURCE_DIR}/firmware NO_DEFAULT_PATH REQUIRED)
+find_library(LibBase85 NAMES base85 PATHS ${CMAKE_SOURCE_DIR}/firmware NO_DEFAULT_PATH REQUIRED)
+
 find_program(ProsCLI pros)
 find_program(ClangFormat clang-format)
 
