@@ -38,10 +38,12 @@ Motor::Motor(const uint8_t port, bool reversed)
 
 Motor::~Motor() = default;
 
-void Motor::move_velocity(int32_t target_velocity) {
+void Motor::move_velocity(int16_t target_velocity) {
   if (target_velocity > this->maxVelocity) {
+    logger::warn("Target velocity %i is over max velocity %i!", target_velocity, this->maxVelocity);
     target_velocity = this->maxVelocity;
   } else if (target_velocity < -this->maxVelocity) {
+    logger::warn("Target velocity %i is over max velocity %i!", target_velocity, -this->maxVelocity);
     target_velocity = -this->maxVelocity;
   }
   if (this->targetType != TargetType::VELOCITY && this->target != target_velocity) {
@@ -52,7 +54,14 @@ void Motor::move_velocity(int32_t target_velocity) {
   }
 }
 
-void Motor::move_millivolts(const int16_t target_voltage) {
+void Motor::move_millivolts(int16_t target_voltage) {
+  if (target_voltage > this->maxVelocity) {
+    logger::warn("Target voltage %imV is over max voltage 12000mV!", target_voltage);
+    target_voltage = this->maxVelocity;
+  } else if (target_voltage < -this->maxVelocity) {
+    logger::warn("Target voltage %imV is over max voltage -12000mV!", target_voltage);
+    target_voltage = -this->maxVelocity;
+  }
   if (this->targetType != TargetType::VOLTAGE && this->target != target_voltage) {
     this->target = target_voltage;
     this->targetType = TargetType::VOLTAGE;
@@ -70,13 +79,13 @@ void Motor::move_percentage(double percent) {
   this->move_millivolts(static_cast<int16_t>(percent * MAX_MILLIVOLTS));
 }
 
-void Motor::move_absolute(double target_position, int32_t target_velocity) {
+void Motor::move_absolute(double target_position, uint16_t target_velocity) {
   if (target_velocity > this->maxVelocity) {
+    logger::warn("Target velocity %i is over max velocity %i!", target_velocity, this->maxVelocity);
     target_velocity = this->maxVelocity;
-  } else if (target_velocity < -this->maxVelocity) {
-    target_velocity = -this->maxVelocity;
+  } else if (target_velocity == 0) {
+    logger::warn("Target velocity is zero!");
   }
-
   if (this->targetPosition != target_position) {
     this->targetType = TargetType::VELOCITY;
     this->target = target_velocity;
@@ -85,13 +94,13 @@ void Motor::move_absolute(double target_position, int32_t target_velocity) {
   }
 }
 
-void Motor::move_relative(double target_position, int32_t target_velocity) {
+void Motor::move_relative(double target_position, uint16_t target_velocity) {
   if (target_velocity > this->maxVelocity) {
+    logger::warn("Target velocity %i is over max velocity %i!", target_velocity, this->maxVelocity);
     target_velocity = this->maxVelocity;
-  } else if (target_velocity < -this->maxVelocity) {
-    target_velocity = -this->maxVelocity;
+  } else if (target_velocity == 0) {
+    logger::warn("Target velocity is zero!");
   }
-
   if (this->targetPosition != target_position) {
     this->targetType = TargetType::VELOCITY;
     this->target = target_velocity;
@@ -100,13 +109,13 @@ void Motor::move_relative(double target_position, int32_t target_velocity) {
   }
 }
 
-void Motor::move_relative_target(double target_position, int32_t target_velocity) {
+void Motor::move_relative_target(double target_position, uint16_t target_velocity) {
   if (target_velocity > this->maxVelocity) {
+    logger::warn("Target velocity %i is over max velocity %i!", target_velocity, this->maxVelocity);
     target_velocity = this->maxVelocity;
-  } else if (target_velocity < -this->maxVelocity) {
-    target_velocity = -this->maxVelocity;
+  } else if (target_velocity == 0) {
+    logger::warn("Target velocity is zero!");
   }
-
   if (this->targetPosition != target_position) {
     this->targetType = TargetType::VELOCITY;
     this->target = target_velocity;
@@ -115,14 +124,14 @@ void Motor::move_relative_target(double target_position, int32_t target_velocity
   }
 }
 
-bool Motor::is_at_velocity(int32_t target_velocity) const {
-  if (this->targetType == TargetType::VELOCITY && this->target < target_velocity) {
+bool Motor::is_at_velocity(uint16_t target_velocity) const {
+  if (this->targetType == TargetType::VELOCITY && std::abs(this->target) < target_velocity) {
     logger::error("Motor target velocity is less than requested target velocity!");
   }
-  return this->get_velocity() >= target_velocity;
+  return std::abs(this->get_velocity()) >= target_velocity;
 }
 
-void Motor::await_velocity(int32_t target_velocity, int16_t timeout_millis) const {
+void Motor::await_velocity(uint16_t target_velocity, int16_t timeout_millis) const {
   for (uint16_t i = 0; i < timeout_millis / TEST_FREQUENCY; i++) {
     if (this->is_at_velocity(target_velocity))
       break;
@@ -186,7 +195,7 @@ void Motor::stop() { this->move_millivolts(0); }
 
 const pros::Motor &Motor::get_raw_motor() const { return this->motor; }
 
-int32_t get_gearset_max_velocity(const pros::motor_gearset_e_t gearset) {
+uint16_t get_gearset_max_velocity(const pros::motor_gearset_e_t gearset) {
   switch (gearset) {
   case pros::E_MOTOR_GEARSET_36:
     return 100;

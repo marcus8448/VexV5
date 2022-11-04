@@ -9,7 +9,7 @@
 #pragma GCC diagnostic pop
 
 namespace screen {
-void update_motor_digital(lv_obj_t *label, const pros::Motor& motor, bool engaged, const char *name);
+void update_motor_digital(lv_obj_t *label, const pros::Motor &motor, bool engaged, const char *name);
 void update_motor(lv_obj_t *label, const char *name, double position);
 
 Information::Information() = default;
@@ -50,7 +50,7 @@ void Information::update(robot::Robot *robot) {
   set_label_text(this->digitalSpeedLabel, "Flywheel Speed: %i", (int32_t)robot->controller->flywheel_speed());
 }
 
-void update_motor_digital(lv_obj_t *label, const pros::Motor& motor, bool engaged, const char *name) {
+void update_motor_digital(lv_obj_t *label, const pros::Motor &motor, bool engaged, const char *name) {
   if (motor.get_voltage() == INT32_MAX) {
     set_label_text(label, "%s: Disconnected", name);
   } else {

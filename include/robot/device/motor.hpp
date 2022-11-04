@@ -19,7 +19,7 @@ private:
   double prev_target = INFINITY;
 
   const pros::motor_gearset_e_t gearset;
-  const int32_t maxVelocity;
+  const uint16_t maxVelocity;
   pros::motor_brake_mode_e_t brakeMode;
   bool reversed;
 
@@ -34,16 +34,16 @@ public:
 
   ~Motor();
 
-  void move_velocity(int32_t target_velocity);
+  void move_velocity(int16_t target_velocity);
   void move_millivolts(int16_t target_voltage);
   void move_percentage(double percent);
 
-  void move_absolute(double target_position, int32_t target_velocity);
-  void move_relative(double target_position, int32_t target_velocity);
-  void move_relative_target(double target_position, int32_t target_velocity);
+  void move_absolute(double target_position, uint16_t target_velocity);
+  void move_relative(double target_position, uint16_t target_velocity);
+  void move_relative_target(double target_position, uint16_t target_velocity);
 
-  [[nodiscard]] bool is_at_velocity(int32_t target_velocity) const;
-  void await_velocity(int32_t target_velocity, int16_t timeout_millis = MOTOR_TIMEOUT_MILLIS) const;
+  [[nodiscard]] bool is_at_velocity(uint16_t target_velocity) const;
+  void await_velocity(uint16_t target_velocity, int16_t timeout_millis = MOTOR_TIMEOUT_MILLIS) const;
 
   [[nodiscard]] double get_velocity() const;
   [[nodiscard]] double get_efficiency() const;
@@ -70,6 +70,6 @@ public:
   [[nodiscard]] const pros::Motor &get_raw_motor() const;
 };
 
-int32_t get_gearset_max_velocity(pros::motor_gearset_e_t gearset);
+uint16_t get_gearset_max_velocity(pros::motor_gearset_e_t gearset);
 } // namespace robot::device
 #endif // VEXV5_ROBOT_DEVICE_MOTOR_HPP

@@ -25,6 +25,7 @@ Autonomous *get_autonomous() {
     logger::error("No autonomous selected!");
     return nullptr;
   }
+  logger::info("Starting autonomous: '%s'", activeProgram);
   return (*autonomousPrograms)[std::string(activeProgram)];
 }
 } // namespace robot::autonomous

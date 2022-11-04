@@ -50,6 +50,7 @@ public:
    * @param roller The robot's roller.
    */
   explicit Robot(Drivetrain *drivetrain, Intake *intake, Indexer *indexer, Flywheel *flywheel, Expansion *expansion);
+  explicit Robot(const Robot &robot) = delete;
   ~Robot();
 
   /**
