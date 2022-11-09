@@ -29,13 +29,13 @@ lv_res_t prev_page([[maybe_unused]] lv_obj_t *btn);
 lv_res_t next_page([[maybe_unused]] lv_obj_t *btn);
 void destroy_screen(uint16_t screen);
 void init_screen(uint16_t screen);
-void update(robot::Robot *robot);
+void update(robot::Robot &robot);
 [[noreturn]] void update_task(void *params);
 void create_prev_btn(lv_obj_t *obj);
 void create_next_btn(lv_obj_t *obj);
 lv_obj_t *create_screen(lv_obj_t *parent, bool beginning = false, bool end = false);
 
-void initialize(robot::Robot *robot) {
+void initialize(robot::Robot &robot) {
   logger::push("Initialize LVGL");
   lv_init();
   logger::pop();
@@ -59,7 +59,7 @@ void initialize(robot::Robot *robot) {
   logger::pop();
 
   init_screen(activeScreen);
-  pros::Task(update_task, robot, "Screen Update");
+  pros::Task(update_task, &robot, "Screen Update");
 }
 
 lv_obj_t *create_screen(lv_obj_t *parent, bool beginning, bool end) {
@@ -78,12 +78,12 @@ lv_obj_t *create_screen(lv_obj_t *parent, bool beginning, bool end) {
 [[noreturn]] void update_task(void *params) {
   auto *robot = static_cast<robot::Robot *>(params);
   while (true) {
-    update(robot);
+    update(*robot);
     pros::delay(50);
   }
 }
 
-void update(robot::Robot *robot) {
+void update(robot::Robot &robot) {
   if (*enableCanvas) {
     memset(canvasBuffer, 0x00000000, canvasSize);
   }

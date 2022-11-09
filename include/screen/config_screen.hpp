@@ -19,7 +19,7 @@ public:
   explicit ConfigurationScreen();
 
   void create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) override;
-  void update(robot::Robot *robot) override;
+  void update(robot::Robot &robot) override;
   void update_drive_scheme_label();
   void update_alliance_colour_label();
 };

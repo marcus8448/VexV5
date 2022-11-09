@@ -20,6 +20,11 @@
 // #define SERIAL_LINK
 // END CONFIG
 
+#if __has_include("temporary.hpp")
+// #define ENABLE_TEMPORARY_CODE
+#include "temporary.hpp"
+#endif
+
 #include "main.hpp"
 #include "logger.hpp"
 #include "robot/controller/operator.hpp"
@@ -67,8 +72,11 @@ using namespace robot;
  * Called when the robot is first initialized.
  */
 void initialize() {
+  #ifdef ENABLE_TEMPORARY_CODE
+  if (temporary::run()) return;
+  #endif
   logger::push("Initialize");
-  Robot *robot = get_or_create_robot();
+  Robot &robot = get_or_create_robot();
 #ifdef SERIAL_LINK
   logger::warn("Initializing serial connection...");
   serial::add_plugin(6, new serial::RobotStatePlugin(robot));
@@ -117,7 +125,7 @@ void initialize() {
 void autonomous() {
 #ifdef AUTONOMOUS
   logger::push("Autonomous Setup");
-  Robot *robot = get_or_create_robot();
+  Robot &robot = get_or_create_robot();
   logger::pop();
   autonomous::set_active("Left Winpoint");
   autonomous::Autonomous *autonomous = autonomous::get_autonomous();
@@ -136,14 +144,14 @@ void autonomous() {
  */
 void opcontrol() {
   logger::push("Opcontrol Setup");
-  Robot *robot = get_or_create_robot();
-  robot->controller = new controller::OpController(); // set the robot controller to the default operator based one.
+  Robot &robot = get_or_create_robot();
+  robot.controller = new controller::OpController(); // set the robot controller to the default operator based one.
   logger::pop();
 
-  robot->expansion->charge();
+  robot.expansion->charge();
   // infinitely run opcontrol - pros will kill the task when it's over.
   while (true) {
-    robot->update();
+    robot.update();
     pros::delay(20);
   }
 }
@@ -152,14 +160,10 @@ void opcontrol() {
  * Returns the current robot instance, or creates one if it has not been made yet.
  * @return the robot instance
  */
-Robot *get_or_create_robot() {
-  static Robot *robot = nullptr; // stored forever
-  if (robot == nullptr) {        // check if robot exists
-    // otherwise, create the robot
-    robot = new Robot(new Drivetrain(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR),
+Robot &get_or_create_robot() {
+  static Robot robot = Robot(new Drivetrain(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR),
                       new Intake(INTAKE_MOTOR), new Indexer(INDEXER_MOTOR), new Flywheel(FLYWHEEL_MOTOR),
                       new Expansion(EXPANSION_MOTOR));
-  }
   return robot;
 }
 

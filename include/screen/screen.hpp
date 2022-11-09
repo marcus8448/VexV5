@@ -13,10 +13,10 @@ namespace screen {
 class Screen {
 public:
   virtual void create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) = 0;
-  virtual void update(robot::Robot *robot) = 0;
+  virtual void update(robot::Robot &robot) = 0;
 };
 
-void initialize(robot::Robot *robot);
+void initialize(robot::Robot &robot);
 void add_screen(Screen *screen);
 } // namespace screen
 #endif // SCREEN_HPP

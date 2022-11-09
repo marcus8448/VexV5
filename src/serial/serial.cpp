@@ -7,7 +7,11 @@
 #include <string>
 #include <vector>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
 #include "base85/base85.h"
+#pragma GCC diagnostic pop
+
 #include "pros/apix.h"
 #include "pros/rtos.hpp"
 #include "serial/serial.hpp"

@@ -18,3 +18,4 @@ temp.errors
 
 .idea/
 build/
+temporary.hpp

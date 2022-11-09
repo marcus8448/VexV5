@@ -2,19 +2,21 @@
 #include "pros/optical.hpp"
 #include "robot/device/motor.hpp"
 
+#define INTAKE_POWER_LEVEL 11000
+
 namespace robot {
 
-Intake::Intake(uint8_t port) : motor(device::Motor(port, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, false)) {}
+Intake::Intake(uint8_t port) : motor(device::Motor(port, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, true)) {}
 
 Intake::~Intake() = default;
 
 void Intake::engage() {
-  this->motor.move_millivolts(12000);
+  this->motor.move_millivolts(INTAKE_POWER_LEVEL);
   this->engaged = true;
 }
 
 void Intake::reverse() {
-  this->motor.move_millivolts(-12000);
+  this->motor.move_millivolts(-INTAKE_POWER_LEVEL);
   this->engaged = true;
 }
 

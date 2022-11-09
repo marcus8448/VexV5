@@ -53,7 +53,7 @@ void AutonomousSelect::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t hei
   instance = this;
 }
 
-void AutonomousSelect::update(robot::Robot *robot) {}
+void AutonomousSelect::update(robot::Robot &robot) {}
 
 void AutonomousSelect::click(lv_obj_t *btn) {
   if (this->selected != btn) {

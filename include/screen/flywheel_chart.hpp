@@ -16,7 +16,7 @@ public:
   explicit FlywheelChart();
 
   void create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) override;
-  void update(robot::Robot *robot) override;
+  void update(robot::Robot &robot) override;
 };
 } // namespace screen
 

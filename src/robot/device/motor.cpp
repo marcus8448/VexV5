@@ -7,7 +7,7 @@
 
 #define TEST_FREQUENCY 50
 
-#define MAX_MILLIVOLTS 12000
+#define MAX_MILLIVOLTS 11750
 #define DEFAULT_MOTOR_GEARSET pros::E_MOTOR_GEARSET_18
 #define DEFAULT_MOTOR_BRAKE pros::E_MOTOR_BRAKE_BRAKE
 #define MOTOR_ENCODER_UNITS pros::E_MOTOR_ENCODER_DEGREES
@@ -46,7 +46,7 @@ void Motor::move_velocity(int16_t target_velocity) {
     logger::warn("Target velocity %i is over max velocity %i!", target_velocity, -this->maxVelocity);
     target_velocity = -this->maxVelocity;
   }
-  if (this->targetType != TargetType::VELOCITY && this->target != target_velocity) {
+  if (this->targetType != TargetType::VELOCITY || this->target != target_velocity) {
     this->target = target_velocity;
     this->targetType = TargetType::VELOCITY;
     this->targetPosition = INFINITY;
@@ -55,14 +55,14 @@ void Motor::move_velocity(int16_t target_velocity) {
 }
 
 void Motor::move_millivolts(int16_t target_voltage) {
-  if (target_voltage > this->maxVelocity) {
+  if (target_voltage > MAX_MILLIVOLTS) {
     logger::warn("Target voltage %imV is over max voltage 12000mV!", target_voltage);
-    target_voltage = this->maxVelocity;
-  } else if (target_voltage < -this->maxVelocity) {
+    target_voltage = MAX_MILLIVOLTS;
+  } else if (target_voltage < -MAX_MILLIVOLTS) {
     logger::warn("Target voltage %imV is over max voltage -12000mV!", target_voltage);
-    target_voltage = -this->maxVelocity;
+    target_voltage = -MAX_MILLIVOLTS;
   }
-  if (this->targetType != TargetType::VOLTAGE && this->target != target_voltage) {
+  if (this->targetType != TargetType::VOLTAGE || this->target != target_voltage) {
     this->target = target_voltage;
     this->targetType = TargetType::VOLTAGE;
     this->targetPosition = INFINITY;

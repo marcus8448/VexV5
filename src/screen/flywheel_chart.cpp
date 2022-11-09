@@ -32,12 +32,12 @@ void FlywheelChart::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height
                "Flywheel (-)", create_text_color_style(screen::colour::ORANGE));
 }
 
-void FlywheelChart::update(robot::Robot *robot) {
+void FlywheelChart::update(robot::Robot &robot) {
   if (this->velFlywheel.size() == 100) {
     this->velFlywheel.erase(this->velFlywheel.begin());
   }
 
-  auto prev = static_cast<float>(robot->flywheel->getVelocity());
+  auto prev = static_cast<float>(robot.flywheel->getVelocity());
   if (prev == INFINITY || prev == -1) {
     prev = 5;
   }

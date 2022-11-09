@@ -15,7 +15,7 @@ public:
    * Blocking call - does not return until the autonomous run is completed. May not be the full 15 seconds.
    * @param robot
    */
-  virtual void run(Robot *robot) = 0;
+  virtual void run(Robot &robot) = 0;
 };
 
 /**

@@ -44,13 +44,6 @@ endif()
 
 add_dependencies(HotPackage ColdPackage)
 
-set_target_properties(HotPackage ColdPackage PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR}
-        PREFIX ""
-        SUFFIX ""
-)
-set_property(TARGET HotPackage PROPERTY OUTPUT_NAME hot.package.elf)
-set_property(TARGET ColdPackage PROPERTY OUTPUT_NAME cold.package.elf)
 target_compile_options(Timestamp PRIVATE -Wno-unused-const-variable -Wno-reserved-identifier -Wno-date-time)
 
 target_link_libraries(HotPackage PUBLIC ${LibC} ${LibM} ${LibPROS} ${LibBase85})
@@ -60,7 +53,7 @@ set_property(TARGET ColdPackage PROPERTY LINK_DEPENDS ${FIRMWARE_DIR}/v5-common.
 
 target_link_options(
         HotPackage
-        PUBLIC -Wl,-R,${BIN_DIR}/cold.package.elf
+        PUBLIC -Wl,-R,$<TARGET_FILE:ColdPackage>
         PUBLIC -nostartfiles -Wl,-T${FIRMWARE_DIR}/v5-hot.ld,--gc-sections,--start-group,${LibC},${LibM},${LibPROS},${LibBase85},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld
 )
 
@@ -73,23 +66,23 @@ target_link_options(
 add_custom_command(
         TARGET ColdPackage
         POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} --strip-symbol=install_hot_table --strip-symbol=__libc_init_array --strip-symbol=_PROS_COMPILE_DIRECTORY --strip-symbol=_PROS_COMPILE_TIMESTAMP --strip-symbol=_PROS_COMPILE_TIMESTAMP_INT ${BIN_DIR}/cold.package.elf
+        COMMAND ${CMAKE_OBJCOPY} --strip-symbol=install_hot_table --strip-symbol=__libc_init_array --strip-symbol=_PROS_COMPILE_DIRECTORY --strip-symbol=_PROS_COMPILE_TIMESTAMP --strip-symbol=_PROS_COMPILE_TIMESTAMP_INT $<TARGET_FILE:ColdPackage>
 )
 
 add_custom_command(
         TARGET ColdPackage
         POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} -O binary -R .hot_init ${BIN_DIR}/cold.package.elf ${BIN_DIR}/cold.package.bin
+        COMMAND ${CMAKE_OBJCOPY} -O binary -R .hot_init $<TARGET_FILE:ColdPackage> ${BIN_DIR}/cold.package.bin
 )
 
 add_custom_command(
         TARGET HotPackage
         POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} -O binary ${BIN_DIR}/hot.package.elf ${BIN_DIR}/hot.package.bin
+        COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:HotPackage> ${BIN_DIR}/hot.package.bin
 )
 
 add_custom_command(
         TARGET HotPackage
         POST_BUILD
-        COMMAND ${CMAKE_STRIP} --strip-symbol=_PROS_COMPILE_DIRECTORY --strip-symbol=_PROS_COMPILE_TIMESTAMP --strip-symbol=_PROS_COMPILE_TIMESTAMP_INT ${BIN_DIR}/hot.package.elf
+        COMMAND ${CMAKE_STRIP} --strip-symbol=_PROS_COMPILE_DIRECTORY --strip-symbol=_PROS_COMPILE_TIMESTAMP --strip-symbol=_PROS_COMPILE_TIMESTAMP_INT $<TARGET_FILE:HotPackage>
 )

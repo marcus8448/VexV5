@@ -34,7 +34,7 @@ void ConfigurationScreen::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t 
   instance = this;
 }
 
-void ConfigurationScreen::update(robot::Robot *robot) {}
+void ConfigurationScreen::update(robot::Robot &robot) {}
 
 void ConfigurationScreen::update_drive_scheme_label() {
   lv_label_set_text(

@@ -21,7 +21,7 @@ void Logging::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
   lv_obj_set_size(logs, width, static_cast<lv_coord_t>(height - BASE_HEIGHT));
 }
 
-void Logging::update(robot::Robot *robot) {}
+void Logging::update(robot::Robot &robot) {}
 
 void Logging::write_line(const char *string, const lv_color_t colour) {
   if (logs != nullptr) {

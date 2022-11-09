@@ -51,7 +51,7 @@ void DrivetrainChart::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t heig
                qtrWidth, 16, "RB (-)", create_text_color_style(screen::colour::LIGHT_BLUE));
 }
 
-void DrivetrainChart::update(robot::Robot *robot) {
+void DrivetrainChart::update(robot::Robot &robot) {
   if (this->velMotorLF.size() == 100) {
     this->velMotorLF.erase(this->velMotorLF.begin());
     this->velMotorRF.erase(this->velMotorRF.begin());
@@ -59,10 +59,10 @@ void DrivetrainChart::update(robot::Robot *robot) {
     this->velMotorRB.erase(this->velMotorRB.begin());
   }
 
-  auto prevLF = static_cast<float>(robot->drivetrain->leftFront.get_velocity());
-  auto prevRF = static_cast<float>(robot->drivetrain->rightFront.get_velocity());
-  auto prevLB = static_cast<float>(robot->drivetrain->leftBack.get_velocity());
-  auto prevRB = static_cast<float>(robot->drivetrain->rightBack.get_velocity());
+  auto prevLF = static_cast<float>(robot.drivetrain->leftFront.get_velocity());
+  auto prevRF = static_cast<float>(robot.drivetrain->rightFront.get_velocity());
+  auto prevLB = static_cast<float>(robot.drivetrain->leftBack.get_velocity());
+  auto prevRB = static_cast<float>(robot.drivetrain->rightBack.get_velocity());
   if (prevLF == INFINITY || prevLF == -1)
     prevLF = 5;
   if (prevRF == INFINITY || prevRF == -1)

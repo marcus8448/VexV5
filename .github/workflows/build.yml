@@ -5,7 +5,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install toolchain
-        run: sudo apt-get install -y gcc-arm-none-eabi llvm
+        run: sudo apt-get install -y gcc-arm-none-eabi
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
