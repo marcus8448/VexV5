@@ -14,12 +14,6 @@ void Expansion::launch() {
   this->charged = false;
 }
 
-void Expansion::charge() {
-  logger::info("charging expansion");
-  this->motor.move_absolute(155.0, 25.0);
-  this->charged = true;
-}
-
 [[nodiscard]] bool Expansion::has_launched() const { return !this->charged; }
 
 void Expansion::update(Controller *controller) {

@@ -2,13 +2,15 @@
 #include "logger.hpp"
 
 namespace robot {
-Flywheel::Flywheel(uint8_t port)
-    : motor(device::Motor(port, pros::E_MOTOR_GEARSET_36, pros::E_MOTOR_BRAKE_COAST, true)) {}
+Flywheel::Flywheel(uint8_t port, uint8_t secondary_port)
+    : motor(device::Motor(port, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST, false)),
+      secondary_motor(device::Motor(secondary_port, pros::E_MOTOR_GEAR_GREEN, pros::E_MOTOR_BRAKE_COAST, true)) {}
 
 Flywheel::~Flywheel() = default;
 
 void Flywheel::engage(int32_t flywheelSpeed, bool block) {
   this->motor.move_velocity(flywheelSpeed);
+  this->secondary_motor.move_velocity(flywheelSpeed);
   double actual = std::abs(this->motor.get_velocity());
   if (actual > flywheelSpeed) {
     if (std::abs(actual - flywheelSpeed) < 10.0) {
@@ -32,6 +34,7 @@ void Flywheel::engage(int32_t flywheelSpeed, bool block) {
 void Flywheel::disengage() {
   this->state = State::IDLE;
   this->motor.stop();
+  this->secondary_motor.stop();
 }
 
 void Flywheel::update(Controller *controller) {

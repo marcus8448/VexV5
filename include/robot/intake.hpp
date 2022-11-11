@@ -1,6 +1,8 @@
 #ifndef ROBOT_INTAKE_HPP
 #define ROBOT_INTAKE_HPP
 
+#define INTAKE_POWER_LEVEL 11000
+
 #include "configuration.hpp"
 #include "pros/optical.hpp"
 #include "robot/controller/controller.hpp"
@@ -35,7 +37,9 @@ public:
    * Engages the intake.
    * Runs the motor.
    */
-  void engage();
+  void engage(int16_t target_millivolts = INTAKE_POWER_LEVEL);
+
+  void reverse(int16_t target_millivolts = INTAKE_POWER_LEVEL);
 
   /**
    * Disengages the intake.
@@ -43,7 +47,7 @@ public:
    */
   void disengage();
 
-  void hopefully_flip_state(config::AllianceColour teamColour, uint32_t timeout);
+  void roll_to_team_colour(config::AllianceColour teamColour, uint32_t timeout);
 
   /**
    * Returns whether the intake is currently engaged (running).
@@ -54,7 +58,6 @@ public:
   [[nodiscard]] const device::Motor &get_motor() const;
 
   void update(Controller *controller) override;
-  void reverse();
 };
 } // namespace robot
 #endif // ROBOT_INTAKE_HPP

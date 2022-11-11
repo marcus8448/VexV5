@@ -17,6 +17,7 @@ private:
    * The motor of the flywheel.
    */
   device::Motor motor;
+  device::Motor secondary_motor;
   /**
    * Whether the flywheel is currently active.
    */
@@ -27,7 +28,7 @@ public:
    * Creates a new flywheel with the specified motor.
    * @param motor The motor of the flywheel.
    */
-  explicit Flywheel(uint8_t port);
+  explicit Flywheel(uint8_t port, uint8_t secondary_port = 99);
   virtual ~Flywheel();
 
   /**

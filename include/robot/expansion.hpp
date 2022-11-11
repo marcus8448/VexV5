@@ -32,8 +32,6 @@ public:
 
   void launch();
 
-  void charge();
-
   [[nodiscard]] bool has_launched() const;
 
   [[nodiscard]] const device::Motor &get_motor() const;

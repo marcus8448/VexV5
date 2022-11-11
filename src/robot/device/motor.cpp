@@ -3,6 +3,7 @@
 #include "logger.hpp"
 #include "pros/rtos.hpp"
 #include <cmath>
+#include <sys/errno.h>
 #include <utility>
 
 #define TEST_FREQUENCY 50
@@ -124,6 +125,13 @@ void Motor::move_relative_target(double target_position, uint16_t target_velocit
   }
 }
 
+void Motor::set_reversed(const bool reverse) {
+  if (this->reversed != reverse) {
+    this->reversed = reverse;
+    this->motor.set_reversed(reverse);
+  }
+}
+
 bool Motor::is_at_velocity(uint16_t target_velocity) const {
   if (this->targetType == TargetType::VELOCITY && std::abs(this->target) < target_velocity) {
     logger::error("Motor target velocity is less than requested target velocity!");
@@ -168,6 +176,8 @@ void Motor::await_velocity(uint16_t target_velocity, int16_t timeout_millis) con
 [[nodiscard]] bool Motor::is_reversed() const { return this->reversed; }
 
 [[nodiscard]] uint8_t Motor::get_port() const { return this->port; }
+
+[[nodiscard]] bool Motor::is_connected() { return this->motor.get_voltage() == INT32_MAX && errno == ENODEV; }
 
 double Motor::get_temperature() const { return this->motor.get_temperature(); }
 

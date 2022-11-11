@@ -59,18 +59,6 @@ char* bintob85( char* restrict dest, void const* restrict src, size_t size );
   *         Null if string has a bad format.  */
 void* b85tobin( void* restrict dest, char const* restrict src );
 
-/** Convert a base85 string to binary format.
-  * @param p Source base85 string and destination memory block.
-  * @return If success a pointer to the next byte in memory block.
-  *         Null if string has a bad format.  */
-static inline void* b85decode( void* p ) {
-    return b85tobin( p, (char*)p );
-}
-
-static inline char* b85encode( void* p, size_t size ) {
-    return bintob85( (char*)p, p, size );
-}
-
 /** @ } */
 
 #ifdef __cplusplus

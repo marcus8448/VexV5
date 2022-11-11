@@ -4,7 +4,7 @@
 
 namespace robot {
 Indexer::Indexer(uint8_t port)
-    : motor(device::Motor(port, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, true)) {}
+    : motor(device::Motor(port, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, false)) {}
 
 Indexer::~Indexer() = default;
 
@@ -16,7 +16,7 @@ void Indexer::push() {
 }
 
 void Indexer::charge() {
-  this->motor.move_millivolts(-7200);
+  this->motor.move_millivolts(7200);
   this->set_state(CHARGING);
 }
 

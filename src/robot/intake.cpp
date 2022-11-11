@@ -2,21 +2,21 @@
 #include "pros/optical.hpp"
 #include "robot/device/motor.hpp"
 
-#define INTAKE_POWER_LEVEL 11000
-
 namespace robot {
 
 Intake::Intake(uint8_t port) : motor(device::Motor(port, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, true)) {}
 
 Intake::~Intake() = default;
 
-void Intake::engage() {
-  this->motor.move_millivolts(INTAKE_POWER_LEVEL);
+void Intake::engage(int16_t target_millivolts) {
+  this->motor.set_reversed(false);
+  this->motor.move_millivolts(target_millivolts);
   this->engaged = true;
 }
 
-void Intake::reverse() {
-  this->motor.move_millivolts(-INTAKE_POWER_LEVEL);
+void Intake::reverse(int16_t target_millivolts) {
+  this->motor.set_reversed(true);
+  this->motor.move_millivolts(target_millivolts);
   this->engaged = true;
 }
 
@@ -25,10 +25,10 @@ void Intake::disengage() {
   this->motor.stop();
 }
 
-void Intake::hopefully_flip_state(config::AllianceColour teamColour, uint32_t timeout) {
-  this->motor.move_millivolts(-4800);
+void Intake::roll_to_team_colour(config::AllianceColour teamColour, uint32_t timeout) {
+  this->reverse(4800);
   pros::delay(750);
-  this->motor.stop();
+  this->disengage();
   //  if (!looking_at_roller()) {
   //    logger::warn("Spinning roller while not in view?");
   //  }

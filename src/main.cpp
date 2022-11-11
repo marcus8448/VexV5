@@ -1,5 +1,6 @@
 // CONFIG
 #define FLYWHEEL_MOTOR 3
+// flywheel #2 is 5
 #define INTAKE_MOTOR 1
 #define INDEXER_MOTOR 19
 
@@ -25,8 +26,8 @@
 #include "temporary.hpp"
 #endif
 
-#include "main.hpp"
 #include "logger.hpp"
+#include "main.hpp"
 #include "robot/controller/operator.hpp"
 
 #ifdef AUTONOMOUS
@@ -72,9 +73,10 @@ using namespace robot;
  * Called when the robot is first initialized.
  */
 void initialize() {
-  #ifdef ENABLE_TEMPORARY_CODE
-  if (temporary::run()) return;
-  #endif
+#ifdef ENABLE_TEMPORARY_CODE
+  if (temporary::run())
+    return;
+#endif
   logger::push("Initialize");
   Robot &robot = get_or_create_robot();
 #ifdef SERIAL_LINK
@@ -148,7 +150,6 @@ void opcontrol() {
   robot.controller = new controller::OpController(); // set the robot controller to the default operator based one.
   logger::pop();
 
-  robot.expansion->charge();
   // infinitely run opcontrol - pros will kill the task when it's over.
   while (true) {
     robot.update();
@@ -162,8 +163,8 @@ void opcontrol() {
  */
 Robot &get_or_create_robot() {
   static Robot robot = Robot(new Drivetrain(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR),
-                      new Intake(INTAKE_MOTOR), new Indexer(INDEXER_MOTOR), new Flywheel(FLYWHEEL_MOTOR),
-                      new Expansion(EXPANSION_MOTOR));
+                             new Intake(INTAKE_MOTOR), new Indexer(INDEXER_MOTOR), new Flywheel(FLYWHEEL_MOTOR, 5),
+                             new Expansion(EXPANSION_MOTOR));
   return robot;
 }
 

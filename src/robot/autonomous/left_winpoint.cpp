@@ -5,7 +5,7 @@ void LeftWinpoint::run(Robot &robot) {
   robot.drivetrain->backwards(2.5);
   robot.drivetrain->await_move();
   robot.drivetrain->backwards(5.0, DRIVETRAIN_DEFAULT_RPM / 2);
-  robot.intake->hopefully_flip_state(config::get_instance()->get_alliance_colour(), 5000);
+  robot.intake->roll_to_team_colour(config::get_instance()->get_alliance_colour(), 5000);
   robot.drivetrain->forwards(3.0);
   robot.drivetrain->turn_left(90.0);
   robot.drivetrain->await_move();

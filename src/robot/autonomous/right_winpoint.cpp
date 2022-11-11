@@ -13,7 +13,7 @@ void RightWinpoint::run(Robot &robot) {
   robot.drivetrain->forwards(2.0);
   robot.drivetrain->await_move();
   robot.drivetrain->forwards(5.0, DRIVETRAIN_DEFAULT_RPM / 2.0);
-  robot.intake->hopefully_flip_state(config::get_instance()->get_alliance_colour(), 5000);
+  robot.intake->roll_to_team_colour(config::get_instance()->get_alliance_colour(), 5000);
   robot.flywheel->engage();
   robot.drivetrain->backwards(2.0);
   robot.drivetrain->await_move();

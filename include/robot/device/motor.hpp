@@ -2,12 +2,13 @@
 #define VEXV5_ROBOT_DEVICE_MOTOR_HPP
 
 #include "pros/motors.hpp"
+#include "robot/device/device.hpp"
 #include <cmath>
 
 #define MOTOR_TIMEOUT_MILLIS 4000
 
 namespace robot::device {
-class Motor {
+class Motor : public Device {
   enum TargetType { VOLTAGE, VELOCITY };
 
 private:
@@ -42,6 +43,8 @@ public:
   void move_relative(double target_position, uint16_t target_velocity);
   void move_relative_target(double target_position, uint16_t target_velocity);
 
+  void set_reversed(bool reverse);
+
   [[nodiscard]] bool is_at_velocity(uint16_t target_velocity) const;
   void await_velocity(uint16_t target_velocity, int16_t timeout_millis = MOTOR_TIMEOUT_MILLIS) const;
 
@@ -56,7 +59,8 @@ public:
   [[nodiscard]] pros::motor_brake_mode_e_t get_brake_mode() const;
   [[nodiscard]] pros::motor_gearset_e_t get_gearset() const;
   [[nodiscard]] bool is_reversed() const;
-  [[nodiscard]] uint8_t get_port() const;
+  [[nodiscard]] uint8_t get_port() const override;
+  [[nodiscard]] bool is_connected() override;
 
   [[nodiscard]] double get_temperature() const;
 
