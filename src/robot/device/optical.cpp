@@ -1,5 +1,5 @@
-#include "robot/device/optical.hpp"
 #include "pros/optical.hpp"
+#include "robot/device/optical.hpp"
 #include <cerrno>
 #include <cstdint>
 

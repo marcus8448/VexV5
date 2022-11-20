@@ -4,18 +4,18 @@
 
 namespace robot {
 
-Intake::Intake(uint8_t port) : motor(device::Motor(port, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, true)) {}
+Intake::Intake(uint8_t port) : motor(device::Motor(port, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, false)) {}
 
 Intake::~Intake() = default;
 
 void Intake::engage(int16_t target_millivolts) {
-  this->motor.set_reversed(false);
+  this->motor.set_reversed(true);
   this->motor.move_millivolts(target_millivolts);
   this->engaged = true;
 }
 
 void Intake::reverse(int16_t target_millivolts) {
-  this->motor.set_reversed(true);
+  this->motor.set_reversed(false);
   this->motor.move_millivolts(target_millivolts);
   this->engaged = true;
 }

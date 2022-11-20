@@ -1,10 +1,8 @@
+#include "robot/drivetrain.hpp"
 #include "configuration.hpp"
 #include "logger.hpp"
-#include "util.hpp"
-
 #include "robot/device/motor.hpp"
-#include "robot/drivetrain.hpp"
-
+#include "util.hpp"
 #include <algorithm>
 
 #define SAFE_MAX_MOTOR_VOLTAGE 125

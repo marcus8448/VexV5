@@ -4,7 +4,7 @@
 #include "robot/controller/controller.hpp"
 #include "robot/device/motor.hpp"
 
-#define FLYWHEEL_TARGET_SPEED 300
+#define FLYWHEEL_TARGET_SPEED 600
 
 namespace robot {
 /**
@@ -17,7 +17,6 @@ private:
    * The motor of the flywheel.
    */
   device::Motor motor;
-  device::Motor secondary_motor;
   /**
    * Whether the flywheel is currently active.
    */

@@ -26,10 +26,8 @@ void FlywheelChart::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height
   lv_obj_set_size(this->flywheelCanvas, width, trueHeight);
   lv_canvas_set_buffer(this->flywheelCanvas, canvasBuffer, width, trueHeight, CANVAS_COLOUR);
 
-  create_label(screen, 90, static_cast<lv_coord_t>(height - 32 - 4), static_cast<lv_coord_t>(width / 3), 16,
-               "Flywheel (+)", create_text_color_style(screen::colour::BLUE));
-  create_label(screen, 240, static_cast<lv_coord_t>(height - 32 - 4), static_cast<lv_coord_t>(width / 3), 16,
-               "Flywheel (-)", create_text_color_style(screen::colour::ORANGE));
+  create_label(screen, 90, static_cast<lv_coord_t>(height - 32 - 4), static_cast<lv_coord_t>(width / 3), 16, "Flywheel",
+               create_text_color_style(screen::colour::BLUE));
 }
 
 void FlywheelChart::update(robot::Robot &robot) {
@@ -37,7 +35,7 @@ void FlywheelChart::update(robot::Robot &robot) {
     this->velFlywheel.erase(this->velFlywheel.begin());
   }
 
-  auto prev = static_cast<float>(robot.flywheel->getVelocity());
+  auto prev = std::fabs(static_cast<float>(robot.flywheel->getVelocity()));
   if (prev == INFINITY || prev == -1) {
     prev = 5;
   }
@@ -47,13 +45,13 @@ void FlywheelChart::update(robot::Robot &robot) {
 
   float x = 0;
   for (signed int i = static_cast<int32_t>(this->velFlywheel.size()) - 2; i >= 0; --i) {
-    float v = this->velFlywheel[i];
+    float v = std::fabs(this->velFlywheel[i]);
     lv_canvas_draw_line(flywheelCanvas,
                         lv_point_t{static_cast<lv_coord_t>(this->canvasWidth - (x * widthScale)),
-                                   static_cast<lv_coord_t>(this->canvasHeight - std::fabs(prev * heightScale))},
+                                   static_cast<lv_coord_t>(this->canvasHeight - (prev * heightScale))},
                         lv_point_t{static_cast<lv_coord_t>(this->canvasWidth - ((x + 1) * widthScale)),
-                                   static_cast<lv_coord_t>(this->canvasHeight - std::fabs(v * heightScale))},
-                        v >= 0 ? screen::colour::BLUE : screen::colour::ORANGE);
+                                   static_cast<lv_coord_t>(this->canvasHeight - (v * heightScale))},
+                        screen::colour::BLUE);
     ++x;
     prev = v;
   }

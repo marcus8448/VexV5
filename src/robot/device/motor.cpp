@@ -1,9 +1,8 @@
 #include "robot/device/motor.hpp"
-
 #include "logger.hpp"
 #include "pros/rtos.hpp"
+#include <cerrno>
 #include <cmath>
-#include <sys/errno.h>
 #include <utility>
 
 #define TEST_FREQUENCY 50

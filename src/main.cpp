@@ -1,6 +1,5 @@
 // CONFIG
 #define FLYWHEEL_MOTOR 3
-// flywheel #2 is 5
 #define INTAKE_MOTOR 1
 #define INDEXER_MOTOR 19
 
@@ -18,11 +17,12 @@
 #define SCREEN_DRIVETRAIN
 #define SCREEN_FLYWHEEL
 
+// #define ENABLE_TEMPORARY_CODE
+
 // #define SERIAL_LINK
 // END CONFIG
 
-#if __has_include("temporary.hpp")
-// #define ENABLE_TEMPORARY_CODE
+#if __has_include("temporary.hpp") && defined(ENABLE_TEMPORARY_CODE)
 #include "temporary.hpp"
 #endif
 
