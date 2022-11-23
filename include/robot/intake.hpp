@@ -1,6 +1,7 @@
 #ifndef ROBOT_INTAKE_HPP
 #define ROBOT_INTAKE_HPP
 
+#include "robot/device/optical.hpp"
 #define INTAKE_POWER_LEVEL 11000
 
 #include "configuration.hpp"
@@ -19,6 +20,7 @@ private:
    * The motor of the intake/roller.
    */
   device::Motor motor;
+  device::ColourSensor colour;
 
   /**
    * Whether the intake is currently running.
@@ -30,7 +32,7 @@ public:
    * Creates a new intake with the specified motor.
    * @param motor the intake's motor.
    */
-  explicit Intake(uint8_t port);
+  explicit Intake(uint8_t motorPort, uint8_t colourPort);
   virtual ~Intake();
 
   /**

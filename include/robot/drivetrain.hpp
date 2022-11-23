@@ -36,7 +36,8 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while moving.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void forwards(double distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM);
+  void forwards(double distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM,
+                uint16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT);
 
   /**
    * Drives the robot backwards by the specified distance.
@@ -44,7 +45,8 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while moving.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void backwards(double distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM);
+  void backwards(double distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM,
+                 uint16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT);
 
   /**
    * Turns the robot to the right by spinning by the specified number of degrees.
@@ -52,7 +54,8 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while turning.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void turn_right(double degrees, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM);
+  void turn_right(double degrees, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM,
+                  uint16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT);
 
   /**
    * Turns the robot to the left by spinning by the specified number of degrees.
@@ -60,9 +63,10 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while turning.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void turn_left(double degrees, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM);
+  void turn_left(double degrees, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM,
+                 uint16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT);
 
-  void await_move(int16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT) const;
+  void await_move(uint16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT) const;
 
   /**
    * Checks if the distance between the drivetrain's target position and actual position is within a specific distance.

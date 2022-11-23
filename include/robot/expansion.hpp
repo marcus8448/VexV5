@@ -3,7 +3,7 @@
 
 #include "configuration.hpp"
 #include "robot/controller/controller.hpp"
-#include "robot/device/motor.hpp"
+#include "robot/device/pneumatics.hpp"
 
 namespace robot {
 /**
@@ -13,14 +13,14 @@ namespace robot {
 class Expansion : public Updatable {
 private:
   /**
-   * The motor of the expansion/roller.
+   * The piston of the expansion/roller.
    */
-  device::Motor motor;
+  device::PneumaticPiston piston;
 
   /**
    * Whether the mechanism has been released.
    */
-  bool charged = false;
+  bool launched = false;
 
 public:
   /**
@@ -34,7 +34,7 @@ public:
 
   [[nodiscard]] bool has_launched() const;
 
-  [[nodiscard]] const device::Motor &get_motor() const;
+  [[nodiscard]] const device::PneumaticPiston &get_piston() const;
 
   void update(Controller *controller) override;
 };

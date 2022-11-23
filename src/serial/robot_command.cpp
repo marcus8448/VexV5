@@ -6,7 +6,7 @@ namespace serial {
 #define SERIAL_ROBOT_COMMAND "ROBOT_COMMAND"
 #define SERIAL_ROBOT_COMMAND_RESPONSE "ROBOT_COMMAND"
 
-RobotCommandsPlugin::RobotCommandsPlugin(robot::Robot *robot) : robot(robot) {}
+RobotCommandsPlugin::RobotCommandsPlugin(robot::Robot &robot) : robot(robot) {}
 
 void RobotCommandsPlugin::initialize() {}
 

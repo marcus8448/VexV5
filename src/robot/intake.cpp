@@ -1,10 +1,14 @@
 #include "robot/intake.hpp"
+#include "logger.hpp"
 #include "pros/optical.hpp"
 #include "robot/device/motor.hpp"
+#include "robot/device/optical.hpp"
 
 namespace robot {
 
-Intake::Intake(uint8_t port) : motor(device::Motor(port, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, false)) {}
+Intake::Intake(uint8_t motorPort, uint8_t colourPort)
+    : motor(device::Motor(motorPort, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, false)),
+      colour(device::ColourSensor(colourPort)) {}
 
 Intake::~Intake() = default;
 
@@ -26,34 +30,38 @@ void Intake::disengage() {
 }
 
 void Intake::roll_to_team_colour(config::AllianceColour teamColour, uint32_t timeout) {
-  this->reverse(4800);
-  pros::delay(750);
-  this->disengage();
-  //  if (!looking_at_roller()) {
-  //    logger::warn("Spinning roller while not in view?");
-  //  }
-  //  double hue = this->optical->get_hue();
-  //  uint32_t i = 0;
-  //  timeout /= 50;
-  //  switch (teamColour) {
-  //  case config::AllianceColour::RED: {
-  //    while (hue < 335.0 || hue > 15.0) {
-  //      this->motor->move(50);
-  //      pros::delay(50);
-  //      if (i++ == timeout)
-  //        break;
-  //    }
-  //  }
-  //  case config::AllianceColour::BLUE: {
-  //    while (hue < 220.0 || hue > 240.0) {
-  //      this->motor->move(50);
-  //      pros::delay(50);
-  //      if (i++ == timeout)
-  //        break;
-  //    }
-  //  }
-  //  }
-  //  motor->move(0);
+  if (!this->colour.is_connected()) {
+    logger::warn("Colour sensor is not connected. Spinning the roller anyways.");
+    this->reverse(4800);
+    pros::delay(750);
+    this->disengage();
+  } else {
+    // if (!looking_at_roller()) {
+    //   logger::warn("Spinning roller while not in view?");
+    // }
+    double hue = this->colour.get_hue();
+    uint32_t i = 0;
+    timeout /= 50;
+    switch (teamColour) {
+    case config::AllianceColour::RED: {
+      while (hue < 335.0 || hue > 15.0) {
+        this->motor.move_percentage(50.0);
+        pros::delay(50);
+        if (i++ == timeout)
+          break;
+      }
+    }
+    case config::AllianceColour::BLUE: {
+      while (hue < 220.0 || hue > 240.0) {
+        this->motor.move_percentage(50.0);
+        pros::delay(50);
+        if (i++ == timeout)
+          break;
+      }
+    }
+    }
+    this->motor.stop();
+  }
 }
 
 [[nodiscard]] bool Intake::isEngaged() const { return this->engaged; }

@@ -1,3 +1,6 @@
+#ifndef ROBOT_DEVICE_DEVICE_HPP
+#define ROBOT_DEVICE_DEVICE_HPP
+
 #include <cstdint>
 
 namespace robot::device {
@@ -7,3 +10,4 @@ public:
   [[nodiscard]] virtual uint8_t get_port() const = 0;
 };
 } // namespace robot::device
+#endif // ROBOT_DEVICE_DEVICE_HPP

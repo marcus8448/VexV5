@@ -24,7 +24,7 @@
 */
 
 #ifndef BASE85_HPP
-#define	BASE85_HPP
+#define BASE85_HPP
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wall"
 
@@ -48,7 +48,7 @@ extern "C" {
  * @param size Size in bytes of source binary memory block.
  * @return A pointer to the null character of the base85 null-terminated string.
  */
-char* bintob85(char* restrict dest, void const* restrict src, size_t size);
+char *bintob85(char *restrict dest, void const *restrict src, size_t size);
 
 /**
  * Convert a base85 string to binary format.
@@ -57,8 +57,8 @@ char* bintob85(char* restrict dest, void const* restrict src, size_t size);
  * @return If success a pointer to the next byte in memory block.
  *         Null if string has a bad format.
  */
-void* b85tobin(void* restrict dest, char const* restrict src);
+void *b85tobin(void *restrict dest, char const *restrict src);
 }
-}
+} // namespace base85
 #pragma GCC diagnostic pop
 #endif // BASE85_HPP

@@ -9,10 +9,10 @@
 namespace serial {
 class RobotCommandsPlugin : public SerialPlugin {
 public:
-  robot::Robot *robot = nullptr;
+  robot::Robot &robot;
 
 public:
-  explicit RobotCommandsPlugin(robot::Robot *robot);
+  explicit RobotCommandsPlugin(robot::Robot &robot);
 
   void initialize() override;
   void handle(SerialConnection *connection, void *buffer, size_t len) override;

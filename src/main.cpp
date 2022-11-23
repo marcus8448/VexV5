@@ -1,13 +1,15 @@
 // CONFIG
 #define FLYWHEEL_MOTOR 3
-#define INTAKE_MOTOR 1
 #define INDEXER_MOTOR 19
+#define INTAKE_MOTOR 1
+#define ROLLER_COLOUR_SENSOR 7
+#define EXPANSION_PISTON 'A'
 
 #define RIGHT_FRONT_MOTOR 4
-#define LEFT_FRONT_MOTOR 12
+#define LEFT_FRONT_MOTOR 13
 #define RIGHT_BACK_MOTOR 9
 #define LEFT_BACK_MOTOR 20
-#define EXPANSION_MOTOR 6
+
 
 #define AUTONOMOUS
 
@@ -17,7 +19,7 @@
 #define SCREEN_DRIVETRAIN
 #define SCREEN_FLYWHEEL
 
-// #define ENABLE_TEMPORARY_CODE
+#define ENABLE_TEMPORARY_CODE
 
 // #define SERIAL_LINK
 // END CONFIG
@@ -73,10 +75,6 @@ using namespace robot;
  * Called when the robot is first initialized.
  */
 void initialize() {
-#ifdef ENABLE_TEMPORARY_CODE
-  if (temporary::run())
-    return;
-#endif
   logger::push("Initialize");
   Robot &robot = get_or_create_robot();
 #ifdef SERIAL_LINK
@@ -145,10 +143,15 @@ void autonomous() {
  * pressed.
  */
 void opcontrol() {
-  logger::push("Opcontrol Setup");
   Robot &robot = get_or_create_robot();
+  logger::push("Opcontrol Setup");
   robot.controller = new controller::OpController(); // set the robot controller to the default operator based one.
   logger::pop();
+
+#ifdef ENABLE_TEMPORARY_CODE
+  if (temporary::run(robot))
+    return;
+#endif
 
   // infinitely run opcontrol - pros will kill the task when it's over.
   while (true) {
@@ -163,8 +166,8 @@ void opcontrol() {
  */
 Robot &get_or_create_robot() {
   static Robot robot = Robot(new Drivetrain(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR),
-                             new Intake(INTAKE_MOTOR), new Indexer(INDEXER_MOTOR), new Flywheel(FLYWHEEL_MOTOR, 5),
-                             new Expansion(EXPANSION_MOTOR));
+                             new Intake(INTAKE_MOTOR, ROLLER_COLOUR_SENSOR), new Indexer(INDEXER_MOTOR), new Flywheel(FLYWHEEL_MOTOR, 5),
+                             new Expansion(EXPANSION_PISTON));
   return robot;
 }
 

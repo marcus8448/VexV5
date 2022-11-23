@@ -3,10 +3,6 @@
 
 #include "pros/motors.hpp"
 
-#define PI 3.14159265358979323846
-#define WHEEL_SIZE 2.0625
-#define WHEEL_CIRCUMFERENCE (WHEEL_SIZE * 2.0 * PI)
-
 /**
  * Converts inches to encoder unit rotations.
  * @param inches the number of inches to convert.

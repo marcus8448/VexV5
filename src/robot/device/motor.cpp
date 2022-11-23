@@ -119,7 +119,7 @@ void Motor::move_relative_target(double target_position, uint16_t target_velocit
   if (this->targetPosition != target_position) {
     this->targetType = TargetType::VELOCITY;
     this->target = target_velocity;
-    this->targetPosition += target_position;
+    this->targetPosition = target_position;
     this->motor.move_absolute(this->targetPosition, target_velocity);
   }
 }
