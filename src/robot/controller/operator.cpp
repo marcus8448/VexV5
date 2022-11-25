@@ -173,9 +173,11 @@ void OpController::update() {
   if (this->l2 == 1)
     logger::debug("L2 pressed");
 
-  if (this->left_pressed() || this->right_pressed()) {
+  static bool init = false;
+  if (this->left_pressed() || this->right_pressed() || !init) {
+    init = true;
     this->set_line(0, 0,
-                   logger::string_format("Fly Spd: %i  ", (int32_t)this->flywheel_speed())
+                   logger::string_format("Flywheel: %i  ", static_cast<int32_t>(this->flywheel_speed()))
                        .c_str()); // append ' ' to clear out buffer
   }
 }

@@ -3,7 +3,8 @@
 #include <cerrno>
 
 namespace robot::device {
-PneumaticPiston::PneumaticPiston(uint8_t port) : Device(port), piston(pros::ADIDigitalOut(port, false)), extended(false) {}
+PneumaticPiston::PneumaticPiston(uint8_t port)
+    : Device(port), piston(pros::ADIDigitalOut(port, false)), extended(false) {}
 PneumaticPiston::PneumaticPiston(uint8_t port, bool defaultState)
     : Device(port), piston(pros::ADIDigitalOut(port, defaultState)), extended(defaultState) {}
 

@@ -36,9 +36,9 @@ public:
    */
   void engage(int32_t flywheelSpeed = FLYWHEEL_TARGET_SPEED, bool block = false);
 
-  bool isUpToSpeed();
+  bool is_up_to_speed();
 
-  void waitForSpeed(int millis_timeout = 5000);
+  void wait_for_speed(uint16_t millis_timeout = 5000);
 
   /**
    * Disengages the flywheel.
@@ -50,7 +50,7 @@ public:
    * Returns the current velocity of the flywheel.
    * @return the current velocity of the flywheel.
    */
-  double getVelocity();
+  double get_velocity();
 
   [[nodiscard]] const device::Motor &get_motor() const;
 

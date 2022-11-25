@@ -14,11 +14,11 @@ void LeftWinpoint::run(Robot &robot) {
   robot.flywheel->engage();
   robot.drivetrain->backwards(12.8, 50.0);
   robot.drivetrain->turn_right(180.0 - 25.7, DRIVETRAIN_DEFAULT_RPM);
-  robot.flywheel->waitForSpeed();
+  robot.flywheel->wait_for_speed();
   robot.indexer->cycle();
-  robot.flywheel->waitForSpeed();
+  robot.flywheel->wait_for_speed();
   robot.indexer->cycle();
-  robot.flywheel->waitForSpeed();
+  robot.flywheel->wait_for_speed();
   robot.indexer->cycle();
   pros::delay(500);
   robot.flywheel->disengage();

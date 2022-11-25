@@ -23,18 +23,18 @@ void Indexer::charge() {
 void Indexer::cycle() {
   if (this->state != CHARGED) {
     this->charge();
-    this->awaitReady();
+    this->await_ready();
   }
   this->push();
-  this->awaitPush();
+  this->await_push();
   this->charge();
-  this->awaitReady();
+  this->await_ready();
 }
 
-void Indexer::awaitReady(int16_t timeout_millis) {
+void Indexer::await_ready(int16_t timeout_millis) {
   if (this->state == CHARGING) {
     timeout_millis /= 50;
-    int i = 0;
+    uint16_t i = 0;
     pros::delay(250);
     do {
       if (i++ == timeout_millis) {
@@ -48,7 +48,7 @@ void Indexer::awaitReady(int16_t timeout_millis) {
   }
 }
 
-void Indexer::awaitPush(int16_t timeout_millis) {
+void Indexer::await_push(int16_t timeout_millis) {
   if (this->state == PUSHING) {
     this->motor.await_target(timeout_millis);
     this->set_state(PUSHED);

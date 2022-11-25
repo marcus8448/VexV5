@@ -39,7 +39,7 @@ private:
   double prevRightStickX = 0.0;
   double prevRightStickY = 0.0;
 
-  int32_t flywheelSpeed = 600;
+  int32_t flywheelSpeed = 300;
 
 public:
   explicit OpController(pros::Controller controller = pros::Controller(pros::E_CONTROLLER_MASTER));

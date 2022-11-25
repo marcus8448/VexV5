@@ -39,9 +39,9 @@ public:
 
   void cycle();
 
-  void awaitReady(int16_t millis_timeout = 2500);
+  void await_ready(int16_t millis_timeout = 2500);
 
-  void awaitPush(int16_t millis_timeout = 2500);
+  void await_push(int16_t millis_timeout = 2500);
 
   [[nodiscard]] const device::Motor &get_motor() const;
 

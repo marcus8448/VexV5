@@ -25,7 +25,7 @@ void Flywheel::engage(int32_t flywheelSpeed, bool block) {
   }
 
   if (block) {
-    this->waitForSpeed();
+    this->wait_for_speed();
   }
 }
 
@@ -41,7 +41,7 @@ void Flywheel::update(Controller *controller) {
     this->disengage();
   }
   if (this->state == SPINNING_UP || this->state == SPINNING_DOWN) {
-    if (this->isUpToSpeed()) {
+    if (this->is_up_to_speed()) {
       this->state = State::AT_SPEED;
       controller->rumble("-");
     }
@@ -55,19 +55,19 @@ void Flywheel::update(Controller *controller) {
 
 [[nodiscard]] const device::Motor &Flywheel::get_motor() const { return this->motor; }
 
-double Flywheel::getVelocity() { return this->motor.get_velocity(); }
+double Flywheel::get_velocity() { return this->motor.get_velocity(); }
 
-bool Flywheel::isUpToSpeed() {
+bool Flywheel::is_up_to_speed() {
   return std::abs(std::abs(this->motor.get_velocity()) - std::abs(this->motor.get_target_velocity())) < 10.0;
 }
 
-void Flywheel::waitForSpeed(int millis_timeout) {
+void Flywheel::wait_for_speed(uint16_t millis_timeout) {
   if (this->state == State::IDLE) {
     logger::error("Waiting for flywheel to speed up while it's off!");
     return;
   }
   millis_timeout /= 50;
-  int i = 0;
+  int16_t i = 0;
   int32_t target = std::abs(this->motor.get_target_velocity());
   while (target - std::abs(this->motor.get_velocity()) > 10.0) {
     if (i++ == millis_timeout) {

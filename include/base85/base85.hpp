@@ -25,8 +25,6 @@
 
 #ifndef BASE85_HPP
 #define BASE85_HPP
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wall"
 
 #ifdef __GNUC__
 #define restrict __restrict__
@@ -60,5 +58,4 @@ char *bintob85(char *restrict dest, void const *restrict src, size_t size);
 void *b85tobin(void *restrict dest, char const *restrict src);
 }
 } // namespace base85
-#pragma GCC diagnostic pop
 #endif // BASE85_HPP

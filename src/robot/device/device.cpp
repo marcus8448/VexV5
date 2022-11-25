@@ -12,7 +12,7 @@ static std::map<Device *, bool> devices;
 
 [[noreturn]] void reconfigure_task(void *params);
 
-Device::Device(uint8_t port): port(port) {
+Device::Device(uint8_t port) : port(port) {
   devices.emplace(this, true);
   if (!initialized) {
     initialized = true;
@@ -26,9 +26,7 @@ bool Device::checkConnect() const {
   return b;
 }
 
-[[nodiscard]] uint8_t Device::get_port() const {
-  return this->port;
-}
+[[nodiscard]] uint8_t Device::get_port() const { return this->port; }
 
 [[noreturn]] void reconfigure_task(void *params) {
   pros::delay(2500);

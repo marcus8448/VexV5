@@ -42,22 +42,25 @@ void Intake::roll_to_team_colour(config::AllianceColour teamColour, uint32_t tim
     double hue = this->colour.get_hue();
     uint32_t i = 0;
     timeout /= 50;
+        logger::info("z%f", hue);
+
+    this->motor.move_percentage(75.0);
     switch (teamColour) {
     case config::AllianceColour::RED: {
-      while (hue < 335.0 || hue > 15.0) {
-        this->motor.move_percentage(50.0);
-        pros::delay(50);
-        if (i++ == timeout)
-          break;
+      while ((hue > 30.0 && hue < 310.0) || ++i == timeout) {
+        hue = this->colour.get_hue();
+        logger::info("r%f", hue);
+        pros::delay(100);
       }
+      break;
     }
     case config::AllianceColour::BLUE: {
-      while (hue < 210.0 || hue > 240.0) {
-        this->motor.move_percentage(50.0);
-        pros::delay(50);
-        if (i++ == timeout)
-          break;
+      logger::info("b%f", hue);
+      while (hue < 185.0 || hue > 275.0 || ++i == timeout) {
+        hue = this->colour.get_hue();
+        pros::delay(100);
       }
+      break;
     }
     }
     this->motor.stop();

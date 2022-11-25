@@ -14,8 +14,9 @@
 
 namespace robot::device {
 Motor::Motor(pros::Motor motor)
-    : Device(motor.get_port()), motor(std::move(motor)), gearset(this->motor.get_gearing()), maxVelocity(get_gearset_max_velocity(this->gearset)),
-      brakeMode(this->motor.get_brake_mode()), reversed(this->motor.is_reversed()) {
+    : Device(motor.get_port()), motor(std::move(motor)), gearset(this->motor.get_gearing()),
+      maxVelocity(get_gearset_max_velocity(this->gearset)), brakeMode(this->motor.get_brake_mode()),
+      reversed(this->motor.is_reversed()) {
   if (this->motor.get_encoder_units() != MOTOR_ENCODER_UNITS) {
     logger::error("Converting motor to degrees encoder units!");
     this->motor.set_encoder_units(MOTOR_ENCODER_UNITS);
@@ -24,13 +25,15 @@ Motor::Motor(pros::Motor motor)
 
 Motor::Motor(const uint8_t port, const pros::motor_gearset_e_t gearset, const pros::motor_brake_mode_e_t brake_mode,
              bool reversed)
-    : Device(port), motor(pros::Motor(static_cast<int8_t>(port), gearset, reversed, MOTOR_ENCODER_UNITS)), gearset(gearset),
-      maxVelocity(get_gearset_max_velocity(this->gearset)), brakeMode(brake_mode), reversed(reversed) {
+    : Device(port), motor(pros::Motor(static_cast<int8_t>(port), gearset, reversed, MOTOR_ENCODER_UNITS)),
+      gearset(gearset), maxVelocity(get_gearset_max_velocity(this->gearset)), brakeMode(brake_mode),
+      reversed(reversed) {
   this->motor.set_brake_mode(brake_mode);
 }
 
 Motor::Motor(const uint8_t port, bool reversed)
-    : Device(port), motor(pros::Motor(static_cast<int8_t>(port), DEFAULT_MOTOR_GEARSET, DEFAULT_MOTOR_BRAKE, MOTOR_ENCODER_UNITS)),
+    : Device(port),
+      motor(pros::Motor(static_cast<int8_t>(port), DEFAULT_MOTOR_GEARSET, DEFAULT_MOTOR_BRAKE, MOTOR_ENCODER_UNITS)),
       gearset(DEFAULT_MOTOR_GEARSET), maxVelocity(get_gearset_max_velocity(this->gearset)),
       brakeMode(DEFAULT_MOTOR_BRAKE), reversed(reversed) {
   this->motor.set_brake_mode(DEFAULT_MOTOR_BRAKE);
@@ -76,7 +79,7 @@ void Motor::move_percentage(double percent) {
   } else if (percent < -100.0) {
     percent = -100.0;
   }
-  this->move_millivolts(static_cast<int16_t>(percent * MAX_MILLIVOLTS));
+  this->move_millivolts(static_cast<int16_t>((percent * MAX_MILLIVOLTS) / 100.0));
 }
 
 void Motor::move_absolute(double target_position, uint16_t target_velocity) {
