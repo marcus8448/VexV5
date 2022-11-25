@@ -52,7 +52,7 @@ void Intake::roll_to_team_colour(config::AllianceColour teamColour, uint32_t tim
       }
     }
     case config::AllianceColour::BLUE: {
-      while (hue < 220.0 || hue > 240.0) {
+      while (hue < 210.0 || hue > 240.0) {
         this->motor.move_percentage(50.0);
         pros::delay(50);
         if (i++ == timeout)

@@ -9,18 +9,22 @@ Expansion::Expansion(uint8_t port) : piston(device::PneumaticPiston(port)) {}
 Expansion::~Expansion() = default;
 
 void Expansion::launch() {
-  logger::info("Launching expansion");
-  this->piston.extend();
-  this->launched = true;
+  if (!this->launched) {
+    logger::info("Launching expansion");
+    this->piston.extend();
+    this->launched = true;
+  }
 }
 
 [[nodiscard]] bool Expansion::has_launched() const { return this->launched; }
 
 void Expansion::update(Controller *controller) {
-  if (controller->y_pressed() % 5 == 1) {
-    controller->rumble("-");
-  } else if (controller->y_pressed() > 25) {
-    this->launch();
+  if (!this->launched) {
+    if (controller->y_pressed() % 5 == 1) {
+      controller->rumble("-");
+    } else if (controller->y_pressed() > 25) {
+      this->launch();
+    }
   }
 }
 

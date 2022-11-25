@@ -17,5 +17,7 @@ public:
 
   void click(lv_obj_t *btn);
 };
+
+extern AutonomousSelect *autonomous_select_instance;
 } // namespace screen
 #endif // SCREEN_AUTONOMOUS_SELECT_HPP

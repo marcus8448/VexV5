@@ -1,4 +1,5 @@
 // CONFIG
+#include <iostream>
 #define FLYWHEEL_MOTOR 3
 #define INDEXER_MOTOR 19
 #define INTAKE_MOTOR 1
@@ -10,8 +11,7 @@
 #define RIGHT_BACK_MOTOR 9
 #define LEFT_BACK_MOTOR 20
 
-
-#define AUTONOMOUS
+#define ENABLE_AUTONOMOUS
 
 #define SCREEN
 #define SCREEN_CONFIG
@@ -32,7 +32,7 @@
 #include "main.hpp"
 #include "robot/controller/operator.hpp"
 
-#ifdef AUTONOMOUS
+#ifdef ENABLE_AUTONOMOUS
 #include "robot/autonomous/autonomous.hpp"
 #include "robot/autonomous/left_score.hpp"
 #include "robot/autonomous/left_winpoint.hpp"
@@ -54,7 +54,7 @@
 #ifdef SCREEN_CONFIG
 #include "screen/config_screen.hpp"
 #endif
-#ifdef AUTONOMOUS
+#ifdef ENABLE_AUTONOMOUS
 #include "screen/autonomous_select.hpp"
 #endif
 #ifdef SCREEN_DRIVETRAIN
@@ -84,7 +84,7 @@ void initialize() {
   serial::initialize();
 #endif // SERIAL_LINK
   // Optionally disable autonomous for builds
-#ifdef AUTONOMOUS
+#ifdef ENABLE_AUTONOMOUS
   // Register the different types of autonomous-es
   autonomous::register_autonomous("None", new autonomous::None());
   autonomous::register_autonomous("Left Winpoint", new autonomous::LeftWinpoint());
@@ -96,7 +96,7 @@ void initialize() {
 #ifdef SCREEN
   logger::push("Add Screens");
   // Optionally register the different screens
-#ifdef AUTONOMOUS
+#ifdef ENABLE_AUTONOMOUS
   screen::add_screen(new screen::AutonomousSelect());
 #endif
 #ifdef SCREEN_CONFIG
@@ -123,13 +123,19 @@ void initialize() {
  * Called when the robot is in it's autonomous state in a competition.
  */
 void autonomous() {
-#ifdef AUTONOMOUS
+#ifdef ENABLE_AUTONOMOUS
   logger::push("Autonomous Setup");
   Robot &robot = get_or_create_robot();
   logger::pop();
   autonomous::set_active("Left Winpoint");
   autonomous::Autonomous *autonomous = autonomous::get_autonomous();
   if (autonomous != nullptr) {
+    // #ifdef SCREEN
+    // if (screen::autonomous_select_instance != nullptr) {
+    //   screen::remove_screen(screen::autonomous_select_instance);
+    //   screen::autonomous_select_instance = nullptr;
+    // }
+    // #endif
     autonomous->run(robot); // run the autonomous code
   } else {
     logger::error("Missing autonomous run!");
@@ -144,6 +150,13 @@ void autonomous() {
  */
 void opcontrol() {
   Robot &robot = get_or_create_robot();
+// #if defined(ENABLE_AUTONOMOUS) && defined(SCREEN) // todo: fix race condition
+//   if (screen::autonomous_select_instance != nullptr) {
+//     screen::remove_screen(screen::autonomous_select_instance);
+//     screen::autonomous_select_instance = nullptr;
+//   }
+// #endif
+
   logger::push("Opcontrol Setup");
   robot.controller = new controller::OpController(); // set the robot controller to the default operator based one.
   logger::pop();

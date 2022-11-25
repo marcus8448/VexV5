@@ -44,7 +44,6 @@ void Flywheel::update(Controller *controller) {
     if (this->isUpToSpeed()) {
       this->state = State::AT_SPEED;
       controller->rumble("-");
-      controller->rumble("");
     }
   }
   if (this->state == State::AT_SPEED) {

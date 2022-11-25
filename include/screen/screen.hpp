@@ -18,5 +18,6 @@ public:
 
 void initialize(robot::Robot &robot);
 void add_screen(Screen *screen);
+void remove_screen(Screen *screen);
 } // namespace screen
 #endif // SCREEN_HPP
