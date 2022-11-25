@@ -20,7 +20,7 @@ private:
    * The motor of the intake/roller.
    */
   device::Motor motor;
-  device::ColourSensor colour;
+  device::Optical colour;
 
   /**
    * Whether the intake is currently running.

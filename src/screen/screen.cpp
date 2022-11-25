@@ -30,13 +30,13 @@ static lv_coord_t height = 0;
 
 lv_res_t prev_page([[maybe_unused]] lv_obj_t *btn);
 lv_res_t next_page([[maybe_unused]] lv_obj_t *btn);
-void destroy_screen(Screen *screen);
-void init_screen(Screen *screen);
+void hide_screen(Screen *screen);
+void show_screen(Screen *screen);
 void update(robot::Robot &robot);
 [[noreturn]] void update_task(void *params);
 lv_obj_t *create_prev_btn(lv_obj_t *obj);
 lv_obj_t *create_next_btn(lv_obj_t *obj);
-void create_screen(lv_obj_t * output[], lv_obj_t *parent);
+void create_screen(lv_obj_t *output[], lv_obj_t *parent);
 
 void initialize(robot::Robot &robot) {
   logger::push("Initialize LVGL");
@@ -57,14 +57,14 @@ void initialize(robot::Robot &robot) {
   logger::push("Create screens");
   for (size_t i = 0; i < registry->size(); i++) {
     Screen *screen = registry->at(i);
-    lv_obj_t **lvObjs = new lv_obj_t*[3];
+    lv_obj_t **lvObjs = new lv_obj_t *[3];
     create_screen(lvObjs, base_view);
     screens->emplace(screen, lvObjs);
     screen->create(lvObjs[0], width, height);
   }
   logger::pop();
 
-  init_screen(activeScreen);
+  show_screen(activeScreen);
   pros::Task(update_task, &robot, "Screen Update");
 }
 
@@ -97,15 +97,15 @@ void add_screen(Screen *screen) { registry->push_back(screen); }
 
 void remove_screen(Screen *screen) {
   if (activeScreen == screen) {
-    destroy_screen(activeScreen);
+    hide_screen(activeScreen);
     auto newScreen = registry->front() != activeScreen ? registry->front() : registry->back();
     activeScreen = newScreen;
-    init_screen(newScreen);
+    show_screen(newScreen);
   }
 
   registry->erase(std::remove(registry->begin(), registry->end(), screen), registry->end());
 
-  delete [] *screens->at(screen);
+  delete[] * screens->at(screen);
   screens->erase(screen);
 
   lv_obj_set_hidden(screens->at(registry->front())[1], true);
@@ -129,36 +129,32 @@ lv_obj_t *create_next_btn(lv_obj_t *obj) {
 }
 
 lv_res_t prev_page([[maybe_unused]] lv_obj_t *btn) {
-  destroy_screen(activeScreen);
+  logger::debug("Screen switching to previous page");
+  hide_screen(activeScreen);
   auto x = std::find(registry->begin(), registry->end(), activeScreen);
   auto newScreen = registry->at(x - registry->begin() - 1);
-  init_screen(newScreen);
+  show_screen(newScreen);
   activeScreen = newScreen;
   return LV_RES_OK;
 }
 
 lv_res_t next_page([[maybe_unused]] lv_obj_t *btn) {
-  destroy_screen(activeScreen);
+  logger::debug("Screen switching to next page");
+  hide_screen(activeScreen);
   auto x = std::find(registry->begin(), registry->end(), activeScreen);
   auto newScreen = registry->at(x - registry->begin() + 1);
-  init_screen(newScreen);
+  show_screen(newScreen);
   activeScreen = newScreen;
   return LV_RES_OK;
 }
 
-void init_screen(Screen *screen) {
-  logger::push("Show screen");
+void show_screen(Screen *screen) {
   auto objects = screens->at(screen);
   lv_obj_set_hidden(objects[0], false);
   size_t index = std::find(registry->begin(), registry->end(), screen) - registry->begin();
   lv_obj_set_hidden(objects[1], index == 0);
   lv_obj_set_hidden(objects[2], index == registry->size() - 1);
-  logger::pop();
 }
 
-void destroy_screen(Screen * screen) {
-  logger::push("Drop screen");
-  lv_obj_set_hidden(screens->at(screen)[0], true);
-  logger::pop();
-}
+void hide_screen(Screen *screen) { lv_obj_set_hidden(screens->at(screen)[0], true); }
 } // namespace screen

@@ -150,12 +150,12 @@ void autonomous() {
  */
 void opcontrol() {
   Robot &robot = get_or_create_robot();
-// #if defined(ENABLE_AUTONOMOUS) && defined(SCREEN) // todo: fix race condition
-//   if (screen::autonomous_select_instance != nullptr) {
-//     screen::remove_screen(screen::autonomous_select_instance);
-//     screen::autonomous_select_instance = nullptr;
-//   }
-// #endif
+  // #if defined(ENABLE_AUTONOMOUS) && defined(SCREEN) // todo: fix race condition
+  //   if (screen::autonomous_select_instance != nullptr) {
+  //     screen::remove_screen(screen::autonomous_select_instance);
+  //     screen::autonomous_select_instance = nullptr;
+  //   }
+  // #endif
 
   logger::push("Opcontrol Setup");
   robot.controller = new controller::OpController(); // set the robot controller to the default operator based one.
@@ -179,8 +179,8 @@ void opcontrol() {
  */
 Robot &get_or_create_robot() {
   static Robot robot = Robot(new Drivetrain(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR),
-                             new Intake(INTAKE_MOTOR, ROLLER_COLOUR_SENSOR), new Indexer(INDEXER_MOTOR), new Flywheel(FLYWHEEL_MOTOR, 5),
-                             new Expansion(EXPANSION_PISTON));
+                             new Intake(INTAKE_MOTOR, ROLLER_COLOUR_SENSOR), new Indexer(INDEXER_MOTOR),
+                             new Flywheel(FLYWHEEL_MOTOR, 5), new Expansion(EXPANSION_PISTON));
   return robot;
 }
 

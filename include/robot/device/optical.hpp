@@ -5,27 +5,30 @@
 #include "robot/device/device.hpp"
 
 namespace robot::device {
-class ColourSensor : public Device {
+class Optical : public Device {
 private:
-  pros::Optical optical;
-  const uint8_t port;
+  // pros::Optical optical; // for some reason nothing is const
+  uint8_t led_pwm;
+  bool gesture = false;
 
 public:
-  explicit ColourSensor(uint8_t port);
+  explicit Optical(uint8_t port, uint8_t led_pwm = 0, bool gesture = false);
 
-  double get_hue();
-  double get_saturation();
-  double get_brightness();
+  double get_hue() const;
+  double get_saturation() const;
+  double get_brightness() const;
 
-  int32_t get_proximity();
+  int32_t get_proximity() const;
 
-  int32_t set_led_pwm(uint8_t value);
-  int32_t get_led_pwm();
+  void set_led_pwm(uint8_t value);
+  int32_t get_led_pwm() const;
 
-  bool disable_gesture();
+  void enable_gesture();
+  void disable_gesture();
 
-  bool is_connected() override;
-  uint8_t get_port() const override;
+  void reconfigure() const override;
+
+  bool is_connected() const override;
 };
 } // namespace robot::device
 

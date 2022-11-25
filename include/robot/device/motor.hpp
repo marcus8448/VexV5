@@ -24,8 +24,6 @@ private:
   pros::motor_brake_mode_e_t brakeMode;
   bool reversed;
 
-  const uint8_t port;
-
 public:
   explicit Motor(const Motor &motor) = delete;
   explicit Motor(pros::Motor motor);
@@ -59,13 +57,14 @@ public:
   [[nodiscard]] pros::motor_brake_mode_e_t get_brake_mode() const;
   [[nodiscard]] pros::motor_gearset_e_t get_gearset() const;
   [[nodiscard]] bool is_reversed() const;
-  [[nodiscard]] uint8_t get_port() const override;
-  [[nodiscard]] bool is_connected() override;
+  [[nodiscard]] bool is_connected() const override;
 
   [[nodiscard]] double get_temperature() const;
 
   void await_target(int16_t timeout_millis = MOTOR_TIMEOUT_MILLIS) const;
   [[nodiscard]] bool is_at_target() const;
+
+  void reconfigure() const override;
 
   void tare();
   void stop();

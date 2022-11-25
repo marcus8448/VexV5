@@ -1,6 +1,5 @@
 #include "screen/info.hpp"
 #include "configuration.hpp"
-#include "display/lv_misc/lv_area.h"
 #include "screen/lvgl_util.hpp"
 #include "screen/screen.hpp"
 

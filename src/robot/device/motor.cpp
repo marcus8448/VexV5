@@ -14,8 +14,8 @@
 
 namespace robot::device {
 Motor::Motor(pros::Motor motor)
-    : motor(std::move(motor)), gearset(this->motor.get_gearing()), maxVelocity(get_gearset_max_velocity(this->gearset)),
-      brakeMode(this->motor.get_brake_mode()), reversed(this->motor.is_reversed()), port(this->motor.get_port()) {
+    : Device(motor.get_port()), motor(std::move(motor)), gearset(this->motor.get_gearing()), maxVelocity(get_gearset_max_velocity(this->gearset)),
+      brakeMode(this->motor.get_brake_mode()), reversed(this->motor.is_reversed()) {
   if (this->motor.get_encoder_units() != MOTOR_ENCODER_UNITS) {
     logger::error("Converting motor to degrees encoder units!");
     this->motor.set_encoder_units(MOTOR_ENCODER_UNITS);
@@ -24,15 +24,15 @@ Motor::Motor(pros::Motor motor)
 
 Motor::Motor(const uint8_t port, const pros::motor_gearset_e_t gearset, const pros::motor_brake_mode_e_t brake_mode,
              bool reversed)
-    : motor(pros::Motor(static_cast<int8_t>(port), gearset, reversed, MOTOR_ENCODER_UNITS)), gearset(gearset),
-      maxVelocity(get_gearset_max_velocity(this->gearset)), brakeMode(brake_mode), reversed(reversed), port(port) {
+    : Device(port), motor(pros::Motor(static_cast<int8_t>(port), gearset, reversed, MOTOR_ENCODER_UNITS)), gearset(gearset),
+      maxVelocity(get_gearset_max_velocity(this->gearset)), brakeMode(brake_mode), reversed(reversed) {
   this->motor.set_brake_mode(brake_mode);
 }
 
 Motor::Motor(const uint8_t port, bool reversed)
-    : motor(pros::Motor(static_cast<int8_t>(port), DEFAULT_MOTOR_GEARSET, DEFAULT_MOTOR_BRAKE, MOTOR_ENCODER_UNITS)),
+    : Device(port), motor(pros::Motor(static_cast<int8_t>(port), DEFAULT_MOTOR_GEARSET, DEFAULT_MOTOR_BRAKE, MOTOR_ENCODER_UNITS)),
       gearset(DEFAULT_MOTOR_GEARSET), maxVelocity(get_gearset_max_velocity(this->gearset)),
-      brakeMode(DEFAULT_MOTOR_BRAKE), reversed(reversed), port(port) {
+      brakeMode(DEFAULT_MOTOR_BRAKE), reversed(reversed) {
   this->motor.set_brake_mode(DEFAULT_MOTOR_BRAKE);
 }
 
@@ -174,9 +174,10 @@ void Motor::await_velocity(uint16_t target_velocity, int16_t timeout_millis) con
 
 [[nodiscard]] bool Motor::is_reversed() const { return this->reversed; }
 
-[[nodiscard]] uint8_t Motor::get_port() const { return this->port; }
-
-[[nodiscard]] bool Motor::is_connected() { return this->motor.get_voltage() == INT32_MAX && errno == ENODEV; }
+[[nodiscard]] bool Motor::is_connected() const {
+  errno = 0;
+  return this->motor.get_voltage() != INT32_MAX && this->checkConnect();
+}
 
 double Motor::get_temperature() const { return this->motor.get_temperature(); }
 
@@ -194,6 +195,13 @@ void Motor::await_target(int16_t timeout_millis) const {
   } else {
     return std::abs(this->get_velocity() - this->get_target_velocity()) < 10.0;
   }
+}
+
+void Motor::reconfigure() const {
+  this->motor.set_brake_mode(this->brakeMode);
+  this->motor.set_encoder_units(MOTOR_ENCODER_UNITS);
+  this->motor.set_gearing(this->gearset);
+  this->motor.set_reversed(this->reversed);
 }
 
 void Motor::tare() { this->motor.tare_position(); }

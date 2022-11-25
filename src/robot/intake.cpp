@@ -8,7 +8,7 @@ namespace robot {
 
 Intake::Intake(uint8_t motorPort, uint8_t colourPort)
     : motor(device::Motor(motorPort, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, false)),
-      colour(device::ColourSensor(colourPort)) {}
+      colour(device::Optical(colourPort)) {}
 
 Intake::~Intake() = default;
 

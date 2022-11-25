@@ -1,10 +1,11 @@
 #include "robot/device/pneumatics.hpp"
 #include "pros/adi.hpp"
+#include <cerrno>
 
 namespace robot::device {
-PneumaticPiston::PneumaticPiston(char port) : port(port), piston(pros::ADIDigitalOut(port, false)), extended(false) {}
-PneumaticPiston::PneumaticPiston(char port, bool defaultState)
-    : port(port), piston(pros::ADIDigitalOut(port, defaultState)), extended(defaultState) {}
+PneumaticPiston::PneumaticPiston(uint8_t port) : Device(port), piston(pros::ADIDigitalOut(port, false)), extended(false) {}
+PneumaticPiston::PneumaticPiston(uint8_t port, bool defaultState)
+    : Device(port), piston(pros::ADIDigitalOut(port, defaultState)), extended(defaultState) {}
 
 void PneumaticPiston::extend() {
   if (!this->extended) {
@@ -27,11 +28,16 @@ void PneumaticPiston::toggle() {
     this->extend();
   }
 }
+
 [[nodiscard]] bool PneumaticPiston::is_extended() { return this->extended; }
 
-[[nodiscard]] uint8_t PneumaticPiston::get_port() const { return this->port; }
+void PneumaticPiston::reconfigure() const {}
 
-[[nodiscard]] bool PneumaticPiston::is_connected() { return this->piston.set_value(this->extended) == 1; }
+[[nodiscard]] bool PneumaticPiston::is_connected() const {
+  bool b = this->piston.set_value(this->extended) == 1;
+  errno = 0;
+  return b;
+}
 
 [[nodiscard]] pros::ADIDigitalOut PneumaticPiston::get_raw_piston() const { return this->piston; }
 } // namespace robot::device

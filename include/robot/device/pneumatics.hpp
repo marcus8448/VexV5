@@ -10,22 +10,21 @@ typedef __SIZE_TYPE__ size_t; // adi.hpp requires it
 namespace robot::device {
 class PneumaticPiston : public Device {
 private:
-  const char port;
   const pros::ADIDigitalOut piston;
   bool extended;
 
 public:
-  explicit PneumaticPiston(char port);
-  explicit PneumaticPiston(char port, bool defaultState);
+  explicit PneumaticPiston(uint8_t port);
+  explicit PneumaticPiston(uint8_t port, bool defaultState);
 
   void extend();
   void contract();
   void toggle();
-  
+
   [[nodiscard]] bool is_extended();
 
-  [[nodiscard]] virtual uint8_t get_port() const override;
-  [[nodiscard]] virtual bool is_connected() override;
+  void reconfigure() const override;
+  [[nodiscard]] bool is_connected() const override;
 
   [[nodiscard]] pros::ADIDigitalOut get_raw_piston() const;
 };
