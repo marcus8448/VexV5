@@ -90,11 +90,11 @@ void Drivetrain::update(Controller *controller) {
       }
     }
 
-    this->power_right(right / 127.0);
-    this->power_left(left / 127.0);
+    this->power_right(right / 127.0 * 100.0);
+    this->power_left(left / 127.0 * 100.0);
   } else {
-    this->power_right(controller->right_stick_y() / 127.0);
-    this->power_left(controller->left_stick_y() / 127.0);
+    this->power_right(controller->right_stick_y() / 127.0 * 100.0);
+    this->power_left(controller->left_stick_y() / 127.0 * 100.0);
   }
 }
 

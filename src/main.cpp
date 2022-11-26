@@ -161,7 +161,7 @@ void opcontrol() {
   robot.controller = new controller::OpController(); // set the robot controller to the default operator based one.
   logger::pop();
 
-#ifdef ENABLE_TEMPORARY_CODE
+#if __has_include("temporary.hpp") && defined(ENABLE_TEMPORARY_CODE)
   if (temporary::run(robot))
     return;
 #endif
