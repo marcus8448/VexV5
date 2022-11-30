@@ -7,7 +7,7 @@
 #include "serial/serial.hpp"
 
 namespace serial {
-class RobotCommandsPlugin : public SerialPlugin {
+class RobotCommandsPlugin : public PacketHandler {
 public:
   robot::Robot &robot;
 
@@ -16,7 +16,6 @@ public:
 
   void initialize() override;
   void handle(SerialConnection *connection, void *buffer, size_t len) override;
-  void register_packets(IdRegistry *registry) override;
 };
 } // namespace serial
 #endif // SERIAL_ROBOT_COMMAND_HPP

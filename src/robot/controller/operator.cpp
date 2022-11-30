@@ -58,6 +58,7 @@ void OpController::clear_line(uint8_t line) { print_error(this->controller.clear
 void OpController::rumble(const char *str) { print_error(this->controller.rumble(str)); }
 
 void OpController::update() {
+  this->ticks++;
   if (print_error(this->controller.get_digital(pros::E_CONTROLLER_DIGITAL_A))) {
     this->a++;
   } else {
@@ -174,7 +175,7 @@ void OpController::update() {
     logger::debug("L2 pressed");
 
   static bool init = false;
-  if (this->left_pressed() || this->right_pressed() || !init) {
+  if (this->ticks % 10 == 0 || !init) {
     init = true;
     this->set_line(0, 0,
                    logger::string_format("Flywheel: %i  ", static_cast<int32_t>(this->flywheel_speed()))

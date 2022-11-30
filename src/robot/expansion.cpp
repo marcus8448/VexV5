@@ -20,9 +20,9 @@ void Expansion::launch() {
 
 void Expansion::update(Controller *controller) {
   if (!this->launched) {
-    if (controller->y_pressed() % 5 == 1) {
+    if (controller->up_pressed() % 5 == 1) {
       controller->rumble("-");
-    } else if (controller->y_pressed() > 25) {
+    } else if (controller->up_pressed() > 25) {
       this->launch();
     }
   }

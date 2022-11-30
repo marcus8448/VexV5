@@ -35,7 +35,7 @@ void FlywheelChart::update(robot::Robot &robot) {
     this->velFlywheel.erase(this->velFlywheel.begin());
   }
 
-  auto prev = std::fabs(static_cast<float>(robot.flywheel->get_velocity()));
+  auto prev = std::fabs(static_cast<float>(robot.flywheel->get_first_motor_velocity()));
   if (prev == INFINITY || prev == -1) {
     prev = 5;
   }

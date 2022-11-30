@@ -57,8 +57,4 @@ void RobotCommandsPlugin::handle(serial::SerialConnection *connection, void *buf
     }
   }
 }
-
-void RobotCommandsPlugin::register_packets(IdRegistry *registry) {
-  registry->register_packet(SERIAL_ROBOT_COMMAND, this);
-}
 } // namespace serial

@@ -7,7 +7,7 @@
 namespace robot {
 
 Intake::Intake(uint8_t motorPort, uint8_t colourPort)
-    : motor(device::Motor(motorPort, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, false)),
+    : motor(device::Motor(motorPort, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_HOLD, false)),
       colour(device::Optical(colourPort)) {}
 
 Intake::~Intake() = default;
@@ -42,23 +42,20 @@ void Intake::roll_to_team_colour(config::AllianceColour teamColour, uint32_t tim
     double hue = this->colour.get_hue();
     uint32_t i = 0;
     timeout /= 50;
-        logger::info("z%f", hue);
 
-    this->motor.move_percentage(75.0);
+    this->motor.move_percentage(50.0);
     switch (teamColour) {
     case config::AllianceColour::RED: {
       while ((hue > 30.0 && hue < 310.0) || ++i == timeout) {
-        hue = this->colour.get_hue();
-        logger::info("r%f", hue);
         pros::delay(100);
+        hue = this->colour.get_hue();
       }
       break;
     }
     case config::AllianceColour::BLUE: {
-      logger::info("b%f", hue);
       while (hue < 185.0 || hue > 275.0 || ++i == timeout) {
-        hue = this->colour.get_hue();
         pros::delay(100);
+        hue = this->colour.get_hue();
       }
       break;
     }

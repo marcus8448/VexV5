@@ -14,6 +14,7 @@ private:
   bool extended;
 
 public:
+  DEVICE_NAME("Pneumatic Piston")
   explicit PneumaticPiston(uint8_t port);
   explicit PneumaticPiston(uint8_t port, bool defaultState);
 
@@ -21,7 +22,7 @@ public:
   void contract();
   void toggle();
 
-  [[nodiscard]] bool is_extended();
+  [[nodiscard]] bool is_extended() const;
 
   void reconfigure() const override;
   [[nodiscard]] bool is_connected() const override;

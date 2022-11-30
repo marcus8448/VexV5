@@ -16,7 +16,8 @@ private:
   /**
    * The motor of the flywheel.
    */
-  device::Motor motor;
+  device::Motor first_motor;
+  device::Motor second_motor;
   /**
    * Whether the flywheel is currently active.
    */
@@ -50,9 +51,11 @@ public:
    * Returns the current velocity of the flywheel.
    * @return the current velocity of the flywheel.
    */
-  double get_velocity();
+  double get_first_motor_velocity();
+  double get_second_motor_velocity();
 
-  [[nodiscard]] const device::Motor &get_motor() const;
+  [[nodiscard]] const device::Motor &get_first_motor() const;
+  [[nodiscard]] const device::Motor &get_second_motor() const;
 
   void update(Controller *controller) override;
 };

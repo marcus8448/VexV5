@@ -86,6 +86,4 @@ void RobotStatePlugin::handle(serial::SerialConnection *connection, void *buffer
   serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 3], this->robot.drivetrain->leftBack.get_raw_motor());
   connection->send(SERIAL_ROBOT_STATE, &buf, SIZE);
 }
-
-void RobotStatePlugin::register_packets(IdRegistry *registry) { registry->register_packet(SERIAL_ROBOT_STATE, this); }
 } // namespace serial

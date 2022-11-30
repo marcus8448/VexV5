@@ -15,6 +15,12 @@ lv_res_t drop_log(lv_obj_t *obj);
 
 Logging::Logging() { screen::logging = this; }
 
+Logging::~Logging() {
+  if (logging == this) {
+    logging = nullptr;
+  }
+}
+
 void Logging::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
   logs = lv_list_create(screen, nullptr);
   lv_obj_set_pos(logs, 0, 0);

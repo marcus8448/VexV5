@@ -1,6 +1,7 @@
 // CONFIG
 #include <iostream>
 #define FLYWHEEL_MOTOR 3
+#define FLYWHEEL_SECONDARY_MOTOR 5
 #define INDEXER_MOTOR 19
 #define INTAKE_MOTOR 1
 #define ROLLER_COLOUR_SENSOR 7
@@ -19,13 +20,15 @@
 #define SCREEN_DRIVETRAIN
 #define SCREEN_FLYWHEEL
 
-#define ENABLE_TEMPORARY_CODE
-
 // #define SERIAL_LINK
 // END CONFIG
 
-#if __has_include("temporary.hpp") && defined(ENABLE_TEMPORARY_CODE)
+#if __has_include("temporary.hpp")
+// #define ENABLE_TEMPORARY_CODE
+
+#ifdef ENABLE_TEMPORARY_CODE
 #include "temporary.hpp"
+#endif
 #endif
 
 #include "logger.hpp"
@@ -79,8 +82,8 @@ void initialize() {
   Robot &robot = get_or_create_robot();
 #ifdef SERIAL_LINK
   logger::warn("Initializing serial connection...");
-  serial::add_plugin(6, new serial::RobotStatePlugin(robot));
-  serial::add_plugin(7, new serial::RobotCommandsPlugin(robot));
+  serial::add_plugin(7, new serial::RobotStatePlugin(robot));
+  serial::add_plugin(8, new serial::RobotCommandsPlugin(robot));
   serial::initialize();
 #endif // SERIAL_LINK
   // Optionally disable autonomous for builds
@@ -161,7 +164,7 @@ void opcontrol() {
   robot.controller = new controller::OpController(); // set the robot controller to the default operator based one.
   logger::pop();
 
-#if __has_include("temporary.hpp") && defined(ENABLE_TEMPORARY_CODE)
+#ifdef ENABLE_TEMPORARY_CODE
   if (temporary::run(robot))
     return;
 #endif
@@ -180,7 +183,8 @@ void opcontrol() {
 Robot &get_or_create_robot() {
   static Robot robot = Robot(new Drivetrain(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR),
                              new Intake(INTAKE_MOTOR, ROLLER_COLOUR_SENSOR), new Indexer(INDEXER_MOTOR),
-                             new Flywheel(FLYWHEEL_MOTOR, 5), new Expansion(EXPANSION_PISTON));
+                             new Flywheel(FLYWHEEL_MOTOR, FLYWHEEL_SECONDARY_MOTOR), new Expansion(EXPANSION_PISTON));
+  device::initialize();
   return robot;
 }
 

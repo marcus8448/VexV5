@@ -19,6 +19,7 @@
 namespace screen {
 extern bool *enableCanvas;
 extern void *canvasBuffer;
+extern lv_coord_t halfWidth;
 
 static std::vector<Screen *> *registry = new std::vector<Screen *>();
 static std::map<Screen *, lv_obj_t **> *screens = new std::map<Screen *, lv_obj_t **>();
@@ -46,6 +47,7 @@ void initialize(robot::Robot &robot) {
   lv_obj_t *base_view = lv_scr_act();
   width = lv_obj_get_width(base_view);
   height = lv_obj_get_height(base_view);
+  halfWidth = static_cast<lv_coord_t>(width / 2);
   canvasSize = (lv_img_color_format_get_px_size(CANVAS_COLOUR) * width * (height - BASE_HEIGHT)) / 8;
   if (*enableCanvas) {
     canvasBuffer = calloc(canvasSize, 1);

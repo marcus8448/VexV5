@@ -17,6 +17,8 @@ lv_obj_t *create_label(lv_obj_t *screen, lv_coord_t x, lv_coord_t y, lv_coord_t 
 
 lv_style_t *create_text_color_style(lv_color_t colour);
 
+lv_obj_t *create_info_label(lv_obj_t *screen, bool right, lv_coord_t index, const char *text = "<uninit>");
+
 template <typename... Args> void set_label_text(lv_obj_t *label, const char *format, Args... args) {
   static char *buffer = new char[64];
   snprintf(buffer, 64, format, args...);

@@ -57,7 +57,7 @@ void Indexer::await_push(int16_t timeout_millis) {
 
 void Indexer::update(Controller *controller) {
   this->ticksInState++;
-  if (controller->up_pressed()) {
+  if (controller->r2_pressed()) {
     this->push();
   }
   if (this->state == PUSHING) {

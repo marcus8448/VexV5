@@ -12,6 +12,7 @@ private:
   bool gesture = false;
 
 public:
+  DEVICE_NAME("Optical")
   explicit Optical(uint8_t port, uint8_t led_pwm = 0, bool gesture = false);
 
   double get_hue() const;

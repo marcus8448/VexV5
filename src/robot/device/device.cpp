@@ -8,14 +8,17 @@
 
 namespace robot::device {
 static bool initialized;
+static std::vector<Device *> pendingDevices;
 static std::map<Device *, bool> devices;
 
 [[noreturn]] void reconfigure_task(void *params);
 
-Device::Device(uint8_t port) : port(port) {
-  devices.emplace(this, true);
-  if (!initialized) {
-    initialized = true;
+Device::Device(uint8_t port) : port(port) { pendingDevices.push_back(this); }
+
+void initialize() {
+  static bool init = false;
+  if (!init) {
+    init = true;
     pros::Task(reconfigure_task, nullptr, "Device reconfigure task");
   }
 }
@@ -29,27 +32,34 @@ bool Device::checkConnect() const {
 [[nodiscard]] uint8_t Device::get_port() const { return this->port; }
 
 [[noreturn]] void reconfigure_task(void *params) {
-  pros::delay(2500);
   logger::info("Device reconfigure task started.");
-  bool init = false;
   while (true) {
+    if (!pendingDevices.empty()) {
+      std::vector<Device *> pd;
+      pd = pendingDevices;
+      pendingDevices.clear();
+      for (Device *&device : pd) {
+        if (device->is_connected()) {
+          devices.emplace(device, true);
+        } else {
+          devices.emplace(device, false);
+          logger::warn("No device on port %i (expected %s).", device->get_port(), device->device_name());
+        }
+      }
+    }
+
     for (auto &pair : devices) {
       bool connected = pair.first->is_connected();
       if (pair.second && !connected) {
         pair.second = false;
-        if (init) {
-          logger::warn("Device on port %i disconnected.", pair.first->get_port());
-        } else {
-          logger::warn("No device on port %i.", pair.first->get_port());
-        }
+        logger::warn("%s on port %i disconnected.", pair.first->device_name(), pair.first->get_port());
       } else if (!pair.second && connected) {
-        logger::info("Device on port %i reconnected. Reconfiguring...", pair.first->get_port());
+        logger::info("%s on port %i reconnected. Reconfiguring...", pair.first->device_name(), pair.first->get_port());
         pair.second = true;
         pair.first->reconfigure();
       }
       pros::delay(100);
     }
-    init = true;
   }
 }
 } // namespace robot::device

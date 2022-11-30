@@ -30,7 +30,7 @@ void PneumaticPiston::toggle() {
   }
 }
 
-[[nodiscard]] bool PneumaticPiston::is_extended() { return this->extended; }
+[[nodiscard]] bool PneumaticPiston::is_extended() const { return this->extended; }
 
 void PneumaticPiston::reconfigure() const {}
 
