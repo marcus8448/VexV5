@@ -795,7 +795,7 @@ class ADILed : protected ADIPort {
 	ADILed(ext_adi_port_pair_t port_pair, std::uint32_t length);
 
 	/**
-	 * @brief Operator overload to access the buffer in the ADILed class, it is 
+	 * @brief Operator overload to access the buffer in the ADILed class, it is
 	 * recommended that you call .update(); after doing any operations with this.
 	 * 
 	 * @param i 0 indexed pixel of the lED

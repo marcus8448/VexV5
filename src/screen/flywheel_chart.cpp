@@ -44,7 +44,7 @@ void FlywheelChart::update(robot::Robot &robot) {
   float widthScale = this->canvasWidth / 100.0f;
 
   float x = 0;
-  for (int32_t i = static_cast<int32_t>(this->velFlywheel.size() - 2); i >= 0; --i) {
+  for (auto i = static_cast<int32_t>(this->velFlywheel.size() - 2); i >= 0; --i) {
     float v = std::fabs(this->velFlywheel[i]);
     lv_canvas_draw_line(flywheelCanvas,
                         lv_point_t{static_cast<lv_coord_t>(this->canvasWidth - (x * widthScale)),

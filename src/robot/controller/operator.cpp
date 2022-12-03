@@ -45,9 +45,9 @@ OpController::OpController(pros::Controller controller) : controller(controller)
 
 [[nodiscard]] double OpController::prev_right_stick_y() const { return this->prevRightStickY; }
 
-[[nodiscard]] int32_t OpController::flywheel_speed() const { return this->flywheelSpeed; }
+[[nodiscard]] int16_t OpController::flywheel_speed() const { return this->flywheelSpeed; }
 
-void OpController::flywheel_speed(int32_t speed) { this->flywheelSpeed = speed; }
+void OpController::flywheel_speed(int16_t speed) { this->flywheelSpeed = speed; }
 
 void OpController::set_line(uint8_t line, uint8_t col, const char *str) {
   print_error(this->controller.set_text(line, col, str));
@@ -144,9 +144,9 @@ void OpController::update() {
   this->rightStickY = print_error(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
 
   if (this->right_pressed()) {
-    this->flywheel_speed(std::min(this->flywheel_speed() + 1, static_cast<int32_t>(400)));
+    this->flywheel_speed(static_cast<int16_t>(std::min(this->flywheel_speed() + 1, 400)));
   } else if (this->left_pressed()) {
-    this->flywheel_speed(std::max(this->flywheel_speed() - 1, static_cast<int32_t>(0)));
+    this->flywheel_speed(static_cast<int16_t>(std::max(this->flywheel_speed() - 1, 0)));
   }
 
   if (this->a == 1)

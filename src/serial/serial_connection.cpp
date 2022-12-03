@@ -1,9 +1,7 @@
 #include "serial/serial_connection.hpp"
 #include "base85/base85.hpp"
-#include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include <istream>
 #include <ostream>
 #include <map>
 
@@ -14,9 +12,7 @@ static const char PACKET_IDS[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                                  'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '!', '#', '$', '%', '&', '(',
                                  ')', '*', '+', '-', ';', '<', '=', '>', '?', '@', '^', '_', '`', '{', '|', '}', '~'};
 static std::map<const char, const uint8_t> *generate_char_map();
-static std::map<const char, const uint8_t> *buf_to_char = generate_char_map();
-
-static void *buffer = malloc(512);
+static std::map<const char, const uint8_t> *BUF_TO_CHAR = generate_char_map();
 
 SerialConnection &SerialConnection::get_instance() {
   static SerialConnection connection = SerialConnection(std::cout.rdbuf(), std::cin.rdbuf());
@@ -26,10 +22,21 @@ SerialConnection &SerialConnection::get_instance() {
 SerialConnection::SerialConnection(std::streambuf *output, std::streambuf *input)
     : output(std::ostream(output)), input(std::istream(input)) {}
 
-uint16_t SerialConnection::read_packet(void *ptr, const uint16_t len) {
-  auto charPtr = static_cast<char*>(ptr);
-  this->input.getline(charPtr, len, '\n');
-  return static_cast<char*>(base85::b85tobin(ptr, charPtr)) - charPtr;
+PacketData SerialConnection::read_packet(void *ptr, const uint16_t ptr_len) {
+  this->input.getline(static_cast<char*>(ptr), ptr_len, '\n');
+  uint8_t id = BUF_TO_CHAR->at(static_cast<char*>(ptr)[0]);
+  if (static_cast<char*>(ptr)[1] == 0) {
+    return {
+      id,
+      nullptr,
+      0
+    };
+  }
+  return {
+    id,
+    ptr,
+    static_cast<uint16_t>(static_cast<char *>(base85::b85tobin(ptr, static_cast<char*>(ptr) + 1)) - static_cast<char *>(ptr))
+  };
 }
 
 void SerialConnection::send_packet(uint8_t packet_id, void *ptr, const uint16_t len) {
@@ -37,25 +44,23 @@ void SerialConnection::send_packet(uint8_t packet_id, void *ptr, const uint16_t 
   this->write_prefix();
   this->output.write(&PACKET_IDS[packet_id], 1);
   base85::bintob85(charPtr, ptr, len);
-  this->output.write(charPtr, std::strlen(charPtr));
-  this->write_suffix();
+  this->output.write(charPtr, static_cast<std::streamsize>(std::strlen(charPtr)));
 }
 
 uint8_t SerialConnection::read_packet_id() {
-  char c = 0;
-  this->input.read(&c, 1);
-  return buf_to_char->at(c);
+  return BUF_TO_CHAR->at(this->input.peek());
 }
 
 void SerialConnection::sync_output() {
-
-}
-
-size_t SerialConnection::available() {
-
+  this->output.flush();
 }
 
 void SerialConnection::skip_to_end() {
+  this->input.ignore();
+}
+
+void SerialConnection::write_prefix() {
+  this->output.write(".[", 2);
 }
 
 static std::map<const char, const uint8_t> *generate_char_map() {

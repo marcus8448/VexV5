@@ -50,7 +50,8 @@ void Drivetrain::turn_left(double degrees, int32_t max_rpm, uint16_t timeout_mil
 void Drivetrain::await_move(uint16_t timeout_millis) const {
   if (timeout_millis == 0)
     return;
-  for (int16_t i = 0; i < timeout_millis / 50; i++) {
+  timeout_millis /= 50;
+  for (uint16_t i = 0; i < timeout_millis / 50; i++) {
     if (this->is_at_target())
       break;
     pros::delay(50);

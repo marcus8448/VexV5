@@ -1,7 +1,6 @@
 #include "pros/optical.h"
 #include "robot/device/optical.hpp"
 #include <cerrno>
-#include <cstdint>
 
 namespace robot::device {
 Optical::Optical(uint8_t port, uint8_t led_pwm, bool gesture)
@@ -55,6 +54,6 @@ void Optical::reconfigure() const {
 
 bool Optical::is_connected() const {
   errno = 0;
-  return pros::c::optical_get_proximity(port) != INT32_MAX && this->checkConnect();
+  return pros::c::optical_get_proximity(port) != INT32_MAX && checkConnect();
 }
 } // namespace robot::device

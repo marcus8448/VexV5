@@ -20,7 +20,7 @@ private:
   double prev_target = INFINITY;
 
   const pros::motor_gearset_e_t gearset;
-  const uint16_t maxVelocity;
+  const int16_t maxVelocity;
   pros::motor_brake_mode_e_t brakeMode;
   bool reversed;
 
@@ -74,6 +74,6 @@ public:
   [[nodiscard]] const pros::Motor &get_raw_motor() const;
 };
 
-uint16_t get_gearset_max_velocity(pros::motor_gearset_e_t gearset);
+int16_t get_gearset_max_velocity(pros::motor_gearset_e_t gearset);
 } // namespace robot::device
 #endif // VEXV5_ROBOT_DEVICE_MOTOR_HPP

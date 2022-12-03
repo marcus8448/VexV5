@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <cstddef>
 #include <cstdlib>
 #include <cstring>
 #include <map>
@@ -57,9 +56,8 @@ void initialize(robot::Robot &robot) {
 
   logger::debug("Width: %i\nHeight: %i", width, height);
   logger::push("Create screens");
-  for (size_t i = 0; i < registry->size(); i++) {
-    Screen *screen = registry->at(i);
-    lv_obj_t **lvObjs = new lv_obj_t *[3];
+  for (auto screen : *registry) {
+    auto **lvObjs = new lv_obj_t *[3];
     create_screen(lvObjs, base_view);
     screens->emplace(screen, lvObjs);
     screen->create(lvObjs[0], width, height);

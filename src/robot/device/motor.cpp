@@ -47,7 +47,7 @@ void Motor::move_velocity(int16_t target_velocity) {
     target_velocity = this->maxVelocity;
   } else if (target_velocity < -this->maxVelocity) {
     logger::warn("Target velocity %i is over max velocity %i!", target_velocity, -this->maxVelocity);
-    target_velocity = -this->maxVelocity;
+    target_velocity = static_cast<int16_t>(-this->maxVelocity);
   }
   if (this->targetType != TargetType::VELOCITY || this->target != target_velocity) {
     this->target = target_velocity;
@@ -179,7 +179,7 @@ void Motor::await_velocity(uint16_t target_velocity, int16_t timeout_millis) con
 
 [[nodiscard]] bool Motor::is_connected() const {
   errno = 0;
-  return this->motor.get_voltage() != INT32_MAX && this->checkConnect();
+  return this->motor.get_voltage() != INT32_MAX && checkConnect();
 }
 
 double Motor::get_temperature() const { return this->motor.get_temperature(); }
@@ -215,7 +215,7 @@ void Motor::stop() { this->move_millivolts(0); }
 
 const pros::Motor &Motor::get_raw_motor() const { return this->motor; }
 
-uint16_t get_gearset_max_velocity(const pros::motor_gearset_e_t gearset) {
+int16_t get_gearset_max_velocity(const pros::motor_gearset_e_t gearset) {
   switch (gearset) {
   case pros::E_MOTOR_GEARSET_36:
     return 100;

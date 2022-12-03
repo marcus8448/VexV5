@@ -28,14 +28,14 @@ public:
    * Creates a new flywheel with the specified motor.
    * @param motor The motor of the flywheel.
    */
-  explicit Flywheel(uint8_t port, uint8_t secondary_port = 99);
+  explicit Flywheel(uint8_t port, uint8_t secondary_port);
   virtual ~Flywheel();
 
   /**
    * Engages the flywheel.
    * Sets the motor to run at max speed.
    */
-  void engage(int32_t flywheelSpeed = FLYWHEEL_TARGET_SPEED, bool block = false);
+  void engage(int16_t flywheelSpeed = FLYWHEEL_TARGET_SPEED, bool block = false);
 
   bool is_up_to_speed();
 

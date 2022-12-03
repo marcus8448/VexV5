@@ -1,17 +1,15 @@
 #include "robot/device/device.hpp"
 #include "logger.hpp"
 #include "pros/rtos.hpp"
-#include <algorithm>
 #include <cerrno>
 #include <map>
-#include <vector>
 
 namespace robot::device {
 static bool initialized;
 static std::vector<Device *> pendingDevices;
 static std::map<Device *, bool> devices;
 
-[[noreturn]] void reconfigure_task(void *params);
+[[noreturn]] void reconfigure_task([[maybe_unused]] void *params);
 
 Device::Device(uint8_t port) : port(port) { pendingDevices.push_back(this); }
 
@@ -23,7 +21,7 @@ void initialize() {
   }
 }
 
-bool Device::checkConnect() const {
+bool Device::checkConnect() {
   bool b = errno != ENODEV;
   errno = 0;
   return b;
@@ -31,7 +29,7 @@ bool Device::checkConnect() const {
 
 [[nodiscard]] uint8_t Device::get_port() const { return this->port; }
 
-[[noreturn]] void reconfigure_task(void *params) {
+[[noreturn]] void reconfigure_task([[maybe_unused]] void *params) {
   logger::info("Device reconfigure task started.");
   while (true) {
     if (!pendingDevices.empty()) {

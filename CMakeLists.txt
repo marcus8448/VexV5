@@ -34,11 +34,9 @@ endif()
 
 if (ClangFormat)
 message(NOTICE "Clang-format found, adding utility target.")
-get_target_property(PROJECT_SOURCES HotPackage SOURCES)
-
 add_custom_target(
         FormatCode
-        COMMAND cd ${CMAKE_SOURCE_DIR} && ${ClangFormat} -i ${PROJECT_SOURCES}
+        COMMAND cd ${CMAKE_SOURCE_DIR} && ${ClangFormat} -i ${HEADER_FILES} ${SOURCE_FILES}
 )
 endif()
 

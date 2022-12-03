@@ -1,8 +1,4 @@
 #include "screen/banner.hpp"
-#include "screen/colour.hpp"
-#include "screen/lvgl_util.hpp"
-#include "screen/screen.hpp"
-#include <cmath>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wall"

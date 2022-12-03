@@ -12,7 +12,7 @@ public:
   robot::Robot &robot;
 
 public:
-  explicit RobotCommandsPlugin(robot::Robot &robot);
+  explicit RobotCommandsPlugin(uint8_t id, robot::Robot &robot);
 
   void initialize() override;
   void handle(SerialConnection *connection, void *buffer, size_t len) override;

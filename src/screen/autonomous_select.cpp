@@ -23,7 +23,7 @@ static lv_style_t *selected_style = nullptr;
 lv_res_t drop([[maybe_unused]] lv_obj_t *obj);
 lv_res_t click(lv_obj_t *btn);
 
-AutonomousSelect::AutonomousSelect() { autonomous_select_instance = this; };
+AutonomousSelect::AutonomousSelect() { autonomous_select_instance = this; }
 
 void AutonomousSelect::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
   this->selections = lv_list_create(screen, nullptr);

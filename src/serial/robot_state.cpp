@@ -1,16 +1,15 @@
 #include "serial/robot_state.hpp"
+#include "serial/serial_connection.hpp"
 #include <cstring>
 
 namespace serial {
-#define SERIAL_ROBOT_STATE "ROBOT_STATE"
-
 typedef double floating;
 
-RobotStatePlugin::RobotStatePlugin(robot::Robot &robot) : robot(robot) {}
+RobotStatePlugin::RobotStatePlugin(uint8_t id, robot::Robot &robot) : PacketHandler(id), robot(robot) {}
 
 void RobotStatePlugin::initialize() {}
 
-void serialize_motor(uint8_t *buffer, const pros::Motor motor) {
+void serialize_motor(uint8_t *buffer, const pros::Motor& motor) {
   floating src;
   src = motor.get_target_position();
   std::memcpy(&buffer[sizeof(floating) * 0], &src, sizeof(floating));
@@ -39,11 +38,11 @@ void serialize_motor(uint8_t *buffer, const pros::Motor motor) {
   std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 4], &i_src, sizeof(int));
 }
 
-void RobotStatePlugin::handle(serial::SerialConnection *connection, void *buffer, size_t len) {
-  const uint32_t CONTROLLER_SIZE = 3 + (sizeof(float) * 4);
+void RobotStatePlugin::handle(SerialConnection *connection, void *buffer, size_t len) {
+  const uint32_t CONTROLLER_SIZE = 3 + (sizeof(floating) * 4);
   const uint32_t MOTOR_SIZE = (sizeof(floating) * 7) + (sizeof(int) * 5);
   const uint32_t SIZE = CONTROLLER_SIZE + (MOTOR_SIZE * 4);
-  static uint8_t buf[SIZE];
+  uint8_t buf[SIZE];
 
   if (this->robot.controller->a_pressed())
     buf[0] |= 0b00000001;
@@ -70,20 +69,20 @@ void RobotStatePlugin::handle(serial::SerialConnection *connection, void *buffer
   if (this->robot.controller->r2_pressed())
     buf[1] |= 0b00001000;
   // buf[2] = this->robot.controller->flywheel_speed(); todo
-  float src;
-  src = static_cast<float>(this->robot.controller->left_stick_x());
+  floating src;
+  src = static_cast<floating>(this->robot.controller->left_stick_x());
   std::memcpy(&buf[3 + sizeof(float) * 0], &src, sizeof(float));
-  src = static_cast<float>(this->robot.controller->left_stick_y());
+  src = static_cast<floating>(this->robot.controller->left_stick_y());
   std::memcpy(&buf[3 + sizeof(float) * 1], &src, sizeof(float));
-  src = static_cast<float>(this->robot.controller->right_stick_x());
+  src = static_cast<floating>(this->robot.controller->right_stick_x());
   std::memcpy(&buf[3 + sizeof(float) * 2], &src, sizeof(float));
-  src = static_cast<float>(this->robot.controller->right_stick_y());
+  src = static_cast<floating>(this->robot.controller->right_stick_y());
   std::memcpy(&buf[3 + sizeof(float) * 3], &src, sizeof(float));
 
   serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 0], this->robot.drivetrain->rightFront.get_raw_motor());
   serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 1], this->robot.drivetrain->leftFront.get_raw_motor());
   serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 2], this->robot.drivetrain->rightBack.get_raw_motor());
   serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 3], this->robot.drivetrain->leftBack.get_raw_motor());
-  connection->send(SERIAL_ROBOT_STATE, &buf, SIZE);
+  connection->send_packet(this->id, &buf, SIZE);
 }
 } // namespace serial

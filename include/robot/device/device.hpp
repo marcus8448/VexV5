@@ -22,7 +22,7 @@ public:
 protected:
   const uint8_t port;
 
-  bool checkConnect() const;
+  [[nodiscard]] static bool checkConnect();
 };
 
 void initialize();

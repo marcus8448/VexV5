@@ -1,6 +1,5 @@
 #include "robot/expansion.hpp"
 #include "logger.hpp"
-#include "robot/device/motor.hpp"
 #include "robot/device/pneumatics.hpp"
 
 namespace robot {

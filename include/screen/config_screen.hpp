@@ -4,8 +4,8 @@
 #include "screen.hpp"
 
 namespace screen {
-lv_res_t switch_alliance_colour(lv_obj_t *btn);
-lv_res_t switch_drive_scheme(lv_obj_t *btn);
+lv_res_t switch_alliance_colour([[maybe_unused]] lv_obj_t *btn);
+lv_res_t switch_drive_scheme([[maybe_unused]] lv_obj_t *btn);
 
 class ConfigurationScreen : public Screen {
 private:

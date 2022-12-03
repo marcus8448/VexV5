@@ -63,7 +63,7 @@ void ConfigurationScreen::update_alliance_colour_label() {
   this->styleSet = true;
 }
 
-lv_res_t switch_drive_scheme(lv_obj_t *btn) {
+lv_res_t switch_drive_scheme([[maybe_unused]] lv_obj_t *btn) {
   config::get_instance()->set_drivetrain_control_scheme(config::get_instance()->get_drivetrain_control_scheme() ==
                                                                 config::DrivetrainControlScheme::TANK_DRIVE
                                                             ? config::DrivetrainControlScheme::ARCADE_DRIVE
@@ -72,7 +72,7 @@ lv_res_t switch_drive_scheme(lv_obj_t *btn) {
   return LV_RES_INV;
 }
 
-lv_res_t switch_alliance_colour(lv_obj_t *btn) {
+lv_res_t switch_alliance_colour([[maybe_unused]] lv_obj_t *btn) {
   config::get_instance()->set_alliance_colour(
       config::get_instance()->get_alliance_colour() == config::AllianceColour::RED ? config::AllianceColour::BLUE
                                                                                    : config::AllianceColour::RED);

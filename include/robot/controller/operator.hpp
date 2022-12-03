@@ -39,7 +39,7 @@ private:
   double prevRightStickX = 0.0;
   double prevRightStickY = 0.0;
 
-  int32_t flywheelSpeed = 300;
+  int16_t flywheelSpeed = 300;
   uint32_t ticks = 0;
 
 public:
@@ -70,8 +70,8 @@ public:
   [[nodiscard]] double prev_right_stick_x() const override;
   [[nodiscard]] double prev_right_stick_y() const override;
 
-  [[nodiscard]] int32_t flywheel_speed() const override;
-  void flywheel_speed(int32_t speed) override;
+  [[nodiscard]] int16_t flywheel_speed() const override;
+  void flywheel_speed(int16_t speed) override;
 
   void set_line(uint8_t line, uint8_t col, const char *str) override;
   void clear_line(uint8_t line) override;
