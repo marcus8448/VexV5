@@ -1,5 +1,4 @@
 // CONFIG
-#include <iostream>
 #define FLYWHEEL_MOTOR 3
 #define FLYWHEEL_SECONDARY_MOTOR 5
 #define INDEXER_MOTOR 19

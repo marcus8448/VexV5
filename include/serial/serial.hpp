@@ -1,9 +1,9 @@
 #ifndef SERIAL_DEBUG_HPP
 #define SERIAL_DEBUG_HPP
 
+#include "serial/serial_connection.hpp"
 #include <map>
 #include <streambuf>
-#include "serial/serial_connection.hpp"
 
 namespace serial {
 class PacketHandler {
@@ -11,7 +11,7 @@ protected:
   const uint8_t id;
 
 public:
-  explicit PacketHandler(uint8_t id): id(id) {};
+  explicit PacketHandler(uint8_t id) : id(id){};
 
   virtual void initialize() = 0;
   virtual void handle(SerialConnection *connection, void *buffer, size_t len) = 0;

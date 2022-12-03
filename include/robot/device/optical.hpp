@@ -15,21 +15,21 @@ public:
   DEVICE_NAME("Optical")
   explicit Optical(uint8_t port, uint8_t led_pwm = 0, bool gesture = false);
 
-  double get_hue() const;
-  double get_saturation() const;
-  double get_brightness() const;
+  [[nodiscard]] double get_hue() const;
+  [[nodiscard]] double get_saturation() const;
+  [[nodiscard]] double get_brightness() const;
 
-  int32_t get_proximity() const;
+  [[nodiscard]] int32_t get_proximity() const;
 
   void set_led_pwm(uint8_t value);
-  int32_t get_led_pwm() const;
+  [[nodiscard]] int32_t get_led_pwm() const;
 
   void enable_gesture();
   void disable_gesture();
 
   void reconfigure() const override;
 
-  bool is_connected() const override;
+  [[nodiscard]] bool is_connected() const override;
 };
 } // namespace robot::device
 

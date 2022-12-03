@@ -9,7 +9,7 @@ RobotStatePlugin::RobotStatePlugin(uint8_t id, robot::Robot &robot) : PacketHand
 
 void RobotStatePlugin::initialize() {}
 
-void serialize_motor(uint8_t *buffer, const pros::Motor& motor) {
+void serialize_motor(uint8_t *buffer, const pros::Motor &motor) {
   floating src;
   src = motor.get_target_position();
   std::memcpy(&buffer[sizeof(floating) * 0], &src, sizeof(floating));

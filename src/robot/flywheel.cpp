@@ -3,7 +3,8 @@
 
 namespace robot {
 Flywheel::Flywheel(uint8_t port, uint8_t secondary_port)
-    : first_motor(device::Motor(port, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST, false)), second_motor(device::Motor(secondary_port, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST, true)) {}
+    : first_motor(device::Motor(port, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST, false)),
+      second_motor(device::Motor(secondary_port, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST, true)) {}
 
 Flywheel::~Flywheel() = default;
 
@@ -49,7 +50,8 @@ void Flywheel::update(Controller *controller) {
     }
   }
   if (this->state == State::AT_SPEED) {
-    if (std::abs(std::abs(this->first_motor.get_velocity()) - std::abs(this->first_motor.get_target_velocity())) > 40.0) {
+    if (std::abs(std::abs(this->first_motor.get_velocity()) - std::abs(this->first_motor.get_target_velocity())) >
+        40.0) {
       this->state = State::SPINNING_UP;
     }
   }
@@ -62,8 +64,10 @@ double Flywheel::get_first_motor_velocity() { return this->first_motor.get_veloc
 double Flywheel::get_second_motor_velocity() { return this->second_motor.get_velocity(); }
 
 bool Flywheel::is_up_to_speed() {
-  return std::abs(std::abs(this->first_motor.get_velocity()) - std::abs(this->first_motor.get_target_velocity())) < 10.0
-  && std::abs(std::abs(this->second_motor.get_velocity()) - std::abs(this->second_motor.get_target_velocity())) < 10.0;
+  return std::abs(std::abs(this->first_motor.get_velocity()) - std::abs(this->first_motor.get_target_velocity())) <
+             10.0 &&
+         std::abs(std::abs(this->second_motor.get_velocity()) - std::abs(this->second_motor.get_target_velocity())) <
+             10.0;
 }
 
 void Flywheel::wait_for_speed(uint16_t millis_timeout) {
@@ -74,7 +78,8 @@ void Flywheel::wait_for_speed(uint16_t millis_timeout) {
   millis_timeout /= 50;
   int16_t i = 0;
   int32_t target = std::abs(this->first_motor.get_target_velocity());
-  while (target - std::abs(this->first_motor.get_velocity()) > 10.0 || target - std::abs(this->second_motor.get_velocity()) > 10.0) {
+  while (target - std::abs(this->first_motor.get_velocity()) > 10.0 ||
+         target - std::abs(this->second_motor.get_velocity()) > 10.0) {
     if (i++ == millis_timeout) {
       break;
     }
