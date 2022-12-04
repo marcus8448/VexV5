@@ -39,7 +39,7 @@ private:
   double prevRightStickX = 0.0;
   double prevRightStickY = 0.0;
 
-  int16_t flywheelSpeed = 300;
+  int16_t flywheelSpeed = 9500;
   uint32_t ticks = 0;
 
 public:

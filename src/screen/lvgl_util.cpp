@@ -26,6 +26,7 @@ lv_style_t *create_text_color_style(lv_color_t colour) {
 }
 
 lv_obj_t *create_info_label(lv_obj_t *screen, bool right, lv_coord_t index, const char *text) {
-  return create_label(screen, right ? halfWidth : static_cast<lv_coord_t>(0), static_cast<lv_coord_t>(index * 16), halfWidth, 16, text);
+  return create_label(screen, right ? halfWidth : static_cast<lv_coord_t>(0), static_cast<lv_coord_t>(index * 16),
+                      halfWidth, 16, text);
 }
 } // namespace screen

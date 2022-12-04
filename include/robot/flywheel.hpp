@@ -4,7 +4,7 @@
 #include "robot/controller/controller.hpp"
 #include "robot/device/motor.hpp"
 
-#define FLYWHEEL_TARGET_SPEED 300
+#define FLYWHEEL_TARGET_SPEED 9500
 
 namespace robot {
 /**

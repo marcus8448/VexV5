@@ -55,7 +55,8 @@ void OpController::set_line(uint8_t line, uint8_t col, const char *str) {
 
 void OpController::clear_line(uint8_t line) { print_error(this->controller.clear_line(line)); }
 
-void OpController::rumble(const char *str) { print_error(this->controller.rumble(str)); }
+void OpController::rumble(const char *str) { /* print_error(this->controller.rumble(str)); */
+}
 
 void OpController::update() {
   this->ticks++;
@@ -144,9 +145,9 @@ void OpController::update() {
   this->rightStickY = print_error(this->controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y));
 
   if (this->right_pressed()) {
-    this->flywheel_speed(static_cast<int16_t>(std::min(this->flywheel_speed() + 1, 400)));
+    this->flywheel_speed(static_cast<int16_t>(std::min(this->flywheel_speed() + 100, 12000)));
   } else if (this->left_pressed()) {
-    this->flywheel_speed(static_cast<int16_t>(std::max(this->flywheel_speed() - 1, 0)));
+    this->flywheel_speed(static_cast<int16_t>(std::max(this->flywheel_speed() - 100, 7000)));
   }
 
   if (this->a == 1)
