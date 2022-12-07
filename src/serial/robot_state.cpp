@@ -44,6 +44,9 @@ void RobotStatePlugin::handle(SerialConnection *connection, void *buffer, size_t
   const uint32_t SIZE = CONTROLLER_SIZE + (MOTOR_SIZE * 4);
   uint8_t buf[SIZE];
 
+  buf[0] = 0;
+  buf[1] = 0;
+
   if (this->robot.controller->a_pressed())
     buf[0] |= 0b00000001;
   if (this->robot.controller->b_pressed())

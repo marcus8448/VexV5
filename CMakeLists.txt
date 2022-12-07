@@ -33,10 +33,18 @@ add_custom_target(
 endif()
 
 if (ClangFormat)
-message(NOTICE "Clang-format found, adding utility target.")
+message(NOTICE "clang-format found, adding utility target.")
 add_custom_target(
         FormatCode
         COMMAND cd ${CMAKE_SOURCE_DIR} && ${ClangFormat} -i ${HEADER_FILES} ${SOURCE_FILES}
+)
+endif()
+
+if (ClangCheck)
+message(NOTICE "clang-check found, adding utility target.")
+add_custom_target(
+        CheckCode
+        COMMAND cd ${CMAKE_SOURCE_DIR} && ${ClangCheck} --extra-arg="--target=${TARGET_TRIPLE}" --extra-arg="--sysroot=${ARM_SYSROOT}" --extra-arg="-I${CMAKE_SOURCE_DIR}/include" --extra-arg="-I${ARM_SYSROOT}/include/c++/${ARM_GCC_VERSION}" --extra-arg="-I${ARM_SYSROOT}/include/c++/${ARM_GCC_VERSION}/${TARGET_TRIPLE}/${ARM_MULTI_DIR}" --analyze --analyzer-output-path="${BUILD_DIR}/analysis" -p ${BUILD_DIR} ${HEADER_FILES} ${SOURCE_FILES}
 )
 endif()
 
