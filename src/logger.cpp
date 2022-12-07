@@ -35,21 +35,16 @@ void debug(const std::string &string) {
 }
 
 void push(const char *string) {
-#ifdef DEBUG_LOG
   sections->emplace_back(std::pair(string, pros::millis()));
   std::cout << "== BEGIN " << string << " ==" << std::endl;
-#endif
 }
 
 void pop_push(const char *string) {
-#ifdef DEBUG_LOG
   pop();
   push(string);
-#endif
 }
 
 void pop() {
-#ifdef DEBUG_LOG
   uint32_t millis = pros::millis();
   if (sections->empty()) {
     error("Section stack underflow!");
@@ -58,6 +53,5 @@ void pop() {
   std::cout << "=== END " << back.first << " ==="
             << " (Took " << millis - back.second << " ms)" << std::endl;
   sections->pop_back();
-#endif
 }
 } // namespace logger

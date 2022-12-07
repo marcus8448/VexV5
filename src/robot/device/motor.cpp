@@ -66,6 +66,7 @@ void Motor::move_millivolts(int16_t target_voltage) {
     target_voltage = -MAX_MILLIVOLTS;
   }
   if (this->targetType != TargetType::VOLTAGE || this->target != target_voltage) {
+    logger::debug("Targetting %i", target_voltage);
     this->target = target_voltage;
     this->targetType = TargetType::VOLTAGE;
     this->targetPosition = INFINITY;

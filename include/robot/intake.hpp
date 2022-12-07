@@ -1,13 +1,13 @@
 #ifndef ROBOT_INTAKE_HPP
 #define ROBOT_INTAKE_HPP
 
-#include "robot/device/optical.hpp"
 #define INTAKE_POWER_LEVEL 11000
 
 #include "configuration.hpp"
 #include "pros/optical.hpp"
 #include "robot/controller/controller.hpp"
 #include "robot/device/motor.hpp"
+#include "robot/device/optical.hpp"
 
 namespace robot {
 /**

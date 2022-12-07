@@ -1,11 +1,17 @@
 #ifndef DEBUG_TOOLS_HPP
 #define DEBUG_TOOLS_HPP
 
+#include <cstdint>
+
 /**
  * Tests for a PROS error and prints out errno if one is found.
  * @return whether an error was found.
  */
 bool check_error();
+
+void clear_error();
+
+int32_t get_error();
 
 /**
  * Tests for a PROS error and prints out errno if one is found.

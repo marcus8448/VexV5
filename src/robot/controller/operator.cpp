@@ -55,7 +55,13 @@ void OpController::set_line(uint8_t line, uint8_t col, const char *str) {
 
 void OpController::clear_line(uint8_t line) { print_error(this->controller.clear_line(line)); }
 
-void OpController::rumble(const char *str) { /* print_error(this->controller.rumble(str)); */
+void OpController::rumble(char *str) {
+  clear_error();
+  this->controller.rumble(str);
+  if (get_error() == EAGAIN) {
+    logger::debug("Failed to send rumble. Trying again soon.");
+    this->enqueued_rumble = str;
+  }
 }
 
 void OpController::update() {
@@ -147,7 +153,7 @@ void OpController::update() {
   if (this->right_pressed()) {
     this->flywheel_speed(static_cast<int16_t>(std::min(this->flywheel_speed() + 100, 12000)));
   } else if (this->left_pressed()) {
-    this->flywheel_speed(static_cast<int16_t>(std::max(this->flywheel_speed() - 100, 7000)));
+    this->flywheel_speed(static_cast<int16_t>(std::max(this->flywheel_speed() - 100, 4000)));
   }
 
   if (this->a == 1)
@@ -174,6 +180,14 @@ void OpController::update() {
     logger::debug("L1 pressed");
   if (this->l2 == 1)
     logger::debug("L2 pressed");
+
+  if (enqueued_rumble != nullptr) {
+    clear_error();
+    this->rumble(this->enqueued_rumble);
+    if (get_error() != EAGAIN) {
+      this->enqueued_rumble = nullptr;
+    } 
+  }
 
   static bool init = false;
   if (this->ticks % 10 == 0 || !init) {

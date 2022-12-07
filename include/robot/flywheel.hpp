@@ -18,6 +18,9 @@ private:
    */
   device::Motor first_motor;
   device::Motor second_motor;
+
+  int16_t targetMV = 0;
+  
   /**
    * Whether the flywheel is currently active.
    */
@@ -35,7 +38,7 @@ public:
    * Engages the flywheel.
    * Sets the motor to run at max speed.
    */
-  void engage(int16_t flywheelSpeed = FLYWHEEL_TARGET_SPEED, bool block = false);
+  void engage(int16_t flywheelMV = FLYWHEEL_TARGET_SPEED, bool block = false);
 
   bool is_up_to_speed();
 

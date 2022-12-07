@@ -4,14 +4,21 @@
 #include <cstring>
 
 bool check_error() {
-  if (errno != 0) {
-    if (errno == ENODEV) {
-      errno = 0;    // reset errno so that we don't keep on detecting the same error.
-      return false; // skip printing 19 - no such device.
-    }
-    logger::error("Error %i: %s", errno, strerror(errno)); // print the error
-    errno = 0; // reset errno so that we don't keep on detecting the same error.
+  int32_t error = get_error();
+  if (error != 0) {
+    if (error == ENODEV) return false; // skip printing 19 - no such device.
+    logger::error("Error %i: %s", error, strerror(error)); // print the error
     return false;
   }
   return true;
+}
+
+void clear_error() {
+  errno = 0;
+}
+
+int32_t get_error() {
+  int32_t error = errno;
+  errno = 0;
+  return error;
 }

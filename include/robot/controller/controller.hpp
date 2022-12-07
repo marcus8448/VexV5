@@ -113,7 +113,7 @@ public:
    * The patten is set by morse code. ('-' = long, '.' = short, ' ' = rest)
    * @param str the morse code pattern to use.
    */
-  virtual void rumble(const char *str) = 0;
+  virtual void rumble(char *str) = 0;
 
   /**
    * Returns the position of the left stick on the x-axis.

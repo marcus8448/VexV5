@@ -10,6 +10,7 @@ Indexer::~Indexer() = default;
 
 void Indexer::push() {
   if (this->state == CHARGED) {
+    logger::info("Shooting.");
     this->motor.move_absolute(90.0, 200);
     this->set_state(State::PUSHING);
   }

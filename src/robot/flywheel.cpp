@@ -1,6 +1,8 @@
 #include "robot/flywheel.hpp"
 #include "logger.hpp"
 
+#define VELCONV(mv) (mv/20.0)
+
 // at  6000: max = 288.800000, min = 262.800000, avg = 273.468293
 // at  6250: max = 299.600000, min = 274.600000, avg = 284.751220
 // at  6500: max = 316.800000, min = 279.800000, avg = 296.482927
@@ -35,26 +37,33 @@ Flywheel::Flywheel(uint8_t port, uint8_t secondary_port)
 
 Flywheel::~Flywheel() = default;
 
-void Flywheel::engage(int16_t flywheelPower, bool block) {
-  this->first_motor.move_millivolts(flywheelPower);
-  this->second_motor.move_millivolts(flywheelPower);
+void Flywheel::engage(int16_t flywheelMV, bool block) {
+  double targetVelocity = VELCONV(flywheelMV);
   double actual = std::abs(this->first_motor.get_velocity());
-  if (actual > flywheelPower) {
-    if (std::abs(actual - flywheelPower) < 10.0) {
+  if (actual > targetVelocity) {
+    if (std::abs(actual - targetVelocity) < 10.0) {
       this->state = State::AT_SPEED;
     } else {
       this->state = State::SPINNING_DOWN;
     }
   } else {
-    if (std::abs(actual - flywheelPower) < 10.0) {
+    if (std::abs(actual - targetVelocity) < 10.0) {
       this->state = State::AT_SPEED;
     } else {
       this->state = State::SPINNING_UP;
     }
   }
+  if (this->state == AT_SPEED || this->state == SPINNING_DOWN) {
+    this->first_motor.move_millivolts(flywheelMV);
+    this->second_motor.move_millivolts(flywheelMV);
+  } else {
+    this->first_motor.move_millivolts(12000);
+    this->second_motor.move_millivolts(12000);
+  }
+  this->targetMV = flywheelMV;
 
   if (block) {
-    this->wait_for_speed();
+    this->wait_for_speed(flywheelMV);
   }
 }
 
@@ -65,21 +74,40 @@ void Flywheel::disengage() {
 }
 
 void Flywheel::update(Controller *controller) {
+  if (this->state != IDLE) logger::info("%i, %f, %f", this->state, this->first_motor.get_velocity(), VELCONV(this->targetMV));
   if (controller->r1_pressed()) {
     this->engage(controller->flywheel_speed());
   } else if (controller->x_pressed()) {
     this->disengage();
   }
-  if (this->state == SPINNING_UP || this->state == SPINNING_DOWN) {
+  if (this->state == SPINNING_DOWN) {
     if (this->is_up_to_speed()) {
+      logger::info("^ dts %i", this->targetMV);
       this->state = State::AT_SPEED;
       controller->rumble("-");
     }
   }
+  if (this->state == SPINNING_UP) {
+    if (this->is_up_to_speed()) {
+      logger::info("^ uts %i");
+      this->state = State::AT_SPEED;
+      this->first_motor.move_millivolts(this->targetMV);
+      this->second_motor.move_millivolts(this->targetMV);
+      controller->rumble("-");
+    } else if (this->get_first_motor().get_velocity() > VELCONV(this->targetMV)) {
+      logger::info("^ too high");
+      this->state = SPINNING_DOWN;
+      this->first_motor.move_millivolts(this->targetMV);
+      this->second_motor.move_millivolts(this->targetMV);
+    }
+  }
   if (this->state == State::AT_SPEED) {
-    if (std::abs(std::abs(this->first_motor.get_velocity()) - std::abs(this->first_motor.get_target_velocity())) >
+    if (std::abs(std::abs(this->first_motor.get_velocity()) - std::abs(VELCONV(this->targetMV))) >
         40.0) {
+      logger::info("regression - spinning up.");
       this->state = State::SPINNING_UP;
+      this->first_motor.move_millivolts(12000);
+      this->second_motor.move_millivolts(12000);
     }
   }
 }
@@ -91,10 +119,10 @@ double Flywheel::get_first_motor_velocity() { return this->first_motor.get_veloc
 double Flywheel::get_second_motor_velocity() { return this->second_motor.get_velocity(); }
 
 bool Flywheel::is_up_to_speed() {
-  return std::abs(std::abs(this->first_motor.get_velocity()) - std::abs(this->first_motor.get_target_velocity())) <
+  return (std::abs(std::abs(this->first_motor.get_velocity()) - std::abs(VELCONV(this->targetMV))) <
              10.0 &&
-         std::abs(std::abs(this->second_motor.get_velocity()) - std::abs(this->second_motor.get_target_velocity())) <
-             10.0;
+         std::abs(std::abs(this->second_motor.get_velocity()) - std::abs(VELCONV(this->targetMV))) <
+             10.0);
 }
 
 void Flywheel::wait_for_speed(uint16_t millis_timeout) {
@@ -104,14 +132,16 @@ void Flywheel::wait_for_speed(uint16_t millis_timeout) {
   }
   millis_timeout /= 50;
   int16_t i = 0;
-  int32_t target = std::abs(this->first_motor.get_target_velocity());
-  while (target - std::abs(this->first_motor.get_velocity()) > 10.0 ||
+  int32_t target = std::abs(VELCONV(this->targetMV));
+  while (target - std::abs(this->first_motor.get_velocity()) > 10.0 &&
          target - std::abs(this->second_motor.get_velocity()) > 10.0) {
     if (i++ == millis_timeout) {
       break;
     }
     pros::delay(20);
   }
+  this->first_motor.move_millivolts(this->targetMV);
+  this->second_motor.move_millivolts(this->targetMV);
   this->state = State::AT_SPEED;
 }
 } // namespace robot
