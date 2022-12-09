@@ -3,6 +3,7 @@
 
 #include "robot/controller/controller.hpp"
 #include "robot/device/motor.hpp"
+#include <vector>
 
 #define FLYWHEEL_TARGET_SPEED 9500
 
@@ -20,6 +21,7 @@ private:
   device::Motor second_motor;
 
   int16_t targetMV = 0;
+  std::vector<double> prevSpeeds = std::vector<double>();
   
   /**
    * Whether the flywheel is currently active.
@@ -56,6 +58,8 @@ public:
    */
   double get_first_motor_velocity();
   double get_second_motor_velocity();
+
+  void reset_speeds();
 
   [[nodiscard]] const device::Motor &get_first_motor() const;
   [[nodiscard]] const device::Motor &get_second_motor() const;

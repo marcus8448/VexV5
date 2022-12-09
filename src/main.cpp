@@ -3,11 +3,12 @@
 #define FLYWHEEL_SECONDARY_MOTOR 5
 #define INDEXER_MOTOR 19
 #define INTAKE_MOTOR 1
-#define ROLLER_COLOUR_SENSOR 7
+#define ROLLER_COLOUR_SENSOR_UPPER 7
+#define ROLLER_COLOUR_SENSOR_LOWER 6
 #define EXPANSION_PISTON 'A'
 
 #define RIGHT_FRONT_MOTOR 4
-#define LEFT_FRONT_MOTOR 13
+#define LEFT_FRONT_MOTOR 2
 #define RIGHT_BACK_MOTOR 9
 #define LEFT_BACK_MOTOR 20
 
@@ -181,7 +182,7 @@ void opcontrol() {
  */
 Robot &get_or_create_robot() {
   static Robot robot = Robot(new Drivetrain(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR),
-                             new Intake(INTAKE_MOTOR, ROLLER_COLOUR_SENSOR), new Indexer(INDEXER_MOTOR),
+                             new Intake(INTAKE_MOTOR, ROLLER_COLOUR_SENSOR_UPPER, ROLLER_COLOUR_SENSOR_LOWER), new Indexer(INDEXER_MOTOR),
                              new Flywheel(FLYWHEEL_MOTOR, FLYWHEEL_SECONDARY_MOTOR), new Expansion(EXPANSION_PISTON));
   device::initialize();
   return robot;

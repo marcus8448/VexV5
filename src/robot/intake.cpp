@@ -6,9 +6,9 @@
 
 namespace robot {
 
-Intake::Intake(uint8_t motorPort, uint8_t colourPort)
+Intake::Intake(uint8_t motorPort, uint8_t upperColourPort, uint8_t lowerColourPort)
     : motor(device::Motor(motorPort, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_HOLD, false)),
-      colour(device::Optical(colourPort)) {}
+      upperColour(device::Optical(upperColourPort)), lowerColour(device::Optical(lowerColourPort)) {}
 
 Intake::~Intake() = default;
 
@@ -30,41 +30,76 @@ void Intake::disengage() {
 }
 
 void Intake::roll_to_team_colour(config::AllianceColour teamColour, uint32_t timeout) {
-  if (!this->colour.is_connected()) {
+  this->lowerColour.set_led_pwm(100);
+  // this->upperColour.set_led_pwm(100);
+  // 20-80 bot
+  if (!this->upperColour.is_connected()) {
     logger::warn("Colour sensor is not connected. Spinning the roller anyways.");
     this->reverse(4800);
-    pros::delay(750);
+    pros::delay(2000);
     this->disengage();
   } else {
     // if (!looking_at_roller()) {
     //   logger::warn("Spinning roller while not in view?");
     // }
-    double hue = this->colour.get_hue();
+    double upperHue = this->upperColour.get_hue();
+    double lowerHue = this->lowerColour.get_hue();
     uint32_t i = 0;
-    timeout /= 50;
+    int16_t ticksProper = 0;
+    timeout /= 10;
 
     this->motor.move_percentage(50.0);
     switch (teamColour) {
     case config::AllianceColour::RED: {
-      while ((hue > 30.0 && hue < 310.0) || ++i == timeout) {
-        pros::delay(100);
-        hue = this->colour.get_hue();
+      while (++i != timeout) {
+        if (i % 250 == 249) {
+          this->motor.set_reversed(!this->motor.is_reversed());
+        }
+        if (this->is_red(upperHue) && !this->is_lower_red(lowerHue)) {
+          if (ticksProper++ == 15) {
+            break;
+          }
+        } else {
+          ticksProper = 0;
+        }
+        pros::delay(10);
+        upperHue = this->upperColour.get_hue();
+        lowerHue = this->lowerColour.get_hue();
       }
       break;
     }
     case config::AllianceColour::BLUE: {
-      while (hue < 185.0 || hue > 275.0 || ++i == timeout) {
-        pros::delay(100);
-        hue = this->colour.get_hue();
+      while (!this->is_blue(upperHue) || this->is_lower_blue(lowerHue)  || ++i == timeout) {
+        if (i % 250 == 249) {
+          this->motor.set_reversed(!this->motor.is_reversed());
+        }
+        if (this->is_red(upperHue) && !this->is_lower_red(lowerHue)) {
+          if (ticksProper++ == 15) {
+            break;
+          }
+        } else {
+          ticksProper = 0;
+        }
+        pros::delay(10);
+        upperHue = this->upperColour.get_hue();
+        lowerHue = this->lowerColour.get_hue();
       }
       break;
     }
     }
-    this->motor.stop();
+    logger::info("Success %f %f", upperHue, lowerHue);
+    this->upperColour.set_led_pwm(0);
+    this->lowerColour.set_led_pwm(0);
+    this->motor.move_absolute(this->motor.get_position() - 25, 100);
   }
 }
 
-[[nodiscard]] bool Intake::isEngaged() const { return this->engaged; }
+[[nodiscard]] bool Intake::is_engaged() const { return this->engaged; }
+
+[[nodiscard]] bool Intake::is_red(double hue) { return hue < 30.0 || hue > 310.0; }
+[[nodiscard]] bool Intake::is_lower_red(double hue) { return hue < 40.0 || hue > 310.0; }
+[[nodiscard]] bool Intake::is_blue(double hue) { return hue < 250.0 && hue > 210.0; }
+[[nodiscard]] bool Intake::is_lower_blue(double hue) { return hue < 250.0 && hue > 75.0; }
 
 [[nodiscard]] const device::Motor &Intake::get_motor() const { return this->motor; }
 

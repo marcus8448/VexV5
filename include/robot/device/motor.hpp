@@ -40,7 +40,6 @@ public:
 
   void move_absolute(double target_position, uint16_t target_velocity);
   void move_relative(double target_position, uint16_t target_velocity);
-  void move_relative_target(double target_position, uint16_t target_velocity);
 
   void set_reversed(bool reverse);
 

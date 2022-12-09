@@ -20,7 +20,8 @@ private:
    * The motor of the intake/roller.
    */
   device::Motor motor;
-  device::Optical colour;
+  device::Optical upperColour;
+  device::Optical lowerColour;
 
   /**
    * Whether the intake is currently running.
@@ -32,7 +33,7 @@ public:
    * Creates a new intake with the specified motor.
    * @param motor the intake's motor.
    */
-  explicit Intake(uint8_t motorPort, uint8_t colourPort);
+  explicit Intake(uint8_t motorPort, uint8_t upperColourPort, uint8_t lowerColourPort);
   virtual ~Intake();
 
   /**
@@ -55,7 +56,12 @@ public:
    * Returns whether the intake is currently engaged (running).
    * @return whether the intake is currently engaged (running).
    */
-  [[nodiscard]] bool isEngaged() const;
+  [[nodiscard]] bool is_engaged() const;
+
+  [[nodiscard]] static bool is_red(double hue);
+  [[nodiscard]] static bool is_lower_red(double hue);
+  [[nodiscard]] static bool is_blue(double hue);
+  [[nodiscard]] static bool is_lower_blue(double hue);
 
   [[nodiscard]] const device::Motor &get_motor() const;
 

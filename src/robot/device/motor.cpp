@@ -105,21 +105,8 @@ void Motor::move_relative(double target_position, uint16_t target_velocity) {
   } else if (target_velocity == 0) {
     logger::warn("Target velocity is zero!");
   }
-  if (this->targetPosition != target_position) {
-    this->targetType = TargetType::VELOCITY;
-    this->target = target_velocity;
-    this->targetPosition = this->get_position() + target_position;
-    this->motor.move_absolute(this->targetPosition, target_velocity);
-  }
-}
-
-void Motor::move_relative_target(double target_position, uint16_t target_velocity) {
-  if (target_velocity > this->maxVelocity) {
-    logger::warn("Target velocity %i is over max velocity %i!", target_velocity, this->maxVelocity);
-    target_velocity = this->maxVelocity;
-  } else if (target_velocity == 0) {
-    logger::warn("Target velocity is zero!");
-  }
+  logger::info("Targetting %fEU", target_position);
+  target_position += this->get_position();
   if (this->targetPosition != target_position) {
     this->targetType = TargetType::VELOCITY;
     this->target = target_velocity;

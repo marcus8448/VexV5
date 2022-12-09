@@ -5,7 +5,7 @@
 #include "robot/device/motor.hpp"
 #include <cstdint>
 
-#define DRIVETRAIN_DEFAULT_RPM 100
+#define DRIVETRAIN_DEFAULT_RPM 50
 #define DRIVETRAIN_DEFAULT_TIMEOUT 5000
 
 namespace robot {

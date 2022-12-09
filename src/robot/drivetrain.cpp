@@ -50,8 +50,8 @@ void Drivetrain::turn_left(double degrees, int32_t max_rpm, uint16_t timeout_mil
 void Drivetrain::await_move(uint16_t timeout_millis) const {
   if (timeout_millis == 0)
     return;
-  timeout_millis /= 50;
-  for (uint16_t i = 0; i < timeout_millis / 50; i++) {
+  timeout_millis = static_cast<uint16_t>(timeout_millis / 50.0);
+  for (uint16_t i = 0; i < timeout_millis; i++) {
     if (this->is_at_target())
       break;
     pros::delay(50);
@@ -114,13 +114,13 @@ void Drivetrain::tare() {
 }
 
 void Drivetrain::move_right_distance(double distance, int32_t max_rpm) {
-  this->rightFront.move_relative_target(distance, max_rpm);
-  this->rightBack.move_relative_target(distance, max_rpm);
+  this->rightFront.move_relative(distance, max_rpm);
+  this->rightBack.move_relative(distance, max_rpm);
 }
 
 void Drivetrain::move_left_distance(double distance, int32_t max_rpm) {
-  this->leftFront.move_relative_target(distance, max_rpm);
-  this->leftBack.move_relative_target(distance, max_rpm);
+  this->leftFront.move_relative(distance, max_rpm);
+  this->leftBack.move_relative(distance, max_rpm);
 }
 
 void Drivetrain::power_right(double percent) {
