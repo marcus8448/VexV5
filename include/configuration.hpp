@@ -16,13 +16,13 @@ enum DrivetrainControlScheme {
    * Left stick y-axis controls the left side.
    * Right stick y-axis controls the right side.
    */
-  TANK_DRIVE,
+  TANK,
 
   /**
    * Left stick y-axis determines the overall power.
    * Right stick x-axis determines the balance between the left and right motors.
    */
-  ARCADE_DRIVE
+  ARCADE
 };
 
 class Configuration {
@@ -37,7 +37,7 @@ public:
    * The default control scheme is tank drive.
    * @return The current drivetrain control scheme.
    */
-  [[nodiscard]] DrivetrainControlScheme get_drivetrain_control_scheme();
+  [[nodiscard]] DrivetrainControlScheme get_control_scheme();
 
   /**
    * Sets the drivetrain control scheme to the specified value.

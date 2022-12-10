@@ -79,7 +79,7 @@ void DrivetrainChart::update(robot::Robot &robot) {
   float widthScale = this->canvasWidth / 100.0f;
 
   float x = 0;
-  for (int i = static_cast<int32_t>(this->velMotorLF.size()) - 2; i >= 0; --i) {
+  for (auto i = static_cast<int32_t>(this->velMotorLF.size()) - 2; i >= 0; --i) {
     float v = this->velMotorLF[i];
     lv_canvas_draw_line(this->drivetrainCanvas,
                         lv_point_t{static_cast<lv_coord_t>(this->canvasWidth - (x * widthScale)),

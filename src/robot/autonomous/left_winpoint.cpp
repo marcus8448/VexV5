@@ -3,9 +3,22 @@
 namespace robot::autonomous {
 void LeftWinpoint::run(Robot &robot) {
   // robot.drivetrain->backwards(2.5);
+  /*
+    while (true) {
+      robot.drivetrain->backwards(500.0, 5, 0);
+      robot.intake->roll_to_team_colour(config::get_instance()->get_alliance_colour(), 10000);
+      pros::delay(500);
+    }
+  */
   robot.drivetrain->backwards(500.0, 5, 0);
-  robot.intake->roll_to_team_colour(config::get_instance()->get_alliance_colour(), 10000);
+  pros::delay(250);
+  robot.intake->reverse(5500);
+  pros::delay(500);
+  robot.intake->engage(0);
   robot.drivetrain->stop();
+
+  //  robot.drivetrain->stop();
+
   // robot.drivetrain->forwards(10.0);
   // robot.drivetrain->turn_left(10.0);
   // robot.flywheel->engage();

@@ -12,8 +12,8 @@ private:
   bool gesture = false;
 
 public:
-  DEVICE_NAME("Optical")
-  explicit Optical(uint8_t port, uint8_t led_pwm = 0, bool gesture = false);
+  DEVICE_TYPE_NAME("Optical")
+  explicit Optical(uint8_t port, const char *name, uint8_t led_pwm = 0, bool gesture = false);
 
   [[nodiscard]] double get_hue() const;
   [[nodiscard]] double get_saturation() const;

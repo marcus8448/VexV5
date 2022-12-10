@@ -3,8 +3,8 @@
 #include <cerrno>
 
 namespace robot::device {
-Optical::Optical(uint8_t port, uint8_t led_pwm, bool gesture)
-    : /* optical(pros::Optical(port)),  */ Device(port), led_pwm(led_pwm), gesture(gesture) {
+Optical::Optical(uint8_t port, const char *name, uint8_t led_pwm, bool gesture)
+    : /* optical(pros::Optical(port)),  */ Device(port, name), led_pwm(led_pwm), gesture(gesture) {
   if (gesture) {
     pros::c::optical_enable_gesture(this->port);
   } else {

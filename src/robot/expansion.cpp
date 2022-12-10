@@ -3,7 +3,7 @@
 #include "robot/device/pneumatics.hpp"
 
 namespace robot {
-Expansion::Expansion(uint8_t port) : piston(device::PneumaticPiston(port)) {}
+Expansion::Expansion(uint8_t port) : piston(device::PneumaticPiston(port, "Expansion")) {}
 
 Expansion::~Expansion() = default;
 

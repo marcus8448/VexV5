@@ -10,7 +10,6 @@
 #include "display/lv_core/lv_obj.h"
 #include "display/lv_core/lv_style.h"
 #include "display/lv_objx/lv_btn.h"
-#include "display/lv_objx/lv_label.h"
 #include "display/lv_objx/lv_list.h"
 #pragma GCC diagnostic pop
 
@@ -34,12 +33,10 @@ void AutonomousSelect::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t hei
   default_style = new lv_style_t;
   selected_style = new lv_style_t;
   lv_style_copy(default_style, &lv_style_btn_rel);
-  bool init = false;
   for (auto const &[name, program] : *autonomousPrograms) {
     lv_obj_t *btn = lv_list_add(this->selections, nullptr, name.c_str(), drop);
     lv_btn_set_action(btn, LV_BTN_ACTION_CLICK, ::screen::click);
-    if (!init) {
-      init = true;
+    if (name == *robot::autonomous::get_active()) {
       lv_style_copy(default_style, lv_obj_get_style(btn));
       lv_style_copy(selected_style, default_style);
       lv_obj_set_style(btn, selected_style);
@@ -52,14 +49,12 @@ void AutonomousSelect::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t hei
 void AutonomousSelect::update(robot::Robot &robot) {}
 
 void AutonomousSelect::click(lv_obj_t *btn) {
-  if (this->selected != btn) {
-    if (this->selected != nullptr) {
-      lv_obj_set_style(this->selected, default_style);
-    }
-    this->selected = btn;
-
-    robot::autonomous::set_active(lv_label_get_text(btn));
+  if (this->selected != nullptr) {
+    lv_obj_set_style(this->selected, default_style);
   }
+  this->selected = btn;
+
+  robot::autonomous::set_active(new std::string(lv_list_get_btn_text(btn)));
   lv_obj_set_style(btn, selected_style);
 }
 

@@ -14,9 +14,9 @@ private:
   bool extended;
 
 public:
-  DEVICE_NAME("Pneumatic Piston")
-  explicit PneumaticPiston(uint8_t port);
-  explicit PneumaticPiston(uint8_t port, bool defaultState);
+  DEVICE_TYPE_NAME("Pneumatic Piston")
+  explicit PneumaticPiston(uint8_t port, const char *name);
+  explicit PneumaticPiston(uint8_t port, const char *name, bool defaultState);
 
   void extend();
   void contract();

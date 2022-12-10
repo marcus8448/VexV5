@@ -5,8 +5,6 @@
 #include "robot/device/motor.hpp"
 #include <vector>
 
-#define FLYWHEEL_TARGET_SPEED 9500
-
 namespace robot {
 /**
  * Represents the flywheel of the robot.
@@ -17,12 +15,12 @@ private:
   /**
    * The motor of the flywheel.
    */
-  device::Motor first_motor;
-  device::Motor second_motor;
+  device::Motor primaryMotor;
+  device::Motor secondaryMotor;
 
   int16_t targetMV = 0;
   std::vector<double> prevSpeeds = std::vector<double>();
-  
+
   /**
    * Whether the flywheel is currently active.
    */
@@ -38,11 +36,9 @@ public:
 
   /**
    * Engages the flywheel.
-   * Sets the motor to run at max speed.
+   * Sets the motor to run at the specified voltage.
    */
-  void engage(int16_t flywheelMV = FLYWHEEL_TARGET_SPEED, bool block = false);
-
-  bool is_up_to_speed();
+  void engage(int16_t flywheelMV, bool block = false);
 
   void wait_for_speed(uint16_t millis_timeout = 5000);
 
@@ -52,17 +48,10 @@ public:
    */
   void disengage();
 
-  /**
-   * Returns the current velocity of the flywheel.
-   * @return the current velocity of the flywheel.
-   */
-  double get_first_motor_velocity();
-  double get_second_motor_velocity();
-
   void reset_speeds();
 
-  [[nodiscard]] const device::Motor &get_first_motor() const;
-  [[nodiscard]] const device::Motor &get_second_motor() const;
+  [[nodiscard]] const device::Motor &get_primary_motor() const;
+  [[nodiscard]] const device::Motor &get_secondary_motor() const;
 
   void update(Controller *controller) override;
 };

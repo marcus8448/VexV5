@@ -15,7 +15,7 @@ private:
   pros::Motor motor;
 
   TargetType targetType = TargetType::VOLTAGE;
-  int32_t target = 0;
+  int16_t target = 0;
   double targetPosition = INFINITY;
   double prev_target = INFINITY;
 
@@ -25,12 +25,12 @@ private:
   bool reversed;
 
 public:
-  DEVICE_NAME("Motor")
+  DEVICE_TYPE_NAME("Motor")
 
-  explicit Motor(pros::Motor motor);
-  explicit Motor(uint8_t port, pros::motor_gearset_e_t gearset = pros::E_MOTOR_GEARSET_18,
+  explicit Motor(pros::Motor motor, const char *name);
+  explicit Motor(uint8_t port, const char *name, pros::motor_gearset_e_t gearset = pros::E_MOTOR_GEARSET_18,
                  pros::motor_brake_mode_e_t brake_mode = pros::E_MOTOR_BRAKE_BRAKE, bool reversed = false);
-  explicit Motor(uint8_t port, bool reversed = false);
+  explicit Motor(uint8_t port, const char *name, bool reversed = false);
 
   ~Motor();
 
@@ -38,13 +38,10 @@ public:
   void move_millivolts(int16_t target_voltage);
   void move_percentage(double percent);
 
-  void move_absolute(double target_position, uint16_t target_velocity);
-  void move_relative(double target_position, uint16_t target_velocity);
+  void move_absolute(double target_position, int16_t target_velocity);
+  void move_relative(double target_position, int16_t target_velocity);
 
   void set_reversed(bool reverse);
-
-  [[nodiscard]] bool is_at_velocity(uint16_t target_velocity) const;
-  void await_velocity(uint16_t target_velocity, int16_t timeout_millis = MOTOR_TIMEOUT_MILLIS) const;
 
   [[nodiscard]] double get_velocity() const;
   [[nodiscard]] double get_efficiency() const;

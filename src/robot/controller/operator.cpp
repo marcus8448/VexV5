@@ -55,7 +55,7 @@ void OpController::set_line(uint8_t line, uint8_t col, const char *str) {
 
 void OpController::clear_line(uint8_t line) { print_error(this->controller.clear_line(line)); }
 
-void OpController::rumble(char *str) {
+void OpController::rumble(const char *str) {
   clear_error();
   this->controller.rumble(str);
   if (get_error() == EAGAIN) {
@@ -186,7 +186,7 @@ void OpController::update() {
     this->rumble(this->enqueued_rumble);
     if (get_error() != EAGAIN) {
       this->enqueued_rumble = nullptr;
-    } 
+    }
   }
 
   static bool init = false;

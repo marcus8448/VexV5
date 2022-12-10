@@ -13,26 +13,26 @@
 #define MOTOR_ENCODER_UNITS pros::E_MOTOR_ENCODER_DEGREES
 
 namespace robot::device {
-Motor::Motor(pros::Motor motor)
-    : Device(motor.get_port()), motor(std::move(motor)), gearset(this->motor.get_gearing()),
+Motor::Motor(pros::Motor motor, const char *name)
+    : Device(motor.get_port(), name), motor(std::move(motor)), gearset(this->motor.get_gearing()),
       maxVelocity(get_gearset_max_velocity(this->gearset)), brakeMode(this->motor.get_brake_mode()),
       reversed(this->motor.is_reversed()) {
   if (this->motor.get_encoder_units() != MOTOR_ENCODER_UNITS) {
-    logger::error("Converting motor to degrees encoder units!");
+    logger::warn("Converting motor to degrees encoder units!");
     this->motor.set_encoder_units(MOTOR_ENCODER_UNITS);
   }
 }
 
-Motor::Motor(const uint8_t port, const pros::motor_gearset_e_t gearset, const pros::motor_brake_mode_e_t brake_mode,
-             bool reversed)
-    : Device(port), motor(pros::Motor(static_cast<int8_t>(port), gearset, reversed, MOTOR_ENCODER_UNITS)),
+Motor::Motor(const uint8_t port, const char *name, const pros::motor_gearset_e_t gearset,
+             const pros::motor_brake_mode_e_t brake_mode, bool reversed)
+    : Device(port, name), motor(pros::Motor(static_cast<int8_t>(port), gearset, reversed, MOTOR_ENCODER_UNITS)),
       gearset(gearset), maxVelocity(get_gearset_max_velocity(this->gearset)), brakeMode(brake_mode),
       reversed(reversed) {
   this->motor.set_brake_mode(brake_mode);
 }
 
-Motor::Motor(const uint8_t port, bool reversed)
-    : Device(port),
+Motor::Motor(const uint8_t port, const char *name, bool reversed)
+    : Device(port, name),
       motor(pros::Motor(static_cast<int8_t>(port), DEFAULT_MOTOR_GEARSET, DEFAULT_MOTOR_BRAKE, MOTOR_ENCODER_UNITS)),
       gearset(DEFAULT_MOTOR_GEARSET), maxVelocity(get_gearset_max_velocity(this->gearset)),
       brakeMode(DEFAULT_MOTOR_BRAKE), reversed(reversed) {
@@ -83,14 +83,16 @@ void Motor::move_percentage(double percent) {
   this->move_millivolts(static_cast<int16_t>((percent * MAX_MILLIVOLTS) / 100.0));
 }
 
-void Motor::move_absolute(double target_position, uint16_t target_velocity) {
+void Motor::move_absolute(double target_position, int16_t target_velocity) {
+  target_velocity = static_cast<int16_t>(std::abs(target_velocity));
   if (target_velocity > this->maxVelocity) {
     logger::warn("Target velocity %i is over max velocity %i!", target_velocity, this->maxVelocity);
     target_velocity = this->maxVelocity;
   } else if (target_velocity == 0) {
-    logger::warn("Target velocity is zero!");
+    logger::error("Target velocity is zero!");
   }
-  if (this->targetPosition != target_position) {
+  if (this->targetType != TargetType::VELOCITY || this->target != target_velocity ||
+      this->targetPosition != target_position) {
     this->targetType = TargetType::VELOCITY;
     this->target = target_velocity;
     this->targetPosition = target_position;
@@ -98,7 +100,8 @@ void Motor::move_absolute(double target_position, uint16_t target_velocity) {
   }
 }
 
-void Motor::move_relative(double target_position, uint16_t target_velocity) {
+void Motor::move_relative(double target_position, int16_t target_velocity) {
+  target_velocity = static_cast<int16_t>(std::abs(target_velocity));
   if (target_velocity > this->maxVelocity) {
     logger::warn("Target velocity %i is over max velocity %i!", target_velocity, this->maxVelocity);
     target_velocity = this->maxVelocity;
@@ -107,7 +110,8 @@ void Motor::move_relative(double target_position, uint16_t target_velocity) {
   }
   logger::info("Targetting %fEU", target_position);
   target_position += this->get_position();
-  if (this->targetPosition != target_position) {
+  if (this->targetType != TargetType::VELOCITY || this->target != target_velocity ||
+      this->targetPosition != target_position) {
     this->targetType = TargetType::VELOCITY;
     this->target = target_velocity;
     this->targetPosition = target_position;
@@ -119,21 +123,6 @@ void Motor::set_reversed(const bool reverse) {
   if (this->reversed != reverse) {
     this->reversed = reverse;
     this->motor.set_reversed(reverse);
-  }
-}
-
-bool Motor::is_at_velocity(uint16_t target_velocity) const {
-  if (this->targetType == TargetType::VELOCITY && std::abs(this->target) < target_velocity) {
-    logger::error("Motor target velocity is less than requested target velocity!");
-  }
-  return std::abs(this->get_velocity()) >= target_velocity;
-}
-
-void Motor::await_velocity(uint16_t target_velocity, int16_t timeout_millis) const {
-  for (uint16_t i = 0; i < timeout_millis / TEST_FREQUENCY; i++) {
-    if (this->is_at_velocity(target_velocity))
-      break;
-    pros::delay(TEST_FREQUENCY);
   }
 }
 

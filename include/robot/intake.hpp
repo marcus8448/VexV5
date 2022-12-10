@@ -20,8 +20,8 @@ private:
    * The motor of the intake/roller.
    */
   device::Motor motor;
-  device::Optical upperColour;
-  device::Optical lowerColour;
+  device::Optical upperOptical;
+  device::Optical lowerOptical;
 
   /**
    * Whether the intake is currently running.
@@ -64,6 +64,8 @@ public:
   [[nodiscard]] static bool is_lower_blue(double hue);
 
   [[nodiscard]] const device::Motor &get_motor() const;
+  [[nodiscard]] const device::Optical &get_upper_optical() const;
+  [[nodiscard]] const device::Optical &get_lower_optical() const;
 
   void update(Controller *controller) override;
 };

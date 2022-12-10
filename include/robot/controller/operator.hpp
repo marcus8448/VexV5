@@ -39,10 +39,10 @@ private:
   double prevRightStickX = 0.0;
   double prevRightStickY = 0.0;
 
-  int16_t flywheelSpeed = 9500;
+  int16_t flywheelSpeed = 7100;
   uint32_t ticks = 0;
 
-  char* enqueued_rumble = nullptr;
+  const char *enqueued_rumble = nullptr;
 
 public:
   explicit OpController(pros::Controller controller = pros::Controller(pros::E_CONTROLLER_MASTER));
@@ -78,7 +78,7 @@ public:
   void set_line(uint8_t line, uint8_t col, const char *str) override;
   void clear_line(uint8_t line) override;
 
-  void rumble(char *str) override;
+  void rumble(const char *str) override;
 
   void update() override;
 };

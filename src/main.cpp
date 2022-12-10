@@ -16,7 +16,6 @@
 
 #define SCREEN
 #define SCREEN_CONFIG
-#define SCREEN_LOGGING
 #define SCREEN_DRIVETRAIN
 #define SCREEN_FLYWHEEL
 
@@ -66,10 +65,7 @@
 #ifdef SCREEN_FLYWHEEL
 #include "screen/flywheel_chart.hpp"
 #endif
-#include "screen/info.hpp"
-#ifdef SCREEN_LOGGING
-#include "screen/logging.hpp"
-#endif
+#include "screen/information.hpp"
 #endif
 
 using namespace robot;
@@ -79,7 +75,9 @@ using namespace robot;
  */
 void initialize() {
   logger::push("Initialize");
+  logger::push("Initialize robot");
   Robot &robot = get_or_create_robot();
+  logger::pop();
 #ifdef SERIAL_LINK
   logger::warn("Initializing serial connection...");
   serial::add_plugin(7, new serial::RobotStatePlugin(robot));
@@ -92,12 +90,12 @@ void initialize() {
   autonomous::register_autonomous("None", new autonomous::None());
   autonomous::register_autonomous("Left Winpoint", new autonomous::LeftWinpoint());
   autonomous::register_autonomous("Right Winpoint", new autonomous::RightWinpoint());
-  autonomous::register_autonomous("Left Score", new autonomous::LeftScore());
-  autonomous::register_autonomous("Right Score", new autonomous::RightScore());
+//  autonomous::register_autonomous("Left Score", new autonomous::LeftScore());
+//  autonomous::register_autonomous("Right Score", new autonomous::RightScore());
 #endif
   // Optionally enable extra screen functionality
 #ifdef SCREEN
-  logger::push("Add Screens");
+  logger::push("Register Screens");
   // Optionally register the different screens
 #ifdef ENABLE_AUTONOMOUS
   screen::add_screen(new screen::AutonomousSelect());
@@ -112,9 +110,6 @@ void initialize() {
 #ifdef SCREEN_FLYWHEEL
   screen::add_screen(new screen::FlywheelChart());
 #endif
-#ifdef SCREEN_LOGGING
-  screen::add_screen(new screen::Logging());
-#endif
   logger::pop_push("Initialize Screen");
   screen::initialize(robot); // initialize the screen
   logger::pop();
@@ -127,11 +122,11 @@ void initialize() {
  */
 void autonomous() {
 #ifdef ENABLE_AUTONOMOUS
-  logger::push("Autonomous Setup");
   Robot &robot = get_or_create_robot();
-  logger::pop();
-  autonomous::set_active("Left Winpoint");
+  logger::push("Autonomous Setup");
+  //  autonomous::set_active(new std::string("Left Winpoint"));
   autonomous::Autonomous *autonomous = autonomous::get_autonomous();
+  logger::pop();
   if (autonomous != nullptr) {
     // #ifdef SCREEN
     // if (screen::autonomous_select_instance != nullptr) {
@@ -182,8 +177,9 @@ void opcontrol() {
  */
 Robot &get_or_create_robot() {
   static Robot robot = Robot(new Drivetrain(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR),
-                             new Intake(INTAKE_MOTOR, ROLLER_COLOUR_SENSOR_UPPER, ROLLER_COLOUR_SENSOR_LOWER), new Indexer(INDEXER_MOTOR),
-                             new Flywheel(FLYWHEEL_MOTOR, FLYWHEEL_SECONDARY_MOTOR), new Expansion(EXPANSION_PISTON));
+                             new Intake(INTAKE_MOTOR, ROLLER_COLOUR_SENSOR_UPPER, ROLLER_COLOUR_SENSOR_LOWER),
+                             new Indexer(INDEXER_MOTOR), new Flywheel(FLYWHEEL_MOTOR, FLYWHEEL_SECONDARY_MOTOR),
+                             new Expansion(EXPANSION_PISTON));
   device::initialize();
   return robot;
 }

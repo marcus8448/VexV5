@@ -20,7 +20,9 @@ private:
   lv_obj_t *flywheelTempLabel = nullptr;
   lv_obj_t *flywheelSecondaryTempLabel = nullptr;
   lv_obj_t *flywheelSpeedLabel = nullptr;
-  lv_obj_t *flywheelSecondarySpeedLabel = nullptr;
+  //  lv_obj_t *_unused = nullptr;
+  lv_obj_t *rollerUpperHue = nullptr;
+  lv_obj_t *rollerLowerHue = nullptr;
 
 public:
   explicit Information();

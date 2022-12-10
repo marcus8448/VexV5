@@ -5,15 +5,15 @@
 #include "util.hpp"
 #include <algorithm>
 
-#define SAFE_MAX_MOTOR_VOLTAGE 125
+#define SAFE_MAX_MOTOR_VOLTAGE 120
 
 namespace robot {
 Drivetrain::Drivetrain(const uint8_t rightFront, const uint8_t leftFront, const uint8_t rightBack,
                        const uint8_t leftBack)
-    : rightFront(device::Motor(rightFront, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, false)),
-      leftFront(device::Motor(leftFront, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, true)),
-      rightBack(device::Motor(rightBack, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, false)),
-      leftBack(device::Motor(leftBack, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, true)) {}
+    : rightFront(device::Motor(rightFront, "Right Front", pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, false)),
+      leftFront(device::Motor(leftFront, "Left Front", pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, true)),
+      rightBack(device::Motor(rightBack, "Right Back", pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, false)),
+      leftBack(device::Motor(leftBack, "Left Back", pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_BRAKE, true)) {}
 
 Drivetrain::~Drivetrain() = default;
 
@@ -59,36 +59,16 @@ void Drivetrain::await_move(uint16_t timeout_millis) const {
 }
 
 void Drivetrain::update(Controller *controller) {
-  if (config::get_instance()->get_drivetrain_control_scheme() == config::DrivetrainControlScheme::ARCADE_DRIVE) {
+  if (config::get_instance()->get_control_scheme() == config::DrivetrainControlScheme::ARCADE) {
     double joystickRotX = controller->right_stick_x();
     double joystickY = controller->left_stick_y();
     double right = joystickY - joystickRotX;
     double left = joystickY + joystickRotX;
-    double rOver = 0;
-    double lOver = 0;
-    if (right < -SAFE_MAX_MOTOR_VOLTAGE) {
-      rOver = right + SAFE_MAX_MOTOR_VOLTAGE;
-    } else if (right > SAFE_MAX_MOTOR_VOLTAGE) {
-      rOver = right - SAFE_MAX_MOTOR_VOLTAGE;
-    }
 
-    if (left < -SAFE_MAX_MOTOR_VOLTAGE) {
-      lOver = left + SAFE_MAX_MOTOR_VOLTAGE;
-    } else if (left > SAFE_MAX_MOTOR_VOLTAGE) {
-      lOver = left - SAFE_MAX_MOTOR_VOLTAGE;
-    }
-    double over = std::max(rOver, lOver);
-    if (over > 0) {
-      if (left > 0) {
-        left -= over;
-      } else {
-        left += over;
-      }
-      if (right > 0) {
-        right -= over;
-      } else {
-        right += over;
-      }
+    if (right > SAFE_MAX_MOTOR_VOLTAGE || left > SAFE_MAX_MOTOR_VOLTAGE) {
+      double max = std::max(right, left);
+      right = (right / max) * SAFE_MAX_MOTOR_VOLTAGE;
+      left = (left / max) * SAFE_MAX_MOTOR_VOLTAGE;
     }
 
     this->power_right(right / 127.0 * 100.0);

@@ -16,6 +16,7 @@
 #define SERIAL_DISCONNECT 4
 
 #define BUFFER_SIZE 512
+#define TIMEOUT_LENGTH 5000
 
 namespace serial {
 static std::map<const uint8_t, PacketHandler *> *packet_handlers = new std::map<const uint8_t, PacketHandler *>;
@@ -28,7 +29,6 @@ uint32_t lastTime = 0;
 
 void timeout_hack(void *params) {
   auto task = static_cast<pros::Task>(params);
-  const uint32_t TIMEOUT_LENGTH = 5000;
   while (true) {
     if (state == NOT_CONNECTED) {
       pros::delay(TIMEOUT_LENGTH);
@@ -92,8 +92,10 @@ void timeout_hack(void *params) {
 }
 
 void register_packet_handler(const uint8_t id, PacketHandler *handler) {
-  if (id >= 85 || id < 8)
+  if (id >= 85 || id < 8) {
+    logger::error("Ignoring packet handler with out of bounds id %i", id);
     return;
+  }
   packet_handlers->emplace(id, handler);
 }
 

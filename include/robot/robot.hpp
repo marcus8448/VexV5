@@ -19,7 +19,7 @@ public:
    */
   Drivetrain *drivetrain;
   /**
-   * The robot's intake.
+   * The robot's intake and roller.
    */
   Intake *intake;
   /**

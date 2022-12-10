@@ -7,8 +7,9 @@
 namespace robot {
 
 Intake::Intake(uint8_t motorPort, uint8_t upperColourPort, uint8_t lowerColourPort)
-    : motor(device::Motor(motorPort, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_HOLD, false)),
-      upperColour(device::Optical(upperColourPort)), lowerColour(device::Optical(lowerColourPort)) {}
+    : motor(device::Motor(motorPort, "Intake/Roller", pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_HOLD, false)),
+      upperOptical(device::Optical(upperColourPort, "Upper Optical")),
+      lowerOptical(device::Optical(lowerColourPort, "Lower Optical")) {}
 
 Intake::~Intake() = default;
 
@@ -30,66 +31,69 @@ void Intake::disengage() {
 }
 
 void Intake::roll_to_team_colour(config::AllianceColour teamColour, uint32_t timeout) {
-  this->lowerColour.set_led_pwm(100);
+  this->lowerOptical.set_led_pwm(100);
   // this->upperColour.set_led_pwm(100);
   // 20-80 bot
-  if (!this->upperColour.is_connected()) {
+  if (!this->upperOptical.is_connected()) {
     logger::warn("Colour sensor is not connected. Spinning the roller anyways.");
     this->reverse(4800);
-    pros::delay(2000);
+    pros::delay(750);
     this->disengage();
   } else {
     // if (!looking_at_roller()) {
     //   logger::warn("Spinning roller while not in view?");
     // }
-    double upperHue = this->upperColour.get_hue();
-    double lowerHue = this->lowerColour.get_hue();
+    double upperHue = this->upperOptical.get_hue();
+    double lowerHue = this->lowerOptical.get_hue();
     uint32_t i = 0;
     int16_t ticksProper = 0;
     timeout /= 10;
+    this->motor.set_reversed(true);
 
-    this->motor.move_percentage(50.0);
     switch (teamColour) {
     case config::AllianceColour::RED: {
-      while (++i != timeout) {
+      while (i++ != timeout) {
         if (i % 250 == 249) {
           this->motor.set_reversed(!this->motor.is_reversed());
         }
-        if (this->is_red(upperHue) && !this->is_lower_red(lowerHue)) {
+        if (is_red(upperHue) && !is_lower_red(lowerHue)) {
           if (ticksProper++ == 15) {
             break;
           }
         } else {
           ticksProper = 0;
         }
+        this->motor.move_percentage(50.0);
         pros::delay(10);
-        upperHue = this->upperColour.get_hue();
-        lowerHue = this->lowerColour.get_hue();
+        upperHue = this->upperOptical.get_hue();
+        lowerHue = this->lowerOptical.get_hue();
       }
       break;
     }
     case config::AllianceColour::BLUE: {
-      while (!this->is_blue(upperHue) || this->is_lower_blue(lowerHue)  || ++i == timeout) {
+      while (i++ != timeout) {
         if (i % 250 == 249) {
           this->motor.set_reversed(!this->motor.is_reversed());
         }
-        if (this->is_red(upperHue) && !this->is_lower_red(lowerHue)) {
+        if (is_blue(upperHue) && !is_lower_blue(lowerHue)) {
           if (ticksProper++ == 15) {
             break;
           }
         } else {
           ticksProper = 0;
         }
+        this->motor.move_percentage(50.0);
         pros::delay(10);
-        upperHue = this->upperColour.get_hue();
-        lowerHue = this->lowerColour.get_hue();
+        upperHue = this->upperOptical.get_hue();
+        lowerHue = this->lowerOptical.get_hue();
       }
       break;
     }
     }
-    logger::info("Success %f %f", upperHue, lowerHue);
-    this->upperColour.set_led_pwm(0);
-    this->lowerColour.set_led_pwm(0);
+    logger::info("Successfully rolled to %s (upper: %f, lower: %f)",
+                 config::get_alliance_colour_name(config::get_instance()->get_alliance_colour()), upperHue, lowerHue);
+    this->upperOptical.set_led_pwm(0);
+    this->lowerOptical.set_led_pwm(0);
     this->motor.move_absolute(this->motor.get_position() - 25, 100);
   }
 }
@@ -103,6 +107,8 @@ void Intake::roll_to_team_colour(config::AllianceColour teamColour, uint32_t tim
 
 [[nodiscard]] const device::Motor &Intake::get_motor() const { return this->motor; }
 
+[[nodiscard]] const device::Optical &Intake::get_upper_optical() const { return this->upperOptical; }
+[[nodiscard]] const device::Optical &Intake::get_lower_optical() const { return this->lowerOptical; }
 void Intake::update(Controller *controller) {
   if (controller->l1_pressed() && controller->l2_pressed()) {
     this->reverse();

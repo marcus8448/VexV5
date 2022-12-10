@@ -37,11 +37,10 @@ void ConfigurationScreen::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t 
 void ConfigurationScreen::update(robot::Robot &robot) {}
 
 void ConfigurationScreen::update_drive_scheme_label() {
-  lv_label_set_text(
-      this->driveSchemeBtnLbl,
-      logger::string_format("Control Scheme: %s",
-                            config::get_drive_scheme_name(config::get_instance()->get_drivetrain_control_scheme()))
-          .c_str());
+  lv_label_set_text(this->driveSchemeBtnLbl,
+                    logger::string_format("Control Scheme: %s",
+                                          config::get_drive_scheme_name(config::get_instance()->get_control_scheme()))
+                        .c_str());
 }
 
 void ConfigurationScreen::update_alliance_colour_label() {
@@ -64,10 +63,10 @@ void ConfigurationScreen::update_alliance_colour_label() {
 }
 
 lv_res_t switch_drive_scheme([[maybe_unused]] lv_obj_t *btn) {
-  config::get_instance()->set_drivetrain_control_scheme(config::get_instance()->get_drivetrain_control_scheme() ==
-                                                                config::DrivetrainControlScheme::TANK_DRIVE
-                                                            ? config::DrivetrainControlScheme::ARCADE_DRIVE
-                                                            : config::DrivetrainControlScheme::TANK_DRIVE);
+  config::get_instance()->set_drivetrain_control_scheme(config::get_instance()->get_control_scheme() ==
+                                                                config::DrivetrainControlScheme::TANK
+                                                            ? config::DrivetrainControlScheme::ARCADE
+                                                            : config::DrivetrainControlScheme::TANK);
   instance->update_drive_scheme_label();
   return LV_RES_INV;
 }
