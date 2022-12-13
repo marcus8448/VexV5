@@ -11,9 +11,9 @@ void LeftWinpoint::run(Robot &robot) {
     }
   */
   robot.drivetrain->backwards(500.0, 5, 0);
-  pros::delay(250);
+  pros::delay(1000);
   robot.intake->reverse(5500);
-  pros::delay(500);
+  pros::delay(1000);
   robot.intake->engage(0);
   robot.drivetrain->stop();
 

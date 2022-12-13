@@ -48,7 +48,7 @@ void Intake::roll_to_team_colour(config::AllianceColour teamColour, uint32_t tim
     uint32_t i = 0;
     int16_t ticksProper = 0;
     timeout /= 10;
-    this->motor.set_reversed(true);
+    this->motor.set_reversed(false);
 
     switch (teamColour) {
     case config::AllianceColour::RED: {
@@ -103,7 +103,7 @@ void Intake::roll_to_team_colour(config::AllianceColour teamColour, uint32_t tim
 [[nodiscard]] bool Intake::is_red(double hue) { return hue < 30.0 || hue > 310.0; }
 [[nodiscard]] bool Intake::is_lower_red(double hue) { return hue < 40.0 || hue > 310.0; }
 [[nodiscard]] bool Intake::is_blue(double hue) { return hue < 250.0 && hue > 210.0; }
-[[nodiscard]] bool Intake::is_lower_blue(double hue) { return hue < 250.0 && hue > 75.0; }
+[[nodiscard]] bool Intake::is_lower_blue(double hue) { return hue < 280.0 && hue > 70.0; }
 
 [[nodiscard]] const device::Motor &Intake::get_motor() const { return this->motor; }
 

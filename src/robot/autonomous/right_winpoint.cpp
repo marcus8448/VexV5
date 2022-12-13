@@ -19,10 +19,19 @@ void RightWinpoint::run(Robot &robot) {
   robot.drivetrain->forwards(26.0);
   robot.drivetrain->turn_left(90.0);
   robot.drivetrain->backwards(4.0, 50);
-  while (true) {
+  if (config::get_instance()->get_alliance_colour() == config::BLUE) {
     robot.drivetrain->backwards(500.0, 5, 0);
-    robot.intake->roll_to_team_colour(config::get_instance()->get_alliance_colour(), 10000);
-    pros::delay(500);
+    pros::delay(3000);
+    robot.intake->reverse(5500);
+    pros::delay(1500);
+    robot.intake->engage(0);
+    robot.drivetrain->stop();
+  } else {
+    while (true) {
+      robot.drivetrain->backwards(500.0, 5, 0);
+      robot.intake->roll_to_team_colour(config::get_instance()->get_alliance_colour(), 10000);
+      pros::delay(500);
+    }
   }
   //  robot.drivetrain->stop();
 }
