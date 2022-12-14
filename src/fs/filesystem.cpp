@@ -1,6 +1,7 @@
 #include "fs/filesystem.hpp"
 #include "logger.hpp"
 #include "pros/misc.hpp"
+#include <fstream>
 
 namespace fs {
 std::string to_path(const char *name) { return std::string("/usd/").append(name); }
@@ -8,14 +9,32 @@ std::string to_path(const char *name) { return std::string("/usd/").append(name)
 bool is_connected() { return pros::usd::is_installed(); }
 
 std::ofstream create_sink() { return std::ofstream("/dev/null"); }
+std::ifstream create_read_sink() { return std::ifstream("/dev/null"); }
 
 bool file_exists(const char *name) {
+  if (!pros::usd::is_installed()) {
+    logger::warn("MicroSD unavailable!");
+    return false;
+  }
+
   if (std::FILE *file = std::fopen(name, "r")) {
     std::fclose(file);
     return true;
   } else {
     return false;
   }
+}
+
+std::ifstream open(const char *name) {
+  std::string path = to_path(name);
+  if (!pros::usd::is_installed()) {
+    logger::warn("MicroSD unavailable, creating sink.");
+    return create_read_sink();
+  }
+  if (!file_exists(name)) {
+    return create_read_sink();
+  }
+  return std::ifstream(path);
 }
 
 std::ofstream create(const char *name) {
@@ -53,4 +72,11 @@ std::ofstream create_indexed(const char *name) {
   }
   return create_sink();
 }
+
+void create_with_content(const char *name, const std::string str) {
+  if (!file_exists(name)) {
+    create(name) << str;
+  }
+}
+
 } // namespace fs
