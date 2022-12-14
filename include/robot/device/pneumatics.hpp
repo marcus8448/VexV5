@@ -15,8 +15,7 @@ private:
 
 public:
   DEVICE_TYPE_NAME("Pneumatic Piston")
-  explicit PneumaticPiston(uint8_t port, const char *name);
-  explicit PneumaticPiston(uint8_t port, const char *name, bool defaultState);
+  explicit PneumaticPiston(uint8_t port, const char *name, bool defaultState = false);
 
   void extend();
   void contract();
