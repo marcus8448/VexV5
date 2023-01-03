@@ -1,5 +1,6 @@
 #include "robot/indexer.hpp"
 #include "logger.hpp"
+#include "pros/rtos.hpp"
 #include "robot/device/motor.hpp"
 
 namespace robot {
@@ -10,7 +11,7 @@ Indexer::~Indexer() = default;
 
 void Indexer::push() {
   if (this->state == CHARGED) {
-    logger::info("Shooting a disc");
+    info("Shooting a disc");
     this->motor.move_absolute(90.0, 200);
     this->set_state(State::PUSHING);
   }

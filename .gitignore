@@ -19,3 +19,4 @@ temp.errors
 .idea/
 build/
 temporary.hpp
+firmware/extra/

@@ -36,7 +36,7 @@ void timeout_hack(void *params) {
       if (pros::millis() - lastTime > TIMEOUT_LENGTH) {
         state = NOT_CONNECTED;
         task.remove(); // kill the task.
-        logger::info("Serial connection timed out.");
+        info("Serial connection timed out.");
         initialize();
         break;
       } else {
@@ -93,7 +93,7 @@ void timeout_hack(void *params) {
 
 void register_packet_handler(const uint8_t id, PacketHandler *handler) {
   if (id >= 85 || id < 8) {
-    logger::error("Ignoring packet handler with out of bounds id %i", id);
+    error("Ignoring packet handler with out of bounds id %i", id);
     return;
   }
   packet_handlers->emplace(id, handler);

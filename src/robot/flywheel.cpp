@@ -1,5 +1,6 @@
 #include "robot/flywheel.hpp"
 #include "logger.hpp"
+#include "pros/rtos.hpp"
 #include <cmath>
 
 namespace robot {
@@ -20,13 +21,8 @@ void Flywheel::engage(int16_t flywheelMV, bool block) {
       this->state = State::SPINNING_UP;
     }
 
-    // if (std::abs(this->targetMV - flywheelMV) > 1000) {
-    //   this->first_motor.move_millivolts(12000);
-    //   this->second_motor.move_millivolts(12000);
-    // } else {
     this->primaryMotor.move_millivolts(flywheelMV);
     this->secondaryMotor.move_millivolts(flywheelMV);
-    // }
 
     this->targetMV = flywheelMV;
     this->prevSpeeds.clear();
@@ -45,7 +41,7 @@ void Flywheel::disengage() {
   this->prevSpeeds.clear();
 }
 
-void Flywheel::update(Controller *controller) {
+void Flywheel::update(Controller *controller) { //todo: run at max once target is known.
   if (controller->r1_pressed()) {
     this->engage(controller->flywheel_speed());
   } else if (controller->x_pressed()) {
@@ -64,11 +60,11 @@ void Flywheel::update(Controller *controller) {
   }
 
   if (this->state == SPINNING_UP || this->state == SPINNING_DOWN) {
-    logger::info("FLY: %f %f %f %f", velocity, runMax, runMin, runMax - runMin);
+    debug("Flywheel - vel: %f, max: %f, min: %f, diff: %f", velocity, runMax, runMin, runMax - runMin);
     if (runMax - runMin < 55.0 && this->prevSpeeds.size() == 20) {
       if (this->state == SPINNING_UP) {
         controller->rumble("-");
-        logger::info("SUCCESS: %f", velocity);
+        info("Flywheel up to speed - see ^", velocity);
       }
       this->state = AT_SPEED;
     }
@@ -76,7 +72,7 @@ void Flywheel::update(Controller *controller) {
 
   if (this->state == State::AT_SPEED) {
     if (runMax - velocity > 80.0) {
-      logger::info("regression - spinning up.");
+      info("Speed regression - spinning up.");
       this->state = State::SPINNING_UP;
     }
   }
@@ -89,7 +85,7 @@ void Flywheel::reset_speeds() { return this->prevSpeeds.clear(); }
 
 void Flywheel::wait_for_speed(uint16_t millis_timeout) {
   if (this->state == State::IDLE) {
-    logger::error("Waiting for flywheel to speed up while it's off!");
+    error("Waiting for flywheel to speed up while it's off!");
     return;
   }
   millis_timeout /= 10;
@@ -113,11 +109,11 @@ void Flywheel::wait_for_speed(uint16_t millis_timeout) {
         }
       }
     }
-    double d = this->primaryMotor.get_velocity();
-    logger::info("FLY: %f %f", d, this->primaryMotor.get_raw_motor().get_power());
-    this->prevSpeeds.emplace_back(d);
-    runMax = std::max(d, runMax);
-    runMin = std::min(d, runMin);
+    double velocity = this->primaryMotor.get_velocity();
+    debug("Flywheel (a) - vel: %f, max: %f, min: %f, diff: %f", velocity, runMax, runMin, runMax - runMin);
+    this->prevSpeeds.emplace_back(velocity);
+    runMax = std::max(velocity, runMax);
+    runMin = std::min(velocity, runMin);
 
     // if (runMax - runMin > 100.0) {
     //   this->prevSpeeds.clear();

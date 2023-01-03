@@ -13,7 +13,7 @@ std::ifstream create_read_sink() { return std::ifstream("/dev/null"); }
 
 bool file_exists(const char *name) {
   if (!pros::usd::is_installed()) {
-    logger::warn("MicroSD unavailable!");
+    warn("MicroSD unavailable!");
     return false;
   }
 
@@ -28,7 +28,7 @@ bool file_exists(const char *name) {
 std::ifstream open(const char *name) {
   std::string path = to_path(name);
   if (!pros::usd::is_installed()) {
-    logger::warn("MicroSD unavailable, creating sink.");
+    warn("MicroSD unavailable, creating sink.");
     return create_read_sink();
   }
   if (!file_exists(name)) {
@@ -40,7 +40,7 @@ std::ifstream open(const char *name) {
 std::ofstream create(const char *name) {
   std::string path = to_path(name);
   if (!pros::usd::is_installed()) {
-    logger::warn("MicroSD unavailable, creating sink.");
+    warn("MicroSD unavailable, creating sink.");
     return create_sink();
   }
   return std::ofstream(path, std::ios_base::out | std::ios::app);
@@ -49,7 +49,7 @@ std::ofstream create(const char *name) {
 std::ofstream create_truncate(const char *name) {
   std::string path = to_path(name);
   if (!pros::usd::is_installed()) {
-    logger::warn("MicroSD unavailable, creating sink.");
+    warn("MicroSD unavailable, creating sink.");
     return create_sink();
   }
   return std::ofstream(path, std::ios_base::out | std::ios::trunc);
@@ -58,7 +58,7 @@ std::ofstream create_truncate(const char *name) {
 std::ofstream create_indexed(const char *name) {
   std::string path = to_path(name);
   if (!pros::usd::is_installed()) {
-    logger::warn("MicroSD unavailable, creating sink.");
+    warn("MicroSD unavailable, creating sink.");
     return create_sink();
   }
   if (!file_exists(path.c_str())) {
@@ -73,7 +73,7 @@ std::ofstream create_indexed(const char *name) {
   return create_sink();
 }
 
-void create_with_content(const char *name, const std::string str) {
+void create_with_content(const char *name, const std::string &str) {
   if (!file_exists(name)) {
     create(name) << str;
   }

@@ -39,9 +39,9 @@ lv_obj_t *create_next_btn(lv_obj_t *obj);
 void create_screen(lv_obj_t *output[], lv_obj_t *parent);
 
 void initialize(robot::Robot &robot) {
-  logger::push("Initialize LVGL");
+  section_push("Initialize LVGL");
   lv_init();
-  logger::pop();
+  section_pop();
 
   lv_obj_t *base_view = lv_scr_act();
   width = lv_obj_get_width(base_view);
@@ -54,15 +54,15 @@ void initialize(robot::Robot &robot) {
 
   activeScreen = registry->at(0);
 
-  logger::debug("Width: %i\nHeight: %i", width, height);
-  logger::push("Create screens");
+  debug("Width: %i\nHeight: %i", width, height);
+  section_push("Create screens");
   for (auto screen : *registry) {
     auto **lvObjs = new lv_obj_t *[3];
     create_screen(lvObjs, base_view);
     screens->emplace(screen, lvObjs);
     screen->create(lvObjs[0], width, height);
   }
-  logger::pop();
+  section_pop();
 
   show_screen(activeScreen);
   pros::Task(update_task, &robot, "Screen Update");
@@ -129,7 +129,7 @@ lv_obj_t *create_next_btn(lv_obj_t *obj) {
 }
 
 lv_res_t prev_page([[maybe_unused]] lv_obj_t *btn) {
-  logger::debug("Screen switching to previous page");
+  debug("Screen switching to previous page");
   hide_screen(activeScreen);
   auto x = std::find(registry->begin(), registry->end(), activeScreen);
   auto newScreen = registry->at(x - registry->begin() - 1);
@@ -139,7 +139,7 @@ lv_res_t prev_page([[maybe_unused]] lv_obj_t *btn) {
 }
 
 lv_res_t next_page([[maybe_unused]] lv_obj_t *btn) {
-  logger::debug("Screen switching to next page");
+  debug("Screen switching to next page");
   hide_screen(activeScreen);
   auto x = std::find(registry->begin(), registry->end(), activeScreen);
   auto newScreen = registry->at(x - registry->begin() + 1);

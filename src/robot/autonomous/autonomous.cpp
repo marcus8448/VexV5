@@ -8,13 +8,19 @@ std::map<const std::string, robot::autonomous::Autonomous *> *autonomousPrograms
 namespace robot::autonomous {
 static const std::string *activeProgram = nullptr;
 
-void register_autonomous(const char *name, Autonomous *program) {
-  logger::info("Registering autonomous '%s'.", name);
-  (*autonomousPrograms)[std::string(name)] = program;
+Autonomous::Autonomous(const char *name): name(name) {}
+
+const char *Autonomous::get_name() {
+  return this->name;
+}
+
+void register_autonomous(Autonomous *program) {
+  info("Registering autonomous '%s'.", program->get_name());
+  (*autonomousPrograms)[std::string(program->get_name())] = program;
 
   if (activeProgram == nullptr) {
-    logger::info("Setting '%s' as the default autonomous.", name);
-    activeProgram = new std::string(name); // set the default program to the first one registered
+    info("Setting '%s' as the default autonomous.", program->get_name());
+    activeProgram = new std::string(program->get_name()); // set the default program to the first one registered
   }
 }
 
@@ -24,10 +30,10 @@ void set_active(const std::string *program) { activeProgram = program; }
 
 Autonomous *get_autonomous() {
   if (activeProgram == nullptr) {
-    logger::error("No autonomous selected!");
+    error("No autonomous selected!");
     return nullptr;
   }
-  logger::info("Running autonomous: '%s'", activeProgram);
+  info("Running autonomous: '%s'", activeProgram);
   return (*autonomousPrograms)[*activeProgram];
 }
 } // namespace robot::autonomous

@@ -10,7 +10,6 @@ typedef __SIZE_TYPE__ size_t; // adi.hpp requires it
 namespace robot::device {
 class PneumaticPiston : public Device {
 private:
-  const pros::ADIDigitalOut piston;
   bool extended;
 
 public:
@@ -25,8 +24,6 @@ public:
 
   void reconfigure() const override;
   [[nodiscard]] bool is_connected() const override;
-
-  [[nodiscard]] pros::ADIDigitalOut get_raw_piston() const;
 };
 } // namespace robot::device
 #endif // ROBOT_DEVICE_PNEUMATICS_HPP

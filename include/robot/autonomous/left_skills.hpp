@@ -7,9 +7,10 @@ namespace robot::autonomous {
 /**
  * Autonomous run to be used when aiming for the best score when starting on the left side.
  */
-class LeftScore : public Autonomous {
-private:
+class LeftSkills : public Autonomous {
 public:
+  explicit LeftSkills(): Autonomous("Left Skills") {};
+
   void run(Robot &robot) override;
 };
 } // namespace robot::autonomous

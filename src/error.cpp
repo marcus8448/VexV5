@@ -9,7 +9,7 @@ bool check_error() {
     if (error == ENODEV) {
       return false;
     }                                                      // skip printing 19 - no such device.
-    logger::error("Error %i: %s", error, strerror(error)); // print the error
+    error("Error %i: %s", error, strerror(error)); // print the error
     return false;
   }
   return true;

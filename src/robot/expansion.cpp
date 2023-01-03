@@ -9,7 +9,7 @@ Expansion::~Expansion() = default;
 
 void Expansion::launch() {
   if (!this->launched) {
-    logger::info("Launching expansion");
+    info("Launching expansion!");
     this->piston.extend();
     this->launched = true;
   }
@@ -20,6 +20,9 @@ void Expansion::launch() {
 void Expansion::update(Controller *controller) {
   if (!this->launched) {
     if (controller->up_pressed() % 5 == 1) {
+      if (controller->up_pressed() == 1) {
+        warn("Expansion button pressed!");
+      }
       controller->rumble("-");
     } else if (controller->up_pressed() > 25) {
       this->launch();

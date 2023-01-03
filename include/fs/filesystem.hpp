@@ -15,6 +15,6 @@ std::ifstream open(const char *name);
 std::ofstream create(const char *name);
 std::ofstream create_truncate(const char *name);
 std::ofstream create_indexed(const char *name);
-void create_with_content(const char *name, const std::string str);
+void create_with_content(const char *name, const std::string &str);
 } // namespace fs
 #endif

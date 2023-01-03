@@ -2,7 +2,7 @@
 #define ROBOT_CONTROLLER_OPERATOR_HPP
 
 #include "controller.hpp"
-#include "pros/misc.hpp"
+#include "pros/misc.h"
 #include <cstdint>
 
 namespace robot::controller {
@@ -12,7 +12,7 @@ namespace robot::controller {
  */
 class OpController : public Controller {
 private:
-  pros::Controller controller;
+  pros::controller_id_e_t controller_id;
 
   uint16_t a = 0;
   uint16_t b = 0;
@@ -45,7 +45,7 @@ private:
   const char *enqueued_rumble = nullptr;
 
 public:
-  explicit OpController(pros::Controller controller = pros::Controller(pros::E_CONTROLLER_MASTER));
+  explicit OpController(pros::controller_id_e_t controller_id = pros::E_CONTROLLER_MASTER);
 
   [[nodiscard]] uint16_t a_pressed() const override;
   [[nodiscard]] uint16_t b_pressed() const override;

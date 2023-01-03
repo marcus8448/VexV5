@@ -1,13 +1,11 @@
 #ifndef ROBOT_DEVICE_COLOUR_HPP
 #define ROBOT_DEVICE_COLOUR_HPP
 
-#include "pros/optical.hpp"
 #include "robot/device/device.hpp"
 
 namespace robot::device {
 class Optical : public Device {
 private:
-  // pros::Optical optical; // for some reason nothing is const
   uint8_t led_pwm;
   bool gesture = false;
 

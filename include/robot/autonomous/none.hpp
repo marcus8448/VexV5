@@ -8,8 +8,9 @@ namespace robot::autonomous {
  * Autonomous run that does noting.
  */
 class None : public Autonomous {
-private:
 public:
+  explicit None(): Autonomous("None") {}
+
   void run(Robot &robot) override;
 };
 } // namespace robot::autonomous

@@ -1,7 +1,7 @@
 #ifndef VEXV5_ROBOT_DEVICE_MOTOR_HPP
 #define VEXV5_ROBOT_DEVICE_MOTOR_HPP
 
-#include "pros/motors.hpp"
+#include "pros/motors.h"
 #include "robot/device/device.hpp"
 #include <cmath>
 
@@ -12,12 +12,9 @@ class Motor : public Device {
   enum TargetType { VOLTAGE, VELOCITY };
 
 private:
-  pros::Motor motor;
-
   TargetType targetType = TargetType::VOLTAGE;
   int16_t target = 0;
   double targetPosition = INFINITY;
-  double prev_target = INFINITY;
 
   const pros::motor_gearset_e_t gearset;
   const int16_t maxVelocity;
@@ -27,19 +24,18 @@ private:
 public:
   DEVICE_TYPE_NAME("Motor")
 
-  explicit Motor(pros::Motor motor, const char *name);
   explicit Motor(uint8_t port, const char *name, pros::motor_gearset_e_t gearset = pros::E_MOTOR_GEARSET_18,
                  pros::motor_brake_mode_e_t brake_mode = pros::E_MOTOR_BRAKE_BRAKE, bool reversed = false);
   explicit Motor(uint8_t port, const char *name, bool reversed = false);
 
   ~Motor();
 
-  void move_velocity(int16_t target_velocity);
-  void move_millivolts(int16_t target_voltage);
+  void move_velocity(int16_t velocity);
+  void move_millivolts(int16_t mV);
   void move_percentage(double percent);
 
-  void move_absolute(double target_position, int16_t target_velocity);
-  void move_relative(double target_position, int16_t target_velocity);
+  void move_absolute(double position, int16_t velocity);
+  void move_relative(double amount, int16_t velocity);
 
   void set_reversed(bool reverse);
 
@@ -57,6 +53,13 @@ public:
   [[nodiscard]] bool is_connected() const override;
 
   [[nodiscard]] double get_temperature() const;
+  [[nodiscard]] double get_power() const;
+  [[nodiscard]] double get_torque() const;
+
+  [[nodiscard]] int32_t get_current_draw() const;
+  [[nodiscard]] int32_t get_voltage() const;
+  [[nodiscard]] int32_t get_current_limit() const;
+  [[nodiscard]] int32_t get_voltage_limit() const;
 
   void await_target(int16_t timeout_millis = MOTOR_TIMEOUT_MILLIS) const;
   [[nodiscard]] bool is_at_target() const;
@@ -67,7 +70,6 @@ public:
   void stop();
 
   [[nodiscard]] Motor::TargetType get_target_type() const;
-  [[nodiscard]] const pros::Motor &get_raw_motor() const;
 };
 
 int16_t get_gearset_max_velocity(pros::motor_gearset_e_t gearset);

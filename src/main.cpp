@@ -3,8 +3,6 @@
 #define FLYWHEEL_SECONDARY_MOTOR 5
 #define INDEXER_MOTOR 19
 #define INTAKE_MOTOR 1
-#define ROLLER_COLOUR_SENSOR_UPPER 7
-#define ROLLER_COLOUR_SENSOR_LOWER 6
 #define EXPANSION_PISTON 'A'
 
 #define RIGHT_FRONT_MOTOR 4
@@ -36,14 +34,15 @@
 
 #ifdef ENABLE_AUTONOMOUS
 #include "robot/autonomous/autonomous.hpp"
-#include "robot/autonomous/left_score.hpp"
+#include "robot/autonomous/left_skills.hpp"
 #include "robot/autonomous/left_winpoint.hpp"
 #include "robot/autonomous/none.hpp"
-#include "robot/autonomous/right_score.hpp"
+#include "robot/autonomous/right_skills.hpp"
 #include "robot/autonomous/right_winpoint.hpp"
 #endif
 
 #include "pros/apix.h"
+#include "pros/rtos.hpp"
 
 #ifdef SERIAL_LINK
 #include "serial/robot_command.hpp"
@@ -74,10 +73,10 @@ using namespace robot;
  * Called when the robot is first initialized.
  */
 void initialize() {
-  logger::push("Initialize");
-  logger::push("Initialize robot");
+  section_push("Initialize");
+  section_push("Initialize robot");
   Robot &robot = get_or_create_robot();
-  logger::pop();
+  section_pop();
 #ifdef SERIAL_LINK
   logger::warn("Initializing serial connection...");
   serial::add_plugin(7, new serial::RobotStatePlugin(robot));
@@ -87,15 +86,15 @@ void initialize() {
   // Optionally disable autonomous for builds
 #ifdef ENABLE_AUTONOMOUS
   // Register the different types of autonomous-es
-  autonomous::register_autonomous("None", new autonomous::None());
-  autonomous::register_autonomous("Left Winpoint", new autonomous::LeftWinpoint());
-  autonomous::register_autonomous("Right Winpoint", new autonomous::RightWinpoint());
-//  autonomous::register_autonomous("Left Score", new autonomous::LeftScore());
-//  autonomous::register_autonomous("Right Score", new autonomous::RightScore());
+  autonomous::register_autonomous(new autonomous::None());
+  autonomous::register_autonomous(new autonomous::LeftWinpoint());
+  autonomous::register_autonomous(new autonomous::RightWinpoint());
+//  autonomous::register_autonomous(new autonomous::LeftSkills());
+//  autonomous::register_autonomous(new autonomous::RightScore());
 #endif
   // Optionally enable extra screen functionality
 #ifdef SCREEN
-  logger::push("Register Screens");
+  section_push("Register Screens");
   // Optionally register the different screens
 #ifdef ENABLE_AUTONOMOUS
   screen::add_screen(new screen::AutonomousSelect());
@@ -110,11 +109,11 @@ void initialize() {
 #ifdef SCREEN_FLYWHEEL
   screen::add_screen(new screen::FlywheelChart());
 #endif
-  logger::pop_push("Initialize Screen");
+  section_swap("Initialize Screen");
   screen::initialize(robot); // initialize the screen
-  logger::pop();
+  section_pop();
 #endif // SCREEN
-  logger::pop();
+  section_pop();
 }
 
 /**
@@ -123,10 +122,10 @@ void initialize() {
 void autonomous() {
 #ifdef ENABLE_AUTONOMOUS
   Robot &robot = get_or_create_robot();
-  logger::push("Autonomous Setup");
+  section_push("Autonomous Setup");
   //  autonomous::set_active(new std::string("Left Winpoint"));
   autonomous::Autonomous *autonomous = autonomous::get_autonomous();
-  logger::pop();
+  section_pop();
   if (autonomous != nullptr) {
     // #ifdef SCREEN
     // if (screen::autonomous_select_instance != nullptr) {
@@ -136,7 +135,7 @@ void autonomous() {
     // #endif
     autonomous->run(robot); // run the autonomous code
   } else {
-    logger::error("Missing autonomous run!");
+    error("Missing autonomous run!");
   }
 #endif
 }
@@ -155,9 +154,9 @@ void opcontrol() {
   //   }
   // #endif
 
-  logger::push("Opcontrol Setup");
+  section_push("Opcontrol Setup");
   robot.controller = new controller::OpController(); // set the robot controller to the default operator based one.
-  logger::pop();
+  section_pop();
 
 #ifdef ENABLE_TEMPORARY_CODE
   if (temporary::run(robot))
@@ -177,7 +176,7 @@ void opcontrol() {
  */
 Robot &get_or_create_robot() {
   static Robot robot = Robot(new Drivetrain(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR),
-                             new Intake(INTAKE_MOTOR, ROLLER_COLOUR_SENSOR_UPPER, ROLLER_COLOUR_SENSOR_LOWER),
+                             new Intake(INTAKE_MOTOR),
                              new Indexer(INDEXER_MOTOR), new Flywheel(FLYWHEEL_MOTOR, FLYWHEEL_SECONDARY_MOTOR),
                              new Expansion(EXPANSION_PISTON));
   device::initialize();
@@ -192,4 +191,6 @@ void competition_initialize() {}
 /**
  * Called when the robot should be stopped during a competition
  */
-void disabled() {}
+void disabled() {
+  logger::flush();
+}

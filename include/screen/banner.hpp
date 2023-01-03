@@ -1,3 +1,4 @@
+#ifdef BANNER_AVAILABLE
 #ifndef SCREEN_BANNER_HPP
 #define SCREEN_BANNER_HPP
 
@@ -17,3 +18,4 @@ public:
 } // namespace screen
 
 #endif // SCREEN_BANNER_HPP
+#endif // BANNER_AVAILABLE

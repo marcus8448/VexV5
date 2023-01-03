@@ -46,7 +46,11 @@ void AutonomousSelect::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t hei
   selected_style->text.color = colour::GREEN;
 }
 
-void AutonomousSelect::update(robot::Robot &robot) {}
+static robot::Robot *robot_maybe = nullptr;
+
+void AutonomousSelect::update(robot::Robot &robot) {
+  robot_maybe = &robot;
+}
 
 void AutonomousSelect::click(lv_obj_t *btn) {
   if (this->selected != nullptr) {
@@ -54,7 +58,15 @@ void AutonomousSelect::click(lv_obj_t *btn) {
   }
   this->selected = btn;
 
-  robot::autonomous::set_active(new std::string(lv_list_get_btn_text(btn)));
+  auto name = new std::string(lv_list_get_btn_text(btn));
+
+  if (robot_maybe != nullptr) {
+    if (robot_maybe->controller != nullptr) {
+      robot_maybe->controller->set_line(0, 0, name->c_str());
+    }
+  }
+
+  robot::autonomous::set_active(name);
   lv_obj_set_style(btn, selected_style);
 }
 

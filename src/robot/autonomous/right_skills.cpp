@@ -1,4 +1,4 @@
-#include "robot/autonomous/right_score.hpp"
+#include "robot/autonomous/right_skills.hpp"
 
 namespace robot::autonomous {
 void RightScore::run(Robot &robot) {}

@@ -9,11 +9,11 @@ RobotStatePlugin::RobotStatePlugin(uint8_t id, robot::Robot &robot) : PacketHand
 
 void RobotStatePlugin::initialize() {}
 
-void serialize_motor(uint8_t *buffer, const pros::Motor &motor) {
+void serialize_motor(uint8_t *buffer, const robot::device::Motor &motor) {
   floating src;
   src = motor.get_target_position();
   std::memcpy(&buffer[sizeof(floating) * 0], &src, sizeof(floating));
-  src = motor.get_actual_velocity();
+  src = motor.get_velocity();
   std::memcpy(&buffer[sizeof(floating) * 1], &src, sizeof(floating));
   src = motor.get_position();
   std::memcpy(&buffer[sizeof(floating) * 2], &src, sizeof(floating));
@@ -82,10 +82,10 @@ void RobotStatePlugin::handle(SerialConnection *connection, void *buffer, size_t
   src = static_cast<floating>(this->robot.controller->right_stick_y());
   std::memcpy(&buf[3 + sizeof(float) * 3], &src, sizeof(float));
 
-  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 0], this->robot.drivetrain->rightFront.get_raw_motor());
-  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 1], this->robot.drivetrain->leftFront.get_raw_motor());
-  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 2], this->robot.drivetrain->rightBack.get_raw_motor());
-  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 3], this->robot.drivetrain->leftBack.get_raw_motor());
+  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 0], this->robot.drivetrain->rightFront);
+  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 1], this->robot.drivetrain->leftFront);
+  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 2], this->robot.drivetrain->rightBack);
+  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 3], this->robot.drivetrain->leftBack);
   connection->send_packet(this->id, &buf, SIZE);
 }
 } // namespace serial

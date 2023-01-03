@@ -7,7 +7,7 @@ Robot::Robot(Drivetrain *drivetrain, Intake *intake, Indexer *indexer, Flywheel 
       controller(nullptr) {}
 
 Robot::~Robot() {
-  logger::warn("Robot destructor called");
+  warn("Robot destructor called");
   delete drivetrain;
   drivetrain = nullptr;
   delete intake;
@@ -34,30 +34,30 @@ void Robot::update() const {
     if (this->drivetrain != nullptr) {
       this->drivetrain->update(this->controller);
     } else {
-      logger::error("Drivetrain is null?");
+      error("Drivetrain is null?");
     }
     if (this->intake != nullptr) {
       this->intake->update(this->controller);
     } else {
-      logger::error("Intake is null?");
+      error("Intake is null?");
     }
     if (this->indexer != nullptr) {
       this->indexer->update(this->controller);
     } else {
-      logger::error("Indexer is null?");
+      error("Indexer is null?");
     }
     if (this->flywheel != nullptr) {
       this->flywheel->update(this->controller);
     } else {
-      logger::error("Flywheel is null?");
+      error("Flywheel is null?");
     }
     if (this->expansion != nullptr) {
       this->expansion->update(this->controller);
     } else {
-      logger::error("Expansion is null?");
+      error("Expansion is null?");
     }
   } else {
-    logger::error("Controller is null!");
+    error("Controller is null!");
   }
 }
 } // namespace robot

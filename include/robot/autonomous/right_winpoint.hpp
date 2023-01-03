@@ -8,8 +8,9 @@ namespace robot::autonomous {
  * Autonomous run to be used when trying to earn the autonomous win point when starting on the right side.
  */
 class RightWinpoint : public Autonomous {
-private:
 public:
+  explicit RightWinpoint(): Autonomous("Right Winpoint") {};
+
   void run(Robot &robot) override;
 };
 } // namespace robot::autonomous

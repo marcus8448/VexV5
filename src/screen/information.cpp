@@ -1,5 +1,6 @@
 #include "screen/information.hpp"
 #include "configuration.hpp"
+#include "pros/rtos.hpp"
 #include "screen/lvgl_util.hpp"
 #include "screen/screen.hpp"
 
@@ -43,10 +44,9 @@ void Information::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) 
   this->flywheelSecondaryTempLabel = create_info_label(screen, true, 6);
 
   this->flywheelSpeedLabel = create_info_label(screen, false, 7);
-  //  this->_unused = create_info_label(screen, true, 7);
-
-  this->rollerUpperHue = create_info_label(screen, false, 8);
-  this->rollerLowerHue = create_info_label(screen, true, 8);
+//  this->_unused = create_info_label(screen, true, 7);
+//  this->_unused = create_info_label(screen, false, 8);
+//  this->_unused = create_info_label(screen, true, 8);
 }
 
 void Information::update(robot::Robot &robot) {
@@ -66,10 +66,6 @@ void Information::update(robot::Robot &robot) {
   update_motor_temp(this->flywheelTempLabel, robot.flywheel->get_primary_motor());
   update_motor_temp(this->flywheelSecondaryTempLabel, robot.flywheel->get_secondary_motor());
   set_label_text(this->flywheelSpeedLabel, "Flywheel Speed: %i", robot.controller->flywheel_speed());
-  //  set_label_text(this->_unused, "<unused>");
-
-  update_device(this->rollerUpperHue, robot.intake->get_upper_optical(), robot.intake->get_upper_optical().get_hue());
-  update_device(this->rollerLowerHue, robot.intake->get_lower_optical(), robot.intake->get_lower_optical().get_hue());
 }
 
 void update_device_digital(lv_obj_t *label, const robot::device::Device &device, bool engaged) {

@@ -5,7 +5,6 @@
 #include <map>
 
 namespace robot::device {
-static bool initialized;
 static std::vector<Device *> pendingDevices;
 static std::map<Device *, bool> devices;
 
@@ -32,7 +31,7 @@ bool Device::checkConnect() {
 [[nodiscard]] const char *Device::get_name() const { return this->name; }
 
 [[noreturn]] void reconfigure_task([[maybe_unused]] void *params) {
-  logger::info("Device reconfigure task started.");
+  info("Device reconfigure task started.");
   while (true) {
     if (!pendingDevices.empty()) {
       std::vector<Device *> pd;
@@ -40,11 +39,12 @@ bool Device::checkConnect() {
       pendingDevices.clear();
       for (Device *&device : pd) {
         if (device->is_connected()) {
+          debug("%s '%s' connected on port %i", device->get_type_name(), device->get_name(), device->get_port());
           devices.emplace(device, true);
         } else {
           devices.emplace(device, false);
-          logger::warn("No device on port %i (expected %s '%s').", device->get_port(), device->get_type_name(),
-                       device->get_name());
+          warn("No device on port %i (expected %s '%s').", device->get_port(), device->get_type_name(),
+                        device->get_name());
         }
       }
     }
@@ -53,11 +53,11 @@ bool Device::checkConnect() {
       bool connected = pair.first->is_connected();
       if (pair.second && !connected) {
         pair.second = false;
-        logger::error("%s '%s' (port %i) disconnected.", pair.first->get_type_name(), pair.first->get_name(),
-                      pair.first->get_port());
+        error("%s '%s' (port %i) disconnected.", pair.first->get_type_name(), pair.first->get_name(),
+                       pair.first->get_port());
       } else if (!pair.second && connected) {
-        logger::warn("%s '%s' (port %i) reconnected. Reconfiguring...", pair.first->get_type_name(),
-                     pair.first->get_name(), pair.first->get_port());
+        warn("%s '%s' (port %i) reconnected. Reconfiguring...", pair.first->get_type_name(),
+                      pair.first->get_name(), pair.first->get_port());
         pair.second = true;
         pair.first->reconfigure();
       }

@@ -1,3 +1,4 @@
+#ifdef BANNER_AVAILABLE
 #include "screen/banner.hpp"
 
 #pragma GCC diagnostic push
@@ -19,3 +20,4 @@ void Banner::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
 
 void Banner::update(robot::Robot &robot) {}
 } // namespace screen
+#endif // BANNER_AVAILABLE

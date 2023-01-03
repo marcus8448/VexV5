@@ -22,7 +22,7 @@ bool Drivetrain::is_at_target() const {
          this->leftBack.is_at_target();
 }
 
-void Drivetrain::move(double right_distance, double left_distance, int32_t max_rpm) {
+void Drivetrain::move(double right_distance, double left_distance, int16_t max_rpm) {
   this->move_right_distance(right_distance, max_rpm);
   this->move_left_distance(left_distance, max_rpm);
 }
@@ -93,12 +93,12 @@ void Drivetrain::tare() {
   this->leftBack.tare();
 }
 
-void Drivetrain::move_right_distance(double distance, int32_t max_rpm) {
+void Drivetrain::move_right_distance(double distance, int16_t max_rpm) {
   this->rightFront.move_relative(distance, max_rpm);
   this->rightBack.move_relative(distance, max_rpm);
 }
 
-void Drivetrain::move_left_distance(double distance, int32_t max_rpm) {
+void Drivetrain::move_left_distance(double distance, int16_t max_rpm) {
   this->leftFront.move_relative(distance, max_rpm);
   this->leftBack.move_relative(distance, max_rpm);
 }

@@ -94,7 +94,7 @@ private:
    * @param max_rpm The maximum allowable RPM for the motor to run at while moving.
    * @param block Whether this function should wait for the robot to move or exit immediately.
    */
-  void move(double right_distance, double left_distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM);
+  void move(double right_distance, double left_distance, int16_t max_rpm = DRIVETRAIN_DEFAULT_RPM);
 
   /**
    * Moves the two right motors of the drivetrain at the specified voltage.
@@ -112,13 +112,13 @@ private:
    * Moves the two right motors of the drivetrain by the specified distance.
    * @param distance The distance in ENCODER UNITS to move the right motors by.
    */
-  void move_right_distance(double distance, int32_t max_rpm);
+  void move_right_distance(double distance, int16_t max_rpm);
 
   /**
    * Moves the two left motors of the drivetrain by the specified distance.
    * @param distance The distance in ENCODER UNITS to move the right motors by.
    */
-  void move_left_distance(double distance, int32_t max_rpm);
+  void move_left_distance(double distance, int16_t max_rpm);
 };
 } // namespace robot
 #endif // ROBOT_DRIVETRAIN_HPP
