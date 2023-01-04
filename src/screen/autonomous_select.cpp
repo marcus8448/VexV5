@@ -48,9 +48,7 @@ void AutonomousSelect::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t hei
 
 static robot::Robot *robot_maybe = nullptr;
 
-void AutonomousSelect::update(robot::Robot &robot) {
-  robot_maybe = &robot;
-}
+void AutonomousSelect::update(robot::Robot &robot) { robot_maybe = &robot; }
 
 void AutonomousSelect::click(lv_obj_t *btn) {
   if (this->selected != nullptr) {

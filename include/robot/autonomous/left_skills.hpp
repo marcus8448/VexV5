@@ -9,7 +9,7 @@ namespace robot::autonomous {
  */
 class LeftSkills : public Autonomous {
 public:
-  explicit LeftSkills(): Autonomous("Left Skills") {};
+  explicit LeftSkills() : Autonomous("Left Skills"){};
 
   void run(Robot &robot) override;
 };

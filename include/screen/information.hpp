@@ -21,8 +21,8 @@ private:
   lv_obj_t *flywheelSecondaryTempLabel = nullptr;
   lv_obj_t *flywheelSpeedLabel = nullptr;
   //  lv_obj_t *_unused = nullptr;
-//  lv_obj_t *_unused = nullptr;
-//  lv_obj_t *_unused = nullptr;
+  //  lv_obj_t *_unused = nullptr;
+  //  lv_obj_t *_unused = nullptr;
 
 public:
   explicit Information();

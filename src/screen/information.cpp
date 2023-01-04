@@ -44,9 +44,9 @@ void Information::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) 
   this->flywheelSecondaryTempLabel = create_info_label(screen, true, 6);
 
   this->flywheelSpeedLabel = create_info_label(screen, false, 7);
-//  this->_unused = create_info_label(screen, true, 7);
-//  this->_unused = create_info_label(screen, false, 8);
-//  this->_unused = create_info_label(screen, true, 8);
+  //  this->_unused = create_info_label(screen, true, 7);
+  //  this->_unused = create_info_label(screen, false, 8);
+  //  this->_unused = create_info_label(screen, true, 8);
 }
 
 void Information::update(robot::Robot &robot) {

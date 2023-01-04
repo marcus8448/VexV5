@@ -8,7 +8,7 @@ bool check_error() {
   if (error != 0) {
     if (error == ENODEV) {
       return false;
-    }                                                      // skip printing 19 - no such device.
+    }                                              // skip printing 19 - no such device.
     error("Error %i: %s", error, strerror(error)); // print the error
     return false;
   }

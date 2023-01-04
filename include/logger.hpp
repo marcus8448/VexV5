@@ -17,10 +17,14 @@
 #define section_pop() logger::_pop()
 #define section_swap(name) logger::_pop_push(name)
 #else
-#define debug(fmt, ...) {}
-#define section_push(name) {}
-#define section_pop() {}
-#define section_swap(name) {}
+#define debug(fmt, ...)                                                                                                \
+  {}
+#define section_push(name)                                                                                             \
+  {}
+#define section_pop()                                                                                                  \
+  {}
+#define section_swap(name)                                                                                             \
+  {}
 #endif
 
 namespace logger {

@@ -9,7 +9,7 @@ namespace robot::autonomous {
  */
 class LeftWinpoint : public Autonomous {
 public:
-  explicit LeftWinpoint(): Autonomous("Left Winpoint") {};
+  explicit LeftWinpoint() : Autonomous("Left Winpoint"){};
 
   void run(Robot &robot) override;
 };

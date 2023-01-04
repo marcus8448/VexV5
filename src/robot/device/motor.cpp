@@ -1,5 +1,6 @@
 #include "robot/device/motor.hpp"
 #include "logger.hpp"
+#include "pros/motors.h"
 #include "pros/rtos.hpp"
 #include <cerrno>
 #include <cmath>
@@ -14,20 +15,20 @@
 namespace robot::device {
 Motor::Motor(const uint8_t port, const char *name, const pros::motor_gearset_e_t gearset,
              const pros::motor_brake_mode_e_t brake_mode, bool reversed)
-    : Device(port, name), gearset(gearset), maxVelocity(get_gearset_max_velocity(this->gearset)), brakeMode(brake_mode),
+    : Device(port, name), gearset(gearset), maxVelocity(get_gearset_max_velocity(gearset)), brakeMode(brake_mode),
       reversed(reversed) {
+  pros::c::motor_set_gearing(this->port, this->gearset);
+  pros::c::motor_set_reversed(this->port, this->reversed); // todo: manually reverse
   pros::c::motor_set_encoder_units(this->port, MOTOR_ENCODER_UNITS);
-  pros::c::motor_set_gearing(this->port, gearset);
-  pros::c::motor_set_reversed(this->port, reversed); // todo: manually reverse
-  pros::c::motor_set_brake_mode(this->port, brake_mode);
+  pros::c::motor_set_brake_mode(this->port, this->brakeMode);
 }
 
 Motor::Motor(const uint8_t port, const char *name, bool reversed)
-    : Device(port, name), gearset(DEFAULT_MOTOR_GEARSET), maxVelocity(get_gearset_max_velocity(this->gearset)),
+    : Device(port, name), gearset(DEFAULT_MOTOR_GEARSET), maxVelocity(get_gearset_max_velocity(DEFAULT_MOTOR_GEARSET)),
       brakeMode(DEFAULT_MOTOR_BRAKE), reversed(reversed) {
-  pros::c::motor_set_encoder_units(this->port, MOTOR_ENCODER_UNITS);
   pros::c::motor_set_gearing(this->port, DEFAULT_MOTOR_GEARSET);
   pros::c::motor_set_reversed(this->port, this->reversed); // todo: manually reverse
+  pros::c::motor_set_encoder_units(this->port, MOTOR_ENCODER_UNITS);
   pros::c::motor_set_brake_mode(this->port, DEFAULT_MOTOR_BRAKE);
 }
 
@@ -62,7 +63,7 @@ void Motor::move_millivolts(int16_t mV) {
     this->target = mV;
     this->targetType = TargetType::VOLTAGE;
     this->targetPosition = INFINITY;
-    //    this->motor.move_voltage(mV);
+    pros::c::motor_move_voltage(this->port, mV);
   }
 }
 
@@ -83,8 +84,7 @@ void Motor::move_absolute(double position, int16_t velocity) {
   } else if (velocity == 0) {
     error("Target velocity is zero!");
   }
-  if (this->targetType != TargetType::VELOCITY || this->target != velocity ||
-      this->targetPosition != position) {
+  if (this->targetType != TargetType::VELOCITY || this->target != velocity || this->targetPosition != position) {
     this->targetType = TargetType::VELOCITY;
     this->target = velocity;
     this->targetPosition = position;
@@ -102,8 +102,7 @@ void Motor::move_relative(double amount, int16_t velocity) {
   }
   info("Moving %f degrees", amount);
   amount += this->get_position();
-  if (this->targetType != TargetType::VELOCITY || this->target != velocity ||
-      this->targetPosition != amount) {
+  if (this->targetType != TargetType::VELOCITY || this->target != velocity || this->targetPosition != amount) {
     this->targetType = TargetType::VELOCITY;
     this->target = velocity;
     this->targetPosition = amount;

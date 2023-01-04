@@ -9,7 +9,7 @@ namespace robot::autonomous {
  */
 class None : public Autonomous {
 public:
-  explicit None(): Autonomous("None") {}
+  explicit None() : Autonomous("None") {}
 
   void run(Robot &robot) override;
 };

@@ -3,12 +3,12 @@
 
 #define INTAKE_POWER_LEVEL 11000
 
-#include <vector>
 #include "configuration.hpp"
 #include "pros/optical.hpp"
 #include "robot/controller/controller.hpp"
 #include "robot/device/motor.hpp"
 #include "robot/device/optical.hpp"
+#include <vector>
 
 namespace robot {
 /**
@@ -25,7 +25,8 @@ private:
   /**
    * Whether the intake is currently running.
    */
-  bool engaged = false;
+  int16_t speed = 0;
+  bool reversed = false;
 
 public:
   /**

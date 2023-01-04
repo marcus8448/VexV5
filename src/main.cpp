@@ -176,9 +176,8 @@ void opcontrol() {
  */
 Robot &get_or_create_robot() {
   static Robot robot = Robot(new Drivetrain(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR),
-                             new Intake(INTAKE_MOTOR),
-                             new Indexer(INDEXER_MOTOR), new Flywheel(FLYWHEEL_MOTOR, FLYWHEEL_SECONDARY_MOTOR),
-                             new Expansion(EXPANSION_PISTON));
+                             new Intake(INTAKE_MOTOR), new Indexer(INDEXER_MOTOR),
+                             new Flywheel(FLYWHEEL_MOTOR, FLYWHEEL_SECONDARY_MOTOR), new Expansion(EXPANSION_PISTON));
   device::initialize();
   return robot;
 }
@@ -191,6 +190,4 @@ void competition_initialize() {}
 /**
  * Called when the robot should be stopped during a competition
  */
-void disabled() {
-  logger::flush();
-}
+void disabled() { logger::flush(); }

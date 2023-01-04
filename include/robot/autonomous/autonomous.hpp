@@ -14,6 +14,7 @@ namespace robot::autonomous {
 class Autonomous {
 protected:
   const char *name;
+
 public:
   explicit Autonomous(const char *name);
 

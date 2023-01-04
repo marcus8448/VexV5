@@ -44,7 +44,7 @@ bool Device::checkConnect() {
         } else {
           devices.emplace(device, false);
           warn("No device on port %i (expected %s '%s').", device->get_port(), device->get_type_name(),
-                        device->get_name());
+               device->get_name());
         }
       }
     }
@@ -54,10 +54,10 @@ bool Device::checkConnect() {
       if (pair.second && !connected) {
         pair.second = false;
         error("%s '%s' (port %i) disconnected.", pair.first->get_type_name(), pair.first->get_name(),
-                       pair.first->get_port());
+              pair.first->get_port());
       } else if (!pair.second && connected) {
-        warn("%s '%s' (port %i) reconnected. Reconfiguring...", pair.first->get_type_name(),
-                      pair.first->get_name(), pair.first->get_port());
+        warn("%s '%s' (port %i) reconnected. Reconfiguring...", pair.first->get_type_name(), pair.first->get_name(),
+             pair.first->get_port());
         pair.second = true;
         pair.first->reconfigure();
       }

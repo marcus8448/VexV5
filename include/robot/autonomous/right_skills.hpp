@@ -9,7 +9,7 @@ namespace robot::autonomous {
  */
 class RightScore : public Autonomous {
 public:
-  explicit RightScore(): Autonomous("Right Score") {};
+  explicit RightScore() : Autonomous("Right Score"){};
 
   void run(Robot &robot) override;
 };

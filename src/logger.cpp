@@ -9,9 +9,9 @@ namespace logger {
 static std::vector<std::pair<const char *, uint32_t>> *sections =
     new std::vector<std::pair<const char *, uint32_t>>(); // stores the name and timestamp of sections.
 
-//#ifdef FILE_LOG
+#ifdef FILE_LOG
 static std::ofstream log_file = fs::create_indexed("log");
-//#endif
+#endif
 
 void _info(const char *string) {
   std::cout << string << std::endl;
@@ -88,7 +88,8 @@ void _pop() {
             << " (Took " << millis - back.second << " ms)" << std::endl;
 
 #ifdef FILE_LOG
-  log_file << "[DEBUG] [" << pros::millis() << "] SECTION END: " << back.first << " (Took " << millis - back.second << " ms)" << std::endl;
+  log_file << "[DEBUG] [" << pros::millis() << "] SECTION END: " << back.first << " (Took " << millis - back.second
+           << " ms)" << std::endl;
 #endif
   sections->pop_back();
 }

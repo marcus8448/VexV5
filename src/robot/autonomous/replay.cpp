@@ -1,10 +1,10 @@
 #include "robot/autonomous/replay.hpp"
 #include "fs/filesystem.hpp"
-#include "pros/rtos.hpp"
 #include "logger.hpp"
+#include "pros/rtos.hpp"
 
 namespace robot::autonomous {
-Replay::Replay(const char *name): Autonomous(name) {}
+Replay::Replay(const char *name) : Autonomous(name) {}
 
 void Replay::run(Robot &robot) {
   if (!fs::file_exists(name)) {
