@@ -28,8 +28,8 @@ void AutonomousSelect::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t hei
   this->selections = lv_list_create(screen, nullptr);
   lv_obj_set_pos(this->selections, 0, 0);
   lv_obj_set_size(this->selections, width, static_cast<lv_coord_t>(height - BASE_HEIGHT));
-  free(default_style);
-  free(selected_style);
+  delete default_style;
+  delete selected_style;
   default_style = new lv_style_t;
   selected_style = new lv_style_t;
   lv_style_copy(default_style, &lv_style_btn_rel);
