@@ -140,30 +140,6 @@ public:
   [[nodiscard]] virtual double right_stick_y() const = 0;
 
   /**
-   * Returns the previous position of the left stick on the x-axis.
-   * @return the previous position of the left stick on the x-axis.
-   */
-  [[nodiscard]] virtual double prev_left_stick_x() const = 0;
-
-  /**
-   * Returns the previous position of the left stick on the y-axis.
-   * @return the previous position of the left stick on the y-axis.
-   */
-  [[nodiscard]] virtual double prev_left_stick_y() const = 0;
-
-  /**
-   * Returns the previous position of the right stick on the x-axis.
-   * @return the previous position of the right stick on the x-axis.
-   */
-  [[nodiscard]] virtual double prev_right_stick_x() const = 0;
-
-  /**
-   * Returns the previous position of the right stick on the y-axis.
-   * @return the previous position of the right stick on the y-axis.
-   */
-  [[nodiscard]] virtual double prev_right_stick_y() const = 0;
-
-  /**
    * Updates the controller state.
    */
   virtual void update() = 0;

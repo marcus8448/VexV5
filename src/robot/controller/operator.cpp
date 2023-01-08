@@ -37,14 +37,6 @@ OpController::OpController(pros::controller_id_e_t controller_id) : controller_i
 
 [[nodiscard]] double OpController::right_stick_y() const { return this->rightStickY; }
 
-[[nodiscard]] double OpController::prev_left_stick_x() const { return this->prevLeftStickX; }
-
-[[nodiscard]] double OpController::prev_left_stick_y() const { return this->prevLeftStickY; }
-
-[[nodiscard]] double OpController::prev_right_stick_x() const { return this->prevRightStickX; }
-
-[[nodiscard]] double OpController::prev_right_stick_y() const { return this->prevRightStickY; }
-
 [[nodiscard]] int16_t OpController::flywheel_speed() const { return this->flywheelSpeed; }
 
 void OpController::flywheel_speed(int16_t speed) { this->flywheelSpeed = speed; }
@@ -138,17 +130,13 @@ void OpController::update() {
     this->r2 = 0;
   }
 
-  this->prevLeftStickX = this->leftStickX;
   this->leftStickX = print_error(pros::c::controller_get_analog(this->controller_id, pros::E_CONTROLLER_ANALOG_LEFT_X));
 
-  this->prevLeftStickY = this->leftStickY;
   this->leftStickY = print_error(pros::c::controller_get_analog(this->controller_id, pros::E_CONTROLLER_ANALOG_LEFT_Y));
 
-  this->prevRightStickX = this->rightStickX;
   this->rightStickX =
       print_error(pros::c::controller_get_analog(this->controller_id, pros::E_CONTROLLER_ANALOG_RIGHT_X));
 
-  this->prevRightStickY = this->rightStickY;
   this->rightStickY =
       print_error(pros::c::controller_get_analog(this->controller_id, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
 

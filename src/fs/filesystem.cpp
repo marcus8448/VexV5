@@ -1,6 +1,8 @@
 #include "fs/filesystem.hpp"
 #include "logger.hpp"
 #include "pros/misc.hpp"
+#include "error.hpp"
+#include "pros/rtos.h"
 #include <fstream>
 
 namespace fs {
@@ -16,11 +18,13 @@ bool file_exists(const char *name) {
     warn("MicroSD unavailable!");
     return false;
   }
+  info("nexssist");
 
   if (std::FILE *file = std::fopen(name, "r")) {
     std::fclose(file);
     return true;
   } else {
+    info("nexist");
     return false;
   }
 }
@@ -72,11 +76,4 @@ std::ofstream create_indexed(const char *name) {
   }
   return create_sink();
 }
-
-void create_with_content(const char *name, const std::string &str) {
-  if (!file_exists(name)) {
-    create(name) << str;
-  }
-}
-
 } // namespace fs

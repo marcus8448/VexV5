@@ -40,6 +40,7 @@ set(SOURCE_FILES
         src/robot/autonomous/right_skills.cpp
         src/robot/autonomous/right_winpoint.cpp
         src/robot/controller/operator.cpp
+        src/robot/controller/autonomous_recording.cpp
         src/robot/device/device.cpp
         src/robot/device/motor.cpp
         src/robot/device/optical.cpp
@@ -81,6 +82,7 @@ set(HEADER_FILES
         include/robot/autonomous/right_winpoint.hpp
         include/robot/controller/controller.hpp
         include/robot/controller/operator.hpp
+        include/robot/controller/autonomous_recording.hpp
         include/robot/device/device.hpp
         include/robot/device/motor.hpp
         include/robot/device/optical.hpp

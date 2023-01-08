@@ -187,7 +187,7 @@ void Motor::reconfigure() const {
   pros::c::motor_set_reversed(this->port, this->reversed);
 }
 
-void Motor::tare() { pros::c::motor_tare_position(this->port); }
+void Motor::tare() { pros::c::motor_set_zero_position(this->port, pros::c::motor_get_position(this->port)); }
 
 void Motor::stop() { this->move_millivolts(0); }
 

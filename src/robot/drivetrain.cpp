@@ -28,22 +28,22 @@ void Drivetrain::move(double right_distance, double left_distance, int16_t max_r
 }
 
 void Drivetrain::forwards(double distance, int32_t max_rpm, uint16_t timeout_millis) {
-  this->move(in_to_e_units(distance), in_to_e_units(distance), max_rpm);
+  this->move(util::in_to_e_units(distance), util::in_to_e_units(distance), max_rpm);
   this->await_move(timeout_millis);
 }
 
 void Drivetrain::backwards(double distance, int32_t max_rpm, uint16_t timeout_millis) {
-  this->move(-in_to_e_units(distance), -in_to_e_units(distance), max_rpm);
+  this->move(-util::in_to_e_units(distance), -util::in_to_e_units(distance), max_rpm);
   this->await_move(timeout_millis);
 }
 
 void Drivetrain::turn_right(double degrees, int32_t max_rpm, uint16_t timeout_millis) {
-  this->move(-turn_to_e_units(degrees), turn_to_e_units(degrees), max_rpm);
+  this->move(-util::turn_to_e_units(degrees), util::turn_to_e_units(degrees), max_rpm);
   this->await_move(timeout_millis);
 }
 
 void Drivetrain::turn_left(double degrees, int32_t max_rpm, uint16_t timeout_millis) {
-  this->move(turn_to_e_units(degrees), -turn_to_e_units(degrees), max_rpm);
+  this->move(util::turn_to_e_units(degrees), -util::turn_to_e_units(degrees), max_rpm);
   this->await_move(timeout_millis);
 }
 

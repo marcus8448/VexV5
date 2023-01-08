@@ -48,9 +48,9 @@ void Intake::disengage() {
 void Intake::update(Controller *controller) {
   if (controller->l1_pressed() && controller->l2_pressed()) {
     this->reverse();
-  } else if (controller->l1_pressed()) {
+  } else if (controller->l1_pressed() == 3) {
     this->engage();
-  } else if (controller->l2_pressed()) {
+  } else if (controller->l2_pressed() == 3) {
     this->disengage();
   }
 }
