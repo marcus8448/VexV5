@@ -7,7 +7,8 @@ include(toolchain.cmake)
 
 set(FIRMWARE_DIR ${CMAKE_SOURCE_DIR}/firmware)
 set(BIN_DIR ${CMAKE_SOURCE_DIR}/bin)
-set(BUILD_DIR ${CMAKE_SOURCE_DIR}/build)
+
+file(MAKE_DIRECTORY ${BIN_DIR})
 
 find_program(ProsCLI pros)
 find_program(ClangFormat clang-format)
@@ -19,9 +20,9 @@ find_library(LibPROS NAMES pros PATHS ${CMAKE_SOURCE_DIR}/firmware NO_DEFAULT_PA
 find_library(LibBase85 NAMES base85 PATHS ${CMAKE_SOURCE_DIR}/firmware NO_DEFAULT_PATH REQUIRED)
 find_library(LibBanner NAMES banner PATHS ${CMAKE_SOURCE_DIR}/firmware/extra NO_DEFAULT_PATH)
 
-file(TOUCH ${BUILD_DIR}/empty.cpp)
-file(WRITE ${BUILD_DIR}/timestamp.cpp "char const * const _PROS_COMPILE_TIMESTAMP = __DATE__ \" \" __TIME__; char const * const _PROS_COMPILE_DIRECTORY = \"${CMAKE_SOURCE_DIR}\";\n")
-add_library(Timestamp STATIC ${BUILD_DIR}/timestamp.cpp)
+file(TOUCH ${CMAKE_BINARY_DIR}/empty.cpp)
+file(WRITE ${CMAKE_BINARY_DIR}/timestamp.cpp "char const * const _PROS_COMPILE_TIMESTAMP = __DATE__ \" \" __TIME__; char const * const _PROS_COMPILE_DIRECTORY = \"${CMAKE_SOURCE_DIR}\";\n")
+add_library(Timestamp STATIC ${CMAKE_BINARY_DIR}/timestamp.cpp)
 
 set(ColdLibraries ${LibC} ${LibM} ${LibPROS} ${LibBase85})
 set(HotLinked ${LibC},${LibM},${LibPROS},${LibBase85})
@@ -111,7 +112,7 @@ set(HEADER_FILES
 )
 
 add_executable(ColdPackage)
-target_sources(ColdPackage PRIVATE ${BUILD_DIR}/empty.cpp)
+target_sources(ColdPackage PRIVATE ${CMAKE_BINARY_DIR}/empty.cpp)
 
 add_executable(HotPackage)
 target_sources(HotPackage PUBLIC FILE_SET headers TYPE HEADERS FILES ${HEADER_FILES})
@@ -139,7 +140,7 @@ if (ClangCheck)
 message(NOTICE "clang-check found, adding utility target.")
 add_custom_target(
         CheckCode
-        COMMAND cd ${CMAKE_SOURCE_DIR} && ${ClangCheck} --extra-arg="--target=${TARGET_TRIPLE}" --extra-arg="--sysroot=${ARM_SYSROOT}" --extra-arg="-I${CMAKE_SOURCE_DIR}/include" --extra-arg="-I${ARM_SYSROOT}/include/c++/${ARM_GCC_VERSION}" --extra-arg="-I${ARM_SYSROOT}/include/c++/${ARM_GCC_VERSION}/${TARGET_TRIPLE}/${ARM_MULTI_DIR}" --analyze --analyzer-output-path="${BUILD_DIR}/analysis" -p ${BUILD_DIR} ${HEADER_FILES} ${SOURCE_FILES}
+        COMMAND cd ${CMAKE_SOURCE_DIR} && ${ClangCheck} --extra-arg="--target=${TARGET_TRIPLE}" --extra-arg="--sysroot=${ARM_SYSROOT}" --extra-arg="-I${CMAKE_SOURCE_DIR}/include" --extra-arg="-I${ARM_SYSROOT}/include/c++/${ARM_GCC_VERSION}" --extra-arg="-I${ARM_SYSROOT}/include/c++/${ARM_GCC_VERSION}/${TARGET_TRIPLE}/${ARM_MULTI_DIR}" --analyze --analyzer-output-path="${CMAKE_BINARY_DIR}/analysis" -p ${CMAKE_BINARY_DIR} ${HEADER_FILES} ${SOURCE_FILES}
 )
 endif()
 
