@@ -1,11 +1,12 @@
 on: [push]
+
 jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - name: Install toolchain
-        run: sudo apt-get install -y gcc-arm-none-eabi
+        run: sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
@@ -13,14 +14,10 @@ jobs:
           languages: cpp
 
       - name: Configure CMake
-        run: |
-          mkdir build &&
-          cd build
-          cmake -DCMAKE_BUILD_TYPE=MinSizeRel ..
+        run: cmake -DCMAKE_BUILD_TYPE=MinSizeRel -B build
 
       - name: Build with CMake
-        run: |
-          cmake --build build/
+        run: cmake --build build/
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
