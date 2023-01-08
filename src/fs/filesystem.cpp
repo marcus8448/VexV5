@@ -1,7 +1,6 @@
 #include "fs/filesystem.hpp"
 #include "logger.hpp"
 #include "pros/misc.hpp"
-#include "error.hpp"
 #include "pros/rtos.h"
 #include <fstream>
 
@@ -18,13 +17,11 @@ bool file_exists(const char *name) {
     warn("MicroSD unavailable!");
     return false;
   }
-  info("nexssist");
 
   if (std::FILE *file = std::fopen(name, "r")) {
     std::fclose(file);
     return true;
   } else {
-    info("nexist");
     return false;
   }
 }
@@ -59,7 +56,8 @@ std::ofstream create_truncate(const char *name) {
   return std::ofstream(path, std::ios_base::out | std::ios::trunc);
 }
 
-std::ofstream create_indexed(const char *name) {
+std::ofstream create_indexed(const char *name) { // todo: fails due to too many open file handles, but we close all test
+                                                 // ones (so how does this occur?)
   std::string path = to_path(name);
   if (!pros::usd::is_installed()) {
     warn("MicroSD unavailable, creating sink.");

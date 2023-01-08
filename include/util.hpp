@@ -27,6 +27,6 @@ int32_t get_gearset_max_rpm(pros::motor_gearset_e_t gearset);
  * @return whether the file exists
  */
 bool file_exists(const char *name);
-}
+} // namespace util
 
 #endif // UTIL_HPP

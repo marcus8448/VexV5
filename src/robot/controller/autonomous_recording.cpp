@@ -6,7 +6,8 @@
 #define AUTOSPEED 88.0
 
 namespace robot::controller {
-AutonomousRecordingController::AutonomousRecordingController(robot::Robot &robot, pros::controller_id_e_t controller_id) : controller_id(controller_id), robot(robot), output(fs::create("auton")) {
+AutonomousRecordingController::AutonomousRecordingController(robot::Robot &robot, pros::controller_id_e_t controller_id)
+    : controller_id(controller_id), robot(robot), output(fs::create("auton")) {
   this->output << "// AUTON START\n";
 }
 
@@ -14,7 +15,9 @@ AutonomousRecordingController::AutonomousRecordingController(robot::Robot &robot
 
 [[nodiscard]] uint16_t AutonomousRecordingController::b_pressed() const { return this->b; }
 
-[[nodiscard]] uint16_t AutonomousRecordingController::x_pressed() const { return this->x && this->flywheelRuntime != -1; }
+[[nodiscard]] uint16_t AutonomousRecordingController::x_pressed() const {
+  return this->x && this->flywheelRuntime != -1;
+}
 
 [[nodiscard]] uint16_t AutonomousRecordingController::y_pressed() const { return this->y; }
 
@@ -34,12 +37,11 @@ AutonomousRecordingController::AutonomousRecordingController(robot::Robot &robot
 
 [[nodiscard]] uint16_t AutonomousRecordingController::r2_pressed() const { return this->r2; }
 
-[[nodiscard]] double AutonomousRecordingController::left_stick_x() const {
-  return 0;
-}
+[[nodiscard]] double AutonomousRecordingController::left_stick_x() const { return 0; }
 
 [[nodiscard]] double AutonomousRecordingController::left_stick_y() const {
-  if (!this->targetActive) return 0;
+  if (!this->targetActive)
+    return 0;
   switch (this->drivetrainTarget) {
   case FORWARDS:
   case RIGHT:
@@ -50,12 +52,11 @@ AutonomousRecordingController::AutonomousRecordingController(robot::Robot &robot
   }
 }
 
-[[nodiscard]] double AutonomousRecordingController::right_stick_x() const {
-  return 0;
-}
+[[nodiscard]] double AutonomousRecordingController::right_stick_x() const { return 0; }
 
 [[nodiscard]] double AutonomousRecordingController::right_stick_y() const {
-  if (!this->targetActive) return 0;
+  if (!this->targetActive)
+    return 0;
   switch (this->drivetrainTarget) {
   case FORWARDS:
   case LEFT:
@@ -66,9 +67,7 @@ AutonomousRecordingController::AutonomousRecordingController(robot::Robot &robot
   }
 }
 
-[[nodiscard]] int16_t AutonomousRecordingController::flywheel_speed() const {
-  return this->flywheelSpeed;
-}
+[[nodiscard]] int16_t AutonomousRecordingController::flywheel_speed() const { return this->flywheelSpeed; }
 
 void AutonomousRecordingController::flywheel_speed(int16_t speed) { this->flywheelSpeed = speed; }
 
@@ -76,7 +75,9 @@ void AutonomousRecordingController::set_line(uint8_t line, uint8_t col, const ch
   print_error(pros::c::controller_set_text(this->controller_id, line, col, str));
 }
 
-void AutonomousRecordingController::clear_line(uint8_t line) { print_error(pros::c::controller_clear_line(this->controller_id, line)); }
+void AutonomousRecordingController::clear_line(uint8_t line) {
+  print_error(pros::c::controller_clear_line(this->controller_id, line));
+}
 
 void AutonomousRecordingController::rumble(const char *str) {
   clear_error();
@@ -88,6 +89,14 @@ void AutonomousRecordingController::rumble(const char *str) {
 }
 
 void AutonomousRecordingController::update() {
+  if (this->x > 125) {
+    info("writing out recording!");
+    pros::c::controller_rumble(this->controller_id, "-");
+    this->write_drivetrain_update();
+    this->output << "// AUTONOMOUS END\n";
+    this->output.close(); // pros/vex only writes to the microSD on close.
+  }
+
   this->ticks++;
   if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_A))) {
     this->a++;
@@ -161,42 +170,35 @@ void AutonomousRecordingController::update() {
     this->r2 = 0;
   }
 
-  if (this->x_pressed() > 125) {
-    pros::c::controller_rumble(this->controller_id, "-");
-    this->write_drivetrain_update();
-    this->output << "// AUTONOMOUS END\n";
-    this->output.close(); // pros/vex only writes to the microSD on close.
-  }
-
   bool changed = false;
 
   if (this->up) {
-    if (this->drivetrainTarget != FORWARDS) {
-      this->targetActive = true;
+    if (this->drivetrainTarget != FORWARDS || !this->targetActive) {
       changed = this->write_drivetrain_update();
       this->drivetrainTarget = FORWARDS;
       this->targetDirty = true;
+      this->targetActive = true;
     }
   } else if (this->down) {
-    if (this->drivetrainTarget != BACKWARDS) {
-      this->targetActive = true;
+    if (this->drivetrainTarget != BACKWARDS || !this->targetActive) {
       changed = this->write_drivetrain_update();
       this->drivetrainTarget = BACKWARDS;
       this->targetDirty = true;
+      this->targetActive = true;
     }
   } else if (this->left) {
-    if (this->drivetrainTarget != LEFT) {
-      this->targetActive = true;
+    if (this->drivetrainTarget != LEFT || !this->targetActive) {
       changed = this->write_drivetrain_update();
       this->drivetrainTarget = LEFT;
       this->targetDirty = true;
+      this->targetActive = true;
     }
   } else if (this->right) {
-    if (this->drivetrainTarget != RIGHT) {
-      this->targetActive = true;
+    if (this->drivetrainTarget != RIGHT || !this->targetActive) {
       changed = this->write_drivetrain_update();
       this->drivetrainTarget = RIGHT;
       this->targetDirty = true;
+      this->targetActive = true;
     }
   } else {
     this->targetActive = false;
@@ -204,7 +206,7 @@ void AutonomousRecordingController::update() {
 
   if (this->x_pressed() && this->ticks % 2 == 0 && this->flywheelRuntime == -1) {
     this->flywheel_speed(static_cast<int16_t>(std::min(this->flywheel_speed() + 100, 12000)));
-  } else if (this->y_pressed() && this->ticks % 2 == 0 ) {
+  } else if (this->y_pressed() && this->ticks % 2 == 0) {
     this->flywheel_speed(static_cast<int16_t>(std::max(this->flywheel_speed() - 100, 4000)));
   }
 
@@ -298,32 +300,31 @@ bool AutonomousRecordingController::write_drivetrain_update() {
     this->robot.drivetrain->tare();
     return false;
   }
+  this->targetDirty = false;
   switch (this->drivetrainTarget) {
   case FORWARDS: {
     double dist = util::e_units_to_in(
-        (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position()
-            + this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position())
-            / 4.0);
+        (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position() +
+         this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position()) /
+        4.0);
     this->robot.drivetrain->tare();
     this->output << "robot.drivetrain->forwards(" << dist << ");\n";
     return true;
   }
   case BACKWARDS: {
     double dist = util::e_units_to_in(
-        (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position()
-            + this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position())
-            / 4.0);
+        (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position() +
+         this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position()) /
+        4.0);
     this->robot.drivetrain->tare();
     this->output << "robot.drivetrain->backwards(" << -dist << ");\n";
     return true;
   }
   case LEFT: {
     double dist_left = util::e_units_to_turn(
-        (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position())
-            / 2.0);
+        (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position()) / 2.0);
     double dist_right = util::e_units_to_turn(
-        (this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position())
-            / 2.0);
+        (this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position()) / 2.0);
     this->robot.drivetrain->tare();
     double turn = (dist_right - dist_left) / 2.0;
     this->output << "robot.drivetrain->turn_left(" << turn << ");\n";
@@ -331,11 +332,9 @@ bool AutonomousRecordingController::write_drivetrain_update() {
   }
   case RIGHT: {
     double dist_left = util::e_units_to_turn(
-        (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position())
-            / 2.0);
+        (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position()) / 2.0);
     double dist_right = util::e_units_to_turn(
-        (this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position())
-            / 2.0);
+        (this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position()) / 2.0);
     this->robot.drivetrain->tare();
     double turn = (dist_left - dist_right) / 2.0;
     this->output << "robot.drivetrain->turn_right(" << turn << ");\n";

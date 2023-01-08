@@ -21,5 +21,4 @@ bool file_exists(const char *name) {
     return false;
   }
 }
-}
-
+} // namespace util

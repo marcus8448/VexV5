@@ -65,7 +65,8 @@ void Flywheel::update(Controller *controller) { // todo: run at max once target 
   }
 
   if (this->state == SPINNING_UP || this->state == SPINNING_DOWN) {
-    debug("Flywheel - vel: %f, max: %f, min: %f, diff: %f, pcnt: %f, avg: %f", velocity, runMax, runMin, runMax - runMin, runMin / runMax, runTotal / static_cast<double>(FLYWHEEL_SAMPLES));
+    debug("Flywheel - vel: %f, max: %f, min: %f, diff: %f, pcnt: %f, avg: %f", velocity, runMax, runMin,
+          runMax - runMin, runMin / runMax, runTotal / static_cast<double>(FLYWHEEL_SAMPLES));
     if ((runMin / runMax > FLYWHEEL_VARIANCE && runMin / runMax < 1.0) && this->prevSpeeds.size() == FLYWHEEL_SAMPLES) {
       if (this->state == SPINNING_UP) {
         controller->rumble("-");
@@ -103,7 +104,8 @@ void Flywheel::wait_for_speed(uint16_t millis_timeout) {
     runMax = std::max(d, runMax);
     runMin = std::min(d, runMin);
   }
-  while ((runMin / runMax > FLYWHEEL_VARIANCE && runMin / runMax < 1.0) || this->prevSpeeds.size() != FLYWHEEL_SAMPLES) {
+  while ((runMin / runMax > FLYWHEEL_VARIANCE && runMin / runMax < 1.0) ||
+         this->prevSpeeds.size() != FLYWHEEL_SAMPLES) {
     if (this->prevSpeeds.size() == FLYWHEEL_SAMPLES) {
       double rem = *this->prevSpeeds.erase(this->prevSpeeds.begin());
       if (runMax == rem || runMin == rem) {

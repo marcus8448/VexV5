@@ -2,21 +2,16 @@
 #define ROBOT_CONTROLLER_AUTONOMOUS_RECORDING_HPP
 
 #include "controller.hpp"
+#include "fs/filesystem.hpp"
 #include "pros/misc.h"
 #include "robot/robot.hpp"
-#include "fs/filesystem.hpp"
 #include <cstdint>
 #include <fstream>
 
 namespace robot::controller {
 class AutonomousRecordingController : public Controller {
 private:
-  enum DrivetrainTarget {
-    FORWARDS,
-    BACKWARDS,
-    LEFT,
-    RIGHT
-  };
+  enum DrivetrainTarget { FORWARDS, BACKWARDS, LEFT, RIGHT };
 
   pros::controller_id_e_t controller_id;
   robot::Robot &robot;
@@ -49,7 +44,8 @@ private:
   const char *enqueued_rumble = nullptr;
 
 public:
-  explicit AutonomousRecordingController(robot::Robot &robot, pros::controller_id_e_t controller_id = pros::E_CONTROLLER_MASTER);
+  explicit AutonomousRecordingController(robot::Robot &robot,
+                                         pros::controller_id_e_t controller_id = pros::E_CONTROLLER_MASTER);
 
   [[nodiscard]] uint16_t a_pressed() const override;
   [[nodiscard]] uint16_t b_pressed() const override;
@@ -85,4 +81,4 @@ private:
   bool write_drivetrain_update();
 };
 } // namespace robot::controller
-#endif //ROBOT_CONTROLLER_AUTONOMOUS_RECORDING_HPP
+#endif // ROBOT_CONTROLLER_AUTONOMOUS_RECORDING_HPP

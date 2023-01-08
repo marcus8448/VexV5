@@ -64,8 +64,8 @@
 #ifdef SCREEN_FLYWHEEL
 #include "screen/flywheel_chart.hpp"
 #endif
-#include "screen/information.hpp"
 #include "robot/controller/autonomous_recording.hpp"
+#include "screen/information.hpp"
 #endif
 
 using namespace robot;
@@ -156,7 +156,8 @@ void opcontrol() {
   // #endif
 
   section_push("Opcontrol Setup");
-  robot.controller = new controller::AutonomousRecordingController(robot); // set the robot controller to the default operator based one.
+  robot.controller = new controller::AutonomousRecordingController(
+      robot); // set the robot controller to the default operator based one.
   section_pop();
 
 #ifdef ENABLE_TEMPORARY_CODE
