@@ -31,7 +31,7 @@ Autonomous *get_autonomous() {
     error("No autonomous selected!");
     return nullptr;
   }
-  info("Running autonomous: '%s'", activeProgram);
+  info("Running autonomous: '%s'", activeProgram->c_str());
   return (*autonomousPrograms)[*activeProgram];
 }
 } // namespace robot::autonomous

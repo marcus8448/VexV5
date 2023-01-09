@@ -31,6 +31,7 @@
 #include "logger.hpp"
 #include "main.hpp"
 #include "robot/controller/operator.hpp"
+#include "robot/controller/autonomous_recording.hpp"
 
 #ifdef ENABLE_AUTONOMOUS
 #include "robot/autonomous/autonomous.hpp"
@@ -64,7 +65,6 @@
 #ifdef SCREEN_FLYWHEEL
 #include "screen/flywheel_chart.hpp"
 #endif
-#include "robot/controller/autonomous_recording.hpp"
 #include "screen/information.hpp"
 #endif
 
@@ -124,7 +124,7 @@ void autonomous() {
 #ifdef ENABLE_AUTONOMOUS
   Robot &robot = get_or_create_robot();
   section_push("Autonomous Setup");
-  //  autonomous::set_active(new std::string("Left Winpoint"));
+  autonomous::set_active(new std::string("Right Winpoint"));
   autonomous::Autonomous *autonomous = autonomous::get_autonomous();
   section_pop();
   if (autonomous != nullptr) {
@@ -156,8 +156,7 @@ void opcontrol() {
   // #endif
 
   section_push("Opcontrol Setup");
-  robot.controller = new controller::AutonomousRecordingController(
-      robot); // set the robot controller to the default operator based one.
+  robot.controller = new controller::AutonomousRecordingController(robot); // set the robot controller to the default operator based one.
   section_pop();
 
 #ifdef ENABLE_TEMPORARY_CODE

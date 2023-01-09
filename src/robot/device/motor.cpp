@@ -93,21 +93,7 @@ void Motor::move_absolute(double position, int16_t velocity) {
 }
 
 void Motor::move_relative(double amount, int16_t velocity) {
-  velocity = static_cast<int16_t>(std::abs(velocity));
-  if (velocity > this->maxVelocity) {
-    warn("Target velocity %i is over max velocity %i!", velocity, this->maxVelocity);
-    velocity = this->maxVelocity;
-  } else if (velocity == 0) {
-    warn("Target velocity is zero!");
-  }
-  info("Moving %f degrees", amount);
-  amount += this->get_position();
-  if (this->targetType != TargetType::VELOCITY || this->target != velocity || this->targetPosition != amount) {
-    this->targetType = TargetType::VELOCITY;
-    this->target = velocity;
-    this->targetPosition = amount;
-    pros::c::motor_move_relative(this->port, this->targetPosition, velocity);
-  }
+  this->move_absolute(this->get_position() + amount, velocity);
 }
 
 void Motor::set_reversed(const bool reverse) {

@@ -27,22 +27,22 @@ void Drivetrain::move(double right_distance, double left_distance, int16_t max_r
   this->move_left_distance(left_distance, max_rpm);
 }
 
-void Drivetrain::forwards(double distance, int32_t max_rpm, uint16_t timeout_millis) {
+void Drivetrain::forwards(double distance, int16_t max_rpm, uint16_t timeout_millis) {
   this->move(util::in_to_e_units(distance), util::in_to_e_units(distance), max_rpm);
   this->await_move(timeout_millis);
 }
 
-void Drivetrain::backwards(double distance, int32_t max_rpm, uint16_t timeout_millis) {
+void Drivetrain::backwards(double distance, int16_t max_rpm, uint16_t timeout_millis) {
   this->move(-util::in_to_e_units(distance), -util::in_to_e_units(distance), max_rpm);
   this->await_move(timeout_millis);
 }
 
-void Drivetrain::turn_right(double degrees, int32_t max_rpm, uint16_t timeout_millis) {
+void Drivetrain::turn_right(double degrees, int16_t max_rpm, uint16_t timeout_millis) {
   this->move(-util::turn_to_e_units(degrees), util::turn_to_e_units(degrees), max_rpm);
   this->await_move(timeout_millis);
 }
 
-void Drivetrain::turn_left(double degrees, int32_t max_rpm, uint16_t timeout_millis) {
+void Drivetrain::turn_left(double degrees, int16_t max_rpm, uint16_t timeout_millis) {
   this->move(util::turn_to_e_units(degrees), -util::turn_to_e_units(degrees), max_rpm);
   this->await_move(timeout_millis);
 }
@@ -55,6 +55,14 @@ void Drivetrain::await_move(uint16_t timeout_millis) const {
     if (this->is_at_target())
       break;
     pros::delay(50);
+  }
+  if (!this->is_at_target()) {
+    warn("Drivetrain move timed out. %f / %f, %f / %f | %f / %f, %f / %f",
+         this->leftFront.get_position(), this->leftFront.get_target_position(),
+         this->leftBack.get_position(), this->leftBack.get_target_position(),
+         this->rightFront.get_position(), this->rightFront.get_target_position(),
+         this->rightBack.get_position(), this->rightBack.get_target_position()
+    );
   }
 }
 
