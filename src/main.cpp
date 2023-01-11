@@ -91,7 +91,7 @@ void initialize() {
   autonomous::register_autonomous(new autonomous::LeftWinpoint());
   autonomous::register_autonomous(new autonomous::RightWinpoint());
 //  autonomous::register_autonomous(new autonomous::LeftSkills());
-//  autonomous::register_autonomous(new autonomous::RightScore());
+//  autonomous::register_autonomous(new autonomous::RightSkills());
 #endif
   // Optionally enable extra screen functionality
 #ifdef SCREEN
@@ -156,7 +156,7 @@ void opcontrol() {
   // #endif
 
   section_push("Opcontrol Setup");
-  robot.controller = new controller::AutonomousRecordingController(robot); // set the robot controller to the default operator based one.
+  robot.controller = new controller::OpController(); // set the robot controller to the default operator based one.
   section_pop();
 
 #ifdef ENABLE_TEMPORARY_CODE
