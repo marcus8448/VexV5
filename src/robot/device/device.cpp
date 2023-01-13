@@ -31,6 +31,7 @@ bool Device::checkConnect() {
 [[nodiscard]] const char *Device::get_name() const { return this->name; }
 
 [[noreturn]] void reconfigure_task([[maybe_unused]] void *params) {
+  pros::delay(500); //printing race condition?
   info("Device reconfigure task started.");
   while (true) {
     if (!pendingDevices.empty()) {

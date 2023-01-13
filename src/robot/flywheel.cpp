@@ -6,6 +6,9 @@
 #define FLYWHEEL_VARIANCE 0.876
 #define FLYWHEEL_SAMPLES 50
 
+// shooting across the field: 10100
+// shooting at point blank:
+
 namespace robot {
 Flywheel::Flywheel(uint8_t port, uint8_t secondary_port)
     : primaryMotor(device::Motor(port, "Flywheel", pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST, false)),
@@ -81,6 +84,7 @@ void Flywheel::update(Controller *controller) { // todo: run at max once target 
   }
 
   if (this->state == State::AT_SPEED) {
+    debug("fwd: %f", runMax - velocity);
     if (runMax - velocity > 80.0) {
       info("Speed regression - spinning up.");
       this->state = State::SPINNING_UP;
@@ -93,10 +97,10 @@ void Flywheel::update(Controller *controller) { // todo: run at max once target 
 
 void Flywheel::reset_speeds() { return this->prevSpeeds.clear(); }
 
-void Flywheel::wait_for_speed(uint16_t millis_timeout) {
+double Flywheel::wait_for_speed(uint16_t millis_timeout) {
   if (this->state == State::IDLE) {
     error("Waiting for flywheel to speed up while it's off!");
-    return;
+    return 0.0;
   }
   uint32_t start = pros::millis();
   millis_timeout /= 10;
@@ -104,14 +108,16 @@ void Flywheel::wait_for_speed(uint16_t millis_timeout) {
 
   double runMin = 600.0;
   double runMax = 0.0;
+  double total = 0.0;
   for (double d : prevSpeeds) {
     runMax = std::max(d, runMax);
     runMin = std::min(d, runMin);
+    total += d;
   }
-  while ((runMin / runMax > FLYWHEEL_VARIANCE && runMin / runMax < 1.0) ||
-         this->prevSpeeds.size() != FLYWHEEL_SAMPLES) {
+  do {
     if (this->prevSpeeds.size() == FLYWHEEL_SAMPLES) {
       double rem = *this->prevSpeeds.erase(this->prevSpeeds.begin());
+      total -= rem;
       if (runMax == rem || runMin == rem) {
         runMax = 0;
         runMin = 600;
@@ -122,8 +128,9 @@ void Flywheel::wait_for_speed(uint16_t millis_timeout) {
       }
     }
     double velocity = (this->primaryMotor.get_velocity() + this->secondaryMotor.get_velocity()) / 2.0;
-    debug("Flywheel (a) - vel: %f, max: %f, min: %f, diff: %f", velocity, runMax, runMin, runMax / runMin);
+    debug("Flywheel (a) - vel: %f, max: %f, min: %f, diff: %f", velocity, runMax, runMin, runMin / runMax);
     this->prevSpeeds.emplace_back(velocity);
+    total += velocity;
     runMax = std::max(velocity, runMax);
     runMin = std::min(velocity, runMin);
 
@@ -133,11 +140,12 @@ void Flywheel::wait_for_speed(uint16_t millis_timeout) {
 
     if (i++ == millis_timeout)
       break;
-    pros::delay(10);
-  }
-  //  this->primaryMotor.move_millivolts(this->targetMV);
-  //  this->secondaryMotor.move_millivolts(this->targetMV);
+    pros::delay(8);
+  } while (runMin / runMax < FLYWHEEL_VARIANCE || this->prevSpeeds.size() != FLYWHEEL_SAMPLES);
+//  this->primaryMotor.move_millivolts(this->targetMV);
+//  this->secondaryMotor.move_millivolts(this->targetMV);
   this->state = State::AT_SPEED;
   info("Flywheel (a) up to speed - elapsed: %i", pros::millis() - start);
+  return total / static_cast<double>(FLYWHEEL_SAMPLES);
 }
 } // namespace robot

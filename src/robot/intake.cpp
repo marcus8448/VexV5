@@ -56,7 +56,7 @@ void Intake::update(Controller *controller) {
 }
 
 double Intake::bring_roller_to_speed(int16_t mV) {
-  std::vector<double> speeds = std::vector<double>(10);
+  std::vector<double> speeds = std::vector<double>(20);
   this->reverse(mV);
   pros::delay(250);
 
