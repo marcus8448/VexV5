@@ -77,7 +77,7 @@ void Flywheel::update(Controller *controller) { // todo: run at max once target 
     if ((runMin / runMax > FLYWHEEL_VARIANCE && runMin / runMax < 1.0) && this->prevSpeeds.size() == FLYWHEEL_SAMPLES) {
       if (this->state == SPINNING_UP) {
         controller->rumble("-");
-        info("Flywheel up to speed - see ^", velocity);
+        info("Flywheel up to speed - %f", velocity);
       }
       this->state = AT_SPEED;
     }
@@ -109,11 +109,12 @@ double Flywheel::wait_for_speed(uint16_t millis_timeout) {
   double runMin = 600.0;
   double runMax = 0.0;
   double total = 0.0;
-  for (double d : prevSpeeds) {
-    runMax = std::max(d, runMax);
-    runMin = std::min(d, runMin);
-    total += d;
-  }
+  this->prevSpeeds.clear();
+//  for (double d : prevSpeeds) {
+//    runMax = std::max(d, runMax);
+//    runMin = std::min(d, runMin);
+//    total += d;
+//  }
   do {
     if (this->prevSpeeds.size() == FLYWHEEL_SAMPLES) {
       double rem = *this->prevSpeeds.erase(this->prevSpeeds.begin());
@@ -142,8 +143,8 @@ double Flywheel::wait_for_speed(uint16_t millis_timeout) {
       break;
     pros::delay(8);
   } while (runMin / runMax < FLYWHEEL_VARIANCE || this->prevSpeeds.size() != FLYWHEEL_SAMPLES);
-//  this->primaryMotor.move_millivolts(this->targetMV);
-//  this->secondaryMotor.move_millivolts(this->targetMV);
+  //  this->primaryMotor.move_millivolts(this->targetMV);
+  //  this->secondaryMotor.move_millivolts(this->targetMV);
   this->state = State::AT_SPEED;
   info("Flywheel (a) up to speed - elapsed: %i", pros::millis() - start);
   return total / static_cast<double>(FLYWHEEL_SAMPLES);

@@ -30,8 +30,8 @@
 
 #include "logger.hpp"
 #include "main.hpp"
-#include "robot/controller/operator.hpp"
 #include "robot/controller/autonomous_recording.hpp"
+#include "robot/controller/operator.hpp"
 
 #ifdef ENABLE_AUTONOMOUS
 #include "robot/autonomous/autonomous.hpp"

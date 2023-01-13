@@ -174,28 +174,32 @@ void AutonomousRecordingController::update() {
 
   if (this->up) {
     if (this->drivetrainTarget != FORWARDS || !this->targetActive) {
-      if (this->drivetrainTarget != FORWARDS) changed = this->write_drivetrain_update();
+      if (this->drivetrainTarget != FORWARDS)
+        changed = this->write_drivetrain_update();
       this->drivetrainTarget = FORWARDS;
       this->targetDirty = true;
       this->targetActive = true;
     }
   } else if (this->down) {
     if (this->drivetrainTarget != BACKWARDS || !this->targetActive) {
-      if (this->drivetrainTarget != BACKWARDS)  changed = this->write_drivetrain_update();
+      if (this->drivetrainTarget != BACKWARDS)
+        changed = this->write_drivetrain_update();
       this->drivetrainTarget = BACKWARDS;
       this->targetDirty = true;
       this->targetActive = true;
     }
   } else if (this->left) {
     if (this->drivetrainTarget != LEFT || !this->targetActive) {
-      if (this->drivetrainTarget != LEFT) changed = this->write_drivetrain_update();
+      if (this->drivetrainTarget != LEFT)
+        changed = this->write_drivetrain_update();
       this->drivetrainTarget = LEFT;
       this->targetDirty = true;
       this->targetActive = true;
     }
   } else if (this->right) {
     if (this->drivetrainTarget != RIGHT || !this->targetActive) {
-      if (this->drivetrainTarget != RIGHT) changed = this->write_drivetrain_update();
+      if (this->drivetrainTarget != RIGHT)
+        changed = this->write_drivetrain_update();
       this->drivetrainTarget = RIGHT;
       this->targetDirty = true;
       this->targetActive = true;
@@ -307,9 +311,11 @@ bool AutonomousRecordingController::write_drivetrain_update() {
         (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position() +
          this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position()) /
         4.0);
-//    debug("Forwards %f", (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position() +
-//                          this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position()) /
-//                             4.0);
+    //    debug("Forwards %f", (this->robot.drivetrain->leftFront.get_position() +
+    //    this->robot.drivetrain->leftBack.get_position() +
+    //                          this->robot.drivetrain->rightFront.get_position() +
+    //                          this->robot.drivetrain->rightBack.get_position()) /
+    //                             4.0);
     debug("Forwards %f", dist);
     this->robot.drivetrain->tare();
     this->output << "robot.drivetrain->forwards(" << dist << ");\n";
@@ -320,9 +326,11 @@ bool AutonomousRecordingController::write_drivetrain_update() {
         (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position() +
          this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position()) /
         4.0);
-//    debug("Backwards %f", (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position() +
-//                           this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position()) /
-//                              -4.0);
+    //    debug("Backwards %f", (this->robot.drivetrain->leftFront.get_position() +
+    //    this->robot.drivetrain->leftBack.get_position() +
+    //                           this->robot.drivetrain->rightFront.get_position() +
+    //                           this->robot.drivetrain->rightBack.get_position()) /
+    //                              -4.0);
     debug("Backwards %f", dist);
     this->robot.drivetrain->tare();
     this->output << "robot.drivetrain->backwards(" << -dist << ");\n";
@@ -333,7 +341,9 @@ bool AutonomousRecordingController::write_drivetrain_update() {
         (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position()) / 2.0);
     double dist_right = util::e_units_to_turn(
         (this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position()) / 2.0);
-//    debug("Left %f %f", (this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position()) / 2.0, (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position()) / -2.0);
+    //    debug("Left %f %f", (this->robot.drivetrain->rightFront.get_position() +
+    //    this->robot.drivetrain->rightBack.get_position()) / 2.0, (this->robot.drivetrain->leftFront.get_position() +
+    //    this->robot.drivetrain->leftBack.get_position()) / -2.0);
     this->robot.drivetrain->tare();
     double turn = (dist_right - dist_left) / 2.0;
     debug("Left %f", turn);
@@ -345,7 +355,9 @@ bool AutonomousRecordingController::write_drivetrain_update() {
         (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position()) / 2.0);
     double dist_right = util::e_units_to_turn(
         (this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position()) / 2.0);
-//    debug("Right %f %f", (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position()) / 2.0, (this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position()) / -2.0);
+    //    debug("Right %f %f", (this->robot.drivetrain->leftFront.get_position() +
+    //    this->robot.drivetrain->leftBack.get_position()) / 2.0, (this->robot.drivetrain->rightFront.get_position() +
+    //    this->robot.drivetrain->rightBack.get_position()) / -2.0);
     this->robot.drivetrain->tare();
     double turn = (dist_left - dist_right) / 2.0;
     debug("Right %f", turn);

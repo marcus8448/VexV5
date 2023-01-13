@@ -57,12 +57,10 @@ void Drivetrain::await_move(uint16_t timeout_millis) const {
     pros::delay(50);
   }
   if (!this->is_at_target()) {
-    warn("Drivetrain move timed out. %f / %f, %f / %f | %f / %f, %f / %f",
-         this->leftFront.get_position(), this->leftFront.get_target_position(),
-         this->leftBack.get_position(), this->leftBack.get_target_position(),
-         this->rightFront.get_position(), this->rightFront.get_target_position(),
-         this->rightBack.get_position(), this->rightBack.get_target_position()
-    );
+    warn("Drivetrain move timed out. %f / %f, %f / %f | %f / %f, %f / %f", this->leftFront.get_position(),
+         this->leftFront.get_target_position(), this->leftBack.get_position(), this->leftBack.get_target_position(),
+         this->rightFront.get_position(), this->rightFront.get_target_position(), this->rightBack.get_position(),
+         this->rightBack.get_target_position());
   }
 }
 
