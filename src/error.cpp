@@ -4,11 +4,11 @@
 #include <cstring>
 
 bool check_error() {
-  int32_t error = get_error();
+  int error = get_error();
   if (error != 0) {
-    if (error == ENODEV) {
+    if (error == ENODEV) { // skip printing 19 - no such device.
       return false;
-    }                                              // skip printing 19 - no such device.
+    }
     error("Error %i: %s", error, strerror(error)); // print the error
     return false;
   }
@@ -17,8 +17,8 @@ bool check_error() {
 
 void clear_error() { errno = 0; }
 
-int32_t get_error() {
-  int32_t error = errno;
+int get_error() {
+  int error = errno;
   errno = 0;
   return error;
 }

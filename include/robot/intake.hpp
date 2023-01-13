@@ -46,7 +46,7 @@ public:
 
   /**
    * Disengages the intake.
-   * Stops providing power to run the motor. Does not immediately stop.
+   * Stops providing power to run the motor. Does not immediately brake.
    */
   void disengage();
 

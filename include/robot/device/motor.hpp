@@ -38,6 +38,7 @@ public:
   void move_relative(double amount, int16_t velocity);
 
   void set_reversed(bool reverse);
+  void set_brake_mode(pros::motor_brake_mode_e brake_mode);
 
   [[nodiscard]] double get_velocity() const;
   [[nodiscard]] double get_efficiency() const;
@@ -67,7 +68,7 @@ public:
   void reconfigure() const override;
 
   void tare();
-  void stop();
+  void brake();
 
   [[nodiscard]] Motor::TargetType get_target_type() const;
 };

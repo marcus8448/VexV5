@@ -40,8 +40,10 @@ set(SOURCE_FILES
         src/robot/autonomous/replay.cpp
         src/robot/autonomous/right_skills.cpp
         src/robot/autonomous/right_winpoint.cpp
-        src/robot/controller/operator.cpp
         src/robot/controller/autonomous_recording.cpp
+        src/robot/controller/operator.cpp
+        src/robot/controller/raw_recording.cpp
+        src/robot/controller/raw_replay.cpp
         src/robot/device/device.cpp
         src/robot/device/motor.cpp
         src/robot/device/optical.cpp
@@ -60,7 +62,6 @@ set(SOURCE_FILES
         src/screen/information.cpp
         src/screen/lvgl_util.cpp
         src/screen/screen.cpp
-        src/screen/serial_screen.cpp
         src/serial/robot_command.cpp
         src/serial/robot_state.cpp
         src/serial/serial.cpp
@@ -82,8 +83,10 @@ set(HEADER_FILES
         include/robot/autonomous/right_skills.hpp
         include/robot/autonomous/right_winpoint.hpp
         include/robot/controller/controller.hpp
-        include/robot/controller/operator.hpp
         include/robot/controller/autonomous_recording.hpp
+        include/robot/controller/operator.hpp
+        include/robot/controller/raw_recording.hpp
+        include/robot/controller/raw_replay.hpp
         include/robot/device/device.hpp
         include/robot/device/motor.hpp
         include/robot/device/optical.hpp
@@ -103,7 +106,6 @@ set(HEADER_FILES
         include/screen/information.hpp
         include/screen/lvgl_util.hpp
         include/screen/screen.hpp
-        include/screen/serial_screen.hpp
         include/serial/robot_command.hpp
         include/serial/robot_state.hpp
         include/serial/serial.hpp

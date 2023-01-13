@@ -3,51 +3,51 @@
 #include "logger.hpp"
 
 namespace robot::controller {
-OpController::OpController(pros::controller_id_e_t controller_id) : controller_id(controller_id) {}
+Operator::Operator(pros::controller_id_e_t controller_id) : controller_id(controller_id) {}
 
-[[nodiscard]] uint16_t OpController::a_pressed() const { return this->a; }
+[[nodiscard]] uint16_t Operator::a_pressed() const { return this->a; }
 
-[[nodiscard]] uint16_t OpController::b_pressed() const { return this->b; }
+[[nodiscard]] uint16_t Operator::b_pressed() const { return this->b; }
 
-[[nodiscard]] uint16_t OpController::x_pressed() const { return this->x; }
+[[nodiscard]] uint16_t Operator::x_pressed() const { return this->x; }
 
-[[nodiscard]] uint16_t OpController::y_pressed() const { return this->y; }
+[[nodiscard]] uint16_t Operator::y_pressed() const { return this->y; }
 
-[[nodiscard]] uint16_t OpController::up_pressed() const { return this->up; }
+[[nodiscard]] uint16_t Operator::up_pressed() const { return this->up; }
 
-[[nodiscard]] uint16_t OpController::down_pressed() const { return this->down; }
+[[nodiscard]] uint16_t Operator::down_pressed() const { return this->down; }
 
-[[nodiscard]] uint16_t OpController::left_pressed() const { return this->left; }
+[[nodiscard]] uint16_t Operator::left_pressed() const { return this->left; }
 
-[[nodiscard]] uint16_t OpController::right_pressed() const { return this->right; }
+[[nodiscard]] uint16_t Operator::right_pressed() const { return this->right; }
 
-[[nodiscard]] uint16_t OpController::l1_pressed() const { return this->l1; }
+[[nodiscard]] uint16_t Operator::l1_pressed() const { return this->l1; }
 
-[[nodiscard]] uint16_t OpController::l2_pressed() const { return this->l2; }
+[[nodiscard]] uint16_t Operator::l2_pressed() const { return this->l2; }
 
-[[nodiscard]] uint16_t OpController::r1_pressed() const { return this->r1; }
+[[nodiscard]] uint16_t Operator::r1_pressed() const { return this->r1; }
 
-[[nodiscard]] uint16_t OpController::r2_pressed() const { return this->r2; }
+[[nodiscard]] uint16_t Operator::r2_pressed() const { return this->r2; }
 
-[[nodiscard]] double OpController::left_stick_x() const { return this->leftStickX; }
+[[nodiscard]] double Operator::left_stick_x() const { return this->leftStickX; }
 
-[[nodiscard]] double OpController::left_stick_y() const { return this->leftStickY; }
+[[nodiscard]] double Operator::left_stick_y() const { return this->leftStickY; }
 
-[[nodiscard]] double OpController::right_stick_x() const { return this->rightStickX; }
+[[nodiscard]] double Operator::right_stick_x() const { return this->rightStickX; }
 
-[[nodiscard]] double OpController::right_stick_y() const { return this->rightStickY; }
+[[nodiscard]] double Operator::right_stick_y() const { return this->rightStickY; }
 
-[[nodiscard]] int16_t OpController::flywheel_speed() const { return this->flywheelSpeed; }
+[[nodiscard]] int16_t Operator::flywheel_speed() const { return this->flywheelSpeed; }
 
-void OpController::flywheel_speed(int16_t speed) { this->flywheelSpeed = speed; }
+void Operator::flywheel_speed(int16_t speed) { this->flywheelSpeed = speed; }
 
-void OpController::set_line(uint8_t line, uint8_t col, const char *str) {
+void Operator::set_line(uint8_t line, uint8_t col, const char *str) {
   print_error(pros::c::controller_set_text(this->controller_id, line, col, str));
 }
 
-void OpController::clear_line(uint8_t line) { print_error(pros::c::controller_clear_line(this->controller_id, line)); }
+void Operator::clear_line(uint8_t line) { print_error(pros::c::controller_clear_line(this->controller_id, line)); }
 
-void OpController::rumble(const char *str) {
+void Operator::rumble(const char *str) {
   clear_error();
   pros::c::controller_rumble(this->controller_id, str);
   if (get_error() == EAGAIN) {
@@ -56,7 +56,7 @@ void OpController::rumble(const char *str) {
   }
 }
 
-void OpController::update() {
+void Operator::update() {
   this->ticks++;
   if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_A))) {
     this->a++;

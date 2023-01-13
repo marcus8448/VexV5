@@ -19,6 +19,9 @@ public:
   device::Motor rightBack;
   device::Motor leftBack;
 
+private:
+  uint16_t timeOff = 0;
+
 public:
   /**
    * Creates a new drivetrain with the specified motors.
@@ -36,7 +39,7 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while moving.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void forwards(double distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM,
+  void forwards(double distance, int16_t max_rpm = DRIVETRAIN_DEFAULT_RPM,
                 uint16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT);
 
   /**
@@ -45,7 +48,7 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while moving.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void backwards(double distance, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM,
+  void backwards(double distance, int16_t max_rpm = DRIVETRAIN_DEFAULT_RPM,
                  uint16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT);
 
   /**
@@ -54,7 +57,7 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while turning.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void turn_right(double degrees, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM,
+  void turn_right(double degrees, int16_t max_rpm = DRIVETRAIN_DEFAULT_RPM,
                   uint16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT);
 
   /**
@@ -63,7 +66,7 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while turning.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void turn_left(double degrees, int32_t max_rpm = DRIVETRAIN_DEFAULT_RPM,
+  void turn_left(double degrees, int16_t max_rpm = DRIVETRAIN_DEFAULT_RPM,
                  uint16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT);
 
   void await_move(uint16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT) const;

@@ -161,5 +161,6 @@ void _pop_push(const char *string);
 
 void flush();
 
+void initialize(const char *name);
 } // namespace logger
 #endif // LOGGER_HPP

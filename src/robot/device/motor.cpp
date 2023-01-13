@@ -117,6 +117,13 @@ void Motor::set_reversed(const bool reverse) {
   }
 }
 
+void Motor::set_brake_mode(pros::motor_brake_mode_e brake_mode) {
+  if (this->brakeMode != brake_mode) {
+    this->brakeMode = brake_mode;
+    pros::c::motor_set_brake_mode(this->port, this->brakeMode);
+  }
+}
+
 [[nodiscard]] double Motor::get_velocity() const { return pros::c::motor_get_actual_velocity(this->port); }
 
 [[nodiscard]] double Motor::get_efficiency() const { return pros::c::motor_get_efficiency(this->port); }
@@ -189,7 +196,7 @@ void Motor::reconfigure() const {
 
 void Motor::tare() { pros::c::motor_set_zero_position(this->port, pros::c::motor_get_position(this->port)); }
 
-void Motor::stop() { this->move_millivolts(0); }
+void Motor::brake() { pros::c::motor_brake(this->port); }
 
 [[nodiscard]] Motor::TargetType Motor::get_target_type() const { return this->targetType; }
 

@@ -74,6 +74,7 @@ using namespace robot;
  * Called when the robot is first initialized.
  */
 void initialize() {
+  logger::initialize(pros::Task::current().get_name());
   section_push("Initialize");
   section_push("Initialize robot");
   Robot &robot = get_or_create_robot();
@@ -91,7 +92,7 @@ void initialize() {
   autonomous::register_autonomous(new autonomous::LeftWinpoint());
   autonomous::register_autonomous(new autonomous::RightWinpoint());
 //  autonomous::register_autonomous(new autonomous::LeftSkills());
-//  autonomous::register_autonomous(new autonomous::RightScore());
+//  autonomous::register_autonomous(new autonomous::RightSkills());
 #endif
   // Optionally enable extra screen functionality
 #ifdef SCREEN
@@ -121,12 +122,19 @@ void initialize() {
  * Called when the robot is in it's autonomous state in a competition.
  */
 void autonomous() {
+  logger::initialize(pros::Task::current().get_name());
 #ifdef ENABLE_AUTONOMOUS
   Robot &robot = get_or_create_robot();
   section_push("Autonomous Setup");
   //  autonomous::set_active(new std::string("Left Winpoint"));
   autonomous::Autonomous *autonomous = autonomous::get_autonomous();
   section_pop();
+
+  robot.drivetrain->leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  robot.drivetrain->leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  robot.drivetrain->rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  robot.drivetrain->rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
   if (autonomous != nullptr) {
     // #ifdef SCREEN
     // if (screen::autonomous_select_instance != nullptr) {
@@ -138,6 +146,11 @@ void autonomous() {
   } else {
     error("Missing autonomous run!");
   }
+
+  robot.drivetrain->leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  robot.drivetrain->leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  robot.drivetrain->rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  robot.drivetrain->rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 #endif
 }
 
@@ -147,6 +160,7 @@ void autonomous() {
  * pressed.
  */
 void opcontrol() {
+  logger::initialize(pros::Task::current().get_name());
   Robot &robot = get_or_create_robot();
   // #if defined(ENABLE_AUTONOMOUS) && defined(SCREEN) // todo: fix race condition
   //   if (screen::autonomous_select_instance != nullptr) {
@@ -187,9 +201,12 @@ Robot &get_or_create_robot() {
 /**
  * Called when the robot is at an official competition.
  */
-void competition_initialize() {}
+void competition_initialize() { logger::initialize(pros::Task::current().get_name()); }
 
 /**
  * Called when the robot should be stopped during a competition
  */
-void disabled() { logger::flush(); }
+void disabled() {
+  logger::flush();
+  logger::initialize(pros::Task::current().get_name());
+}

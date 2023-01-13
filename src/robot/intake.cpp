@@ -37,7 +37,7 @@ void Intake::disengage() {
   if (this->speed != 0) {
     debug("Intake disengaged");
     this->speed = 0;
-    this->motor.stop();
+    this->motor.brake();
   }
 }
 

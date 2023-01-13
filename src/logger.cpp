@@ -8,9 +8,11 @@
 namespace logger {
 static std::vector<std::pair<const char *, uint32_t>> *sections =
     new std::vector<std::pair<const char *, uint32_t>>(); // stores the name and timestamp of sections.
+static const char *main_task_name = nullptr;
 
 #ifdef FILE_LOG
-static std::ofstream log_file = fs::create_indexed("log");
+std::ofstream create_logfile(const char *name);
+static std::ofstream log_file = create_logfile("log");
 #endif
 
 void _info(const char *string) {
@@ -71,6 +73,10 @@ void _debug(const std::string &string) {
 }
 
 void _push(const char *string) {
+  if (main_task_name != pros::Task::current().get_name()) {
+    warn("Called section push on non-main task!");
+    return;
+  }
   sections->emplace_back(std::pair(string, pros::millis()));
   std::cout << "== BEGIN " << string << " ==" << std::endl;
 #ifdef FILE_LOG
@@ -79,6 +85,10 @@ void _push(const char *string) {
 }
 
 void _pop() {
+  if (main_task_name != pros::Task::current().get_name()) {
+    warn("Called section pop on non-main task!");
+    return;
+  }
   uint32_t millis = pros::millis();
   if (sections->empty()) {
     _error("Section stack underflow!");
@@ -106,4 +116,17 @@ void flush() {
   log_file.flush();
 #endif
 }
+
+void initialize(const char *name) {
+  main_task_name = name;
+  if (!sections->empty()) {
+    warn("Debug sections not properly cleared!");
+  }
+  sections->clear();
+}
+
+#ifdef FILE_LOG
+std::ofstream create_logfile(const char *name) { return fs::create_append(name); }
+#endif
+
 } // namespace logger

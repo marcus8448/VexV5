@@ -12,8 +12,9 @@ bool file_exists(const char *name);
 
 std::ifstream open(const char *name);
 
-std::ofstream create(const char *name);
+std::ofstream create_append(const char *name);
 std::ofstream create_truncate(const char *name);
+std::ofstream create_binary(const char *name);
 std::ofstream create_indexed(const char *name);
 } // namespace fs
 #endif

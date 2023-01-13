@@ -44,7 +44,7 @@ void Indexer::await_ready(int16_t timeout_millis) {
       }
       pros::delay(50);
     } while (this->motor.get_efficiency() > 1.0);
-    this->motor.stop();
+    this->motor.brake();
     this->motor.tare();
     this->set_state(State::CHARGED);
   }
@@ -75,7 +75,7 @@ void Indexer::update(Controller *controller) {
       if (this->motor.get_efficiency() < 1.0) {
         this->set_state(State::CHARGED);
         this->motor.tare();
-        this->motor.stop();
+        this->motor.brake();
       }
     }
   }

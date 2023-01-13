@@ -7,7 +7,7 @@
 
 namespace robot::controller {
 AutonomousRecordingController::AutonomousRecordingController(robot::Robot &robot, pros::controller_id_e_t controller_id)
-    : controller_id(controller_id), robot(robot), output(fs::create("auton")) {
+    : controller_id(controller_id), robot(robot), output(fs::create_append("auton")) {
   this->output << "// AUTON START\n";
 }
 

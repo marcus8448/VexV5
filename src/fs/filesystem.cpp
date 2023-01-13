@@ -38,7 +38,7 @@ std::ifstream open(const char *name) {
   return std::ifstream(path);
 }
 
-std::ofstream create(const char *name) {
+std::ofstream create_append(const char *name) {
   std::string path = to_path(name);
   if (!pros::usd::is_installed()) {
     warn("MicroSD unavailable, creating sink.");
@@ -54,6 +54,15 @@ std::ofstream create_truncate(const char *name) {
     return create_sink();
   }
   return std::ofstream(path, std::ios_base::out | std::ios::trunc);
+}
+
+std::ofstream create_binary(const char *name) {
+  std::string path = to_path(name);
+  if (!pros::usd::is_installed()) {
+    warn("MicroSD unavailable, creating sink.");
+    return create_sink();
+  }
+  return std::ofstream(path, std::ios_base::out | std::ios::trunc | std::ios::binary);
 }
 
 std::ofstream create_indexed(const char *name) { // todo: fails due to too many open file handles, but we close all test
