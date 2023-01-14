@@ -84,31 +84,29 @@ void Drivetrain::update(Controller *controller) {
   }
   if (right == 0.0 && left == 0.0) {
     if (++timeOff == 1000) {
-      this->leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-      this->leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-      this->rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-      this->rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-      this->leftFront.brake();
-      this->leftBack.brake();
-      this->rightFront.brake();
-      this->rightBack.brake();
+      this->set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+      this->brake();
     }
   } else {
     timeOff = 0;
-    this->leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-    this->leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-    this->rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-    this->rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+    this->set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
   }
   this->power_right(right * 100.0 / 127.0);
   this->power_left(left * 100.0 / 127.0);
 }
 
-void Drivetrain::stop() {
+void Drivetrain::brake() {
   this->rightFront.brake();
   this->leftFront.brake();
   this->rightBack.brake();
   this->leftBack.brake();
+}
+
+void Drivetrain::set_brake_mode(pros::motor_brake_mode_e brake_mode) {
+  this->leftFront.set_brake_mode(brake_mode);
+  this->leftBack.set_brake_mode(brake_mode);
+  this->rightFront.set_brake_mode(brake_mode);
+  this->rightBack.set_brake_mode(brake_mode);
 }
 
 void Drivetrain::tare() {

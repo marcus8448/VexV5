@@ -91,8 +91,8 @@ void initialize() {
   autonomous::register_autonomous(new autonomous::None());
   autonomous::register_autonomous(new autonomous::LeftWinpoint());
   autonomous::register_autonomous(new autonomous::RightWinpoint());
-//  autonomous::register_autonomous(new autonomous::LeftSkills());
-//  autonomous::register_autonomous(new autonomous::RightSkills());
+  autonomous::register_autonomous(new autonomous::LeftSkills());
+  autonomous::register_autonomous(new autonomous::RightSkills());
 #endif
   // Optionally enable extra screen functionality
 #ifdef SCREEN
@@ -126,7 +126,7 @@ void autonomous() {
 #ifdef ENABLE_AUTONOMOUS
   Robot &robot = get_or_create_robot();
   section_push("Autonomous Setup");
-  autonomous::set_active(new std::string("Right Winpoint"));
+//  autonomous::set_active(new std::string("Right Winpoint"));
   autonomous::Autonomous *autonomous = autonomous::get_autonomous();
   section_pop();
 
@@ -170,7 +170,7 @@ void opcontrol() {
   // #endif
 
   section_push("Opcontrol Setup");
-  robot.controller = new controller::OpController(); // set the robot controller to the default operator based one.
+  robot.controller = new controller::Operator(); // set the robot controller to the default operator based one.
   section_pop();
 
 #ifdef ENABLE_TEMPORARY_CODE

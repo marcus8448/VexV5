@@ -16,7 +16,7 @@ AutonomousRecordingController::AutonomousRecordingController(robot::Robot &robot
 [[nodiscard]] uint16_t AutonomousRecordingController::b_pressed() const { return this->b; }
 
 [[nodiscard]] uint16_t AutonomousRecordingController::x_pressed() const {
-  return this->x && this->flywheelRuntime != -1;
+  return this->x >= 2 && this->flywheelRuntime != -1;
 }
 
 [[nodiscard]] uint16_t AutonomousRecordingController::y_pressed() const { return this->y; }
@@ -208,13 +208,13 @@ void AutonomousRecordingController::update() {
     this->targetActive = false;
   }
 
-  if (this->x_pressed() && this->ticks % 2 == 0 && this->flywheelRuntime == -1) {
+  if (this->x % 2 == 1 && this->flywheelRuntime == -1) {
     this->flywheel_speed(static_cast<int16_t>(std::min(this->flywheel_speed() + 100, 12000)));
-  } else if (this->y_pressed() && this->ticks % 2 == 0) {
+  } else if (this->y_pressed() % 2 == 1) {
     this->flywheel_speed(static_cast<int16_t>(std::max(this->flywheel_speed() - 100, 4000)));
   }
 
-  if (this->r1_pressed() == 1) {
+  if (this->r1 == 1) {
     this->write_drivetrain_update();
     this->flywheelRuntime = 0;
     this->output << "robot.flywheel->engage(" << this->flywheelSpeed << ");\n";

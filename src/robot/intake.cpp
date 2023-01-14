@@ -4,7 +4,7 @@
 #include "robot/device/motor.hpp"
 #include "robot/device/optical.hpp"
 
-#define ROLLER_VARIANCE 15.0
+#define ROLLER_VARIANCE 10.0
 
 namespace robot {
 
@@ -56,13 +56,14 @@ void Intake::update(Controller *controller) {
 }
 
 double Intake::bring_roller_to_speed(int16_t mV) {
-  std::vector<double> speeds = std::vector<double>(20);
+  std::vector<double> speeds = std::vector<double>();
+  speeds.reserve(20);
   this->reverse(mV);
   pros::delay(250);
 
   double runMin = 200.0;
   double runMax = 0;
-  while (runMax - runMin > ROLLER_VARIANCE || speeds.size() != 20) {
+  while (runMax - runMin > ROLLER_VARIANCE || speeds.size() < 20) {
     if (speeds.size() == 20) {
       double rem = *speeds.erase(speeds.begin());
       if (runMax == rem || runMin == rem) {
@@ -74,10 +75,12 @@ double Intake::bring_roller_to_speed(int16_t mV) {
         }
       }
     }
+
     double d = this->motor.get_velocity();
     speeds.emplace_back(d);
     runMax = std::max(d, runMax);
     runMin = std::min(d, runMin);
+    debug("Roller (min: %f, max: %f, diff: %f, pcnt: %f)", runMin, runMax, runMax - runMin, runMin / runMax);
 
     pros::delay(10);
   }

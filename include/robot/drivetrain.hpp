@@ -85,7 +85,8 @@ public:
   /**
    * Engages the brakes of all of the motors.
    */
-  void stop();
+  void brake();
+  void set_brake_mode(pros::motor_brake_mode_e brake_mode);
 
   void update(Controller *controller) override;
 

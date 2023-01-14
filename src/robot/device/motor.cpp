@@ -96,6 +96,10 @@ void Motor::move_relative(double amount, int16_t velocity) {
   this->move_absolute(this->get_position() + amount, velocity);
 }
 
+void Motor::move_target_relative(double amount, int16_t velocity) {
+  this->move_absolute(this->get_target_position() + amount, velocity);
+}
+
 void Motor::set_reversed(const bool reverse) {
   if (this->reversed != reverse) {
     this->reversed = reverse;
@@ -167,7 +171,7 @@ void Motor::await_target(int16_t timeout_millis) const {
 
 [[nodiscard]] bool Motor::is_at_target() const {
   if (this->get_target_position() != INFINITY) {
-    return std::abs(this->get_position() - this->targetPosition) < 5.0;
+    return std::abs(this->get_position() - this->targetPosition) < 1.0 || (std::abs(this->get_position() - this->targetPosition) < 5.0 && this->get_efficiency() == 0.0);
   } else {
     return std::abs(this->get_velocity() - this->get_target_velocity()) < 10.0;
   }
@@ -182,7 +186,12 @@ void Motor::reconfigure() const {
 
 void Motor::tare() { pros::c::motor_set_zero_position(this->port, pros::c::motor_get_position(this->port)); }
 
-void Motor::brake() { pros::c::motor_brake(this->port); }
+void Motor::brake() {
+  this->target = 0;
+  this->targetType = VOLTAGE;
+  this->targetPosition = INFINITY;
+  pros::c::motor_brake(this->port);
+}
 
 [[nodiscard]] Motor::TargetType Motor::get_target_type() const { return this->targetType; }
 

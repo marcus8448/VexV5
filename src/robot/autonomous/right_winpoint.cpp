@@ -23,7 +23,7 @@ void RightWinpoint::run(Robot &robot) {
   while (robot.intake->get_motor().get_velocity() > vel) {
     pros::delay(10);
   }
-  robot.drivetrain->stop();
+  robot.drivetrain->brake();
   pros::delay(AUTONOMOUS_ROLLER_SPIN_TIME);
   robot.intake->disengage();
 }

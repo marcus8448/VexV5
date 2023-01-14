@@ -7,9 +7,9 @@ namespace robot::autonomous {
 /**
  * Autonomous run to be used when aiming for the best score when starting on the right side.
  */
-class RightScore : public Autonomous {
+class RightSkills : public Autonomous {
 public:
-  explicit RightScore() : Autonomous("Right Score"){};
+  explicit RightSkills() : Autonomous("Right Score"){};
 
   void run(Robot &robot) override;
 };

@@ -36,6 +36,7 @@ public:
 
   void move_absolute(double position, int16_t velocity);
   void move_relative(double amount, int16_t velocity);
+  void move_target_relative(double amount, int16_t velocity);
 
   void set_reversed(bool reverse);
   void set_brake_mode(pros::motor_brake_mode_e brake_mode);

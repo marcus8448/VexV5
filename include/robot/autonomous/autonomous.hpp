@@ -1,7 +1,7 @@
 #ifndef ROBOT_AUTONOMOUS_AUTONOMOUS_HPP
 #define ROBOT_AUTONOMOUS_AUTONOMOUS_HPP
 
-#define AUTONOMOUS_ROLLER_SPIN_TIME 500
+#define AUTONOMOUS_ROLLER_SPIN_TIME 1000
 
 #include "robot/robot.hpp"
 #include <string>
