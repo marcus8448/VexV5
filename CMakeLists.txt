@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 project(VexV5 VERSION 1.0.0 LANGUAGES C CXX)
 
-set(AUTO_CONFIGURE TRUE CACHE BOOL "auto configure compilers")
-set(USE_CLANG FALSE CACHE BOOL "auto configure using clang")
-include(toolchain.cmake)
-
 set(FIRMWARE_DIR ${CMAKE_SOURCE_DIR}/firmware)
 set(BIN_DIR ${CMAKE_SOURCE_DIR}/bin)
 
@@ -23,6 +19,30 @@ find_library(LibBanner NAMES banner PATHS ${CMAKE_SOURCE_DIR}/firmware/extra NO_
 file(TOUCH ${CMAKE_BINARY_DIR}/empty.cpp)
 file(WRITE ${CMAKE_BINARY_DIR}/timestamp.cpp "char const * const _PROS_COMPILE_TIMESTAMP = __DATE__ \" \" __TIME__; char const * const _PROS_COMPILE_DIRECTORY = \"${CMAKE_SOURCE_DIR}\";\n")
 add_library(Timestamp STATIC ${CMAKE_BINARY_DIR}/timestamp.cpp)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_STANDARD 11)
+set(WARNING_FLAGS "-Wall -Wno-psabi -Wno-shadow-field-in-constructor")
+set(COMPILE_FLAGS "-g -D_POSIX_THREADS -D_UNIX98_THREAD_MUTEX_ATTRIBUTES -ffunction-sections -fdata-sections -fdiagnostics-color -funwind-tables -fno-exceptions")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILE_FLAGS} ${WARNING_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMPILE_FLAGS} ${WARNING_FLAGS}")
+
+if (CMAKE_CXX_COMPILER STREQUAL "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Os")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Os")
+endif()
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(CMAKE_C_LINK_FLAGS "-fuse-ld=bfd")
+    set(CMAKE_CXX_LINK_FLAGS "-fuse-ld=bfd")
+
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --start-no-unused-arguments")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Oz")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Oz")
+    link_directories(${ARM_LIBS})
+    include_directories(SYSTEM $<$<COMPILE_LANGUAGE:CXX>:${ARM_SYSROOT}/include/c++/${ARM_GCC_VERSION} ${ARM_SYSROOT}/include/c++/${ARM_GCC_VERSION}/${TARGET_TRIPLE}/${ARM_MULTI_DIR}>)
+endif()
 
 set(ColdLibraries ${LibC} ${LibM} ${LibPROS} ${LibBase85})
 set(HotLinked ${LibC},${LibM},${LibPROS},${LibBase85})
@@ -48,6 +68,8 @@ set(SOURCE_FILES
         src/robot/device/motor.cpp
         src/robot/device/optical.cpp
         src/robot/device/pneumatics.cpp
+        src/robot/pid/velocity_pid.cpp
+        src/robot/pid/vex_pid.cpp
         src/robot/drivetrain.cpp
         src/robot/expansion.cpp
         src/robot/flywheel.cpp
@@ -91,6 +113,8 @@ set(HEADER_FILES
         include/robot/device/motor.hpp
         include/robot/device/optical.hpp
         include/robot/device/pneumatics.hpp
+        include/robot/pid/velocity_pid.hpp
+        include/robot/pid/vex_pid.hpp
         include/robot/drivetrain.hpp
         include/robot/expansion.hpp
         include/robot/flywheel.hpp

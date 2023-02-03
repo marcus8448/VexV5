@@ -2,6 +2,9 @@
 #include "error.hpp"
 #include "logger.hpp"
 
+#define controller_digital(button) print_error(pros::c::controller_get_digital(this->controller_id, button))
+#define controller_analog(stick_axis) print_error(pros::c::controller_get_analog(this->controller_id, stick_axis))
+
 namespace robot::controller {
 Operator::Operator(pros::controller_id_e_t controller_id) : controller_id(controller_id) {}
 
@@ -58,87 +61,82 @@ void Operator::rumble(const char *str) {
 
 void Operator::update() {
   this->ticks++;
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_A))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_A)) {
     this->a++;
   } else {
     this->a = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_B))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_B)) {
     this->b++;
   } else {
     this->b = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_X))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_X)) {
     this->x++;
   } else {
     this->x = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_Y))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
     this->y++;
   } else {
     this->y = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_UP))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
     this->up++;
   } else {
     this->up = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_DOWN))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) {
     this->down++;
   } else {
     this->down = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_LEFT))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_LEFT)) {
     this->left++;
   } else {
     this->left = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_RIGHT))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
     this->right++;
   } else {
     this->right = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_L1))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
     this->l1++;
   } else {
     this->l1 = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_L2))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
     this->l2++;
   } else {
     this->l2 = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_R1))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
     this->r1++;
   } else {
     this->r1 = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_R2))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
     this->r2++;
   } else {
     this->r2 = 0;
   }
 
-  this->leftStickX = print_error(pros::c::controller_get_analog(this->controller_id, pros::E_CONTROLLER_ANALOG_LEFT_X));
-
-  this->leftStickY = print_error(pros::c::controller_get_analog(this->controller_id, pros::E_CONTROLLER_ANALOG_LEFT_Y));
-
-  this->rightStickX =
-      print_error(pros::c::controller_get_analog(this->controller_id, pros::E_CONTROLLER_ANALOG_RIGHT_X));
-
-  this->rightStickY =
-      print_error(pros::c::controller_get_analog(this->controller_id, pros::E_CONTROLLER_ANALOG_RIGHT_Y));
+  this->leftStickX = controller_analog(pros::E_CONTROLLER_ANALOG_LEFT_X);
+  this->leftStickY = controller_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+  this->rightStickX = controller_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
+  this->rightStickY = controller_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
 
   if (this->right_pressed() % 2 == 1) {
     this->flywheel_speed(static_cast<int16_t>(std::min(this->flywheel_speed() + 100, 12000)));

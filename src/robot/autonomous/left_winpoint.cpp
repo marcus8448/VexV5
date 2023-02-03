@@ -6,10 +6,10 @@ namespace robot::autonomous {
 void LeftWinpoint::run(Robot &robot) {
   double vel = robot.intake->bring_roller_to_speed(6000);
   robot.drivetrain->backwards(5000.0, 20, 0);
-  while (robot.intake->get_motor().get_velocity() + 30 > vel) {
+  while (robot.intake->get_motor().get_velocity() + AUTONOMOUS_ROLLER_SPIN_THRESHOLD > vel) {
     debug("intake velocity: %f [%f off]", robot.intake->get_motor().get_velocity(),
           robot.intake->get_motor().get_velocity() - vel);
-    pros::delay(10);
+    pros::delay(4);
   }
   debug("intake velocity: %f (%f over)", robot.intake->get_motor().get_velocity(),
         robot.intake->get_motor().get_velocity() - vel);

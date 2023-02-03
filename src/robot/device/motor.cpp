@@ -2,6 +2,7 @@
 #include "logger.hpp"
 #include "pros/motors.h"
 #include "pros/rtos.hpp"
+#include "robot/pid/vex_pid.hpp"
 #include <cerrno>
 #include <cmath>
 
@@ -13,6 +14,10 @@
 #define MOTOR_ENCODER_UNITS pros::E_MOTOR_ENCODER_DEGREES
 
 namespace robot::device {
+static std::vector<Motor *> motors;
+
+[[noreturn]] void motor_pid_task([[maybe_unused]] void *params);
+
 Motor::Motor(const uint8_t port, const char *name, const pros::motor_gearset_e_t gearset,
              const pros::motor_brake_mode_e_t brake_mode, bool reversed)
     : Device(port, name), gearset(gearset), maxVelocity(get_gearset_max_velocity(gearset)), brakeMode(brake_mode),
@@ -21,6 +26,8 @@ Motor::Motor(const uint8_t port, const char *name, const pros::motor_gearset_e_t
   pros::c::motor_set_reversed(this->port, this->reversed); // todo: manually reverse
   pros::c::motor_set_encoder_units(this->port, MOTOR_ENCODER_UNITS);
   pros::c::motor_set_brake_mode(this->port, this->brakeMode);
+  this->controller = new robot::VexPid(this->port);
+  motors.push_back(this);
 }
 
 Motor::Motor(const uint8_t port, const char *name, bool reversed)
@@ -30,9 +37,20 @@ Motor::Motor(const uint8_t port, const char *name, bool reversed)
   pros::c::motor_set_reversed(this->port, this->reversed); // todo: manually reverse
   pros::c::motor_set_encoder_units(this->port, MOTOR_ENCODER_UNITS);
   pros::c::motor_set_brake_mode(this->port, DEFAULT_MOTOR_BRAKE);
+  motors.push_back(this);
 }
 
-Motor::~Motor() = default;
+Motor::~Motor() {
+    motors.erase(std::remove(motors.begin(), motors.end(), this), motors.end());
+}
+
+void Motor::initialize() {
+  static bool initialized = false;
+  if (!initialized) {
+    initialized = true;
+    pros::Task(motor_pid_task, nullptr, "Motor PID task");
+  }
+}
 
 void Motor::move_velocity(int16_t velocity) {
   if (velocity > this->maxVelocity) {
@@ -46,7 +64,7 @@ void Motor::move_velocity(int16_t velocity) {
     this->target = velocity;
     this->targetType = TargetType::VELOCITY;
     this->targetPosition = INFINITY;
-    pros::c::motor_move_velocity(this->port, velocity);
+    this->controller->target_velocity(velocity);
   }
 }
 
@@ -58,7 +76,7 @@ void Motor::move_millivolts(int16_t mV) {
     warn("Target voltage %imV is over max voltage -12000mV!", mV);
     mV = -MAX_MILLIVOLTS;
   }
-  if (this->targetType != TargetType::VOLTAGE || this->target != mV) {
+  if (this->targetType != TargetType::VOLTAGE || this->target != mV || true) {
     debug("Targeting %imV", mV);
     this->target = mV;
     this->targetType = TargetType::VOLTAGE;
@@ -207,5 +225,16 @@ int16_t get_gearset_max_velocity(const pros::motor_gearset_e_t gearset) {
     return 0;
   }
   return 0;
+}
+
+[[noreturn]] void motor_pid_task([[maybe_unused]] void *params) {
+  pros::delay(500);
+  info("Motor PID task started.");
+  while (true) {
+    for (Motor* motor : motors) {
+      motor->controller->update();
+    }
+    pros::delay(10);
+  }
 }
 } // namespace robot::device

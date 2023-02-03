@@ -1,4 +1,5 @@
 // CONFIG
+#include "robot/device/motor.hpp"
 #define FLYWHEEL_MOTOR 3
 #define FLYWHEEL_SECONDARY_MOTOR 5
 #define INDEXER_MOTOR 19
@@ -21,7 +22,7 @@
 // END CONFIG
 
 #if __has_include("temporary.hpp")
-// #define ENABLE_TEMPORARY_CODE
+#define ENABLE_TEMPORARY_CODE
 
 #ifdef ENABLE_TEMPORARY_CODE
 #include "temporary.hpp"
@@ -194,6 +195,7 @@ Robot &get_or_create_robot() {
                              new Intake(INTAKE_MOTOR), new Indexer(INDEXER_MOTOR),
                              new Flywheel(FLYWHEEL_MOTOR, FLYWHEEL_SECONDARY_MOTOR), new Expansion(EXPANSION_PISTON));
   device::initialize();
+  device::Motor::initialize();
   return robot;
 }
 

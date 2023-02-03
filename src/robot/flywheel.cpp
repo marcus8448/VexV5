@@ -1,13 +1,14 @@
 #include "robot/flywheel.hpp"
 #include "logger.hpp"
 #include "pros/rtos.hpp"
+#include "robot/pid/velocity_pid.hpp"
 #include <cmath>
 
 #define FLYWHEEL_VARIANCE 0.918
 #define FLYWHEEL_SAMPLES 50
 
 // shooting across the field: 10100
-// shooting at point blank:
+// shooting at point blank: 8700
 
 namespace robot {
 Flywheel::Flywheel(uint8_t port, uint8_t secondary_port)
@@ -15,6 +16,9 @@ Flywheel::Flywheel(uint8_t port, uint8_t secondary_port)
       secondaryMotor(
           device::Motor(secondary_port, "Flywheel 2", pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST, true)) {
   this->prevSpeeds.reserve(FLYWHEEL_SAMPLES);
+  // kp ki kd
+  this->primaryMotor.controller = new VelocityPid(port, 0.6, 0.013, 0.5, 10);
+  this->secondaryMotor.controller = new VelocityPid(port, 0.6, 0.013, 0.5, 10);
 }
 
 Flywheel::~Flywheel() = default;
@@ -27,8 +31,11 @@ void Flywheel::engage(int16_t flywheelMV, bool block) {
       this->state = State::SPINNING_UP;
     }
 
-    this->primaryMotor.move_millivolts(flywheelMV);
-    this->secondaryMotor.move_millivolts(flywheelMV);
+    // this->primaryMotor.move_millivolts(flywheelMV);
+    // this->secondaryMotor.move_millivolts(flywheelMV);
+
+    this->primaryMotor.move_velocity(450);
+    this->secondaryMotor.move_velocity(450);
 
     this->targetMV = flywheelMV;
     this->prevSpeeds.clear();
@@ -72,15 +79,15 @@ void Flywheel::update(Controller *controller) { // todo: run at max once target 
   prevTotal = runTotal - velocity + x;
 
   if (velocity != 0.0) {
-    debug("Flywheel %i - vel: %f, max: %f, min: %f, diff: %f, pcnt: %f, avg: %f", pros::millis(), velocity, runMax,
-          runMin, runMax - runMin, runMin / runMax, runTotal / static_cast<double>(FLYWHEEL_SAMPLES));
+    // debug("Flywheel %i - vel: %f, max: %f, min: %f, diff: %f, pcnt: %f, avg: %f", pros::millis(), velocity, runMax,
+    //       runMin, runMax - runMin, runMin / runMax, runTotal / static_cast<double>(FLYWHEEL_SAMPLES));
   }
 
   if (this->state == SPINNING_UP || this->state == SPINNING_DOWN) {
 
     if (((runMin / runMax > FLYWHEEL_VARIANCE && runMin / runMax < 1.0) || prevTotal > runTotal) && this->prevSpeeds.size() == FLYWHEEL_SAMPLES) {
       if (this->state == SPINNING_UP) {
-        controller->rumble("-");
+        // controller->rumble("-");
         info("Flywheel up to speed - %f", velocity);
       }
       this->state = AT_SPEED;
@@ -89,8 +96,8 @@ void Flywheel::update(Controller *controller) { // todo: run at max once target 
 
   if (this->state == State::AT_SPEED) {
     if (runMax - velocity > 80.0) {
-      info("Speed regression - spinning up.");
-      this->state = State::SPINNING_UP;
+      // info("Speed regression - spinning up.");
+      // this->state = State::SPINNING_UP;
     }
   }
 }

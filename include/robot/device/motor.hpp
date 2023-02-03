@@ -3,15 +3,17 @@
 
 #include "pros/motors.h"
 #include "robot/device/device.hpp"
+#include "robot/pid/pid_controller.hpp"
+#include "robot/pid/vex_pid.hpp"
 #include <cmath>
 
 #define MOTOR_TIMEOUT_MILLIS 4000
 
 namespace robot::device {
 class Motor : public Device {
+private:
   enum TargetType { VOLTAGE, VELOCITY };
 
-private:
   TargetType targetType = TargetType::VOLTAGE;
   int16_t target = 0;
   double targetPosition = INFINITY;
@@ -21,7 +23,9 @@ private:
   pros::motor_brake_mode_e_t brakeMode;
   bool reversed;
 
+
 public:
+  PidController *controller = nullptr;
   DEVICE_TYPE_NAME("Motor")
 
   explicit Motor(uint8_t port, const char *name, pros::motor_gearset_e_t gearset = pros::E_MOTOR_GEARSET_18,
@@ -29,6 +33,8 @@ public:
   explicit Motor(uint8_t port, const char *name, bool reversed = false);
 
   ~Motor();
+
+  static void initialize();
 
   void move_velocity(int16_t velocity);
   void move_millivolts(int16_t mV);

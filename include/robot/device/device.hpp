@@ -11,6 +11,7 @@ class Device {
 public:
   explicit Device(uint8_t port, const char *name);
   explicit Device(const Device &) = delete;
+  virtual ~Device() = default;
 
   virtual void reconfigure() const = 0;
 
