@@ -31,11 +31,11 @@ void Flywheel::engage(int16_t flywheelMV, bool block) {
       this->state = State::SPINNING_UP;
     }
 
-    // this->primaryMotor.move_millivolts(flywheelMV);
-    // this->secondaryMotor.move_millivolts(flywheelMV);
+    this->primaryMotor.move_millivolts(flywheelMV);
+    this->secondaryMotor.move_millivolts(flywheelMV);
 
-    this->primaryMotor.move_velocity(450);
-    this->secondaryMotor.move_velocity(450);
+    // this->primaryMotor.move_velocity(450);
+    // this->secondaryMotor.move_velocity(450);
 
     this->targetMV = flywheelMV;
     this->prevSpeeds.clear();

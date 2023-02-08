@@ -12,13 +12,13 @@ Indexer::~Indexer() = default;
 void Indexer::push() {
   if (this->state == CHARGED) {
     info("Shooting a disc");
-    this->motor.move_absolute(90.0, 200);
+    this->motor.move_absolute(80.0, 200);
     this->set_state(State::PUSHING);
   }
 }
 
 void Indexer::charge() {
-  this->motor.move_millivolts(-7200);
+  this->motor.move_millivolts(-12000);
   this->set_state(CHARGING);
 }
 
@@ -63,8 +63,8 @@ void Indexer::update(Controller *controller) {
     this->push();
   }
   if (this->state == PUSHING) {
-    this->motor.move_absolute(90.0, 200);
-    if (std::abs(90.0 - this->motor.get_position()) < 3.0) {
+    this->motor.move_absolute(80.0, 200);
+    if (std::abs(80.0 - this->motor.get_position()) < 3.0) {
       this->state = PUSHED;
       this->charge();
     }

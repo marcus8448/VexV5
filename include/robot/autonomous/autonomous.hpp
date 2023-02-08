@@ -27,6 +27,9 @@ public:
    * @param robot
    */
   virtual void run(Robot &robot) = 0;
+
+  static void rollerBackwards(Robot &robot);
+  static void shoot(Robot &robot, uint8_t discs, uint16_t millivolts, double velocity);
 };
 
 /**
