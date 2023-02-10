@@ -1,8 +1,9 @@
-#include "robot/autonomous/right_skills.hpp"
+#include "robot/autonomous/manual_load_skills.hpp"
 #include "pros/rtos.hpp"
 
 namespace robot::autonomous {
-void RightSkills::run(Robot &robot) {
+void ManualLoadSkills::run(AutonomousContext &context) {
+  auto &robot = context.robot;
   robot.flywheel->engage(8700);
   robot.drivetrain->forwards(48.0, 100);
   robot.drivetrain->turn_left(12.0);

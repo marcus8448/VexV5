@@ -58,7 +58,7 @@ set(SOURCE_FILES
         src/robot/autonomous/left_winpoint.cpp
         src/robot/autonomous/none.cpp
         src/robot/autonomous/replay.cpp
-        src/robot/autonomous/right_skills.cpp
+        src/robot/autonomous/manual_load_skills.cpp
         src/robot/autonomous/right_winpoint.cpp
         src/robot/controller/autonomous_recording.cpp
         src/robot/controller/operator.cpp
@@ -102,7 +102,7 @@ set(HEADER_FILES
         include/robot/autonomous/left_winpoint.hpp
         include/robot/autonomous/none.hpp
         include/robot/autonomous/replay.hpp
-        include/robot/autonomous/right_skills.hpp
+        include/robot/autonomous/manual_load_skills.hpp
         include/robot/autonomous/right_winpoint.hpp
         include/robot/controller/controller.hpp
         include/robot/controller/autonomous_recording.hpp

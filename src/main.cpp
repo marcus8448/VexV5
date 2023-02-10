@@ -38,8 +38,8 @@
 #include "robot/autonomous/autonomous.hpp"
 #include "robot/autonomous/left_skills.hpp"
 #include "robot/autonomous/left_winpoint.hpp"
+#include "robot/autonomous/manual_load_skills.hpp"
 #include "robot/autonomous/none.hpp"
-#include "robot/autonomous/right_skills.hpp"
 #include "robot/autonomous/right_winpoint.hpp"
 #endif
 
@@ -93,7 +93,7 @@ void initialize() {
   autonomous::register_autonomous(new autonomous::LeftWinpoint());
   autonomous::register_autonomous(new autonomous::RightWinpoint());
   autonomous::register_autonomous(new autonomous::LeftSkills());
-  autonomous::register_autonomous(new autonomous::RightSkills());
+  autonomous::register_autonomous(new autonomous::ManualLoadSkills());
 #endif
   // Optionally enable extra screen functionality
 #ifdef SCREEN
@@ -127,31 +127,16 @@ void autonomous() {
 #ifdef ENABLE_AUTONOMOUS
   Robot &robot = get_or_create_robot();
   section_push("Autonomous Setup");
-//  autonomous::set_active(new std::string("Right Winpoint"));
-  autonomous::Autonomous *autonomous = autonomous::get_autonomous();
-  section_pop();
-
   robot.drivetrain->leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   robot.drivetrain->leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   robot.drivetrain->rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   robot.drivetrain->rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
-  if (autonomous != nullptr) {
-    // #ifdef SCREEN
-    // if (screen::autonomous_select_instance != nullptr) {
-    //   screen::remove_screen(screen::autonomous_select_instance);
-    //   screen::autonomous_select_instance = nullptr;
-    // }
-    // #endif
-    autonomous->run(robot); // run the autonomous code
-  } else {
-    error("Missing autonomous run!");
-  }
+//  autonomous::set_active(new std::string("Right Winpoint"));
+  autonomous::Autonomous *autonomous = autonomous::get_autonomous();
+  section_pop();
 
-  robot.drivetrain->leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-  robot.drivetrain->leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-  robot.drivetrain->rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-  robot.drivetrain->rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  autonomous::run_autonomous(autonomous, robot);
 #endif
 }
 
@@ -163,6 +148,10 @@ void autonomous() {
 void opcontrol() {
   logger::initialize(pros::Task::current().get_name());
   Robot &robot = get_or_create_robot();
+  robot.drivetrain->leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  robot.drivetrain->leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  robot.drivetrain->rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  robot.drivetrain->rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
   // #if defined(ENABLE_AUTONOMOUS) && defined(SCREEN) // todo: fix race condition
   //   if (screen::autonomous_select_instance != nullptr) {
   //     screen::remove_screen(screen::autonomous_select_instance);
@@ -208,6 +197,10 @@ void competition_initialize() { logger::initialize(pros::Task::current().get_nam
  * Called when the robot should be stopped during a competition
  */
 void disabled() {
+  if (robot::autonomous::async_task != nullptr) {
+    pros::c::task_delete(robot::autonomous::async_task);
+    robot::autonomous::async_task = nullptr;
+  }
   logger::flush();
   logger::initialize(pros::Task::current().get_name());
 }

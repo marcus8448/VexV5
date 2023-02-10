@@ -3,7 +3,8 @@
 #include "util.hpp"
 
 namespace robot::autonomous {
-void RightWinpoint::run(Robot &robot) {
+void RightWinpoint::run(AutonomousContext &context) {
+  auto &robot = context.robot;
   robot.flywheel->engage(10000);
   robot.drivetrain->forwards(7.2);
   robot.drivetrain->turn_right(14.0);
@@ -19,6 +20,6 @@ void RightWinpoint::run(Robot &robot) {
   robot.drivetrain->turn_left(90.0);
   robot.drivetrain->backwards(4.0, 50);
 
-  rollerBackwards(robot);
+  rollerBackwards(context);
 }
 } // namespace robot::autonomous

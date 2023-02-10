@@ -8,7 +8,7 @@ class Replay : public Autonomous {
 public:
   explicit Replay(const char *name);
 
-  void run(Robot &robot) override;
+  void run(AutonomousContext &context) override;
 };
 } // namespace robot::autonomous
 #endif // ROBOT_AUTONOMOUS_REPLAY_HPP

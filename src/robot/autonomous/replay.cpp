@@ -6,7 +6,8 @@
 namespace robot::autonomous {
 Replay::Replay(const char *name) : Autonomous(name) {}
 
-void Replay::run(Robot &robot) {
+void Replay::run(AutonomousContext &context) {
+  auto &robot = context.robot;
   if (!fs::file_exists(name)) {
     error("No recording found with name '%s'!", this->name);
     return;

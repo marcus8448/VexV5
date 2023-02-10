@@ -11,7 +11,7 @@ class None : public Autonomous {
 public:
   explicit None() : Autonomous("None") {}
 
-  void run(Robot &robot) override;
+  void run(AutonomousContext &context) override;
 };
 } // namespace robot::autonomous
 #endif // ROBOT_AUTONOMOUS_NONE_HPP

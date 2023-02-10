@@ -107,56 +107,73 @@ void Flywheel::update(Controller *controller) { // todo: run at max once target 
 
 void Flywheel::reset_speeds() { return this->prevSpeeds.clear(); }
 
-double Flywheel::wait_for_speed(uint16_t millis_timeout) {
+double Flywheel::wait_for_speed(double targetVelocity, uint16_t millis_timeout) {
   if (this->state == State::IDLE) {
     error("Waiting for flywheel to speed up while it's off!");
     return 0.0;
   }
   uint32_t start = pros::millis();
   millis_timeout /= 10;
-  int16_t i = 0;
+  if (targetVelocity < 0) {
+    int16_t i = 0;
 
-  double runMin = 600.0;
-  double runMax = 0.0;
-  double total = 0.0;
-  this->prevSpeeds.clear();
-//  for (double d : prevSpeeds) {
-//    runMax = std::max(d, runMax);
-//    runMin = std::min(d, runMin);
-//    total += d;
-//  }
-  do {
-    if (this->prevSpeeds.size() == FLYWHEEL_SAMPLES) {
-      double rem = *this->prevSpeeds.erase(this->prevSpeeds.begin());
-      total -= rem;
-      if (runMax == rem || runMin == rem) {
-        runMax = 0;
-        runMin = 600;
-        for (double d : prevSpeeds) {
-          runMax = std::max(d, runMax);
-          runMin = std::min(d, runMin);
+    double runMin = 600.0;
+    double runMax = 0.0;
+    double total = 0.0;
+    this->prevSpeeds.clear();
+    //  for (double d : prevSpeeds) {
+    //    runMax = std::max(d, runMax);
+    //    runMin = std::min(d, runMin);
+    //    total += d;
+    //  }
+    do {
+      if (this->prevSpeeds.size() == FLYWHEEL_SAMPLES) {
+        double rem = *this->prevSpeeds.erase(this->prevSpeeds.begin());
+        total -= rem;
+        if (runMax == rem || runMin == rem) {
+          runMax = 0;
+          runMin = 600;
+          for (double d : prevSpeeds) {
+            runMax = std::max(d, runMax);
+            runMin = std::min(d, runMin);
+          }
         }
       }
-    }
+      double velocity = (this->primaryMotor.get_velocity() + this->secondaryMotor.get_velocity()) / 2.0;
+      debug("Flywheel (a) - vel: %f, max: %f, min: %f, diff: %f", velocity, runMax, runMin, runMin / runMax);
+      this->prevSpeeds.emplace_back(velocity);
+      total += velocity;
+      runMax = std::max(velocity, runMax);
+      runMin = std::min(velocity, runMin);
+
+      // if (runMax - runMin > 100.0) {
+      //   this->prevSpeeds.clear();
+      // }
+
+      if (i++ == millis_timeout)
+        break;
+      pros::delay(8);
+    } while (runMin / runMax < FLYWHEEL_VARIANCE || this->prevSpeeds.size() != FLYWHEEL_SAMPLES);
+
+    this->state = State::AT_SPEED;
+    info("Flywheel (a) up to speed - elapsed: %i", pros::millis() - start);
+    return total / static_cast<double>(FLYWHEEL_SAMPLES);
+  } else {
     double velocity = (this->primaryMotor.get_velocity() + this->secondaryMotor.get_velocity()) / 2.0;
-    debug("Flywheel (a) - vel: %f, max: %f, min: %f, diff: %f", velocity, runMax, runMin, runMin / runMax);
-    this->prevSpeeds.emplace_back(velocity);
-    total += velocity;
-    runMax = std::max(velocity, runMax);
-    runMin = std::min(velocity, runMin);
+    int16_t i = 0;
+    while (i < 5) {
+      if (velocity >= targetVelocity) {
+        i++;
+      } else {
+        i = 0;
+      }
+      pros::delay(8);
+      velocity = (this->primaryMotor.get_velocity() + this->secondaryMotor.get_velocity()) / 2.0;
+    }
 
-    // if (runMax - runMin > 100.0) {
-    //   this->prevSpeeds.clear();
-    // }
-
-    if (i++ == millis_timeout)
-      break;
-    pros::delay(8);
-  } while (runMin / runMax < FLYWHEEL_VARIANCE || this->prevSpeeds.size() != FLYWHEEL_SAMPLES);
-  //  this->primaryMotor.move_millivolts(this->targetMV);
-  //  this->secondaryMotor.move_millivolts(this->targetMV);
-  this->state = State::AT_SPEED;
-  info("Flywheel (a) up to speed - elapsed: %i", pros::millis() - start);
-  return total / static_cast<double>(FLYWHEEL_SAMPLES);
+    this->state = State::AT_SPEED;
+    info("Flywheel (a) up to speed - elapsed: %i", pros::millis() - start);
+    return (this->primaryMotor.get_velocity() + this->secondaryMotor.get_velocity()) / 2.0;
+  }
 }
 } // namespace robot

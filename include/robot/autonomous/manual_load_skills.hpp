@@ -7,11 +7,11 @@ namespace robot::autonomous {
 /**
  * Autonomous run to be used when aiming for the best score when starting on the right side.
  */
-class RightSkills : public Autonomous {
+class ManualLoadSkills : public Autonomous {
 public:
-  explicit RightSkills() : Autonomous("Right Score"){};
+  explicit ManualLoadSkills() : Autonomous("Manual Load"){};
 
-  void run(Robot &robot) override;
+  void run(AutonomousContext &context) override;
 };
 } // namespace robot::autonomous
 #endif // ROBOT_AUTONOMOUS_RIGHT_SCORE_HPP

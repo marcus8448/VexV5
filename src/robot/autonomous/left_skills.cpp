@@ -3,15 +3,16 @@
 #include "pros/rtos.hpp"
 
 namespace robot::autonomous {
-void LeftSkills::run(Robot &robot) {
+void LeftSkills::run(AutonomousContext &context) {
+  auto &robot = context.robot;
   robot.drivetrain->forwards(14.4);
   robot.drivetrain->turn_right(90.0);
   robot.drivetrain->backwards(21.168);
-  rollerBackwards(robot);
+  rollerBackwards(context);
   robot.drivetrain->forwards(6.912);
   robot.drivetrain->turn_left(90);
   robot.drivetrain->forwards(53.088);
-  shoot(robot, 2, 10900, 450.0);
+  shoot(context, 2, 10900, 450.0);
 
   robot.drivetrain->backwards(3.6);
   robot.drivetrain->turn_left(45);
@@ -21,7 +22,7 @@ void LeftSkills::run(Robot &robot) {
   robot.drivetrain->forwards(24.576);
   robot.drivetrain->turn_right(45);
   robot.drivetrain->forwards(3.6);
-  shoot(robot, 2, 10900, 450.0);
+  shoot(context, 2, 10900, 450.0);
   robot.flywheel->wait_for_speed();
   robot.indexer->cycle();
   robot.flywheel->wait_for_speed();
@@ -39,7 +40,7 @@ void LeftSkills::run(Robot &robot) {
   robot.drivetrain->backwards(24.0);
   robot.intake->disengage();
   robot.drivetrain->turn_right(135);
-  shoot(robot, 3, 11500, 500.0);
+  shoot(context, 3, 11500, 500.0);
 
   robot.drivetrain->turn_left(45);
   robot.intake->engage();
@@ -51,7 +52,7 @@ void LeftSkills::run(Robot &robot) {
   robot.intake->disengage();
   robot.drivetrain->turn_left(75);
   robot.drivetrain->forwards(5.76);
-  shoot(robot, 3, 10900, 450.0);
+  shoot(context, 3, 10900, 450.0);
   robot.flywheel->engage(10900);
   robot.flywheel->wait_for_speed();
   robot.indexer->cycle();
@@ -69,11 +70,11 @@ void LeftSkills::run(Robot &robot) {
   robot.drivetrain->turn_left(45);
   robot.drivetrain->backwards(33.6);
   robot.intake->disengage();
-  rollerBackwards(robot);
+  rollerBackwards(context);
   robot.drivetrain->forwards(17.28);
   robot.drivetrain->turn_right(90);
   robot.drivetrain->backwards(11.52);
-  rollerBackwards(robot);
+  rollerBackwards(context);
   robot.drivetrain->forwards(11.04);
 }
 } // namespace robot::autonomous

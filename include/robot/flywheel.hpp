@@ -40,7 +40,7 @@ public:
    */
   void engage(int16_t flywheelMV, bool block = false);
 
-  double wait_for_speed(uint16_t millis_timeout = 5000);
+  double wait_for_speed(double targetVelocity = -1.0, uint16_t millis_timeout = 5000);
 
   /**
    * Disengages the flywheel.
