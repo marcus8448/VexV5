@@ -1,25 +1,16 @@
 #ifndef ROBOT_AUTONOMOUS_AUTONOMOUS_HPP
 #define ROBOT_AUTONOMOUS_AUTONOMOUS_HPP
 
-#define AUTONOMOUS_ROLLER_SPIN_TIME 300
-#define AUTONOMOUS_ROLLER_SPIN_THRESHOLD 25
-
 #include "pros/rtos.h"
 #include "robot/robot.hpp"
 #include <string>
 
 namespace robot::autonomous {
-extern pros::task_t *async_task;
-
 class AutonomousContext {
 public:
-  std::vector<bool (*)(Robot&)> async_functions;
   Robot &robot;
 
   explicit AutonomousContext(Robot &robot);
-
-  // return true to invalidate
-  void add_async_task(bool (*function)(Robot&));
 };
 
 /**
@@ -42,7 +33,8 @@ public:
    */
   virtual void run(AutonomousContext &context) = 0;
 
-  static void rollerBackwards(AutonomousContext &context);
+  static void spin_roller(AutonomousContext &context);
+
   static void shoot(AutonomousContext &context, uint8_t discs, int16_t millivolts, double velocity);
 };
 
@@ -55,7 +47,7 @@ void register_autonomous(Autonomous *autonomous);
 const std::string *get_active();
 void set_active(const std::string *program);
 
-void run_autonomous(Autonomous* autonomous, Robot &robot);
+void run_autonomous(Autonomous *autonomous, Robot &robot);
 
 /**
  * Returns the selected autonomous run.

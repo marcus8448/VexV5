@@ -85,7 +85,8 @@ void Flywheel::update(Controller *controller) { // todo: run at max once target 
 
   if (this->state == SPINNING_UP || this->state == SPINNING_DOWN) {
 
-    if (((runMin / runMax > FLYWHEEL_VARIANCE && runMin / runMax < 1.0) || prevTotal > runTotal) && this->prevSpeeds.size() == FLYWHEEL_SAMPLES) {
+    if (((runMin / runMax > FLYWHEEL_VARIANCE && runMin / runMax < 1.0) || prevTotal > runTotal) &&
+        this->prevSpeeds.size() == FLYWHEEL_SAMPLES) {
       if (this->state == SPINNING_UP) {
         // controller->rumble("-");
         info("Flywheel up to speed - %f", velocity);
@@ -139,7 +140,7 @@ double Flywheel::wait_for_speed(double targetVelocity, uint16_t millis_timeout) 
           }
         }
       }
-      double velocity = (this->primaryMotor.get_velocity() + this->secondaryMotor.get_velocity()) / 2.0;
+      double velocity = this->get_velocity();
       debug("Flywheel (a) - vel: %f, max: %f, min: %f, diff: %f", velocity, runMax, runMin, runMin / runMax);
       this->prevSpeeds.emplace_back(velocity);
       total += velocity;
@@ -159,21 +160,23 @@ double Flywheel::wait_for_speed(double targetVelocity, uint16_t millis_timeout) 
     info("Flywheel (a) up to speed - elapsed: %i", pros::millis() - start);
     return total / static_cast<double>(FLYWHEEL_SAMPLES);
   } else {
-    double velocity = (this->primaryMotor.get_velocity() + this->secondaryMotor.get_velocity()) / 2.0;
     int16_t i = 0;
     while (i < 5) {
-      if (velocity >= targetVelocity) {
+      if (this->get_velocity() >= targetVelocity) {
         i++;
       } else {
         i = 0;
       }
       pros::delay(8);
-      velocity = (this->primaryMotor.get_velocity() + this->secondaryMotor.get_velocity()) / 2.0;
     }
 
     this->state = State::AT_SPEED;
     info("Flywheel (a) up to speed - elapsed: %i", pros::millis() - start);
-    return (this->primaryMotor.get_velocity() + this->secondaryMotor.get_velocity()) / 2.0;
+    return this->get_velocity();
   }
+}
+
+double Flywheel::get_velocity() {
+  return (this->primaryMotor.get_velocity() + this->secondaryMotor.get_velocity()) / 2.0;
 }
 } // namespace robot

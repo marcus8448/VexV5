@@ -25,6 +25,7 @@ public:
   void enable_gesture();
   void disable_gesture();
 
+  void update() override;
   void reconfigure() const override;
 
   [[nodiscard]] bool is_connected() const override;

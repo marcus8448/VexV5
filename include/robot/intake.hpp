@@ -15,7 +15,7 @@ namespace robot {
  * Represents the intake on the robot.
  * Also controls the roller.
  */
-class Intake : public Updatable {
+class Intake : public Controlled {
 private:
   /**
    * The motor of the intake/roller.

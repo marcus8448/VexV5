@@ -5,6 +5,7 @@
 #include "robot/device/device.hpp"
 #include "robot/pid/pid_controller.hpp"
 #include "robot/pid/vex_pid.hpp"
+#include "robot/updatable.hpp"
 #include <cmath>
 
 #define MOTOR_TIMEOUT_MILLIS 4000
@@ -23,7 +24,6 @@ private:
   pros::motor_brake_mode_e_t brakeMode;
   bool reversed;
 
-
 public:
   PidController *controller = nullptr;
   DEVICE_TYPE_NAME("Motor")
@@ -32,9 +32,7 @@ public:
                  pros::motor_brake_mode_e_t brake_mode = pros::E_MOTOR_BRAKE_BRAKE, bool reversed = false);
   explicit Motor(uint8_t port, const char *name, bool reversed = false);
 
-  ~Motor();
-
-  static void initialize();
+  ~Motor() override;
 
   void move_velocity(int16_t velocity);
   void move_millivolts(int16_t mV);
@@ -72,6 +70,7 @@ public:
   void await_target(int16_t timeout_millis = MOTOR_TIMEOUT_MILLIS) const;
   [[nodiscard]] bool is_at_target() const;
 
+  void update() override;
   void reconfigure() const override;
 
   void tare();

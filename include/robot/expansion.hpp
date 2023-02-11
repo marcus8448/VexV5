@@ -10,7 +10,7 @@ namespace robot {
  * Represents the expansion on the robot.
  * Also controls the roller.
  */
-class Expansion : public Updatable {
+class Expansion : public Controlled {
 private:
   /**
    * The piston of the expansion/roller.

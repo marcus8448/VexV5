@@ -9,7 +9,7 @@ namespace robot {
 /**
  * Represents the flywheel of the robot.
  */
-class Indexer : public Updatable {
+class Indexer : public Controlled {
 public:
   enum State { CHARGED, PUSHING, PUSHED, CHARGING };
 

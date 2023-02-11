@@ -132,7 +132,7 @@ void autonomous() {
   robot.drivetrain->rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   robot.drivetrain->rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
-//  autonomous::set_active(new std::string("Right Winpoint"));
+  //  autonomous::set_active(new std::string("Right Winpoint"));
   autonomous::Autonomous *autonomous = autonomous::get_autonomous();
   section_pop();
 
@@ -184,7 +184,6 @@ Robot &get_or_create_robot() {
                              new Intake(INTAKE_MOTOR), new Indexer(INDEXER_MOTOR),
                              new Flywheel(FLYWHEEL_MOTOR, FLYWHEEL_SECONDARY_MOTOR), new Expansion(EXPANSION_PISTON));
   device::initialize();
-  device::Motor::initialize();
   return robot;
 }
 
@@ -197,10 +196,6 @@ void competition_initialize() { logger::initialize(pros::Task::current().get_nam
  * Called when the robot should be stopped during a competition
  */
 void disabled() {
-  if (robot::autonomous::async_task != nullptr) {
-    pros::c::task_delete(robot::autonomous::async_task);
-    robot::autonomous::async_task = nullptr;
-  }
   logger::flush();
   logger::initialize(pros::Task::current().get_name());
 }

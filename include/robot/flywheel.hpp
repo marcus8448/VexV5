@@ -9,7 +9,7 @@ namespace robot {
 /**
  * Represents the flywheel of the robot.
  */
-class Flywheel : public Updatable {
+class Flywheel : public Controlled {
 private:
   enum State { IDLE, SPINNING_UP, SPINNING_DOWN, AT_SPEED };
   /**
@@ -54,6 +54,7 @@ public:
   [[nodiscard]] const device::Motor &get_secondary_motor() const;
 
   void update(Controller *controller) override;
+  double get_velocity();
 };
 } // namespace robot
 #endif // ROBOT_FLYWHEEL_HPP

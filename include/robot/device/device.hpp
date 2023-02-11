@@ -4,14 +4,15 @@
 #define DEVICE_TYPE_NAME(type_name)                                                                                    \
   [[nodiscard]] const char *get_type_name() const override { return type_name; };
 
+#include "robot/updatable.hpp"
 #include <cstdint>
 
 namespace robot::device {
-class Device {
+class Device : public Updatable {
 public:
   explicit Device(uint8_t port, const char *name);
   explicit Device(const Device &) = delete;
-  virtual ~Device() = default;
+  ~Device() override = default;
 
   virtual void reconfigure() const = 0;
 

@@ -11,9 +11,7 @@ static std::map<Device *, bool> devices;
 
 [[noreturn]] void reconfigure_task([[maybe_unused]] void *params);
 
-Device::Device(uint8_t port, const char *name) : port(port), name(name) {
-  pendingDevices.push_back(this);
-}
+Device::Device(uint8_t port, const char *name) : port(port), name(name) { pendingDevices.push_back(this); }
 
 void initialize() {
   static bool init = false;

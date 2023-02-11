@@ -149,7 +149,7 @@ public:
  * Represents objects that change state based on the controller.
  * Used during the operator control period.
  */
-class Updatable {
+class Controlled {
 public:
   /**
    * Updates this part of the robot based on the controller's state.

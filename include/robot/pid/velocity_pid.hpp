@@ -4,7 +4,7 @@
 #include "robot/pid/pid_controller.hpp"
 
 namespace robot {
-class VelocityPid: public PidController {
+class VelocityPid : public PidController {
 private:
   double error[3];
   double proportional = 0.0;
@@ -44,5 +44,5 @@ public:
   void target_velocity(double targetVelocity) override;
   void update() override;
 };
-}
+} // namespace robot
 #endif // ROBOT_PID_VELOCITY_PID_HPP

@@ -1,5 +1,4 @@
 #include "robot/autonomous/left_skills.hpp"
-#include "logger.hpp"
 #include "pros/rtos.hpp"
 
 namespace robot::autonomous {
@@ -8,7 +7,7 @@ void LeftSkills::run(AutonomousContext &context) {
   robot.drivetrain->forwards(14.4);
   robot.drivetrain->turn_right(90.0);
   robot.drivetrain->backwards(21.168);
-  rollerBackwards(context);
+  spin_roller(context);
   robot.drivetrain->forwards(6.912);
   robot.drivetrain->turn_left(90);
   robot.drivetrain->forwards(53.088);
@@ -53,13 +52,6 @@ void LeftSkills::run(AutonomousContext &context) {
   robot.drivetrain->turn_left(75);
   robot.drivetrain->forwards(5.76);
   shoot(context, 3, 10900, 450.0);
-  robot.flywheel->engage(10900);
-  robot.flywheel->wait_for_speed();
-  robot.indexer->cycle();
-  robot.flywheel->wait_for_speed();
-  robot.indexer->cycle();
-  robot.flywheel->wait_for_speed();
-  robot.indexer->cycle();
   pros::delay(250);
   robot.flywheel->disengage();
 
@@ -70,11 +62,11 @@ void LeftSkills::run(AutonomousContext &context) {
   robot.drivetrain->turn_left(45);
   robot.drivetrain->backwards(33.6);
   robot.intake->disengage();
-  rollerBackwards(context);
+  spin_roller(context);
   robot.drivetrain->forwards(17.28);
   robot.drivetrain->turn_right(90);
   robot.drivetrain->backwards(11.52);
-  rollerBackwards(context);
+  spin_roller(context);
   robot.drivetrain->forwards(11.04);
 }
 } // namespace robot::autonomous

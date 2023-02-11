@@ -4,7 +4,7 @@
 #include "robot/pid/pid_controller.hpp"
 
 namespace robot {
-class VexPid: public PidController {
+class VexPid : public PidController {
 private:
   const uint8_t port;
 
@@ -16,5 +16,5 @@ public:
   void target_velocity(double targetVelocity) override;
   void update() override;
 };
-}
+} // namespace robot
 #endif // ROBOT_PID_VEX_PID_HPP

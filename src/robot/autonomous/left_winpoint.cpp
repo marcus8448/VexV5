@@ -5,7 +5,7 @@
 namespace robot::autonomous {
 void LeftWinpoint::run(AutonomousContext &context) {
   auto &robot = context.robot;
-  rollerBackwards(context);
+  spin_roller(context);
 
   robot.drivetrain->forwards(5.4);
   robot.drivetrain->turn_left(10.0);

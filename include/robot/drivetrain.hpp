@@ -12,7 +12,7 @@ namespace robot {
 /**
  * Represents the drivetrain of the robot.
  */
-class Drivetrain : public Updatable {
+class Drivetrain : public Controlled {
 public:
   device::Motor rightFront;
   device::Motor leftFront;
