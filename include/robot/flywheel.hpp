@@ -18,7 +18,7 @@ private:
   device::Motor primaryMotor;
   device::Motor secondaryMotor;
 
-  int16_t targetMV = 0;
+  int16_t targetVelocity = 0;
   std::vector<double> prevSpeeds = std::vector<double>();
 
   /**
@@ -38,7 +38,7 @@ public:
    * Engages the flywheel.
    * Sets the motor to run at the specified voltage.
    */
-  void engage(int16_t flywheelMV, bool block = false);
+//  void engage(int16_t flywheelMV, bool block = false);
 
   double wait_for_speed(double targetVelocity = -1.0, uint16_t millis_timeout = 5000);
 
@@ -55,6 +55,7 @@ public:
 
   void update(Controller *controller) override;
   double get_velocity();
+  void engage_velocity(double velocity, bool block = false);
 };
 } // namespace robot
 #endif // ROBOT_FLYWHEEL_HPP

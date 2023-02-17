@@ -36,7 +36,11 @@ Motor::Motor(const uint8_t port, const char *name, bool reversed)
 
 Motor::~Motor() = default;
 
-void Motor::update() { this->controller->update(); }
+void Motor::update() {
+  if (this->controller != nullptr) {
+    this->controller->update();
+  }
+}
 
 void Motor::move_velocity(int16_t velocity) {
   if (velocity > this->maxVelocity) {
@@ -50,8 +54,9 @@ void Motor::move_velocity(int16_t velocity) {
     this->target = velocity;
     this->targetType = TargetType::VELOCITY;
     this->targetPosition = INFINITY;
-    pros::c::motor_move_velocity(this->port, velocity);
-//    this->controller->target_velocity(velocity);
+    if (this->controller != nullptr) {
+      this->controller->target_velocity(velocity);
+    }
   }
 }
 
@@ -197,6 +202,9 @@ void Motor::brake() {
     this->target = 0;
     this->targetType = VOLTAGE;
     this->targetPosition = INFINITY;
+    if (this->controller != nullptr) {
+      this->controller->target_velocity(0.0);
+    }
     pros::c::motor_brake(this->port);
   }
 }

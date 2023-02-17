@@ -4,12 +4,13 @@
 #define FLYWHEEL_SECONDARY_MOTOR 5
 #define INDEXER_MOTOR 19
 #define INTAKE_MOTOR 1
-#define EXPANSION_PISTON 'A'
+#define EXPANSION_PISTON 'D'
 
 #define RIGHT_FRONT_MOTOR 4
 #define LEFT_FRONT_MOTOR 2
 #define RIGHT_BACK_MOTOR 9
 #define LEFT_BACK_MOTOR 20
+#define INERTIAL 18
 
 #define ENABLE_AUTONOMOUS
 
@@ -21,13 +22,13 @@
 // #define SERIAL_LINK
 // END CONFIG
 
-#if __has_include("temporary.hpp")
+//#if __has_include("temporary.hpp")
 #define ENABLE_TEMPORARY_CODE
 
-#ifdef ENABLE_TEMPORARY_CODE
+//#ifdef ENABLE_TEMPORARY_CODE
 #include "temporary.hpp"
-#endif
-#endif
+//#endif
+//#endif
 
 #include "logger.hpp"
 #include "main.hpp"
@@ -66,6 +67,7 @@
 #ifdef SCREEN_FLYWHEEL
 #include "screen/flywheel_chart.hpp"
 #endif
+#include "robot/autonomous/both_rollers.hpp"
 #include "screen/information.hpp"
 #endif
 
@@ -93,7 +95,8 @@ void initialize() {
   autonomous::register_autonomous(new autonomous::LeftWinpoint());
   autonomous::register_autonomous(new autonomous::RightWinpoint());
   autonomous::register_autonomous(new autonomous::LeftSkills());
-  autonomous::register_autonomous(new autonomous::ManualLoadSkills());
+//  autonomous::register_autonomous(new autonomous::ManualLoadSkills());
+  autonomous::register_autonomous(new autonomous::BothRollers());
 #endif
   // Optionally enable extra screen functionality
 #ifdef SCREEN
@@ -116,6 +119,7 @@ void initialize() {
   screen::initialize(robot); // initialize the screen
   section_pop();
 #endif // SCREEN
+  robot.drivetrain->imu.calibrate();
   section_pop();
 }
 
@@ -148,6 +152,9 @@ void autonomous() {
 void opcontrol() {
   logger::initialize(pros::Task::current().get_name());
   Robot &robot = get_or_create_robot();
+//  auto ctx = autonomous::AutonomousContext(robot);
+//  autonomous::LeftSkills().run(ctx);
+
   robot.drivetrain->leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
   robot.drivetrain->leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
   robot.drivetrain->rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
@@ -180,7 +187,7 @@ void opcontrol() {
  * @return the robot instance
  */
 Robot &get_or_create_robot() {
-  static Robot robot = Robot(new Drivetrain(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR),
+  static Robot robot = Robot(new Drivetrain(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR, INERTIAL),
                              new Intake(INTAKE_MOTOR), new Indexer(INDEXER_MOTOR),
                              new Flywheel(FLYWHEEL_MOTOR, FLYWHEEL_SECONDARY_MOTOR), new Expansion(EXPANSION_PISTON));
   device::initialize();

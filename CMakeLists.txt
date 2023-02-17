@@ -54,6 +54,7 @@ set(SOURCE_FILES
         src/main.cpp
         src/fs/filesystem.cpp
         src/robot/autonomous/autonomous.cpp
+        src/robot/autonomous/both_rollers.cpp
         src/robot/autonomous/left_skills.cpp
         src/robot/autonomous/left_winpoint.cpp
         src/robot/autonomous/none.cpp
@@ -65,10 +66,12 @@ set(SOURCE_FILES
         src/robot/controller/raw_recording.cpp
         src/robot/controller/raw_replay.cpp
         src/robot/device/device.cpp
+        src/robot/device/gyro.cpp
+        src/robot/device/inertial.cpp
         src/robot/device/motor.cpp
         src/robot/device/optical.cpp
         src/robot/device/pneumatics.cpp
-        src/robot/pid/velocity_pid.cpp
+        src/robot/pid/tbh.cpp
         src/robot/pid/vex_pid.cpp
         src/robot/drivetrain.cpp
         src/robot/expansion.cpp
@@ -98,6 +101,7 @@ set(HEADER_FILES
         include/main.hpp
         include/fs/filesystem.hpp
         include/robot/autonomous/autonomous.hpp
+        include/robot/autonomous/both_rollers.hpp
         include/robot/autonomous/left_skills.hpp
         include/robot/autonomous/left_winpoint.hpp
         include/robot/autonomous/none.hpp
@@ -110,10 +114,12 @@ set(HEADER_FILES
         include/robot/controller/raw_recording.hpp
         include/robot/controller/raw_replay.hpp
         include/robot/device/device.hpp
+        include/robot/device/gyro.hpp
+        include/robot/device/inertial.hpp
         include/robot/device/motor.hpp
         include/robot/device/optical.hpp
         include/robot/device/pneumatics.hpp
-        include/robot/pid/velocity_pid.hpp
+        include/robot/pid/tbh.hpp
         include/robot/pid/vex_pid.hpp
         include/robot/drivetrain.hpp
         include/robot/expansion.hpp
@@ -140,7 +146,7 @@ set(HEADER_FILES
 add_executable(ColdPackage)
 target_sources(ColdPackage PRIVATE ${CMAKE_BINARY_DIR}/empty.cpp)
 
-add_executable(HotPackage)
+add_executable(HotPackage src/temporary.hpp)
 target_sources(HotPackage PUBLIC FILE_SET headers TYPE HEADERS FILES ${HEADER_FILES})
 target_sources(HotPackage PRIVATE ${SOURCE_FILES} $<TARGET_OBJECTS:Timestamp>)
 
@@ -148,7 +154,7 @@ target_include_directories(HotPackage PRIVATE include)
 target_link_directories(HotPackage PRIVATE firmware)
 
 if (ProsCLI)
-add_custom_target(Upload DEPENDS HotPackage COMMAND ${ProsCLI} upload)
+add_custom_target(Upload DEPENDS HotPackage COMMAND ${ProsCLI} upload --slot 2)
 endif()
 
 if (ClangFormat)

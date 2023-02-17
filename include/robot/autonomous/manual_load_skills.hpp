@@ -9,7 +9,7 @@ namespace robot::autonomous {
  */
 class ManualLoadSkills : public Autonomous {
 public:
-  explicit ManualLoadSkills() : Autonomous("Manual Load"){};
+  explicit ManualLoadSkills() : Autonomous("zManual Load"){};
 
   void run(AutonomousContext &context) override;
 };

@@ -34,7 +34,7 @@ private:
   double rightStickX = 0.0;
   double rightStickY = 0.0;
 
-  int16_t flywheelSpeed = 8700;
+  int16_t flywheelSpeed = 450;
   uint32_t ticks = 0;
 
   const char *enqueued_rumble = nullptr;

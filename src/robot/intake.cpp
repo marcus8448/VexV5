@@ -4,7 +4,7 @@
 #include "robot/device/motor.hpp"
 #include "robot/device/optical.hpp"
 
-#define ROLLER_VARIANCE 10.0
+#define ROLLER_VARIANCE 22.0
 
 namespace robot {
 

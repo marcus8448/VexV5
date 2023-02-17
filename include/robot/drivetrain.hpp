@@ -2,10 +2,13 @@
 #define ROBOT_DRIVETRAIN_HPP
 
 #include "robot/controller/controller.hpp"
+#include "robot/device/gyro.hpp"
+#include "robot/device/inertial.hpp"
 #include "robot/device/motor.hpp"
 #include <cstdint>
 
-#define DRIVETRAIN_DEFAULT_RPM 50
+#define DRIVETRAIN_DEFAULT_RPM 80
+#define DRIVETRAIN_DEFAULT_TURN_RPM 50
 #define DRIVETRAIN_DEFAULT_TIMEOUT 5000
 
 namespace robot {
@@ -18,8 +21,13 @@ public:
   device::Motor leftFront;
   device::Motor rightBack;
   device::Motor leftBack;
+  device::Inertial imu;
+
+  void power(double percent);
 
 private:
+  bool arcade = false;
+  double targetRotation = 0.0;
   uint16_t timeOff = 0;
 
 public:
@@ -30,7 +38,7 @@ public:
    * @param rightBack The motor on the back of the robot and the right side.
    * @param leftBack The motor on the back of the robot and the left side.
    */
-  Drivetrain(uint8_t rightFront, uint8_t leftFront, uint8_t rightBack, uint8_t leftBack);
+  Drivetrain(uint8_t rightFront, uint8_t leftFront, uint8_t rightBack, uint8_t leftBack, uint8_t inertial);
   virtual ~Drivetrain();
 
   /**
@@ -57,7 +65,7 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while turning.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void turn_right(double degrees, int16_t max_rpm = DRIVETRAIN_DEFAULT_RPM,
+  void turn_right(double degrees, int16_t max_rpm = DRIVETRAIN_DEFAULT_TURN_RPM,
                   uint16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT);
 
   /**
@@ -66,7 +74,7 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while turning.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void turn_left(double degrees, int16_t max_rpm = DRIVETRAIN_DEFAULT_RPM,
+  void turn_left(double degrees, int16_t max_rpm = DRIVETRAIN_DEFAULT_TURN_RPM,
                  uint16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT);
 
   void await_move(uint16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT) const;

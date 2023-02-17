@@ -139,9 +139,9 @@ void Operator::update() {
   this->rightStickY = controller_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
 
   if (this->right_pressed() % 2 == 1) {
-    this->flywheel_speed(static_cast<int16_t>(std::min(this->flywheel_speed() + 100, 12000)));
+    this->flywheel_speed(static_cast<int16_t>(std::min(this->flywheel_speed() + 10, 600)));
   } else if (this->left_pressed() % 2 == 1) {
-    this->flywheel_speed(static_cast<int16_t>(std::max(this->flywheel_speed() - 100, 4000)));
+    this->flywheel_speed(static_cast<int16_t>(std::max(this->flywheel_speed() - 10, 200)));
   }
 
   if (this->a == 1)
