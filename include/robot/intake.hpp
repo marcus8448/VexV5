@@ -27,6 +27,7 @@ private:
    */
   int16_t speed = 0;
   bool reversed = false;
+  bool slow = false;
 
 public:
   /**

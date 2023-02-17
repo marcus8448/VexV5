@@ -78,17 +78,17 @@ void Flywheel::update(Controller *controller) { // todo: run at max once target 
   }
   prevTotal = runTotal - velocity + x;
 
-  if (velocity != 0.0) {
-    // debug("Flywheel %i - vel: %f, max: %f, min: %f, diff: %f, pcnt: %f, avg: %f", pros::millis(), velocity, runMax,
-    //       runMin, runMax - runMin, runMin / runMax, runTotal / static_cast<double>(FLYWHEEL_SAMPLES));
-  }
+//  if (velocity != 0.0) {
+//     debug("Flywheel %i - vel: %f, max: %f, min: %f, diff: %f, pcnt: %f, avg: %f", pros::millis(), velocity, runMax,
+//           runMin, runMax - runMin, runMin / runMax, runTotal / static_cast<double>(FLYWHEEL_SAMPLES));
+//  }
 
   if (this->state == SPINNING_UP || this->state == SPINNING_DOWN) {
 
     if (((runMin / runMax > FLYWHEEL_VARIANCE && runMin / runMax < 1.0) || prevTotal > runTotal) &&
         this->prevSpeeds.size() == FLYWHEEL_SAMPLES) {
       if (this->state == SPINNING_UP) {
-        // controller->rumble("-");
+         controller->rumble(".");
         info("Flywheel up to speed - %f", velocity);
       }
       this->state = AT_SPEED;
@@ -101,6 +101,7 @@ void Flywheel::update(Controller *controller) { // todo: run at max once target 
       // this->state = State::SPINNING_UP;
     }
   }
+
 }
 
 [[nodiscard]] const device::Motor &Flywheel::get_primary_motor() const { return this->primaryMotor; }
@@ -161,9 +162,12 @@ double Flywheel::wait_for_speed(double targetVelocity, uint16_t millis_timeout) 
     return total / static_cast<double>(FLYWHEEL_SAMPLES);
   } else {
     int16_t i = 0;
-    while (i < 5) {
-      if (this->get_velocity() >= targetVelocity) {
+    while (true) {
+      double vel = this->get_velocity();
+      debug("Flywheel at %f / %f", vel, targetVelocity);
+      if (vel >= targetVelocity) {
         i++;
+        break;
       } else {
         i = 0;
       }

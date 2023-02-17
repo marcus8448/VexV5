@@ -1,19 +1,23 @@
 #include "robot/drivetrain.hpp"
 #include "configuration.hpp"
+#include "error.hpp"
 #include "logger.hpp"
+#include "pros/error.h"
 #include "robot/device/motor.hpp"
 #include "util.hpp"
 #include <algorithm>
+#include <iostream>
 
 #define SAFE_MAX_MOTOR_VOLTAGE 120
 
 namespace robot {
 Drivetrain::Drivetrain(const uint8_t rightFront, const uint8_t leftFront, const uint8_t rightBack,
-                       const uint8_t leftBack)
+                       const uint8_t leftBack, const uint8_t inertial)
     : rightFront(device::Motor(rightFront, "Right Front", pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST, false)),
       leftFront(device::Motor(leftFront, "Left Front", pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST, true)),
       rightBack(device::Motor(rightBack, "Right Back", pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST, false)),
-      leftBack(device::Motor(leftBack, "Left Back", pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST, true)) {}
+      leftBack(device::Motor(leftBack, "Left Back", pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST, true)),
+      imu(device::Inertial(inertial, "IDrive")) {}
 
 Drivetrain::~Drivetrain() = default;
 
@@ -38,13 +42,35 @@ void Drivetrain::backwards(double distance, int16_t max_rpm, uint16_t timeout_mi
 }
 
 void Drivetrain::turn_right(double degrees, int16_t max_rpm, uint16_t timeout_millis) {
-  this->move(-util::turn_to_e_units(degrees), util::turn_to_e_units(degrees), max_rpm);
+  this->targetRotation += degrees;
+  double rotation = this->imu.get_heading();
+  if (this->imu.is_connected() && (rotation > -1e10 && rotation < 1e10)) {
+    info("supposedly targeting %f, actual %f, target: %f", degrees, (this->targetRotation - rotation),
+         this->targetRotation);
+    info("rotation %f maybe %f, %f", (double)rotation, (double)(this->targetRotation + rotation),
+         (int)(-this->targetRotation - rotation));
+    std::cout << rotation << ' ' << (double)(this->targetRotation + rotation) << ' '
+              << (int)(-this->targetRotation - rotation) << std::endl;
+
+    degrees = this->targetRotation - rotation;
+    if (degrees > 180) {
+      degrees -= 360;
+    } else if (degrees < -180) {
+      degrees += 360;
+    }
+  } else {
+    if (rotation == PROS_ERR_F) {
+      check_error();
+    }
+    warn("IMU not connected/error");
+  }
+  double distance = util::turn_to_e_units(degrees);
+  this->move(-distance, distance, max_rpm);
   this->await_move(timeout_millis);
 }
 
 void Drivetrain::turn_left(double degrees, int16_t max_rpm, uint16_t timeout_millis) {
-  this->move(util::turn_to_e_units(degrees), -util::turn_to_e_units(degrees), max_rpm);
-  this->await_move(timeout_millis);
+  this->turn_right(-degrees, max_rpm, timeout_millis);
 }
 
 void Drivetrain::await_move(uint16_t timeout_millis) const {
@@ -65,9 +91,14 @@ void Drivetrain::await_move(uint16_t timeout_millis) const {
 }
 
 void Drivetrain::update(Controller *controller) {
+  if (controller->down_pressed() == 1) {
+    this->arcade = !this->arcade;
+    controller->rumble("-");
+  }
+
   double left;
   double right;
-  if (config::get_instance()->get_control_scheme() == config::DrivetrainControlScheme::ARCADE) {
+  if (this->arcade) {
     double joystickRotX = controller->right_stick_x();
     double joystickY = controller->left_stick_y();
     left = joystickY + joystickRotX;
@@ -114,6 +145,8 @@ void Drivetrain::tare() {
   this->leftFront.tare();
   this->rightBack.tare();
   this->leftBack.tare();
+  this->targetRotation = 0.0;
+  this->imu.tare();
 }
 
 void Drivetrain::move_right_distance(double distance, int16_t max_rpm) {
@@ -134,5 +167,10 @@ void Drivetrain::power_right(double percent) {
 void Drivetrain::power_left(double percent) {
   this->leftFront.move_percentage(percent);
   this->leftBack.move_percentage(percent);
+}
+
+void Drivetrain::power(double percent) {
+  this->power_right(percent);
+  this->power_left(percent);
 }
 } // namespace robot

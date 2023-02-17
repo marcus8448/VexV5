@@ -22,6 +22,7 @@
 #include <tuple>
 #include <utility>
 #include <vector>
+#include <cstddef>
 
 #include "pros/adi.h"
 

@@ -23,8 +23,8 @@ void Expansion::update(Controller *controller) {
       if (controller->up_pressed() == 1) {
         warn("Expansion button pressed!");
       }
-      controller->rumble("-");
-    } else if (controller->up_pressed() > 25) {
+      controller->rumble("..");
+    } else if (controller->up_pressed() > 15) {
       this->launch();
     }
   }

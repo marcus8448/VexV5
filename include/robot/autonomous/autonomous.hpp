@@ -1,6 +1,9 @@
 #ifndef ROBOT_AUTONOMOUS_AUTONOMOUS_HPP
 #define ROBOT_AUTONOMOUS_AUTONOMOUS_HPP
 
+#define AUTONOMOUS_ROLLER_SPIN_TIME 35
+#define AUTONOMOUS_ROLLER_OPPOSITE_SPIN_TIME 150
+
 #include "pros/rtos.h"
 #include "robot/robot.hpp"
 #include <string>
@@ -32,11 +35,11 @@ public:
    * @param robot
    */
   virtual void run(AutonomousContext &context) = 0;
-
-  static void spin_roller(AutonomousContext &context);
-
-  static void shoot(AutonomousContext &context, uint8_t discs, int16_t millivolts, double velocity);
 };
+
+void spin_roller(AutonomousContext &context, uint32_t time = AUTONOMOUS_ROLLER_SPIN_TIME, int16_t mV = 11000);
+
+void shoot(AutonomousContext &context, uint8_t discs, int16_t millivolts, double velocity, bool preSpeed = true);
 
 /**
  * Registers an autonomous instance to the system.
