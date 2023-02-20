@@ -154,7 +154,7 @@ target_include_directories(HotPackage PRIVATE include)
 target_link_directories(HotPackage PRIVATE firmware)
 
 if (ProsCLI)
-add_custom_target(Upload DEPENDS HotPackage COMMAND ${ProsCLI} upload --slot 2)
+add_custom_target(Upload DEPENDS HotPackage COMMAND ${ProsCLI} upload --slot 1)
 endif()
 
 if (ClangFormat)

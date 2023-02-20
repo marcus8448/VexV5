@@ -95,7 +95,7 @@ void initialize() {
   autonomous::register_autonomous(new autonomous::LeftWinpoint());
   autonomous::register_autonomous(new autonomous::RightWinpoint());
   autonomous::register_autonomous(new autonomous::LeftSkills());
-//  autonomous::register_autonomous(new autonomous::ManualLoadSkills());
+  autonomous::register_autonomous(new autonomous::ManualLoadSkills());
   autonomous::register_autonomous(new autonomous::BothRollers());
 #endif
   // Optionally enable extra screen functionality

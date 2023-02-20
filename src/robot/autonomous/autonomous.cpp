@@ -39,33 +39,33 @@ void shoot(AutonomousContext &context, uint8_t discs, int16_t millivolts, double
   uint32_t time = pros::millis();
   Robot &robot = context.robot;
   robot.flywheel->reset_speeds();
-//  if (robot.flywheel->get_primary_motor().get_velocity() < 100.0 && millivolts > 9000 && preSpeed) {
-//    robot.flywheel->engage(12000);
-//    double prev[5] = {0.0, 0.0, 0.0, 0.0, 0.0};
-//    while (true) {
-//      double d = (prev[0] + prev[1] + prev[2] + prev[3] + prev[4]) / 5.0;
-//      prev[4] = prev[3];
-//      prev[3] = prev[2];
-//      prev[2] = prev[1];
-//      prev[1] = prev[0];
-//
-//      prev[0] = robot.flywheel->get_velocity();
-//
-//      if (prev[4] == 0.0)
-//        continue;
-//
-//      d = prev[0] - d;
-//      debug("d12 %f / %f", prev[0] + d * 2.0, velocity);
-//      if (prev[0] + d * 2.5 >= velocity - 12.0 /* || std::abs(prev[0] - velocity) < 20.0*/) {
-//        robot.flywheel->engage(millivolts);
-//        break;
-//      }
-//      pros::delay(3);
-//    }
-//  } else {
-//    robot.flywheel->engage(millivolts);
-//  }
-  robot.flywheel->engage_velocity(velocity);
+  if (robot.flywheel->get_primary_motor().get_velocity() < 100.0 && millivolts > 9000 && preSpeed) {
+    robot.flywheel->engage(12000);
+    double prev[5] = {0.0, 0.0, 0.0, 0.0, 0.0};
+    while (true) {
+      double d = (prev[0] + prev[1] + prev[2] + prev[3] + prev[4]) / 5.0;
+      prev[4] = prev[3];
+      prev[3] = prev[2];
+      prev[2] = prev[1];
+      prev[1] = prev[0];
+
+      prev[0] = robot.flywheel->get_velocity();
+
+      if (prev[4] == 0.0)
+        continue;
+
+      d = prev[0] - d;
+      debug("d12 %f / %f", prev[0] + d * 2.0, velocity);
+      if (prev[0] + d * 2.5 >= velocity - 12.0 /* || std::abs(prev[0] - velocity) < 20.0*/) {
+        robot.flywheel->engage(millivolts);
+        break;
+      }
+      pros::delay(3);
+    }
+  } else {
+    robot.flywheel->engage(millivolts);
+  }
+
   for (uint8_t i = 0; i < discs; i++) {
     uint32_t t = pros::millis();
     robot.flywheel->wait_for_speed(velocity);
