@@ -11,22 +11,12 @@
 #define SCREEN
 #define SCREEN_CONFIG
 #define SCREEN_DRIVETRAIN
-#define SCREEN_FLYWHEEL
 
 // #define SERIAL_LINK
 // END CONFIG
 
-// #if __has_include("temporary.hpp")
-#define ENABLE_TEMPORARY_CODE
-
-// #ifdef ENABLE_TEMPORARY_CODE
-#include "temporary.hpp"
-// #endif
-// #endif
-
 #include "debug/logger.hpp"
 #include "main.hpp"
-#include "robot/controller/autonomous_recording.hpp"
 #include "robot/controller/operator.hpp"
 
 #ifdef ENABLE_AUTONOMOUS
@@ -132,11 +122,6 @@ void autonomous() {
 void opcontrol() {
   pros_task_begin();
   Robot &robot = getRobot();
-
-#ifdef ENABLE_TEMPORARY_CODE
-  if (temporary::run(robot))
-    return;
-#endif
 
   section_push("Opcontrol Setup");
   robot.set_controller(

@@ -129,7 +129,7 @@ set(HEADER_FILES
 add_executable(ColdPackage)
 target_sources(ColdPackage PRIVATE ${CMAKE_BINARY_DIR}/empty.cpp)
 
-add_executable(HotPackage src/temporary.hpp)
+add_executable(HotPackage)
 target_sources(HotPackage PUBLIC FILE_SET headers TYPE HEADERS FILES ${HEADER_FILES})
 target_sources(HotPackage PRIVATE ${SOURCE_FILES} $<TARGET_OBJECTS:Timestamp>)
 
