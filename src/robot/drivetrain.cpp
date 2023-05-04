@@ -1,14 +1,12 @@
 #include "robot/drivetrain.hpp"
-#include "configuration.hpp"
-#include "error.hpp"
-#include "logger.hpp"
-#include "pros/error.h"
+#include "debug/logger.hpp"
 #include "robot/device/motor.hpp"
 #include "util.hpp"
-#include <algorithm>
-#include <iostream>
 
-#define SAFE_MAX_MOTOR_VOLTAGE 120
+#define JOYSTICK_MAX 127
+#define ACCEPTABLE_ERROR 10.0
+#define ACCEPTABLE_OFFSET 1.0
+#define STABILIZE_MARGIN 10
 
 namespace robot {
 Drivetrain::Drivetrain(const uint8_t rightFront, const uint8_t leftFront, const uint8_t rightBack,
@@ -22,108 +20,138 @@ Drivetrain::Drivetrain(const uint8_t rightFront, const uint8_t leftFront, const 
 Drivetrain::~Drivetrain() = default;
 
 bool Drivetrain::is_at_target() const {
-  return this->rightFront.is_at_target() && this->leftFront.is_at_target() && this->rightBack.is_at_target() &&
-         this->leftBack.is_at_target();
+  return this->timeAtTarget > STABILIZE_MARGIN;
 }
 
-void Drivetrain::move(double right_distance, double left_distance, int16_t max_rpm) {
-  this->move_right_distance(right_distance, max_rpm);
-  this->move_left_distance(left_distance, max_rpm);
-}
-
-void Drivetrain::forwards(double distance, int16_t max_rpm, uint16_t timeout_millis) {
-  this->move(util::in_to_e_units(distance), util::in_to_e_units(distance), max_rpm);
-  this->await_move(timeout_millis);
-}
-
-void Drivetrain::backwards(double distance, int16_t max_rpm, uint16_t timeout_millis) {
-  this->move(-util::in_to_e_units(distance), -util::in_to_e_units(distance), max_rpm);
-  this->await_move(timeout_millis);
-}
-
-void Drivetrain::turn_right(double degrees, int16_t max_rpm, uint16_t timeout_millis) {
-  this->targetRotation += degrees;
-  double rotation = this->imu.get_heading();
-  if (this->imu.is_connected() && (rotation > -1e10 && rotation < 1e10)) {
-    info("supposedly targeting %f, actual %f, target: %f", degrees, (this->targetRotation - rotation),
-         this->targetRotation);
-    info("rotation %f maybe %f, %f", (double)rotation, (double)(this->targetRotation + rotation),
-         (int)(-this->targetRotation - rotation));
-    std::cout << rotation << ' ' << (double)(this->targetRotation + rotation) << ' '
-              << (int)(-this->targetRotation - rotation) << std::endl;
-
-    degrees = this->targetRotation - rotation;
-    if (degrees > 180) {
-      degrees -= 360;
-    } else if (degrees < -180) {
-      degrees += 360;
-    }
-  } else {
-    if (rotation == PROS_ERR_F) {
-      check_error();
-    }
-    warn("IMU not connected/error");
-  }
-  double distance = util::turn_to_e_units(degrees);
-  this->move(-distance, distance, max_rpm);
-  this->await_move(timeout_millis);
-}
-
-void Drivetrain::turn_left(double degrees, int16_t max_rpm, uint16_t timeout_millis) {
-  this->turn_right(-degrees, max_rpm, timeout_millis);
-}
-
-void Drivetrain::await_move(uint16_t timeout_millis) const {
-  if (timeout_millis == 0)
-    return;
-  timeout_millis = static_cast<uint16_t>(timeout_millis / 50.0);
-  for (uint16_t i = 0; i < timeout_millis; i++) {
-    if (this->is_at_target())
-      break;
-    pros::delay(50);
-  }
-  if (!this->is_at_target()) {
-    warn("Drivetrain move timed out. %f / %f, %f / %f | %f / %f, %f / %f", this->leftFront.get_position(),
-         this->leftFront.get_target_position(), this->leftBack.get_position(), this->leftBack.get_target_position(),
-         this->rightFront.get_position(), this->rightFront.get_target_position(), this->rightBack.get_position(),
-         this->rightBack.get_target_position());
+void Drivetrain::forwards(double distance, bool wait) {
+  info("Moving forwards %fin.", distance);
+  this->setTarget(DIRECT_MOVE);
+  this->targetHeading = this->heading;
+  this->targetLeft = util::in_to_e_units(distance);
+  this->targetRight = util::in_to_e_units(distance);
+  if (wait) {
+    timer_start(move_forwards);
+    await_move();
+    timer_print(move_forwards);
   }
 }
 
-void Drivetrain::update(Controller *controller) {
+void Drivetrain::backwards(double distance, bool wait) {
+  info("Moving backwards %fin.", distance);
+  this->setTarget(DIRECT_MOVE);
+  this->targetHeading = this->heading;
+  this->targetLeft = util::in_to_e_units(-distance);
+  this->targetRight = util::in_to_e_units(-distance);
+  if (wait) {
+    timer_start(move_backwards);
+    await_move();
+    timer_print(move_backwards);
+  }
+}
+
+void Drivetrain::turn_right(double degrees, bool wait) {
+  info("Turning right %f degrees.", degrees);
+  this->setTarget(STATIC_TURN);
+  this->targetHeading += degrees - floor(degrees / 360.0);
+  if (wait) {
+    timer_start(turn_right);
+    await_move();
+    timer_print(turn_right);
+  }
+}
+
+void Drivetrain::turn_left(double degrees, bool wait) {
+  info("Turning left %f degrees.", degrees);
+  this->setTarget(STATIC_TURN);
+  this->targetHeading -= degrees - floor(degrees / 360.0);
+  if (wait) {
+    timer_start(turn_left);
+    await_move();
+    timer_print(turn_left);
+  }
+}
+
+void Drivetrain::await_move() const {
+  while (this->timeAtTarget < STABILIZE_MARGIN) {
+    pros::delay(ROBOT_TICK_RATE * (STABILIZE_MARGIN - this->timeAtTarget));
+  }
+}
+
+void Drivetrain::updateTargeting(Controller *controller) {
   if (controller->down_pressed() == 1) {
     this->arcade = !this->arcade;
     controller->rumble("-");
   }
 
-  double left;
-  double right;
+  this->setTarget(OPERATOR_DIRECT);
   if (this->arcade) {
     double joystickRotX = controller->right_stick_x();
     double joystickY = controller->left_stick_y();
-    left = joystickY + joystickRotX;
-    right = joystickY - joystickRotX;
 
-    if (right > SAFE_MAX_MOTOR_VOLTAGE || left > SAFE_MAX_MOTOR_VOLTAGE) {
-      double max = std::max(right, left);
-      right = (right / max) * SAFE_MAX_MOTOR_VOLTAGE;
-      left = (left / max) * SAFE_MAX_MOTOR_VOLTAGE;
-    }
+    double left = (joystickY + joystickRotX) / JOYSTICK_MAX;
+    double right = (joystickY - joystickRotX) / JOYSTICK_MAX;
+    double max = std::max(right, left);
+    right /= max;
+    left /= max;
+    this->powerRight = static_cast<int16_t>(right * MOTOR_MAX_MILLIVOLTS);
+    this->powerLeft = static_cast<int16_t>(left * MOTOR_MAX_MILLIVOLTS);
   } else {
-    right = controller->right_stick_y();
-    left = controller->left_stick_y();
+    this->powerRight = static_cast<int16_t>(controller->right_stick_y() / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
+    this->powerLeft = static_cast<int16_t>(controller->left_stick_y() / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
   }
-  if (right == 0.0 && left == 0.0) {
-    if (++timeOff == 1000) {
-      this->set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-      this->brake();
+}
+
+void Drivetrain::updateMovement() {
+  bool atTarget = false;
+  switch (this->targetType) {
+  case NONE: {
+    atTarget = true;
+    break;
+  }
+  case OPERATOR_DIRECT: {
+    if (this->powerRight == 0 && this->powerLeft == 0) {
+      if (++this->timeOff == 200) {
+        this->set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+        this->brake();
+      }
+    } else {
+      this->set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+      this->timeOff = 0;
     }
-  } else {
-    timeOff = 0;
-    this->set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+    this->power_right(this->powerRight);
+    this->power_left(this->powerLeft);
   }
-  this->power_right(right * 100.0 / 127.0);
-  this->power_left(left * 100.0 / 127.0);
+  case STATIC_TURN: {
+    double offset = this->targetHeading - this->heading;
+    if (std::abs(offset) > 0.2) {
+      if (offset > 180.0) {
+        offset -= 360.0;
+      } else if (offset < -180.0) {
+        offset += 360;
+      }
+
+      double distance = util::turn_to_e_units(offset);
+      this->move_right_targeting(this->rightPos -distance);
+      this->move_left_targeting(this->leftPos + distance);
+      if (std::abs(distance) < ACCEPTABLE_OFFSET && std::abs(distance) < ACCEPTABLE_OFFSET) {
+        atTarget = true;
+      }
+    }
+  }
+  case DIRECT_MOVE: {
+    this->move_right_targeting(this->targetLeft);
+    this->move_left_targeting(this->targetRight);
+    if (std::abs(this->targetLeft - this->leftPos) < ACCEPTABLE_OFFSET
+    && std::abs(this->targetRight - this->rightPos) < ACCEPTABLE_OFFSET) {
+      atTarget = true;
+    }
+  }
+  }
+  if (atTarget) {
+    this->timeAtTarget++;
+  } else {
+    this->timeAtTarget = 0;
+  }
 }
 
 void Drivetrain::brake() {
@@ -145,32 +173,59 @@ void Drivetrain::tare() {
   this->leftFront.tare();
   this->rightBack.tare();
   this->leftBack.tare();
-  this->targetRotation = 0.0;
   this->imu.tare();
+
+  this->targetHeading -= this->heading;
+  this->heading = 0.0;
 }
 
-void Drivetrain::move_right_distance(double distance, int16_t max_rpm) {
-  this->rightFront.move_relative(distance, max_rpm);
-  this->rightBack.move_relative(distance, max_rpm);
+void Drivetrain::move_right_targeting(double target) {
+  this->prevErrorRight = this->errorRight;
+  this->errorRight = target - this->rightPos;
+  this->integralRight += this->errorRight;
+  if (std::abs(this->errorRight) < ACCEPTABLE_ERROR) {
+    this->integralRight = 0;
+  }
+  double derivative = this->errorRight - this->prevErrorRight;
+  auto output = static_cast<int16_t>(this->errorLeft * this->kp + this->integralLeft * this->ki + derivative * this->kd);
+  if (abs(output) > MOTOR_MAX_MILLIVOLTS) {
+    output = MOTOR_MAX_MILLIVOLTS;
+  }
+  power_right(output);
 }
 
-void Drivetrain::move_left_distance(double distance, int16_t max_rpm) {
-  this->leftFront.move_relative(distance, max_rpm);
-  this->leftBack.move_relative(distance, max_rpm);
+void Drivetrain::move_left_targeting(double target) {
+  this->prevErrorLeft = this->errorLeft;
+  this->errorLeft = target - this->leftPos;
+  this->integralLeft += this->errorLeft;
+  if (std::abs(this->errorLeft) < ACCEPTABLE_ERROR) {
+    this->integralLeft = 0;
+  }
+  double derivative = this->errorLeft - this->prevErrorLeft;
+  auto output = static_cast<int16_t>(this->errorLeft * this->kp + this->integralLeft * this->ki + derivative * this->kd);
+  if (abs(output) > MOTOR_MAX_MILLIVOLTS) {
+    output = MOTOR_MAX_MILLIVOLTS;
+  }
+  power_left(output);
 }
 
-void Drivetrain::power_right(double percent) {
-  this->rightFront.move_percentage(percent);
-  this->rightBack.move_percentage(percent);
+void Drivetrain::power_right(int16_t millivolts) {
+  this->rightFront.move_millivolts(millivolts);
+  this->rightBack.move_millivolts(millivolts);
 }
 
-void Drivetrain::power_left(double percent) {
-  this->leftFront.move_percentage(percent);
-  this->leftBack.move_percentage(percent);
+void Drivetrain::power_left(int16_t millivolts) {
+  this->leftFront.move_millivolts(millivolts);
+  this->leftBack.move_millivolts(millivolts);
 }
 
-void Drivetrain::power(double percent) {
-  this->power_right(percent);
-  this->power_left(percent);
+void Drivetrain::setTarget(Drivetrain::TargetType type) {
+  this->targetType = type;
+}
+
+void Drivetrain::updatePosition() {
+  this->heading = this->imu.get_heading();
+  this->rightPos = (this->rightFront.get_position() + this->rightBack.get_position()) / 2.0;
+  this->leftPos = (this->leftFront.get_position() + this->leftBack.get_position()) / 2.0;
 }
 } // namespace robot

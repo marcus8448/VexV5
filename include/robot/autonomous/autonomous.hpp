@@ -9,13 +9,6 @@
 #include <string>
 
 namespace robot::autonomous {
-class AutonomousContext {
-public:
-  Robot &robot;
-
-  explicit AutonomousContext(Robot &robot);
-};
-
 /**
  * An autonomous run.
  * Contains all of the code necessary to run the robot for the 15 second autonomous period.
@@ -34,12 +27,8 @@ public:
    * Blocking call - does not return until the autonomous run is completed. May not be the full 15 seconds.
    * @param robot
    */
-  virtual void run(AutonomousContext &context) = 0;
+  virtual void run(Robot &robot) = 0;
 };
-
-void spin_roller(AutonomousContext &context, uint32_t time = AUTONOMOUS_ROLLER_SPIN_TIME, int16_t mV = 11000);
-
-void shoot(AutonomousContext &context, uint8_t discs, int16_t millivolts, double velocity, bool preSpeed = true);
 
 /**
  * Registers an autonomous instance to the system.
@@ -49,8 +38,6 @@ void shoot(AutonomousContext &context, uint8_t discs, int16_t millivolts, double
 void register_autonomous(Autonomous *autonomous);
 const std::string *get_active();
 void set_active(const std::string *program);
-
-void run_autonomous(Autonomous *autonomous, Robot &robot);
 
 /**
  * Returns the selected autonomous run.

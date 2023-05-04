@@ -1,11 +1,17 @@
 #include "robot/controller/raw_replay.hpp"
-#include "error.hpp"
+#include "debug/error.hpp"
 #include "fs/filesystem.hpp"
-#include "logger.hpp"
+#include "debug/logger.hpp"
 #include <cstring>
 
 namespace robot::controller {
-RawReplay::RawReplay(const char *name) : input(fs::open(name)) {
+RawReplay::RawReplay(const char *name) : input(fs::open(name, std::ios_base::in | std::ios_base::binary)) {
+  if (!input.is_open() || input.bad()) {
+    input.close();
+    error("Failed to read recording.");
+    return;
+  }
+
   char buf[4];
   input.read(buf, 4);
   if (input.eof() || strcmp(buf, "v5r\n") != 0) {

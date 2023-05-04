@@ -13,16 +13,13 @@ private:
   lv_obj_t *motorRFLabel = nullptr;
   lv_obj_t *motorLBLabel = nullptr;
   lv_obj_t *motorRBLabel = nullptr;
-  lv_obj_t *indexerLabel = nullptr;
-  lv_obj_t *intakeLabel = nullptr;
-  lv_obj_t *flywheelLabel = nullptr;
-  lv_obj_t *flywheelSecondaryLabel = nullptr;
-  lv_obj_t *flywheelTempLabel = nullptr;
-  lv_obj_t *flywheelSecondaryTempLabel = nullptr;
-  lv_obj_t *flywheelSpeedLabel = nullptr;
-  //  lv_obj_t *_unused = nullptr;
-  //  lv_obj_t *_unused = nullptr;
-  //  lv_obj_t *_unused = nullptr;
+//  lv_obj_t *_unused0 = nullptr;
+//  lv_obj_t *_unused1 = nullptr;
+//  lv_obj_t *_unused2 = nullptr;
+//  lv_obj_t *_unused3 = nullptr;
+//  lv_obj_t *_unused4 = nullptr;
+//  lv_obj_t *_unused5 = nullptr;
+  lv_obj_t *digitalSpeed = nullptr;
 
 public:
   explicit Information();

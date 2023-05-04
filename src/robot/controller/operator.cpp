@@ -1,6 +1,6 @@
 #include "robot/controller/operator.hpp"
-#include "error.hpp"
-#include "logger.hpp"
+#include "include/debug/error.hpp"
+#include "include/debug/logger.hpp"
 
 #define controller_digital(button) print_error(pros::c::controller_get_digital(this->controller_id, button))
 #define controller_analog(stick_axis) print_error(pros::c::controller_get_analog(this->controller_id, stick_axis))

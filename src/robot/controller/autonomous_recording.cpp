@@ -1,13 +1,13 @@
 #include "robot/controller/autonomous_recording.hpp"
-#include "error.hpp"
-#include "logger.hpp"
+#include "debug/error.hpp"
+#include "debug/logger.hpp"
 #include "util.hpp"
 
 #define AUTOSPEED 35.0
 
 namespace robot::controller {
 AutonomousRecordingController::AutonomousRecordingController(robot::Robot &robot, pros::controller_id_e_t controller_id)
-    : controller_id(controller_id), robot(robot), output(fs::create_append("auton")) {
+    : controller_id(controller_id), robot(robot), output(fs::open_indexed("autonomous", std::ios::out)) {
   this->output << "// AUTON START\n";
 }
 
@@ -50,6 +50,7 @@ AutonomousRecordingController::AutonomousRecordingController(robot::Robot &robot
   case LEFT:
     return -AUTOSPEED;
   }
+  return 0;
 }
 
 [[nodiscard]] double AutonomousRecordingController::right_stick_x() const { return 0; }
@@ -65,6 +66,7 @@ AutonomousRecordingController::AutonomousRecordingController(robot::Robot &robot
   case RIGHT:
     return -AUTOSPEED;
   }
+  return 0;
 }
 
 [[nodiscard]] int16_t AutonomousRecordingController::flywheel_speed() const { return this->flywheelSpeed; }
@@ -301,69 +303,70 @@ void AutonomousRecordingController::update() {
 
 bool AutonomousRecordingController::write_drivetrain_update() {
   if (!this->targetDirty) {
-    this->robot.drivetrain->tare();
+    this->robot.drivetrain.tare();
     return false;
   }
   this->targetDirty = false;
   switch (this->drivetrainTarget) {
   case FORWARDS: {
     double dist = util::e_units_to_in(
-        (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position() +
-         this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position()) /
+        (this->robot.drivetrain.leftFront.get_position() + this->robot.drivetrain.leftBack.get_position() +
+         this->robot.drivetrain.rightFront.get_position() + this->robot.drivetrain.rightBack.get_position()) /
         4.0);
-    //    debug("Forwards %f", (this->robot.drivetrain->leftFront.get_position() +
-    //    this->robot.drivetrain->leftBack.get_position() +
-    //                          this->robot.drivetrain->rightFront.get_position() +
-    //                          this->robot.drivetrain->rightBack.get_position()) /
+    //    debug("Forwards %f", (this->robot.drivetrain.leftFront.get_position() +
+    //    this->robot.drivetrain.leftBack.get_position() +
+    //                          this->robot.drivetrain.rightFront.get_position() +
+    //                          this->robot.drivetrain.rightBack.get_position()) /
     //                             4.0);
     debug("Forwards %f", dist);
-    this->robot.drivetrain->tare();
-    this->output << "robot.drivetrain->forwards(" << dist << ");\n";
+    this->robot.drivetrain.tare();
+    this->output << "robot.drivetrain.forwards(" << dist << ");\n";
     return true;
   }
   case BACKWARDS: {
     double dist = util::e_units_to_in(
-        (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position() +
-         this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position()) /
+        (this->robot.drivetrain.leftFront.get_position() + this->robot.drivetrain.leftBack.get_position() +
+         this->robot.drivetrain.rightFront.get_position() + this->robot.drivetrain.rightBack.get_position()) /
         4.0);
-    //    debug("Backwards %f", (this->robot.drivetrain->leftFront.get_position() +
-    //    this->robot.drivetrain->leftBack.get_position() +
-    //                           this->robot.drivetrain->rightFront.get_position() +
-    //                           this->robot.drivetrain->rightBack.get_position()) /
+    //    debug("Backwards %f", (this->robot.drivetrain.leftFront.get_position() +
+    //    this->robot.drivetrain.leftBack.get_position() +
+    //                           this->robot.drivetrain.rightFront.get_position() +
+    //                           this->robot.drivetrain.rightBack.get_position()) /
     //                              -4.0);
     debug("Backwards %f", dist);
-    this->robot.drivetrain->tare();
-    this->output << "robot.drivetrain->backwards(" << -dist << ");\n";
+    this->robot.drivetrain.tare();
+    this->output << "robot.drivetrain.backwards(" << -dist << ");\n";
     return true;
   }
   case LEFT: {
     double dist_left = util::e_units_to_turn(
-        (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position()) / 2.0);
+        (this->robot.drivetrain.leftFront.get_position() + this->robot.drivetrain.leftBack.get_position()) / 2.0);
     double dist_right = util::e_units_to_turn(
-        (this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position()) / 2.0);
-    //    debug("Left %f %f", (this->robot.drivetrain->rightFront.get_position() +
-    //    this->robot.drivetrain->rightBack.get_position()) / 2.0, (this->robot.drivetrain->leftFront.get_position() +
-    //    this->robot.drivetrain->leftBack.get_position()) / -2.0);
-    this->robot.drivetrain->tare();
+        (this->robot.drivetrain.rightFront.get_position() + this->robot.drivetrain.rightBack.get_position()) / 2.0);
+    //    debug("Left %f %f", (this->robot.drivetrain.rightFront.get_position() +
+    //    this->robot.drivetrain.rightBack.get_position()) / 2.0, (this->robot.drivetrain.leftFront.get_position() +
+    //    this->robot.drivetrain.leftBack.get_position()) / -2.0);
+    this->robot.drivetrain.tare();
     double turn = (dist_right - dist_left) / 2.0;
     debug("Left %f", turn);
-    this->output << "robot.drivetrain->turn_left(" << turn << ");\n";
+    this->output << "robot.drivetrain.turn_left(" << turn << ");\n";
     return true;
   }
   case RIGHT: {
     double dist_left = util::e_units_to_turn(
-        (this->robot.drivetrain->leftFront.get_position() + this->robot.drivetrain->leftBack.get_position()) / 2.0);
+        (this->robot.drivetrain.leftFront.get_position() + this->robot.drivetrain.leftBack.get_position()) / 2.0);
     double dist_right = util::e_units_to_turn(
-        (this->robot.drivetrain->rightFront.get_position() + this->robot.drivetrain->rightBack.get_position()) / 2.0);
-    //    debug("Right %f %f", (this->robot.drivetrain->leftFront.get_position() +
-    //    this->robot.drivetrain->leftBack.get_position()) / 2.0, (this->robot.drivetrain->rightFront.get_position() +
-    //    this->robot.drivetrain->rightBack.get_position()) / -2.0);
-    this->robot.drivetrain->tare();
+        (this->robot.drivetrain.rightFront.get_position() + this->robot.drivetrain.rightBack.get_position()) / 2.0);
+    //    debug("Right %f %f", (this->robot.drivetrain.leftFront.get_position() +
+    //    this->robot.drivetrain.leftBack.get_position()) / 2.0, (this->robot.drivetrain.rightFront.get_position() +
+    //    this->robot.drivetrain.rightBack.get_position()) / -2.0);
+    this->robot.drivetrain.tare();
     double turn = (dist_left - dist_right) / 2.0;
     debug("Right %f", turn);
-    this->output << "robot.drivetrain->turn_right(" << turn << ");\n";
+    this->output << "robot.drivetrain.turn_right(" << turn << ");\n";
     return true;
   }
   }
+  return false;
 }
 } // namespace robot::controller

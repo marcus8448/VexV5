@@ -4,7 +4,7 @@
 
 namespace robot::controller {
 RawRecording::RawRecording(Controller *controller, const char *name)
-    : controller(controller), output(fs::create_binary(name)) {
+    : controller(controller), output(fs::open_indexed(name, std::ios::out | std::ios::binary)) {
   this->output << "v5r\n";
 }
 

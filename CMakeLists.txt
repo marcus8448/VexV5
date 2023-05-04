@@ -14,7 +14,6 @@ find_library(LibC NAMES c REQUIRED)
 find_library(LibM NAMES m REQUIRED)
 find_library(LibPROS NAMES pros REQUIRED)
 find_library(LibBase85 NAMES base85 REQUIRED)
-find_library(LibBanner NAMES banner)
 
 file(TOUCH ${CMAKE_BINARY_DIR}/empty.cpp)
 file(WRITE ${CMAKE_BINARY_DIR}/timestamp.cpp "char const * const _PROS_COMPILE_TIMESTAMP = __DATE__ \" \" __TIME__; char const * const _PROS_COMPILE_DIRECTORY = \"${CMAKE_SOURCE_DIR}\";\n")
@@ -49,17 +48,15 @@ set(HotLinked ${LibC},${LibM},${LibPROS},${LibBase85})
 
 set(SOURCE_FILES
         src/configuration.cpp
-        src/error.cpp
-        src/logger.cpp
         src/main.cpp
+        src/debug/error.cpp
+        src/debug/logger.cpp
         src/fs/filesystem.cpp
         src/robot/autonomous/autonomous.cpp
-        src/robot/autonomous/both_rollers.cpp
-        src/robot/autonomous/left_skills.cpp
+        src/robot/autonomous/skills.cpp
         src/robot/autonomous/left_winpoint.cpp
         src/robot/autonomous/none.cpp
         src/robot/autonomous/replay.cpp
-        src/robot/autonomous/manual_load_skills.cpp
         src/robot/autonomous/right_winpoint.cpp
         src/robot/controller/autonomous_recording.cpp
         src/robot/controller/operator.cpp
@@ -74,16 +71,10 @@ set(SOURCE_FILES
         src/robot/pid/tbh.cpp
         src/robot/pid/vex_pid.cpp
         src/robot/drivetrain.cpp
-        src/robot/expansion.cpp
-        src/robot/flywheel.cpp
-        src/robot/indexer.cpp
-        src/robot/intake.cpp
         src/robot/robot.cpp
         src/screen/autonomous_select.cpp
-        src/screen/banner.cpp
         src/screen/config_screen.cpp
         src/screen/drivetrain_chart.cpp
-        src/screen/flywheel_chart.cpp
         src/screen/information.cpp
         src/screen/lvgl_util.cpp
         src/screen/screen.cpp
@@ -96,17 +87,15 @@ set(SOURCE_FILES
 
 set(HEADER_FILES
         include/configuration.hpp
-        include/error.hpp
-        include/logger.hpp
         include/main.hpp
+        include/debug/error.hpp
+        include/debug/logger.hpp
         include/fs/filesystem.hpp
         include/robot/autonomous/autonomous.hpp
-        include/robot/autonomous/both_rollers.hpp
-        include/robot/autonomous/left_skills.hpp
+        include/robot/autonomous/skills.hpp
         include/robot/autonomous/left_winpoint.hpp
         include/robot/autonomous/none.hpp
         include/robot/autonomous/replay.hpp
-        include/robot/autonomous/manual_load_skills.hpp
         include/robot/autonomous/right_winpoint.hpp
         include/robot/controller/controller.hpp
         include/robot/controller/autonomous_recording.hpp
@@ -122,17 +111,11 @@ set(HEADER_FILES
         include/robot/pid/tbh.hpp
         include/robot/pid/vex_pid.hpp
         include/robot/drivetrain.hpp
-        include/robot/expansion.hpp
-        include/robot/flywheel.hpp
-        include/robot/indexer.hpp
-        include/robot/intake.hpp
         include/robot/robot.hpp
         include/screen/autonomous_select.hpp
-        include/screen/banner.hpp
         include/screen/colour.hpp
         include/screen/config_screen.hpp
         include/screen/drivetrain_chart.hpp
-        include/screen/flywheel_chart.hpp
         include/screen/information.hpp
         include/screen/lvgl_util.hpp
         include/screen/screen.hpp
@@ -160,12 +143,6 @@ endif()
 if (ClangFormat)
 message(NOTICE "clang-format found, adding utility target.")
 add_custom_target(FormatCode COMMAND cd ${CMAKE_SOURCE_DIR} && ${ClangFormat} -i ${HEADER_FILES} ${SOURCE_FILES})
-endif()
-
-if (LibBanner)
-target_compile_options(HotPackage PRIVATE -DBANNER_AVAILABLE)
-set(ColdLibraries ${ColdLibraries} ${LibBanner})
-set(HotLinked ${HotLinked},${LibBanner})
 endif()
 
 if (ClangCheck)

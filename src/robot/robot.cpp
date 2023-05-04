@@ -1,63 +1,64 @@
 #include "robot/robot.hpp"
-#include "logger.hpp"
+#include "debug/logger.hpp"
+#include "robot/autonomous/autonomous.hpp"
 
 namespace robot {
-Robot::Robot(Drivetrain *drivetrain, Intake *intake, Indexer *indexer, Flywheel *flywheel, Expansion *expansion)
-    : drivetrain(drivetrain), intake(intake), indexer(indexer), flywheel(flywheel), expansion(expansion),
-      controller(nullptr) {}
+Robot::Robot(const uint8_t rightFront, const uint8_t leftFront, const uint8_t rightBack,
+             const uint8_t leftBack, const uint8_t inertial)
+    : drivetrain(rightFront, leftFront, rightBack, leftBack, inertial),
+      controller(nullptr) {
+}
 
 Robot::~Robot() {
   warn("Robot destructor called");
-  delete drivetrain;
-  drivetrain = nullptr;
-  delete intake;
-  intake = nullptr;
-  delete indexer;
-  indexer = nullptr;
-  delete flywheel;
-  flywheel = nullptr;
-  delete expansion;
-  expansion = nullptr;
   delete controller;
   controller = nullptr;
 }
 
-void Robot::update() const {
-  if (this->controller != nullptr) {
-    this->controller->update();
-    // if (this->controller->a_pressed()) {
-    //   this->drivetrain->turn_right(1800);
-    // }
-    // if (this->controller->x_pressed()) {
-    //   this->drivetrain->forwards(48);
-    // }
-    if (this->drivetrain != nullptr) {
-      this->drivetrain->update(this->controller);
-    } else {
-      error("Drivetrain is null?");
-    }
-    if (this->intake != nullptr) {
-      this->intake->update(this->controller);
-    } else {
-      error("Intake is null?");
-    }
-    if (this->indexer != nullptr) {
-      this->indexer->update(this->controller);
-    } else {
-      error("Indexer is null?");
-    }
-    if (this->flywheel != nullptr) {
-      this->flywheel->update(this->controller);
-    } else {
-      error("Flywheel is null?");
-    }
-    if (this->expansion != nullptr) {
-      this->expansion->update(this->controller);
-    } else {
-      error("Expansion is null?");
-    }
-  } else {
-    error("Controller is null!");
+[[noreturn]] void Robot::background_control() {
+  while (true) {
+    this->drivetrain.updatePosition();
+
+    this->drivetrain.updateMovement();
+    pros::delay(ROBOT_TICK_RATE);
   }
+}
+
+[[noreturn]] void Robot::opcontrol() {
+  this->drivetrain.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+
+  pros::c::task_create([] (void* param) {
+    static_cast<Robot*>(param)->background_control();
+  }, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Robot async control (OP)");
+
+  while (true) {
+    if (this->controller != nullptr) {
+      this->controller->update();
+      this->drivetrain.updateTargeting(this->controller);
+    } else {
+      error("Controller is null!");
+    }
+    pros::delay(ROBOT_TICK_RATE);
+  }
+}
+
+void Robot::run_autonomous() {
+  this->drivetrain.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+  pros::c::task_create([] (void* param) {
+    static_cast<Robot*>(param)->background_control();
+  }, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Robot async control (OP)");
+
+  if (autonomous::get_active() == nullptr) {
+    error("No autonomous to run!");
+    return;
+  }
+  info("Running autonomous: '%s'", autonomous::get_active()->c_str());
+  autonomous::get_autonomous()->run(*this);
+}
+
+void Robot::set_controller(Controller *controller) {
+  delete this->controller;
+  this->controller = controller;
 }
 } // namespace robot

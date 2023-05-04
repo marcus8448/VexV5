@@ -7,15 +7,20 @@
 #include "robot/device/motor.hpp"
 #include <cstdint>
 
-#define DRIVETRAIN_DEFAULT_RPM 80
-#define DRIVETRAIN_DEFAULT_TURN_RPM 50
-#define DRIVETRAIN_DEFAULT_TIMEOUT 5000
-
 namespace robot {
 /**
  * Represents the drivetrain of the robot.
  */
-class Drivetrain : public Controlled {
+class Drivetrain {
+private:
+  enum TargetType {
+    NONE,
+
+    OPERATOR_DIRECT, // power L/R
+
+    STATIC_TURN, // abs angle
+    DIRECT_MOVE, // dist
+  };
 public:
   device::Motor rightFront;
   device::Motor leftFront;
@@ -23,12 +28,36 @@ public:
   device::Motor leftBack;
   device::Inertial imu;
 
-  void power(double percent);
+  double kp = 1.0;
+  double ki = 0.0;
+  double kd = 0.0;
 
 private:
+  TargetType targetType = NONE;
+  double targetHeading = 0.0;
+
+  int16_t powerLeft = 0;
+  int16_t powerRight = 0;
+
+  double targetLeft = 0.0;
+  double targetRight = 0.0;
+
   bool arcade = false;
-  double targetRotation = 0.0;
+
+  double heading = 0.0;
+  double rightPos = 0.0;
+  double leftPos = 0.0;
+
+  double errorRight = 0.0;
+  double errorLeft = 0.0;
+  double prevErrorRight = 0.0;
+  double prevErrorLeft = 0.0;
+
+  double integralRight = 0.0;
+  double integralLeft = 0.0;
+
   uint16_t timeOff = 0;
+  uint16_t timeAtTarget = 0;
 
 public:
   /**
@@ -47,8 +76,7 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while moving.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void forwards(double distance, int16_t max_rpm = DRIVETRAIN_DEFAULT_RPM,
-                uint16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT);
+  void forwards(double distance, bool wait = true);
 
   /**
    * Drives the robot backwards by the specified distance.
@@ -56,8 +84,7 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while moving.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void backwards(double distance, int16_t max_rpm = DRIVETRAIN_DEFAULT_RPM,
-                 uint16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT);
+  void backwards(double distance, bool wait = true);
 
   /**
    * Turns the robot to the right by spinning by the specified number of degrees.
@@ -65,8 +92,7 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while turning.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void turn_right(double degrees, int16_t max_rpm = DRIVETRAIN_DEFAULT_TURN_RPM,
-                  uint16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT);
+  void turn_right(double degrees, bool wait = true);
 
   /**
    * Turns the robot to the left by spinning by the specified number of degrees.
@@ -74,10 +100,9 @@ public:
    * @param max_rpm The maximum allowable RPM for the motor to run at while turning.
    * @param block Whether this function should wait for the robot to turn or exit immediately.
    */
-  void turn_left(double degrees, int16_t max_rpm = DRIVETRAIN_DEFAULT_TURN_RPM,
-                 uint16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT);
+  void turn_left(double degrees, bool wait = true);
 
-  void await_move(uint16_t timeout_millis = DRIVETRAIN_DEFAULT_TIMEOUT) const;
+  void await_move() const;
 
   /**
    * Checks if the distance between the drivetrain's target position and actual position is within a specific distance.
@@ -96,41 +121,36 @@ public:
   void brake();
   void set_brake_mode(pros::motor_brake_mode_e brake_mode);
 
-  void update(Controller *controller) override;
+  void updateTargeting(Controller *controller);
+  void updatePosition();
+  void updateMovement();
 
 private:
-  /**
-   * Moves the robot by the specified distances.
-   * @param right_distance The distance in ENCODER UNITS to move the right motors by.
-   * @param left_distance The distance in ENCODER UNITS to move the left motors by.
-   * @param max_rpm The maximum allowable RPM for the motor to run at while moving.
-   * @param block Whether this function should wait for the robot to move or exit immediately.
-   */
-  void move(double right_distance, double left_distance, int16_t max_rpm = DRIVETRAIN_DEFAULT_RPM);
+  void setTarget(Drivetrain::TargetType type);
 
   /**
    * Moves the two right motors of the drivetrain at the specified voltage.
    * @param voltage The voltage to run at [-127 - 127]
    */
-  void power_right(double percent);
+  void power_right(int16_t millivolts);
 
   /**
    * Moves the two left motors of the drivetrain at the specified voltage.
    * @param voltage The voltage to run at [-127 - 127]
    */
-  void power_left(double percent);
+  void power_left(int16_t millivolts);
 
   /**
    * Moves the two right motors of the drivetrain by the specified distance.
-   * @param distance The distance in ENCODER UNITS to move the right motors by.
+   * @param target The distance in ENCODER UNITS to move the right motors by.
    */
-  void move_right_distance(double distance, int16_t max_rpm);
+  void move_right_targeting(double target);
 
   /**
    * Moves the two left motors of the drivetrain by the specified distance.
-   * @param distance The distance in ENCODER UNITS to move the right motors by.
+   * @param target The distance in ENCODER UNITS to move the right motors by.
    */
-  void move_left_distance(double distance, int16_t max_rpm);
+  void move_left_targeting(double target);
 };
 } // namespace robot
 #endif // ROBOT_DRIVETRAIN_HPP

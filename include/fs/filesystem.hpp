@@ -4,17 +4,14 @@
 #include <fstream>
 
 namespace fs {
-bool is_connected();
-std::ofstream create_sink();
-std::ifstream create_read_sink();
+bool is_available();
 
-bool file_exists(const char *name);
+bool file_exists(const std::filesystem::path& path);
+bool can_access(const std::filesystem::path& path);
 
-std::ifstream open(const char *name);
+void* read_all(const char* path);
 
-std::ofstream create_append(const char *name);
-std::ofstream create_truncate(const char *name);
-std::ofstream create_binary(const char *name);
-std::ofstream create_indexed(const char *name);
+std::ifstream open(const std::filesystem::path &path, std::ios_base::openmode mode = std::ios::in);
+std::ofstream open_indexed(const std::filesystem::path &path, std::ios_base::openmode mode = std::ios::out);
 } // namespace fs
 #endif

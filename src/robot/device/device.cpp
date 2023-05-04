@@ -1,9 +1,11 @@
 #include "robot/device/device.hpp"
-#include "logger.hpp"
+#include "debug/logger.hpp"
 #include "pros/rtos.hpp"
 #include <cerrno>
 #include <map>
 #include <vector>
+
+#define DEVICE_CONFIGURE_RATE 500
 
 namespace robot::device {
 static std::vector<Device *> pendingDevices;
@@ -17,7 +19,8 @@ void initialize() {
   static bool init = false;
   if (!init) {
     init = true;
-    pros::Task(reconfigure_task, nullptr, "Device reconfigure task");
+    pros::c::task_create(reconfigure_task, nullptr,TASK_PRIORITY_DEFAULT,
+                         TASK_STACK_DEPTH_DEFAULT, "Device reconfigure task");
   }
 }
 
@@ -32,7 +35,7 @@ bool Device::checkConnect() {
 [[nodiscard]] const char *Device::get_name() const { return this->name; }
 
 [[noreturn]] void reconfigure_task([[maybe_unused]] void *params) {
-  pros::delay(500); // printing race condition?
+  pros::delay(DEVICE_CONFIGURE_RATE * 2); // printing race condition?
   info("Device reconfigure task started.");
   while (true) {
     if (!pendingDevices.empty()) {
@@ -63,7 +66,7 @@ bool Device::checkConnect() {
         pair.second = true;
         pair.first->reconfigure();
       }
-      pros::delay(100);
+      pros::delay(DEVICE_CONFIGURE_RATE);
     }
   }
 }

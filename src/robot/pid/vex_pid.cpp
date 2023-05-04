@@ -4,7 +4,7 @@
 namespace robot {
 VexPid::VexPid(uint8_t port) : port(port) {}
 
-VexPid::~VexPid() {}
+VexPid::~VexPid() = default;
 
 void VexPid::reset() {}
 

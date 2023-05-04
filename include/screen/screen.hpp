@@ -7,6 +7,8 @@
 #pragma GCC diagnostic pop
 #include "robot/robot.hpp"
 
+#define SCREEN_UPDATE_RATE 50
+
 namespace screen {
 #define BASE_HEIGHT static_cast<lv_coord_t>(40)
 

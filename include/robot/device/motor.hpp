@@ -1,6 +1,10 @@
 #ifndef VEXV5_ROBOT_DEVICE_MOTOR_HPP
 #define VEXV5_ROBOT_DEVICE_MOTOR_HPP
 
+#include <cerrno>
+#include "pros/rtos.hpp"
+#include "include/debug/logger.hpp"
+#include "robot/device/motor.hpp"
 #include "pros/motors.h"
 #include "robot/device/device.hpp"
 #include "robot/pid/pid_controller.hpp"
@@ -9,6 +13,7 @@
 #include <cmath>
 
 #define MOTOR_TIMEOUT_MILLIS 4000
+#define MOTOR_MAX_MILLIVOLTS 12000
 
 namespace robot::device {
 class Motor : public Device {

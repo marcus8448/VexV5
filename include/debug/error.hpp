@@ -1,5 +1,5 @@
-#ifndef DEBUG_TOOLS_HPP
-#define DEBUG_TOOLS_HPP
+#ifndef DEBUG_ERROR_HPP
+#define DEBUG_ERROR_HPP
 
 /**
  * Tests for a PROS error and prints out errno if one is found.
@@ -20,4 +20,4 @@ template <class T> T print_error(T value) {
   return value;
 }
 
-#endif // DEBUG_TOOLS_HPP
+#endif // DEBUG_ERROR_HPP

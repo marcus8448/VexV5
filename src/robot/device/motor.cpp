@@ -1,14 +1,12 @@
 #include "robot/device/motor.hpp"
-#include "logger.hpp"
+#include "include/debug/logger.hpp"
 #include "pros/motors.h"
-#include "pros/rtos.hpp"
 #include "robot/pid/vex_pid.hpp"
 #include <cerrno>
 #include <cmath>
 
 #define TEST_FREQUENCY 50
 
-#define MAX_MILLIVOLTS 12000
 #define DEFAULT_MOTOR_GEARSET pros::E_MOTOR_GEARSET_18
 #define DEFAULT_MOTOR_BRAKE pros::E_MOTOR_BRAKE_BRAKE
 #define MOTOR_ENCODER_UNITS pros::E_MOTOR_ENCODER_DEGREES
@@ -61,12 +59,12 @@ void Motor::move_velocity(int16_t velocity) {
 }
 
 void Motor::move_millivolts(int16_t mV) {
-  if (mV > MAX_MILLIVOLTS) {
+  if (mV > MOTOR_MAX_MILLIVOLTS) {
     warn("Target voltage %imV is over max voltage 12000mV!", mV);
-    mV = MAX_MILLIVOLTS;
-  } else if (mV < -MAX_MILLIVOLTS) {
+    mV = MOTOR_MAX_MILLIVOLTS;
+  } else if (mV < -MOTOR_MAX_MILLIVOLTS) {
     warn("Target voltage %imV is over max voltage -12000mV!", mV);
-    mV = -MAX_MILLIVOLTS;
+    mV = -MOTOR_MAX_MILLIVOLTS;
   }
   if (this->targetType != TargetType::VOLTAGE || this->target != mV) {
     debug("Targeting %imV", mV);
@@ -83,7 +81,7 @@ void Motor::move_percentage(double percent) {
   } else if (percent < -100.0) {
     percent = -100.0;
   }
-  this->move_millivolts(static_cast<int16_t>((percent * MAX_MILLIVOLTS) / 100.0));
+  this->move_millivolts(static_cast<int16_t>((percent * MOTOR_MAX_MILLIVOLTS) / 100.0));
 }
 
 void Motor::move_absolute(double position, int16_t velocity) {

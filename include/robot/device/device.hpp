@@ -1,6 +1,8 @@
 #ifndef ROBOT_DEVICE_DEVICE_HPP
 #define ROBOT_DEVICE_DEVICE_HPP
 
+#define ROBOT_TICK_RATE 20
+
 #define DEVICE_TYPE_NAME(type_name)                                                                                    \
   [[nodiscard]] const char *get_type_name() const override { return type_name; };
 

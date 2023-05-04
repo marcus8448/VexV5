@@ -145,17 +145,4 @@ public:
   virtual void update() = 0;
 };
 
-/**
- * Represents objects that change state based on the controller.
- * Used during the operator control period.
- */
-class Controlled {
-public:
-  /**
-   * Updates this part of the robot based on the controller's state.
-   * @param controller the controller of the robot.
-   */
-  virtual void update(Controller *controller) = 0;
-};
-
 #endif // ROBOT_CONTROLLER_CONTROLLER_HPP

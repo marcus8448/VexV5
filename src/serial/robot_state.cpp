@@ -82,10 +82,10 @@ void RobotStatePlugin::handle(SerialConnection *connection, void *buffer, size_t
   src = static_cast<floating>(this->robot.controller->right_stick_y());
   std::memcpy(&buf[3 + sizeof(float) * 3], &src, sizeof(float));
 
-  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 0], this->robot.drivetrain->rightFront);
-  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 1], this->robot.drivetrain->leftFront);
-  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 2], this->robot.drivetrain->rightBack);
-  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 3], this->robot.drivetrain->leftBack);
+  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 0], this->robot.drivetrain.rightFront);
+  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 1], this->robot.drivetrain.leftFront);
+  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 2], this->robot.drivetrain.rightBack);
+  serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 3], this->robot.drivetrain.leftBack);
   connection->send_packet(this->id, &buf, SIZE);
 }
 } // namespace serial

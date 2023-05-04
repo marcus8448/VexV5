@@ -10,8 +10,7 @@
 #include "display/lv_objx/lv_btn.h"
 #pragma GCC diagnostic pop
 
-#include "logger.hpp"
-#include "pros/rtos.hpp"
+#include "debug/logger.hpp"
 #include "screen/lvgl_util.hpp"
 #include "screen/screen.hpp"
 
@@ -65,7 +64,8 @@ void initialize(robot::Robot &robot) {
   section_pop();
 
   show_screen(activeScreen);
-  pros::Task(update_task, &robot, "Screen Update");
+  pros::c::task_create(update_task, static_cast<void *>(&robot),TASK_PRIORITY_DEFAULT,
+                       TASK_STACK_DEPTH_DEFAULT, "Screen update");
 }
 
 void create_screen(lv_obj_t *output[], lv_obj_t *parent) {
@@ -82,7 +82,7 @@ void create_screen(lv_obj_t *output[], lv_obj_t *parent) {
   auto *robot = static_cast<robot::Robot *>(params);
   while (true) {
     update(*robot);
-    pros::delay(50);
+    pros::delay(SCREEN_UPDATE_RATE);
   }
 }
 

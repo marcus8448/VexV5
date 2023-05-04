@@ -1,5 +1,5 @@
-#include "error.hpp"
-#include "logger.hpp"
+#include "include/debug/error.hpp"
+#include "include/debug/logger.hpp"
 #include <cerrno>
 #include <cstring>
 

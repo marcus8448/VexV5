@@ -1,5 +1,5 @@
 #include "robot/pid/tbh.hpp"
-#include "logger.hpp"
+#include "debug/logger.hpp"
 #include "pros/motors.h"
 #include <cmath>
 
@@ -7,7 +7,7 @@ namespace robot {
 TBHControl::TBHControl(uint8_t port, uint8_t port2, double gain)
     : port(port), port2(port2), gain(gain) {}
 
-TBHControl::~TBHControl() {}
+TBHControl::~TBHControl() = default;
 
 void TBHControl::reset() { this->target = 0.0; }
 

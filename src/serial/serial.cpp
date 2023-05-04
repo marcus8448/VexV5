@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "logger.hpp"
+#include "debug/logger.hpp"
 #include "pros/apix.h"
 #include "pros/rtos.hpp"
 #include "serial/serial.hpp"
@@ -28,14 +28,14 @@ State state = NOT_CONNECTED;
 uint32_t lastTime = 0;
 
 void timeout_hack(void *params) {
-  auto task = static_cast<pros::Task>(params);
+  auto task = static_cast<pros::task_t>(params);
   while (true) {
     if (state == NOT_CONNECTED) {
       pros::delay(TIMEOUT_LENGTH);
     } else {
       if (pros::millis() - lastTime > TIMEOUT_LENGTH) {
         state = NOT_CONNECTED;
-        task.remove(); // kill the task.
+        pros::c::task_delete(task); // kill the task.
         info("Serial connection timed out.");
         initialize();
         break;
@@ -55,11 +55,12 @@ void timeout_hack(void *params) {
     v->initialize();
   }
 
-  pros::Task(timeout_hack, static_cast<void *>(pros::Task::current()), "Timeout hack");
+  pros::c::task_create(timeout_hack, static_cast<void *>(pros::c::task_get_current()),TASK_PRIORITY_DEFAULT,
+                       TASK_STACK_DEPTH_DEFAULT, "Timeout hack");
 
   while (true) {
     connection->sync_output();
-    pros::delay(10);
+    pros::delay(30);
     lastTime = pros::millis();
     PacketData data = connection->read_packet(BUFFER, BUFFER_SIZE);
     switch (state) {
@@ -100,6 +101,7 @@ void register_packet_handler(const uint8_t id, PacketHandler *handler) {
 }
 
 void initialize() {
-  pros::Task(debug_input_task, static_cast<void *>(&SerialConnection::get_instance()), "Debug Input Task");
+  pros::c::task_create(debug_input_task, static_cast<void*>(&SerialConnection::get_instance()),TASK_PRIORITY_DEFAULT,
+                       TASK_STACK_DEPTH_DEFAULT, "Debug input");
 }
 } // namespace serial

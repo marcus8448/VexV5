@@ -11,7 +11,7 @@ class RightWinpoint : public Autonomous {
 public:
   explicit RightWinpoint() : Autonomous("Right Winpoint"){};
 
-  void run(AutonomousContext &context) override;
+  void run(Robot &robot) override;
 };
 } // namespace robot::autonomous
 #endif // ROBOT_AUTONOMOUS_RIGHT_WINPOINT_HPP

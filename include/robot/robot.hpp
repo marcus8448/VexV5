@@ -3,10 +3,6 @@
 
 #include "controller/controller.hpp"
 #include "drivetrain.hpp"
-#include "expansion.hpp"
-#include "flywheel.hpp"
-#include "indexer.hpp"
-#include "intake.hpp"
 
 namespace robot {
 /**
@@ -17,23 +13,7 @@ public:
   /**
    * The robot's drivetrain.
    */
-  Drivetrain *drivetrain;
-  /**
-   * The robot's intake and roller.
-   */
-  Intake *intake;
-  /**
-   * The robot's indexer.
-   */
-  Indexer *indexer;
-  /**
-   * The robot's flywheel.
-   */
-  Flywheel *flywheel;
-  /**
-   * The robot's expansion.
-   */
-  Expansion *expansion;
+  Drivetrain drivetrain;
   /**
    * The robot's controller. Used during operator control.
    */
@@ -49,14 +29,15 @@ public:
    * @param indexer The robot's indexer.
    * @param roller The robot's roller.
    */
-  explicit Robot(Drivetrain *drivetrain, Intake *intake, Indexer *indexer, Flywheel *flywheel, Expansion *expansion);
+  explicit Robot(uint8_t rightFront, uint8_t leftFront, uint8_t rightBack, uint8_t leftBack, uint8_t inertial);
   explicit Robot(const Robot &robot) = delete;
   ~Robot();
 
-  /**
-   * Called every 20ms during operator control.
-   */
-  void update() const;
+  void set_controller(Controller* controller);
+
+  [[noreturn]] void background_control();
+  void run_autonomous();
+  [[noreturn]] void opcontrol();
 };
 } // namespace robot
 

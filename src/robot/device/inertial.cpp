@@ -1,6 +1,6 @@
 #include "robot/device/inertial.hpp"
-#include "error.hpp"
-#include "logger.hpp"
+#include "debug/error.hpp"
+#include "debug/logger.hpp"
 #include "pros/imu.h"
 #include <cerrno>
 

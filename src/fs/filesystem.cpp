@@ -1,86 +1,84 @@
 #include "fs/filesystem.hpp"
-#include "logger.hpp"
+#include "debug/logger.hpp"
 #include "pros/misc.hpp"
-#include "pros/rtos.h"
-#include <fstream>
+#include <filesystem>
+#include <cstring>
 
 namespace fs {
 std::string to_path(const char *name) { return std::string("/usd/").append(name); }
 
-bool is_connected() { return pros::usd::is_installed(); }
+bool is_available() { return pros::usd::is_installed(); }
 
-std::ofstream create_sink() { return std::ofstream("/dev/null"); }
-std::ifstream create_read_sink() { return std::ifstream("/dev/null"); }
-
-bool file_exists(const char *name) {
+bool can_access(const std::filesystem::path& path) {
   if (!pros::usd::is_installed()) {
-    warn("MicroSD unavailable!");
+    warn("MicroSD unavailable. Cannot access %s", path.c_str());
+    return false;
+  } else if (std::strncmp(path.c_str(), "/usd/", strlen("/usd/")) != 0) {
+    warn("Attempted to access file '%s' outside of MicroSD!", path.c_str());
     return false;
   }
-
-  if (std::FILE *file = std::fopen(name, "r")) {
-    std::fclose(file);
-    return true;
-  } else {
-    return false;
-  }
+  return true;
 }
 
-std::ifstream open(const char *name) {
-  std::string path = to_path(name);
-  if (!pros::usd::is_installed()) {
-    warn("MicroSD unavailable, creating sink.");
-    return create_read_sink();
-  }
-  if (!file_exists(name)) {
-    return create_read_sink();
-  }
-  return std::ifstream(path);
+bool file_exists(const std::filesystem::path& path) {
+  return can_access(path) && std::filesystem::exists(path);
 }
 
-std::ofstream create_append(const char *name) {
-  std::string path = to_path(name);
-  if (!pros::usd::is_installed()) {
-    warn("MicroSD unavailable, creating sink.");
-    return create_sink();
+void* read_all(const char* path) {
+  if (!file_exists(path)) {
+    warn("File does not exist: %s", path);
+    return nullptr;
   }
-  return std::ofstream(path, std::ios_base::out | std::ios::app);
-}
-
-std::ofstream create_truncate(const char *name) {
-  std::string path = to_path(name);
-  if (!pros::usd::is_installed()) {
-    warn("MicroSD unavailable, creating sink.");
-    return create_sink();
+  size_t len = std::filesystem::file_size(path) + 1;
+  void* contents = malloc(len);
+  std::FILE* file = std::fopen(path, "r");
+  size_t read = std::fread(contents, 1, len, file);
+  if (std::fclose(file) != 0) {
+    warn("Failed to close file %s!", path);
   }
-  return std::ofstream(path, std::ios_base::out | std::ios::trunc);
-}
-
-std::ofstream create_binary(const char *name) {
-  std::string path = to_path(name);
-  if (!pros::usd::is_installed()) {
-    warn("MicroSD unavailable, creating sink.");
-    return create_sink();
-  }
-  return std::ofstream(path, std::ios_base::out | std::ios::trunc | std::ios::binary);
-}
-
-std::ofstream create_indexed(const char *name) { // todo: fails due to too many open file handles, but we close all test
-                                                 // ones (so how does this occur?)
-  std::string path = to_path(name);
-  if (!pros::usd::is_installed()) {
-    warn("MicroSD unavailable, creating sink.");
-    return create_sink();
-  }
-  if (!file_exists(path.c_str())) {
-    return std::ofstream(path);
-  }
-  for (int16_t i = 1; i < 1000; i++) {
-    std::string numPath = std::string(path).append("_").append(std::to_string(i));
-    if (!file_exists(numPath.c_str())) {
-      return std::ofstream(numPath);
+  if (read != len) {
+    warn("File size mismatch: Expected %i bytes, found %i bytes", len, read);
+    void* reallocated = realloc(contents, read);
+    if (reallocated != nullptr) {
+      contents = reallocated;
     }
   }
-  return create_sink();
+
+  return contents;
+}
+
+std::ifstream open(const std::filesystem::path &path, std::ios_base::openmode mode) {
+  std::ifstream stream = std::ifstream();
+  if (can_access(path)) {
+    stream.open(path, mode);
+  }
+
+  if (!stream.is_open()) {
+    warn("Failed to open file %s!", path.c_str());
+    stream.setstate(std::ios::badbit);
+  }
+  return stream;
+}
+
+std::ofstream open_indexed(const std::filesystem::path &path, std::ios_base::openmode mode) {
+  std::ofstream stream = std::ofstream();
+  if (can_access(path)) {
+    if (file_exists(path)) {
+      for (int16_t i = 1; i < 1000; i++) {
+        std::string indexedPath = std::string(path) + "." + std::to_string(i);
+        if (!file_exists(indexedPath)) {
+          std::filesystem::rename(path, indexedPath);
+          break;
+        }
+      }
+    }
+    stream.open(path, mode);
+  }
+
+  if (!stream.is_open()) {
+    warn("Failed to create file %s!", path.c_str());
+    stream.setstate(std::ios::badbit);
+  }
+  return stream;
 }
 } // namespace fs

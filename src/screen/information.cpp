@@ -1,6 +1,5 @@
 #include "screen/information.hpp"
 #include "configuration.hpp"
-#include "pros/rtos.hpp"
 #include "screen/lvgl_util.hpp"
 #include "screen/screen.hpp"
 
@@ -34,38 +33,32 @@ void Information::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) 
   this->motorLBLabel = create_info_label(screen, false, 3);
   this->motorRBLabel = create_info_label(screen, true, 3);
 
-  this->intakeLabel = create_info_label(screen, false, 4);
-  this->indexerLabel = create_info_label(screen, true, 4);
+//  this->_unused1 = create_info_label(screen, false, 4);
+//  this->_unused0 = create_info_label(screen, true, 4);
+//
+//  this->_unused2 = create_info_label(screen, false, 5);
+//  this->_unused3 = create_info_label(screen, true, 5);
+//
+//  this->_unused4 = create_info_label(screen, false, 6);
+//  this->_unused5 = create_info_label(screen, true, 6);
 
-  this->flywheelLabel = create_info_label(screen, false, 5);
-  this->flywheelSecondaryLabel = create_info_label(screen, true, 5);
-
-  this->flywheelTempLabel = create_info_label(screen, false, 6);
-  this->flywheelSecondaryTempLabel = create_info_label(screen, true, 6);
-
-  this->flywheelSpeedLabel = create_info_label(screen, false, 7);
+  this->digitalSpeed = create_info_label(screen, false, 7);
   //  this->_unused = create_info_label(screen, true, 7);
   //  this->_unused = create_info_label(screen, false, 8);
   //  this->_unused = create_info_label(screen, true, 8);
 }
 
 void Information::update(robot::Robot &robot) {
-  set_label_text(this->uptimeLabel, "Uptime: %i", pros::millis());
+  set_label_text(this->uptimeLabel, "Uptime: %i", pros::c::millis());
   set_label_text(this->controlSchemeLabel, "Control Scheme: %s",
                  config::get_drive_scheme_name(config::get_instance()->get_control_scheme()));
   set_label_text(this->teamColourLabel, "Team Colour: %s",
                  config::get_alliance_colour_name(config::get_instance()->get_alliance_colour()));
-  update_motor_pos(this->motorLFLabel, robot.drivetrain->leftFront);
-  update_motor_pos(this->motorRFLabel, robot.drivetrain->rightFront);
-  update_motor_pos(this->motorLBLabel, robot.drivetrain->leftBack);
-  update_motor_pos(this->motorRBLabel, robot.drivetrain->rightBack);
-  update_device_digital(this->intakeLabel, robot.intake->get_motor(), robot.intake->is_engaged());
-  update_device_digital(this->indexerLabel, robot.indexer->get_motor(), false);
-  update_motor_vel(this->flywheelLabel, robot.flywheel->get_primary_motor());
-  update_motor_vel(this->flywheelSecondaryLabel, robot.flywheel->get_secondary_motor());
-  update_motor_temp(this->flywheelTempLabel, robot.flywheel->get_primary_motor());
-  update_motor_temp(this->flywheelSecondaryTempLabel, robot.flywheel->get_secondary_motor());
-  set_label_text(this->flywheelSpeedLabel, "Flywheel Speed: %i", robot.controller->flywheel_speed());
+  update_motor_pos(this->motorLFLabel, robot.drivetrain.leftFront);
+  update_motor_pos(this->motorRFLabel, robot.drivetrain.rightFront);
+  update_motor_pos(this->motorLBLabel, robot.drivetrain.leftBack);
+  update_motor_pos(this->motorRBLabel, robot.drivetrain.rightBack);
+  set_label_text(this->digitalSpeed, "Flywheel Speed: %i", robot.controller->flywheel_speed());
 }
 
 void update_device_digital(lv_obj_t *label, const robot::device::Device &device, bool engaged) {

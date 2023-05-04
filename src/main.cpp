@@ -1,11 +1,5 @@
 // CONFIG
 #include "robot/device/motor.hpp"
-#define FLYWHEEL_MOTOR 3
-#define FLYWHEEL_SECONDARY_MOTOR 5
-#define INDEXER_MOTOR 19
-#define INTAKE_MOTOR 1
-#define EXPANSION_PISTON 'D'
-
 #define RIGHT_FRONT_MOTOR 4
 #define LEFT_FRONT_MOTOR 2
 #define RIGHT_BACK_MOTOR 9
@@ -30,21 +24,19 @@
 //#endif
 //#endif
 
-#include "logger.hpp"
+#include "debug/logger.hpp"
 #include "main.hpp"
 #include "robot/controller/autonomous_recording.hpp"
 #include "robot/controller/operator.hpp"
 
 #ifdef ENABLE_AUTONOMOUS
 #include "robot/autonomous/autonomous.hpp"
-#include "robot/autonomous/left_skills.hpp"
+#include "robot/autonomous/skills.hpp"
 #include "robot/autonomous/left_winpoint.hpp"
-#include "robot/autonomous/manual_load_skills.hpp"
 #include "robot/autonomous/none.hpp"
 #include "robot/autonomous/right_winpoint.hpp"
 #endif
 
-#include "pros/apix.h"
 #include "pros/rtos.hpp"
 
 #ifdef SERIAL_LINK
@@ -64,23 +56,22 @@
 #ifdef SCREEN_DRIVETRAIN
 #include "screen/drivetrain_chart.hpp"
 #endif
-#ifdef SCREEN_FLYWHEEL
-#include "screen/flywheel_chart.hpp"
-#endif
-#include "robot/autonomous/both_rollers.hpp"
 #include "screen/information.hpp"
 #endif
 
 using namespace robot;
 
+robot::Robot &getRobot();
+void pros_task_begin();
+
 /**
  * Called when the robot is first initialized.
  */
 void initialize() {
-  logger::initialize(pros::Task::current().get_name());
+  pros_task_begin();
   section_push("Initialize");
   section_push("Initialize robot");
-  Robot &robot = get_or_create_robot();
+  Robot &robot = getRobot();
   section_pop();
 #ifdef SERIAL_LINK
   logger::warn("Initializing serial connection...");
@@ -94,9 +85,7 @@ void initialize() {
   autonomous::register_autonomous(new autonomous::None());
   autonomous::register_autonomous(new autonomous::LeftWinpoint());
   autonomous::register_autonomous(new autonomous::RightWinpoint());
-  autonomous::register_autonomous(new autonomous::LeftSkills());
-  autonomous::register_autonomous(new autonomous::ManualLoadSkills());
-  autonomous::register_autonomous(new autonomous::BothRollers());
+  autonomous::register_autonomous(new autonomous::Skills());
 #endif
   // Optionally enable extra screen functionality
 #ifdef SCREEN
@@ -112,14 +101,11 @@ void initialize() {
 #ifdef SCREEN_DRIVETRAIN
   screen::add_screen(new screen::DrivetrainChart());
 #endif
-#ifdef SCREEN_FLYWHEEL
-  screen::add_screen(new screen::FlywheelChart());
-#endif
   section_swap("Initialize Screen");
   screen::initialize(robot); // initialize the screen
   section_pop();
 #endif // SCREEN
-  robot.drivetrain->imu.calibrate();
+  robot.drivetrain.imu.calibrate();
   section_pop();
 }
 
@@ -127,20 +113,14 @@ void initialize() {
  * Called when the robot is in it's autonomous state in a competition.
  */
 void autonomous() {
-  logger::initialize(pros::Task::current().get_name());
+  pros_task_begin();
 #ifdef ENABLE_AUTONOMOUS
-  Robot &robot = get_or_create_robot();
+  Robot &robot = getRobot();
   section_push("Autonomous Setup");
-  robot.drivetrain->leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-  robot.drivetrain->leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-  robot.drivetrain->rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-  robot.drivetrain->rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
   //  autonomous::set_active(new std::string("Right Winpoint"));
-  autonomous::Autonomous *autonomous = autonomous::get_autonomous();
   section_pop();
 
-  autonomous::run_autonomous(autonomous, robot);
+  robot.run_autonomous();
 #endif
 }
 
@@ -150,59 +130,46 @@ void autonomous() {
  * pressed.
  */
 void opcontrol() {
-  logger::initialize(pros::Task::current().get_name());
-  Robot &robot = get_or_create_robot();
-//  auto ctx = autonomous::AutonomousContext(robot);
-//  autonomous::LeftSkills().run(ctx);
-
-  robot.drivetrain->leftFront.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-  robot.drivetrain->leftBack.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-  robot.drivetrain->rightFront.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-  robot.drivetrain->rightBack.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-  // #if defined(ENABLE_AUTONOMOUS) && defined(SCREEN) // todo: fix race condition
-  //   if (screen::autonomous_select_instance != nullptr) {
-  //     screen::remove_screen(screen::autonomous_select_instance);
-  //     screen::autonomous_select_instance = nullptr;
-  //   }
-  // #endif
-
-  section_push("Opcontrol Setup");
-  robot.controller = new controller::Operator(); // set the robot controller to the default operator based one.
-  section_pop();
+  pros_task_begin();
+  Robot &robot = getRobot();
 
 #ifdef ENABLE_TEMPORARY_CODE
   if (temporary::run(robot))
     return;
 #endif
 
-  // infinitely run opcontrol - pros will kill the task when it's over.
-  while (true) {
-    robot.update();
-    pros::delay(20);
-  }
+  section_push("Opcontrol Setup");
+  robot.set_controller(new robot::controller::Operator()); // set the robot controller to the default operator based one.
+  section_pop();
+
+  robot.opcontrol();
+}
+
+/**
+ * Called when the robot is at an official competition.
+ */
+void competition_initialize() {
+  pros_task_begin();
+}
+
+/**
+ * Called when the robot should be stopped during a competition
+ */
+void disabled() {
+  pros_task_begin();
+}
+
+void pros_task_begin() {
+  logger::flush();
+  logger::initialize(pros::c::task_get_name(pros::c::task_get_current()));
 }
 
 /**
  * Returns the current robot instance, or creates one if it has not been made yet.
  * @return the robot instance
  */
-Robot &get_or_create_robot() {
-  static Robot robot = Robot(new Drivetrain(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR, INERTIAL),
-                             new Intake(INTAKE_MOTOR), new Indexer(INDEXER_MOTOR),
-                             new Flywheel(FLYWHEEL_MOTOR, FLYWHEEL_SECONDARY_MOTOR), new Expansion(EXPANSION_PISTON));
+Robot &getRobot() {
+  static Robot robot = Robot(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR, INERTIAL);
   device::initialize();
   return robot;
-}
-
-/**
- * Called when the robot is at an official competition.
- */
-void competition_initialize() { logger::initialize(pros::Task::current().get_name()); }
-
-/**
- * Called when the robot should be stopped during a competition
- */
-void disabled() {
-  logger::flush();
-  logger::initialize(pros::Task::current().get_name());
 }
