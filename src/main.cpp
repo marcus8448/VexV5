@@ -16,13 +16,13 @@
 // #define SERIAL_LINK
 // END CONFIG
 
-//#if __has_include("temporary.hpp")
+// #if __has_include("temporary.hpp")
 #define ENABLE_TEMPORARY_CODE
 
-//#ifdef ENABLE_TEMPORARY_CODE
+// #ifdef ENABLE_TEMPORARY_CODE
 #include "temporary.hpp"
-//#endif
-//#endif
+// #endif
+// #endif
 
 #include "debug/logger.hpp"
 #include "main.hpp"
@@ -31,10 +31,10 @@
 
 #ifdef ENABLE_AUTONOMOUS
 #include "robot/autonomous/autonomous.hpp"
-#include "robot/autonomous/skills.hpp"
 #include "robot/autonomous/left_winpoint.hpp"
 #include "robot/autonomous/none.hpp"
 #include "robot/autonomous/right_winpoint.hpp"
+#include "robot/autonomous/skills.hpp"
 #endif
 
 #include "pros/rtos.hpp"
@@ -139,7 +139,8 @@ void opcontrol() {
 #endif
 
   section_push("Opcontrol Setup");
-  robot.set_controller(new robot::controller::Operator()); // set the robot controller to the default operator based one.
+  robot.set_controller(
+      new robot::controller::Operator()); // set the robot controller to the default operator based one.
   section_pop();
 
   robot.opcontrol();
@@ -148,16 +149,12 @@ void opcontrol() {
 /**
  * Called when the robot is at an official competition.
  */
-void competition_initialize() {
-  pros_task_begin();
-}
+void competition_initialize() { pros_task_begin(); }
 
 /**
  * Called when the robot should be stopped during a competition
  */
-void disabled() {
-  pros_task_begin();
-}
+void disabled() { pros_task_begin(); }
 
 void pros_task_begin() {
   logger::flush();

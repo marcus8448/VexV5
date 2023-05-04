@@ -16,5 +16,5 @@ public:
   void update() override;
   void reconfigure() const override;
 };
-}
+} // namespace robot::device
 #endif // ROBOT_DEVICE_GYRO_HPP

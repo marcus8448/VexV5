@@ -19,8 +19,8 @@ void initialize() {
   static bool init = false;
   if (!init) {
     init = true;
-    pros::c::task_create(reconfigure_task, nullptr,TASK_PRIORITY_DEFAULT,
-                         TASK_STACK_DEPTH_DEFAULT, "Device reconfigure task");
+    pros::c::task_create(reconfigure_task, nullptr, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT,
+                         "Device reconfigure task");
   }
 }
 

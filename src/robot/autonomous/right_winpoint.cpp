@@ -2,6 +2,5 @@
 #include "util.hpp"
 
 namespace robot::autonomous {
-void RightWinpoint::run(Robot &robot) {
-}
+void RightWinpoint::run(Robot &robot) {}
 } // namespace robot::autonomous

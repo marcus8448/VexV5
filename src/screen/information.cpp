@@ -33,14 +33,14 @@ void Information::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) 
   this->motorLBLabel = create_info_label(screen, false, 3);
   this->motorRBLabel = create_info_label(screen, true, 3);
 
-//  this->_unused1 = create_info_label(screen, false, 4);
-//  this->_unused0 = create_info_label(screen, true, 4);
-//
-//  this->_unused2 = create_info_label(screen, false, 5);
-//  this->_unused3 = create_info_label(screen, true, 5);
-//
-//  this->_unused4 = create_info_label(screen, false, 6);
-//  this->_unused5 = create_info_label(screen, true, 6);
+  //  this->_unused1 = create_info_label(screen, false, 4);
+  //  this->_unused0 = create_info_label(screen, true, 4);
+  //
+  //  this->_unused2 = create_info_label(screen, false, 5);
+  //  this->_unused3 = create_info_label(screen, true, 5);
+  //
+  //  this->_unused4 = create_info_label(screen, false, 6);
+  //  this->_unused5 = create_info_label(screen, true, 6);
 
   this->digitalSpeed = create_info_label(screen, false, 7);
   //  this->_unused = create_info_label(screen, true, 7);

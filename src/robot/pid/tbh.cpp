@@ -4,8 +4,7 @@
 #include <cmath>
 
 namespace robot {
-TBHControl::TBHControl(uint8_t port, uint8_t port2, double gain)
-    : port(port), port2(port2), gain(gain) {}
+TBHControl::TBHControl(uint8_t port, uint8_t port2, double gain) : port(port), port2(port2), gain(gain) {}
 
 TBHControl::~TBHControl() = default;
 
@@ -14,7 +13,7 @@ void TBHControl::reset() { this->target = 0.0; }
 void TBHControl::target_velocity(double targetVelocity) {
   info("target %f", targetVelocity);
   this->target = targetVelocity;
-  this->output = targetVelocity * 16.0; //guess
+  this->output = targetVelocity * 16.0; // guess
   this->tbh = targetVelocity * 16.0;
 }
 

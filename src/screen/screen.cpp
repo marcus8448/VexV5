@@ -64,8 +64,8 @@ void initialize(robot::Robot &robot) {
   section_pop();
 
   show_screen(activeScreen);
-  pros::c::task_create(update_task, static_cast<void *>(&robot),TASK_PRIORITY_DEFAULT,
-                       TASK_STACK_DEPTH_DEFAULT, "Screen update");
+  pros::c::task_create(update_task, static_cast<void *>(&robot), TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT,
+                       "Screen update");
 }
 
 void create_screen(lv_obj_t *output[], lv_obj_t *parent) {
@@ -105,7 +105,7 @@ void remove_screen(Screen *screen) {
 
   registry->erase(std::remove(registry->begin(), registry->end(), screen), registry->end());
 
-  delete[] * screens->at(screen);
+  delete[] *screens->at(screen);
   screens->erase(screen);
 
   lv_obj_set_hidden(screens->at(registry->front())[1], true);

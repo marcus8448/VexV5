@@ -3,11 +3,9 @@
 #include "robot/autonomous/autonomous.hpp"
 
 namespace robot {
-Robot::Robot(const uint8_t rightFront, const uint8_t leftFront, const uint8_t rightBack,
-             const uint8_t leftBack, const uint8_t inertial)
-    : drivetrain(rightFront, leftFront, rightBack, leftBack, inertial),
-      controller(nullptr) {
-}
+Robot::Robot(const uint8_t rightFront, const uint8_t leftFront, const uint8_t rightBack, const uint8_t leftBack,
+             const uint8_t inertial)
+    : drivetrain(rightFront, leftFront, rightBack, leftBack, inertial), controller(nullptr) {}
 
 Robot::~Robot() {
   warn("Robot destructor called");
@@ -27,9 +25,8 @@ Robot::~Robot() {
 [[noreturn]] void Robot::opcontrol() {
   this->drivetrain.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 
-  pros::c::task_create([] (void* param) {
-    static_cast<Robot*>(param)->background_control();
-  }, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Robot async control (OP)");
+  pros::c::task_create([](void *param) { static_cast<Robot *>(param)->background_control(); }, this,
+                       TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Robot async control (OP)");
 
   while (true) {
     if (this->controller != nullptr) {
@@ -45,9 +42,8 @@ Robot::~Robot() {
 void Robot::run_autonomous() {
   this->drivetrain.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
-  pros::c::task_create([] (void* param) {
-    static_cast<Robot*>(param)->background_control();
-  }, this, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Robot async control (OP)");
+  pros::c::task_create([](void *param) { static_cast<Robot *>(param)->background_control(); }, this,
+                       TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Robot async control (OP)");
 
   if (autonomous::get_active() == nullptr) {
     error("No autonomous to run!");

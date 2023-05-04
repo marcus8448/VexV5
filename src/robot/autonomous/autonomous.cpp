@@ -1,8 +1,8 @@
 #include "robot/autonomous/autonomous.hpp"
 #include "debug/logger.hpp"
+#include <deque>
 #include <map>
 #include <string>
-#include <deque>
 
 std::map<const std::string, robot::autonomous::Autonomous *> *autonomousPrograms =
     new std::map<const std::string, robot::autonomous::Autonomous *>();

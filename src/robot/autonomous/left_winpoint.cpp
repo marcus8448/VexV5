@@ -3,6 +3,5 @@
 #include "pros/rtos.hpp"
 
 namespace robot::autonomous {
-void LeftWinpoint::run(Robot &robot) {
-}
+void LeftWinpoint::run(Robot &robot) {}
 } // namespace robot::autonomous

@@ -1,15 +1,15 @@
 #ifndef VEXV5_ROBOT_DEVICE_MOTOR_HPP
 #define VEXV5_ROBOT_DEVICE_MOTOR_HPP
 
-#include <cerrno>
-#include "pros/rtos.hpp"
 #include "include/debug/logger.hpp"
-#include "robot/device/motor.hpp"
 #include "pros/motors.h"
+#include "pros/rtos.hpp"
 #include "robot/device/device.hpp"
+#include "robot/device/motor.hpp"
 #include "robot/pid/pid_controller.hpp"
 #include "robot/pid/vex_pid.hpp"
 #include "robot/updatable.hpp"
+#include <cerrno>
 #include <cmath>
 
 #define MOTOR_TIMEOUT_MILLIS 4000

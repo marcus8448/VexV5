@@ -33,7 +33,7 @@ public:
   explicit Robot(const Robot &robot) = delete;
   ~Robot();
 
-  void set_controller(Controller* controller);
+  void set_controller(Controller *controller);
 
   [[noreturn]] void background_control();
   void run_autonomous();

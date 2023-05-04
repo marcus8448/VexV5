@@ -19,5 +19,5 @@ public:
   void tare();
   void calibrate();
 };
-}
+} // namespace robot::device
 #endif // ROBOT_DEVICE_INERTIAL_HPP

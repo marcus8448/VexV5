@@ -13,12 +13,12 @@ private:
   lv_obj_t *motorRFLabel = nullptr;
   lv_obj_t *motorLBLabel = nullptr;
   lv_obj_t *motorRBLabel = nullptr;
-//  lv_obj_t *_unused0 = nullptr;
-//  lv_obj_t *_unused1 = nullptr;
-//  lv_obj_t *_unused2 = nullptr;
-//  lv_obj_t *_unused3 = nullptr;
-//  lv_obj_t *_unused4 = nullptr;
-//  lv_obj_t *_unused5 = nullptr;
+  //  lv_obj_t *_unused0 = nullptr;
+  //  lv_obj_t *_unused1 = nullptr;
+  //  lv_obj_t *_unused2 = nullptr;
+  //  lv_obj_t *_unused3 = nullptr;
+  //  lv_obj_t *_unused4 = nullptr;
+  //  lv_obj_t *_unused5 = nullptr;
   lv_obj_t *digitalSpeed = nullptr;
 
 public:

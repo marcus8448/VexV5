@@ -1,15 +1,15 @@
 #include "fs/filesystem.hpp"
 #include "debug/logger.hpp"
 #include "pros/misc.hpp"
-#include <filesystem>
 #include <cstring>
+#include <filesystem>
 
 namespace fs {
 std::string to_path(const char *name) { return std::string("/usd/").append(name); }
 
 bool is_available() { return pros::usd::is_installed(); }
 
-bool can_access(const std::filesystem::path& path) {
+bool can_access(const std::filesystem::path &path) {
   if (!pros::usd::is_installed()) {
     warn("MicroSD unavailable. Cannot access %s", path.c_str());
     return false;
@@ -20,25 +20,23 @@ bool can_access(const std::filesystem::path& path) {
   return true;
 }
 
-bool file_exists(const std::filesystem::path& path) {
-  return can_access(path) && std::filesystem::exists(path);
-}
+bool file_exists(const std::filesystem::path &path) { return can_access(path) && std::filesystem::exists(path); }
 
-void* read_all(const char* path) {
+void *read_all(const char *path) {
   if (!file_exists(path)) {
     warn("File does not exist: %s", path);
     return nullptr;
   }
   size_t len = std::filesystem::file_size(path) + 1;
-  void* contents = malloc(len);
-  std::FILE* file = std::fopen(path, "r");
+  void *contents = malloc(len);
+  std::FILE *file = std::fopen(path, "r");
   size_t read = std::fread(contents, 1, len, file);
   if (std::fclose(file) != 0) {
     warn("Failed to close file %s!", path);
   }
   if (read != len) {
     warn("File size mismatch: Expected %i bytes, found %i bytes", len, read);
-    void* reallocated = realloc(contents, read);
+    void *reallocated = realloc(contents, read);
     if (reallocated != nullptr) {
       contents = reallocated;
     }

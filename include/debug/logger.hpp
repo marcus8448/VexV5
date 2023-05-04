@@ -1,9 +1,9 @@
 #ifndef DEBUG_LOGGER_HPP
 #define DEBUG_LOGGER_HPP
 
+#include "pros/rtos.h"
 #include <memory>
 #include <string>
-#include "pros/rtos.h"
 
 #define DEBUG_LOG
 // #define FILE_LOG
@@ -18,8 +18,8 @@
 #define section_pop() logger::_pop()
 #define section_swap(name) logger::_pop_push(name)
 
-#define timer_start(name) auto __timer_ ## name ## __ = pros::c::millis()
-#define timer_print(name) info("%s took %i ms", #name, pros::c::millis() - __timer_ ## name ## __)
+#define timer_start(name) auto __timer_##name##__ = pros::c::millis()
+#define timer_print(name) info("%s took %i ms", #name, pros::c::millis() - __timer_##name##__)
 #else
 #define debug(fmt, ...)                                                                                                \
   {}

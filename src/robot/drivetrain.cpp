@@ -19,9 +19,7 @@ Drivetrain::Drivetrain(const uint8_t rightFront, const uint8_t leftFront, const 
 
 Drivetrain::~Drivetrain() = default;
 
-bool Drivetrain::is_at_target() const {
-  return this->timeAtTarget > STABILIZE_MARGIN;
-}
+bool Drivetrain::is_at_target() const { return this->timeAtTarget > STABILIZE_MARGIN; }
 
 void Drivetrain::forwards(double distance, bool wait) {
   info("Moving forwards %fin.", distance);
@@ -131,7 +129,7 @@ void Drivetrain::updateMovement() {
       }
 
       double distance = util::turn_to_e_units(offset);
-      this->move_right_targeting(this->rightPos -distance);
+      this->move_right_targeting(this->rightPos - distance);
       this->move_left_targeting(this->leftPos + distance);
       if (std::abs(distance) < ACCEPTABLE_OFFSET && std::abs(distance) < ACCEPTABLE_OFFSET) {
         atTarget = true;
@@ -141,8 +139,8 @@ void Drivetrain::updateMovement() {
   case DIRECT_MOVE: {
     this->move_right_targeting(this->targetLeft);
     this->move_left_targeting(this->targetRight);
-    if (std::abs(this->targetLeft - this->leftPos) < ACCEPTABLE_OFFSET
-    && std::abs(this->targetRight - this->rightPos) < ACCEPTABLE_OFFSET) {
+    if (std::abs(this->targetLeft - this->leftPos) < ACCEPTABLE_OFFSET &&
+        std::abs(this->targetRight - this->rightPos) < ACCEPTABLE_OFFSET) {
       atTarget = true;
     }
   }
@@ -187,7 +185,8 @@ void Drivetrain::move_right_targeting(double target) {
     this->integralRight = 0;
   }
   double derivative = this->errorRight - this->prevErrorRight;
-  auto output = static_cast<int16_t>(this->errorLeft * this->kp + this->integralLeft * this->ki + derivative * this->kd);
+  auto output =
+      static_cast<int16_t>(this->errorLeft * this->kp + this->integralLeft * this->ki + derivative * this->kd);
   if (abs(output) > MOTOR_MAX_MILLIVOLTS) {
     output = MOTOR_MAX_MILLIVOLTS;
   }
@@ -202,7 +201,8 @@ void Drivetrain::move_left_targeting(double target) {
     this->integralLeft = 0;
   }
   double derivative = this->errorLeft - this->prevErrorLeft;
-  auto output = static_cast<int16_t>(this->errorLeft * this->kp + this->integralLeft * this->ki + derivative * this->kd);
+  auto output =
+      static_cast<int16_t>(this->errorLeft * this->kp + this->integralLeft * this->ki + derivative * this->kd);
   if (abs(output) > MOTOR_MAX_MILLIVOLTS) {
     output = MOTOR_MAX_MILLIVOLTS;
   }
@@ -219,9 +219,7 @@ void Drivetrain::power_left(int16_t millivolts) {
   this->leftBack.move_millivolts(millivolts);
 }
 
-void Drivetrain::setTarget(Drivetrain::TargetType type) {
-  this->targetType = type;
-}
+void Drivetrain::setTarget(Drivetrain::TargetType type) { this->targetType = type; }
 
 void Drivetrain::updatePosition() {
   this->heading = this->imu.get_heading();

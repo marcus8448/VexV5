@@ -21,6 +21,7 @@ private:
     STATIC_TURN, // abs angle
     DIRECT_MOVE, // dist
   };
+
 public:
   device::Motor rightFront;
   device::Motor leftFront;

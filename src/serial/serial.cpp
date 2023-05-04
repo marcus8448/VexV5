@@ -55,7 +55,7 @@ void timeout_hack(void *params) {
     v->initialize();
   }
 
-  pros::c::task_create(timeout_hack, static_cast<void *>(pros::c::task_get_current()),TASK_PRIORITY_DEFAULT,
+  pros::c::task_create(timeout_hack, static_cast<void *>(pros::c::task_get_current()), TASK_PRIORITY_DEFAULT,
                        TASK_STACK_DEPTH_DEFAULT, "Timeout hack");
 
   while (true) {
@@ -101,7 +101,7 @@ void register_packet_handler(const uint8_t id, PacketHandler *handler) {
 }
 
 void initialize() {
-  pros::c::task_create(debug_input_task, static_cast<void*>(&SerialConnection::get_instance()),TASK_PRIORITY_DEFAULT,
+  pros::c::task_create(debug_input_task, static_cast<void *>(&SerialConnection::get_instance()), TASK_PRIORITY_DEFAULT,
                        TASK_STACK_DEPTH_DEFAULT, "Debug input");
 }
 } // namespace serial

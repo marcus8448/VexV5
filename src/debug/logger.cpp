@@ -13,7 +13,7 @@ static std::vector<std::pair<const char *, uint32_t>> *sections =
 static const char *main_task_name = nullptr;
 
 #ifdef FILE_LOG
-static std::ofstream* log_file = nullptr;
+static std::ofstream *log_file = nullptr;
 #endif
 
 void _info(const char *string) {
@@ -24,9 +24,7 @@ void _info(const char *string) {
 #endif
 }
 
-void _info(const std::string &string) {
-  _info(string.c_str());
-}
+void _info(const std::string &string) { _info(string.c_str()); }
 
 void _warn(const char *string) {
   std::cout << string << std::endl;
@@ -36,9 +34,7 @@ void _warn(const char *string) {
 #endif
 }
 
-void _warn(const std::string &string) {
-  _warn(string.c_str());
-}
+void _warn(const std::string &string) { _warn(string.c_str()); }
 
 void _error(const char *string) {
   std::cout << string << std::endl;
@@ -48,9 +44,7 @@ void _error(const char *string) {
 #endif
 }
 
-void _error(const std::string &string) {
-  _error(string.c_str());
-}
+void _error(const std::string &string) { _error(string.c_str()); }
 
 #ifdef DEBUG_LOG
 void _debug(const char *string) {
@@ -61,9 +55,7 @@ void _debug(const char *string) {
 #endif
 }
 
-void _debug(const std::string &string) {
-  _debug(string.c_str());
-}
+void _debug(const std::string &string) { _debug(string.c_str()); }
 
 void _push(const char *string) {
   if (main_task_name != pros::Task::current().get_name()) {
@@ -113,7 +105,7 @@ void initialize(const char *name) {
 
 #ifdef FILE_LOG
   if (log_file == nullptr) {
-    auto* stream = static_cast<std::ofstream *>(malloc(sizeof(std::ofstream)));
+    auto *stream = static_cast<std::ofstream *>(malloc(sizeof(std::ofstream)));
     *stream = fs::open_indexed("log");
 
     if (stream->is_open()) {
