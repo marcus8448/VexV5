@@ -1,46 +1,24 @@
-#ifndef ROBOT_CONTROLLER_OPERATOR_HPP
-#define ROBOT_CONTROLLER_OPERATOR_HPP
+#ifndef CONTROL_OPERATOR_RAW_RECORDING_HPP
+#define CONTROL_OPERATOR_RAW_RECORDING_HPP
 
 #include "controller.hpp"
+#include "operator.hpp"
 #include "pros/misc.h"
 #include <cstdint>
+#include <fstream>
 
 namespace robot::controller {
 /**
  * The default type of controller.
  * Updates the controller state based on the V5 controller input.
  */
-class Operator : public Controller {
+class RawRecording : public Controller {
 private:
-  pros::controller_id_e_t controller_id;
-
-  uint16_t a = 0;
-  uint16_t b = 0;
-  uint16_t x = 0;
-  uint16_t y = 0;
-
-  uint16_t up = 0;
-  uint16_t down = 0;
-  uint16_t left = 0;
-  uint16_t right = 0;
-
-  uint16_t l1 = 0;
-  uint16_t l2 = 0;
-  uint16_t r1 = 0;
-  uint16_t r2 = 0;
-
-  double leftStickX = 0.0;
-  double leftStickY = 0.0;
-  double rightStickX = 0.0;
-  double rightStickY = 0.0;
-
-  int16_t flywheelSpeed = 450;
-  uint32_t ticks = 0;
-
-  const char *enqueued_rumble = nullptr;
+  Controller *controller;
+  std::ofstream output;
 
 public:
-  explicit Operator(pros::controller_id_e_t controller_id = pros::E_CONTROLLER_MASTER);
+  explicit RawRecording(Controller *controller = new Operator(), const char *name = "recording.v5r");
 
   [[nodiscard]] uint16_t a_pressed() const override;
   [[nodiscard]] uint16_t b_pressed() const override;
@@ -73,4 +51,4 @@ public:
   void update() override;
 };
 } // namespace robot::controller
-#endif // ROBOT_CONTROLLER_OPERATOR_HPP
+#endif // CONTROL_OPERATOR_RAW_RECORDING_HPP

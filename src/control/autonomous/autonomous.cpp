@@ -1,4 +1,4 @@
-#include "robot/autonomous/autonomous.hpp"
+#include "control/autonomous/autonomous.hpp"
 #include "debug/logger.hpp"
 #include <deque>
 #include <map>

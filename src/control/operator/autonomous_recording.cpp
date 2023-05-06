@@ -1,4 +1,4 @@
-#include "robot/controller/autonomous_recording.hpp"
+#include "control/operator/autonomous_recording.hpp"
 #include "debug/error.hpp"
 #include "debug/logger.hpp"
 #include "util.hpp"

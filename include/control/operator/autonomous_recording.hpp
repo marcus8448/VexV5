@@ -1,19 +1,22 @@
-#ifndef ROBOT_CONTROLLER_RAW_REPLAY_HPP
-#define ROBOT_CONTROLLER_RAW_REPLAY_HPP
+#ifndef CONTROL_OPERATOR_AUTONOMOUS_RECORDING_HPP
+#define CONTROL_OPERATOR_AUTONOMOUS_RECORDING_HPP
 
 #include "controller.hpp"
+#include "fs/filesystem.hpp"
 #include "pros/misc.h"
+#include "robot/robot.hpp"
 #include <cstdint>
 #include <fstream>
 
 namespace robot::controller {
-/**
- * The default type of controller.
- * Updates the controller state based on the V5 controller input.
- */
-class RawReplay : public Controller {
+class AutonomousRecordingController : public Controller {
 private:
-  std::ifstream input;
+  enum DrivetrainTarget { FORWARDS, BACKWARDS, LEFT, RIGHT };
+
+  pros::controller_id_e_t controller_id;
+  robot::Robot &robot;
+
+  std::ofstream output;
 
   uint16_t a = 0;
   uint16_t b = 0;
@@ -30,16 +33,19 @@ private:
   uint16_t r1 = 0;
   uint16_t r2 = 0;
 
-  double leftStickX = 0.0;
-  double leftStickY = 0.0;
-  double rightStickX = 0.0;
-  double rightStickY = 0.0;
+  DrivetrainTarget drivetrainTarget = FORWARDS;
+  bool targetActive = false;
+  bool targetDirty = false;
 
+  int16_t flywheelRuntime = 0;
   int16_t flywheelSpeed = 7100;
   uint32_t ticks = 0;
 
+  const char *enqueued_rumble = nullptr;
+
 public:
-  explicit RawReplay(const char *name);
+  explicit AutonomousRecordingController(robot::Robot &robot,
+                                         pros::controller_id_e_t controller_id = pros::E_CONTROLLER_MASTER);
 
   [[nodiscard]] uint16_t a_pressed() const override;
   [[nodiscard]] uint16_t b_pressed() const override;
@@ -70,6 +76,9 @@ public:
   void rumble(const char *str) override;
 
   void update() override;
+
+private:
+  bool write_drivetrain_update();
 };
 } // namespace robot::controller
-#endif // ROBOT_CONTROLLER_RAW_REPLAY_HPP
+#endif // CONTROL_OPERATOR_AUTONOMOUS_RECORDING_HPP

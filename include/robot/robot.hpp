@@ -1,7 +1,7 @@
 #ifndef ROBOT_ROBOT_HPP
 #define ROBOT_ROBOT_HPP
 
-#include "controller/controller.hpp"
+#include "control/operator/controller.hpp"
 #include "drivetrain.hpp"
 
 namespace robot {

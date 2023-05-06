@@ -1,6 +1,6 @@
 #include "robot/robot.hpp"
+#include "control/autonomous/autonomous.hpp"
 #include "debug/logger.hpp"
-#include "robot/autonomous/autonomous.hpp"
 
 namespace robot {
 Robot::Robot(const uint8_t rightFront, const uint8_t leftFront, const uint8_t rightBack, const uint8_t leftBack,

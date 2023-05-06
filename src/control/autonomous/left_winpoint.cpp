@@ -1,4 +1,4 @@
-#include "robot/autonomous/left_winpoint.hpp"
+#include "control/autonomous/left_winpoint.hpp"
 #include "debug/logger.hpp"
 #include "pros/rtos.hpp"
 

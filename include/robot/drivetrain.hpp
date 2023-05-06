@@ -1,7 +1,7 @@
 #ifndef ROBOT_DRIVETRAIN_HPP
 #define ROBOT_DRIVETRAIN_HPP
 
-#include "robot/controller/controller.hpp"
+#include "control/operator/controller.hpp"
 #include "robot/device/gyro.hpp"
 #include "robot/device/inertial.hpp"
 #include "robot/device/motor.hpp"

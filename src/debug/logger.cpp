@@ -5,8 +5,6 @@
 #include <iostream>
 #include <vector>
 
-#define FILE_LOG
-
 namespace logger {
 static std::vector<std::pair<const char *, uint32_t>> *sections =
     new std::vector<std::pair<const char *, uint32_t>>(); // stores the name and timestamp of sections.

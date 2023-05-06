@@ -1,6 +1,6 @@
-#ifndef ROBOT_AUTONOMOUS_REPLAY_HPP
-#define ROBOT_AUTONOMOUS_REPLAY_HPP
-#include "robot/autonomous/autonomous.hpp"
+#ifndef CONTROL_AUTONOMOUS_REPLAY_HPP
+#define CONTROL_AUTONOMOUS_REPLAY_HPP
+#include "autonomous.hpp"
 
 namespace robot::autonomous {
 
@@ -11,4 +11,4 @@ public:
   void run(Robot &robot) override;
 };
 } // namespace robot::autonomous
-#endif // ROBOT_AUTONOMOUS_REPLAY_HPP
+#endif // CONTROL_AUTONOMOUS_REPLAY_HPP

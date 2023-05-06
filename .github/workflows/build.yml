@@ -17,7 +17,7 @@ jobs:
           languages: cpp
 
       - name: Configure CMake
-        run: cmake -DCMAKE_BUILD_TYPE=MinSizeRel --toolchain toolchain.cmake -B build
+        run: cmake -DCMAKE_BUILD_TYPE=MinSizeRel --toolchain toolchain-gcc.cmake -B build
 
       - name: Build with CMake
         run: cmake --build build/

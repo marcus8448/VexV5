@@ -1,8 +1,5 @@
-#ifndef ROBOT_AUTONOMOUS_AUTONOMOUS_HPP
-#define ROBOT_AUTONOMOUS_AUTONOMOUS_HPP
-
-#define AUTONOMOUS_ROLLER_SPIN_TIME 35
-#define AUTONOMOUS_ROLLER_OPPOSITE_SPIN_TIME 150
+#ifndef CONTROL_AUTONOMOUS_AUTONOMOUS_HPP
+#define CONTROL_AUTONOMOUS_AUTONOMOUS_HPP
 
 #include "pros/rtos.h"
 #include "robot/robot.hpp"
@@ -45,4 +42,4 @@ void set_active(const std::string *program);
  */
 Autonomous *get_autonomous();
 } // namespace robot::autonomous
-#endif // ROBOT_AUTONOMOUS_AUTONOMOUS_HPP
+#endif // CONTROL_AUTONOMOUS_AUTONOMOUS_HPP

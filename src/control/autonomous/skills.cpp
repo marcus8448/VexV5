@@ -1,4 +1,4 @@
-#include "robot/autonomous/skills.hpp"
+#include "control/autonomous/skills.hpp"
 #include "debug/logger.hpp"
 
 namespace robot::autonomous {

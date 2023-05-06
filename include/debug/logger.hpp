@@ -5,9 +5,6 @@
 #include <memory>
 #include <string>
 
-#define DEBUG_LOG
-// #define FILE_LOG
-
 #define info(fmt, ...) logger::_info(fmt, ##__VA_ARGS__)
 #define warn(fmt, ...) logger::_warn(fmt, ##__VA_ARGS__)
 #define error(fmt, ...) logger::_error(fmt, ##__VA_ARGS__)

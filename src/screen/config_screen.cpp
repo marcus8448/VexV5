@@ -32,15 +32,14 @@ void ConfigurationScreen::update(robot::Robot &robot) {}
 void ConfigurationScreen::update_drive_scheme_label() {
   lv_label_set_text(this->driveSchemeBtnLbl,
                     logger::string_format("Control Scheme: %s",
-                                          config::get_drive_scheme_name(config::get_instance()->get_control_scheme()))
+                                          config::get_drive_scheme_name(config::controlScheme))
                         .c_str());
 }
 
 lv_res_t switch_drive_scheme([[maybe_unused]] lv_obj_t *btn) {
-  config::get_instance()->set_drivetrain_control_scheme(config::get_instance()->get_control_scheme() ==
-                                                                config::DrivetrainControlScheme::TANK
-                                                            ? config::DrivetrainControlScheme::ARCADE
-                                                            : config::DrivetrainControlScheme::TANK);
+  config::controlScheme = config::controlScheme == config::DrivetrainControlScheme::TANK
+                              ? config::DrivetrainControlScheme::ARCADE
+                              : config::DrivetrainControlScheme::TANK;
   instance->update_drive_scheme_label();
   return LV_RES_INV;
 }

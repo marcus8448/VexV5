@@ -1,5 +1,5 @@
 #include "screen/autonomous_select.hpp"
-#include "robot/autonomous/autonomous.hpp"
+#include "control/autonomous/autonomous.hpp"
 #include "robot/robot.hpp"
 #include "screen/colour.hpp"
 #include "screen/screen.hpp"

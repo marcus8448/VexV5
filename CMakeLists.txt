@@ -1,4 +1,40 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.22)
+set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_PROCESSOR arm)
+set(CMAKE_SYSTEM_VERSION 0)
+set(TARGET_TRIPLE arm-none-eabi)
+
+set(CMAKE_C_COMPILER_TARGET ${TARGET_TRIPLE})
+set(CMAKE_CXX_COMPILER_TARGET ${TARGET_TRIPLE})
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+
+include(CMakeOptions.txt)
+
+set(MFLAGS "-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp -nostdlib")
+set(CMAKE_CXX_FLAGS "${EXTRA_CXX_FLAGS} ${MFLAGS}")
+set(CMAKE_C_FLAGS "${EXTRA_C_FLAGS} ${MFLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "-Wl,--no-enum-size-warning -z noexecstack")
+
+set(CMAKE_LINKER ${CMAKE_CXX_COMPILER})
+
+set(CMAKE_C_LINK_EXECUTABLE "<CMAKE_LINKER> <FLAGS> <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+set(CMAKE_CXX_LINK_EXECUTABLE "<CMAKE_LINKER> <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+
+set(FIRMWARE_DIR ${CMAKE_SOURCE_DIR}/firmware)
+link_directories(BEFORE ${FIRMWARE_DIR} ${FIRMWARE_DIR}/extra)
+set(LibC ${FIRMWARE_DIR}/libc.a)
+set(LibM ${FIRMWARE_DIR}/libm.a)
+set(LibPROS ${FIRMWARE_DIR}/libpros.a)
+set(LibBase85 ${FIRMWARE_DIR}/libbase85.a)
+
+message(STATUS "Using toolchain: ${CMAKE_TOOLCHAIN_FILE}")
+
 project(VexV5 VERSION 1.0.0 LANGUAGES C CXX)
 
 set(FIRMWARE_DIR ${CMAKE_SOURCE_DIR}/firmware)
@@ -22,26 +58,10 @@ add_library(Timestamp STATIC ${CMAKE_BINARY_DIR}/timestamp.cpp)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 set(WARNING_FLAGS "-Wall -Wno-psabi -Wno-shadow-field-in-constructor")
-set(COMPILE_FLAGS "-g -D_POSIX_THREADS -D_UNIX98_THREAD_MUTEX_ATTRIBUTES -ffunction-sections -fdata-sections -fdiagnostics-color -funwind-tables -fno-exceptions")
-
+set(COMPILE_FLAGS "-g -ffunction-sections -fdata-sections -fdiagnostics-color -funwind-tables -fno-exceptions")
+add_compile_definitions(_POSIX_THREADS _UNIX98_THREAD_MUTEX_ATTRIBUTES)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILE_FLAGS} ${WARNING_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMPILE_FLAGS} ${WARNING_FLAGS}")
-
-if (CMAKE_CXX_COMPILER STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Os")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Os")
-endif()
-
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    set(CMAKE_C_LINK_FLAGS "-fuse-ld=bfd")
-    set(CMAKE_CXX_LINK_FLAGS "-fuse-ld=bfd")
-
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --start-no-unused-arguments")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Oz")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Oz")
-    link_directories(${ARM_LIBS})
-    include_directories(SYSTEM $<$<COMPILE_LANGUAGE:CXX>:${ARM_SYSROOT}/include/c++/${ARM_GCC_VERSION} ${ARM_SYSROOT}/include/c++/${ARM_GCC_VERSION}/${TARGET_TRIPLE}/${ARM_MULTI_DIR}>)
-endif()
 
 set(ColdLibraries ${LibC} ${LibM} ${LibPROS} ${LibBase85})
 set(HotLinked ${LibC},${LibM},${LibPROS},${LibBase85})
@@ -49,19 +69,21 @@ set(HotLinked ${LibC},${LibM},${LibPROS},${LibBase85})
 set(SOURCE_FILES
         src/configuration.cpp
         src/main.cpp
+        src/control/autonomous/autonomous.cpp
+        src/control/autonomous/skills.cpp
+        src/control/autonomous/left_score.cpp
+        src/control/autonomous/left_winpoint.cpp
+        src/control/autonomous/none.cpp
+        src/control/autonomous/replay.cpp
+        src/control/autonomous/right_score.cpp
+        src/control/autonomous/right_winpoint.cpp
+        src/control/operator/autonomous_recording.cpp
+        src/control/operator/operator.cpp
+        src/control/operator/raw_recording.cpp
+        src/control/operator/raw_replay.cpp
         src/debug/error.cpp
         src/debug/logger.cpp
         src/fs/filesystem.cpp
-        src/robot/autonomous/autonomous.cpp
-        src/robot/autonomous/skills.cpp
-        src/robot/autonomous/left_winpoint.cpp
-        src/robot/autonomous/none.cpp
-        src/robot/autonomous/replay.cpp
-        src/robot/autonomous/right_winpoint.cpp
-        src/robot/controller/autonomous_recording.cpp
-        src/robot/controller/operator.cpp
-        src/robot/controller/raw_recording.cpp
-        src/robot/controller/raw_replay.cpp
         src/robot/device/device.cpp
         src/robot/device/gyro.cpp
         src/robot/device/inertial.cpp
@@ -91,17 +113,19 @@ set(HEADER_FILES
         include/debug/error.hpp
         include/debug/logger.hpp
         include/fs/filesystem.hpp
-        include/robot/autonomous/autonomous.hpp
-        include/robot/autonomous/skills.hpp
-        include/robot/autonomous/left_winpoint.hpp
-        include/robot/autonomous/none.hpp
-        include/robot/autonomous/replay.hpp
-        include/robot/autonomous/right_winpoint.hpp
-        include/robot/controller/controller.hpp
-        include/robot/controller/autonomous_recording.hpp
-        include/robot/controller/operator.hpp
-        include/robot/controller/raw_recording.hpp
-        include/robot/controller/raw_replay.hpp
+        include/control/autonomous/autonomous.hpp
+        include/control/autonomous/skills.hpp
+        include/control/autonomous/left_score.hpp
+        include/control/autonomous/left_winpoint.hpp
+        include/control/autonomous/none.hpp
+        include/control/autonomous/replay.hpp
+        include/control/autonomous/right_score.hpp
+        include/control/autonomous/right_winpoint.hpp
+        include/control/operator/controller.hpp
+        include/control/operator/autonomous_recording.hpp
+        include/control/operator/operator.hpp
+        include/control/operator/raw_recording.hpp
+        include/control/operator/raw_replay.hpp
         include/robot/device/device.hpp
         include/robot/device/gyro.hpp
         include/robot/device/inertial.hpp
@@ -126,6 +150,10 @@ set(HEADER_FILES
         include/util.hpp
 )
 
+if (ENABLE_TEMPORARY_CODE)
+    set(SOURCE_FILES "${SOURCE_FILES} src/temporary.hpp")
+endif()
+
 add_executable(ColdPackage)
 target_sources(ColdPackage PRIVATE ${CMAKE_BINARY_DIR}/empty.cpp)
 
@@ -141,16 +169,8 @@ add_custom_target(Upload DEPENDS HotPackage COMMAND ${ProsCLI} upload --slot 1)
 endif()
 
 if (ClangFormat)
-message(NOTICE "clang-format found, adding utility target.")
+message(STATUS "clang-format found, adding utility target.")
 add_custom_target(FormatCode COMMAND cd ${CMAKE_SOURCE_DIR} && ${ClangFormat} -i ${HEADER_FILES} ${SOURCE_FILES})
-endif()
-
-if (ClangCheck)
-message(NOTICE "clang-check found, adding utility target.")
-add_custom_target(
-        CheckCode
-        COMMAND cd ${CMAKE_SOURCE_DIR} && ${ClangCheck} --extra-arg="--target=${TARGET_TRIPLE}" --extra-arg="--sysroot=${ARM_SYSROOT}" --extra-arg="-I${CMAKE_SOURCE_DIR}/include" --extra-arg="-I${ARM_SYSROOT}/include/c++/${ARM_GCC_VERSION}" --extra-arg="-I${ARM_SYSROOT}/include/c++/${ARM_GCC_VERSION}/${TARGET_TRIPLE}/${ARM_MULTI_DIR}" --analyze --analyzer-output-path="${CMAKE_BINARY_DIR}/analysis" -p ${CMAKE_BINARY_DIR} ${HEADER_FILES} ${SOURCE_FILES}
-)
 endif()
 
 add_dependencies(HotPackage ColdPackage)
@@ -160,7 +180,7 @@ target_link_libraries(HotPackage PUBLIC ${ColdLibraries})
 
 set_property(TARGET HotPackage PROPERTY LINK_DEPENDS ${FIRMWARE_DIR}/v5-common.ld ${FIRMWARE_DIR}/v5-hot.ld)
 set_property(TARGET ColdPackage PROPERTY LINK_DEPENDS ${FIRMWARE_DIR}/v5-common.ld ${FIRMWARE_DIR}/v5.ld)
-
+set(TARGET_FILE)
 target_link_options(HotPackage PRIVATE -Wl,-R,$<TARGET_FILE:ColdPackage> -nostartfiles -Wl,-T${FIRMWARE_DIR}/v5-hot.ld,--gc-sections,--start-group,${HotLinked},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld)
 target_link_options(ColdPackage PRIVATE -Wl,--gc-keep-exported,--whole-archive,${LibPROS},-lstdc++,--no-whole-archive -Wl,-T${FIRMWARE_DIR}/v5.ld,--gc-sections,--start-group,${HotLinked},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld)
 

@@ -1,4 +1,4 @@
-#include "robot/autonomous/right_winpoint.hpp"
+#include "control/autonomous/right_winpoint.hpp"
 #include "util.hpp"
 
 namespace robot::autonomous {

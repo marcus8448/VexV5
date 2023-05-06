@@ -24,7 +24,7 @@ void Information::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) 
   this->uptimeLabel = create_info_label(screen, true, 0);
 
   this->controlSchemeLabel = create_info_label(screen, false, 1);
-  this->teamColourLabel = create_info_label(screen, true, 1);
+//  this->teamColourLabel = create_info_label(screen, true, 1);
 
   // Port Statuses
   this->motorLFLabel = create_info_label(screen, false, 2);
@@ -51,9 +51,7 @@ void Information::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) 
 void Information::update(robot::Robot &robot) {
   set_label_text(this->uptimeLabel, "Uptime: %i", pros::c::millis());
   set_label_text(this->controlSchemeLabel, "Control Scheme: %s",
-                 config::get_drive_scheme_name(config::get_instance()->get_control_scheme()));
-  set_label_text(this->teamColourLabel, "Team Colour: %s",
-                 config::get_alliance_colour_name(config::get_instance()->get_alliance_colour()));
+                 config::get_drive_scheme_name(config::controlScheme));
   update_motor_pos(this->motorLFLabel, robot.drivetrain.leftFront);
   update_motor_pos(this->motorRFLabel, robot.drivetrain.rightFront);
   update_motor_pos(this->motorLBLabel, robot.drivetrain.leftBack);
