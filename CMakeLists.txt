@@ -77,10 +77,10 @@ set(SOURCE_FILES
         src/control/autonomous/replay.cpp
         src/control/autonomous/right_score.cpp
         src/control/autonomous/right_winpoint.cpp
-        src/control/operator/autonomous_recording.cpp
-        src/control/operator/operator.cpp
-        src/control/operator/raw_recording.cpp
-        src/control/operator/raw_replay.cpp
+        src/control/input/autonomous_recording.cpp
+        src/control/input/operator.cpp
+        src/control/input/raw_recording.cpp
+        src/control/input/raw_replay.cpp
         src/debug/error.cpp
         src/debug/logger.cpp
         src/fs/filesystem.cpp
@@ -121,11 +121,11 @@ set(HEADER_FILES
         include/control/autonomous/replay.hpp
         include/control/autonomous/right_score.hpp
         include/control/autonomous/right_winpoint.hpp
-        include/control/operator/controller.hpp
-        include/control/operator/autonomous_recording.hpp
-        include/control/operator/operator.hpp
-        include/control/operator/raw_recording.hpp
-        include/control/operator/raw_replay.hpp
+        include/control/input/controller.hpp
+        include/control/input/autonomous_recording.hpp
+        include/control/input/operator.hpp
+        include/control/input/raw_recording.hpp
+        include/control/input/raw_replay.hpp
         include/robot/device/device.hpp
         include/robot/device/gyro.hpp
         include/robot/device/inertial.hpp
@@ -147,7 +147,7 @@ set(HEADER_FILES
         include/serial/robot_state.hpp
         include/serial/serial.hpp
         include/serial/serial_connection.hpp
-        include/util.hpp
+        include/units.hpp
 )
 
 if (ENABLE_TEMPORARY_CODE)

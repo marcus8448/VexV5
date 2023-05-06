@@ -8,7 +8,7 @@ class Information : public Screen {
 private:
   lv_obj_t *uptimeLabel = nullptr;
   lv_obj_t *controlSchemeLabel = nullptr;
-//  lv_obj_t *teamColourLabel = nullptr;
+  //  lv_obj_t *teamColourLabel = nullptr;
   lv_obj_t *motorLFLabel = nullptr;
   lv_obj_t *motorRFLabel = nullptr;
   lv_obj_t *motorLBLabel = nullptr;

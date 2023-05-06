@@ -1,7 +1,5 @@
 #include "control/autonomous/left_winpoint.hpp"
-#include "debug/logger.hpp"
-#include "pros/rtos.hpp"
 
-namespace robot::autonomous {
+namespace control::autonomous {
 void LeftWinpoint::run(Robot &robot) {}
-} // namespace robot::autonomous
+} // namespace control::autonomous

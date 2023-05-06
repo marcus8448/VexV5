@@ -1,8 +1,9 @@
-#ifndef CONTROL_OPERATOR_CONTROLLER_HPP
-#define CONTROL_OPERATOR_CONTROLLER_HPP
+#ifndef CONTROL_INPUT_CONTROLLER_HPP
+#define CONTROL_INPUT_CONTROLLER_HPP
 
 #include <cstdint>
 
+namespace control::input {
 /**
  * A source of driver input.
  */
@@ -144,5 +145,6 @@ public:
    */
   virtual void update() = 0;
 };
+} // namespace control::input
 
-#endif // CONTROL_OPERATOR_CONTROLLER_HPP
+#endif // CONTROL_INPUT_CONTROLLER_HPP

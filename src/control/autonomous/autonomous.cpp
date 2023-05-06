@@ -1,12 +1,11 @@
 #include "control/autonomous/autonomous.hpp"
 #include "debug/logger.hpp"
-#include <deque>
 #include <map>
 #include <string>
 
-std::map<const std::string, robot::autonomous::Autonomous *> *autonomousPrograms =
-    new std::map<const std::string, robot::autonomous::Autonomous *>();
-namespace robot::autonomous {
+std::map<const std::string, control::autonomous::Autonomous *> *autonomousPrograms =
+    new std::map<const std::string, control::autonomous::Autonomous *>();
+namespace control::autonomous {
 static const std::string *activeProgram = nullptr;
 
 Autonomous::Autonomous(const char *name) : name(name) {}
@@ -34,4 +33,4 @@ Autonomous *get_autonomous() {
   return (*autonomousPrograms)[*activeProgram];
 }
 
-} // namespace robot::autonomous
+} // namespace control::autonomous

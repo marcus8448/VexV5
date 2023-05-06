@@ -2,7 +2,7 @@
 #define CONTROL_AUTONOMOUS_RIGHT_WINPOINT_HPP
 #include "autonomous.hpp"
 
-namespace robot::autonomous {
+namespace control::autonomous {
 
 /**
  * Autonomous run to be used when trying to earn the autonomous win point when starting on the right side.
@@ -13,5 +13,5 @@ public:
 
   void run(Robot &robot) override;
 };
-} // namespace robot::autonomous
+} // namespace control::autonomous
 #endif // CONTROL_AUTONOMOUS_RIGHT_WINPOINT_HPP

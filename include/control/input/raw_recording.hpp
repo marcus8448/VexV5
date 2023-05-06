@@ -1,45 +1,24 @@
-#ifndef CONTROL_OPERATOR_RAW_REPLAY_HPP
-#define CONTROL_OPERATOR_RAW_REPLAY_HPP
+#ifndef CONTROL_INPUT_RAW_RECORDING_HPP
+#define CONTROL_INPUT_RAW_RECORDING_HPP
 
 #include "controller.hpp"
+#include "operator.hpp"
 #include "pros/misc.h"
 #include <cstdint>
 #include <fstream>
 
-namespace robot::controller {
+namespace control::input {
 /**
  * The default type of controller.
  * Updates the controller state based on the V5 controller input.
  */
-class RawReplay : public Controller {
+class RawRecording : public Controller {
 private:
-  std::ifstream input;
-
-  uint16_t a = 0;
-  uint16_t b = 0;
-  uint16_t x = 0;
-  uint16_t y = 0;
-
-  uint16_t up = 0;
-  uint16_t down = 0;
-  uint16_t left = 0;
-  uint16_t right = 0;
-
-  uint16_t l1 = 0;
-  uint16_t l2 = 0;
-  uint16_t r1 = 0;
-  uint16_t r2 = 0;
-
-  double leftStickX = 0.0;
-  double leftStickY = 0.0;
-  double rightStickX = 0.0;
-  double rightStickY = 0.0;
-
-  int16_t flywheelSpeed = 7100;
-  uint32_t ticks = 0;
+  Controller *controller;
+  std::ofstream output;
 
 public:
-  explicit RawReplay(const char *name);
+  explicit RawRecording(Controller *controller = new Operator(), const char *name = "recording.v5r");
 
   [[nodiscard]] uint16_t a_pressed() const override;
   [[nodiscard]] uint16_t b_pressed() const override;
@@ -71,5 +50,5 @@ public:
 
   void update() override;
 };
-} // namespace robot::controller
-#endif // CONTROL_OPERATOR_RAW_REPLAY_HPP
+} // namespace control::input
+#endif // CONTROL_INPUT_RAW_RECORDING_HPP

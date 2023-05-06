@@ -1,8 +1,8 @@
-#include "control/operator/raw_recording.hpp"
+#include "control/input/raw_recording.hpp"
 #include "fs/filesystem.hpp"
 #include <cstring>
 
-namespace robot::controller {
+namespace control::input {
 RawRecording::RawRecording(Controller *controller, const char *name)
     : controller(controller), output(fs::open_indexed(name, std::ios::out | std::ios::binary)) {
   this->output << "v5r\n";
@@ -101,4 +101,4 @@ void RawRecording::update() {
     this->output.close();
   }
 }
-} // namespace robot::controller
+} // namespace control::input

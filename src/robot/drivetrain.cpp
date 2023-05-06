@@ -1,7 +1,7 @@
 #include "robot/drivetrain.hpp"
 #include "debug/logger.hpp"
 #include "robot/device/motor.hpp"
-#include "util.hpp"
+#include "units.hpp"
 
 #define JOYSTICK_MAX 127
 #define ACCEPTABLE_ERROR 10.0
@@ -25,8 +25,8 @@ void Drivetrain::forwards(double distance, bool wait) {
   info("Moving forwards %fin.", distance);
   this->setTarget(DIRECT_MOVE);
   this->targetHeading = this->heading;
-  this->targetLeft = util::in_to_e_units(distance);
-  this->targetRight = util::in_to_e_units(distance);
+  this->targetLeft = units::inchToEncoder(distance);
+  this->targetRight = units::inchToEncoder(distance);
   if (wait) {
     timer_start(move_forwards);
     await_move();
@@ -38,8 +38,8 @@ void Drivetrain::backwards(double distance, bool wait) {
   info("Moving backwards %fin.", distance);
   this->setTarget(DIRECT_MOVE);
   this->targetHeading = this->heading;
-  this->targetLeft = util::in_to_e_units(-distance);
-  this->targetRight = util::in_to_e_units(-distance);
+  this->targetLeft = units::inchToEncoder(-distance);
+  this->targetRight = units::inchToEncoder(-distance);
   if (wait) {
     timer_start(move_backwards);
     await_move();
@@ -75,7 +75,7 @@ void Drivetrain::await_move() const {
   }
 }
 
-void Drivetrain::updateTargeting(Controller *controller) {
+void Drivetrain::updateTargeting(control::input::Controller *controller) {
   if (controller->down_pressed() == 1) {
     this->arcade = !this->arcade;
     controller->rumble("-");
@@ -128,7 +128,7 @@ void Drivetrain::updateMovement() {
         offset += 360;
       }
 
-      double distance = util::turn_to_e_units(offset);
+      double distance = units::degreesToEncoder(offset);
       this->move_right_targeting(this->rightPos - distance);
       this->move_left_targeting(this->leftPos + distance);
       if (std::abs(distance) < ACCEPTABLE_OFFSET && std::abs(distance) < ACCEPTABLE_OFFSET) {

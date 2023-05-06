@@ -13,7 +13,7 @@
 #include "display/lv_objx/lv_list.h"
 #pragma GCC diagnostic pop
 
-extern std::map<const std::string, robot::autonomous::Autonomous *> *autonomousPrograms;
+extern std::map<const std::string, control::autonomous::Autonomous *> *autonomousPrograms;
 namespace screen {
 AutonomousSelect *autonomous_select_instance = nullptr;
 static lv_style_t *default_style = nullptr;
@@ -36,7 +36,7 @@ void AutonomousSelect::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t hei
   for (auto const &[name, program] : *autonomousPrograms) {
     lv_obj_t *btn = lv_list_add(this->selections, nullptr, name.c_str(), drop);
     lv_btn_set_action(btn, LV_BTN_ACTION_CLICK, ::screen::click);
-    if (name == *robot::autonomous::get_active()) {
+    if (name == *control::autonomous::get_active()) {
       lv_style_copy(default_style, lv_obj_get_style(btn));
       lv_style_copy(selected_style, default_style);
       lv_obj_set_style(btn, selected_style);
@@ -64,7 +64,7 @@ void AutonomousSelect::click(lv_obj_t *btn) {
     }
   }
 
-  robot::autonomous::set_active(name);
+  control::autonomous::set_active(name);
   lv_obj_set_style(btn, selected_style);
 }
 

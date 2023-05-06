@@ -1,8 +1,8 @@
 #include "main.hpp"
-#include "control/operator/operator.hpp"
+#include "control/input/operator.hpp"
 #include "debug/logger.hpp"
-#include "robot/device/motor.hpp"
 #include "pros/rtos.hpp"
+#include "robot/device/motor.hpp"
 
 #ifndef DISABLE_AUTONOMOUS
 #include "control/autonomous/autonomous.hpp"
@@ -11,7 +11,6 @@
 #include "control/autonomous/right_winpoint.hpp"
 #include "control/autonomous/skills.hpp"
 #endif
-
 
 #ifndef DISABLE_SERIAL
 #include "serial/robot_command.hpp"
@@ -64,10 +63,10 @@ void initialize() {
   // Optionally disable autonomous for builds
 #ifndef DISABLE_AUTONOMOUS
   // Register the different types of autonomous-es
-  autonomous::register_autonomous(new autonomous::None());
-  autonomous::register_autonomous(new autonomous::LeftWinpoint());
-  autonomous::register_autonomous(new autonomous::RightWinpoint());
-  autonomous::register_autonomous(new autonomous::Skills());
+  control::autonomous::register_autonomous(new control::autonomous::None());
+  control::autonomous::register_autonomous(new control::autonomous::LeftWinpoint());
+  control::autonomous::register_autonomous(new control::autonomous::RightWinpoint());
+  control::autonomous::register_autonomous(new control::autonomous::Skills());
 #endif
   // Optionally enable extra screen functionality
 #ifndef DISABLE_SCREEN
@@ -118,8 +117,7 @@ void opcontrol() {
   Robot &robot = getRobot();
 
   section_push("Opcontrol Setup");
-  robot.set_controller(
-      new robot::controller::Operator()); // set the robot controller to the default operator based one.
+  robot.set_controller(new control::input::Operator()); // set the robot controller to the default operator based one
   section_pop();
 
   robot.opcontrol();

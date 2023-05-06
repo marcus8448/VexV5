@@ -9,7 +9,6 @@ option(DISABLE_AUTONOMOUS "Disable autonomous code" OFF)
 
 option(DISABLE_SCREEN "Disable screen code" OFF)
 
-cmake_dependent_option(USE_FOO "Use Foo" ON "USE_BAR;NOT USE_ZOT" OFF)
 cmake_dependent_option(DISABLE_CONFIG_SCREEN "Disable the configuration screen" OFF "NOT DISABLE_SCREEN" ON)
 cmake_dependent_option(DISABLE_AUTONOMOUS_SELECTION_SCREEN "Disable the autonomous selection screen" OFF "NOT DISABLE_SCREEN;NOT DISABLE_AUTONOMOUS" ON)
 cmake_dependent_option(DISABLE_DRIVETRAIN_DEBUG_SCREEN "Disable the drivetrain debug screen" OFF "NOT DISABLE_SCREEN" ON)

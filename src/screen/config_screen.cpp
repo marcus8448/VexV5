@@ -30,10 +30,9 @@ void ConfigurationScreen::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t 
 void ConfigurationScreen::update(robot::Robot &robot) {}
 
 void ConfigurationScreen::update_drive_scheme_label() {
-  lv_label_set_text(this->driveSchemeBtnLbl,
-                    logger::string_format("Control Scheme: %s",
-                                          config::get_drive_scheme_name(config::controlScheme))
-                        .c_str());
+  lv_label_set_text(
+      this->driveSchemeBtnLbl,
+      logger::string_format("Control Scheme: %s", config::get_drive_scheme_name(config::controlScheme)).c_str());
 }
 
 lv_res_t switch_drive_scheme([[maybe_unused]] lv_obj_t *btn) {

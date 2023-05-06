@@ -45,15 +45,15 @@ void Robot::run_autonomous() {
   pros::c::task_create([](void *param) { static_cast<Robot *>(param)->background_control(); }, this,
                        TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Robot async control (OP)");
 
-  if (autonomous::get_active() == nullptr) {
+  if (control::autonomous::get_active() == nullptr) {
     error("No autonomous to run!");
     return;
   }
-  info("Running autonomous: '%s'", autonomous::get_active()->c_str());
-  autonomous::get_autonomous()->run(*this);
+  info("Running autonomous: '%s'", control::autonomous::get_active()->c_str());
+  control::autonomous::get_autonomous()->run(*this);
 }
 
-void Robot::set_controller(Controller *controller) {
+void Robot::set_controller(control::input::Controller *controller) {
   delete this->controller;
   this->controller = controller;
 }

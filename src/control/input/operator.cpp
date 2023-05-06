@@ -1,11 +1,11 @@
-#include "control/operator/operator.hpp"
+#include "control/input/operator.hpp"
 #include "include/debug/error.hpp"
 #include "include/debug/logger.hpp"
 
 #define controller_digital(button) print_error(pros::c::controller_get_digital(this->controller_id, button))
 #define controller_analog(stick_axis) print_error(pros::c::controller_get_analog(this->controller_id, stick_axis))
 
-namespace robot::controller {
+namespace control::input {
 Operator::Operator(pros::controller_id_e_t controller_id) : controller_id(controller_id) {}
 
 [[nodiscard]] uint16_t Operator::a_pressed() const { return this->a; }
@@ -185,4 +185,4 @@ void Operator::update() {
                        .c_str()); // append ' ' to clear out buffer
   }
 }
-} // namespace robot::controller
+} // namespace control::input

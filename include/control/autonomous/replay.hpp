@@ -2,7 +2,7 @@
 #define CONTROL_AUTONOMOUS_REPLAY_HPP
 #include "autonomous.hpp"
 
-namespace robot::autonomous {
+namespace control::autonomous {
 
 class Replay : public Autonomous {
 public:
@@ -10,5 +10,5 @@ public:
 
   void run(Robot &robot) override;
 };
-} // namespace robot::autonomous
+} // namespace control::autonomous
 #endif // CONTROL_AUTONOMOUS_REPLAY_HPP

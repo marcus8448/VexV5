@@ -2,7 +2,7 @@
 #define CONTROL_AUTONOMOUS_SKILLS_HPP
 #include "autonomous.hpp"
 
-namespace robot::autonomous {
+namespace control::autonomous {
 
 /**
  * Autonomous run to be used when aiming for the best score..
@@ -13,5 +13,5 @@ public:
 
   void run(Robot &robot) override;
 };
-} // namespace robot::autonomous
+} // namespace control::autonomous
 #endif // CONTROL_AUTONOMOUS_SKILLS_HPP

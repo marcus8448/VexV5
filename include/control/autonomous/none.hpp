@@ -2,7 +2,7 @@
 #define CONTROL_AUTONOMOUS_NONE_HPP
 #include "autonomous.hpp"
 
-namespace robot::autonomous {
+namespace control::autonomous {
 
 /**
  * Autonomous run that does noting.
@@ -13,5 +13,5 @@ public:
 
   void run(Robot &robot) override;
 };
-} // namespace robot::autonomous
+} // namespace control::autonomous
 #endif // CONTROL_AUTONOMOUS_NONE_HPP

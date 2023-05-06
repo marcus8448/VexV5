@@ -1,6 +1,5 @@
 #include "control/autonomous/none.hpp"
-#include "debug/logger.hpp"
 
-namespace robot::autonomous {
+namespace control::autonomous {
 void None::run(Robot &robot) { warn("No autonomous running!"); }
-} // namespace robot::autonomous
+} // namespace control::autonomous

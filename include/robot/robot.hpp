@@ -1,7 +1,7 @@
 #ifndef ROBOT_ROBOT_HPP
 #define ROBOT_ROBOT_HPP
 
-#include "control/operator/controller.hpp"
+#include "control/input/controller.hpp"
 #include "drivetrain.hpp"
 
 namespace robot {
@@ -17,7 +17,7 @@ public:
   /**
    * The robot's controller. Used during operator control.
    */
-  Controller *controller;
+  control::input::Controller *controller;
 
 public:
   /**
@@ -33,7 +33,7 @@ public:
   explicit Robot(const Robot &robot) = delete;
   ~Robot();
 
-  void set_controller(Controller *controller);
+  void set_controller(control::input::Controller *controller);
 
   [[noreturn]] void background_control();
   void run_autonomous();

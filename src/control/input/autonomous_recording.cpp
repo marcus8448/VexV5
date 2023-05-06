@@ -1,11 +1,12 @@
-#include "control/operator/autonomous_recording.hpp"
+#include "control/input/autonomous_recording.hpp"
 #include "debug/error.hpp"
 #include "debug/logger.hpp"
-#include "util.hpp"
+#include "units.hpp"
 
+#define controller_digital(button) print_error(pros::c::controller_get_digital(this->controller_id, button))
 #define AUTOSPEED 35.0
 
-namespace robot::controller {
+namespace control::input {
 AutonomousRecordingController::AutonomousRecordingController(robot::Robot &robot, pros::controller_id_e_t controller_id)
     : controller_id(controller_id), robot(robot), output(fs::open_indexed("autonomous", std::ios::out)) {
   this->output << "// AUTON START\n";
@@ -100,73 +101,73 @@ void AutonomousRecordingController::update() {
   }
 
   this->ticks++;
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_A))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_A)) {
     this->a++;
   } else {
     this->a = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_B))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_B)) {
     this->b++;
   } else {
     this->b = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_X))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_X)) {
     this->x++;
   } else {
     this->x = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_Y))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
     this->y++;
   } else {
     this->y = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_UP))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
     this->up++;
   } else {
     this->up = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_DOWN))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) {
     this->down++;
   } else {
     this->down = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_LEFT))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_LEFT)) {
     this->left++;
   } else {
     this->left = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_RIGHT))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
     this->right++;
   } else {
     this->right = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_L1))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
     this->l1++;
   } else {
     this->l1 = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_L2))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
     this->l2++;
   } else {
     this->l2 = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_R1))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
     this->r1++;
   } else {
     this->r1 = 0;
   }
 
-  if (print_error(pros::c::controller_get_digital(this->controller_id, pros::E_CONTROLLER_DIGITAL_R2))) {
+  if (controller_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
     this->r2++;
   } else {
     this->r2 = 0;
@@ -309,10 +310,10 @@ bool AutonomousRecordingController::write_drivetrain_update() {
   this->targetDirty = false;
   switch (this->drivetrainTarget) {
   case FORWARDS: {
-    double dist = util::e_units_to_in(
+    double dist = units::encoderToInch(
         (this->robot.drivetrain.leftFront.get_position() + this->robot.drivetrain.leftBack.get_position() +
-         this->robot.drivetrain.rightFront.get_position() + this->robot.drivetrain.rightBack.get_position()) /
-        4.0);
+            this->robot.drivetrain.rightFront.get_position() + this->robot.drivetrain.rightBack.get_position()) /
+            4.0);
     //    debug("Forwards %f", (this->robot.drivetrain.leftFront.get_position() +
     //    this->robot.drivetrain.leftBack.get_position() +
     //                          this->robot.drivetrain.rightFront.get_position() +
@@ -324,10 +325,10 @@ bool AutonomousRecordingController::write_drivetrain_update() {
     return true;
   }
   case BACKWARDS: {
-    double dist = util::e_units_to_in(
+    double dist = units::encoderToInch(
         (this->robot.drivetrain.leftFront.get_position() + this->robot.drivetrain.leftBack.get_position() +
-         this->robot.drivetrain.rightFront.get_position() + this->robot.drivetrain.rightBack.get_position()) /
-        4.0);
+            this->robot.drivetrain.rightFront.get_position() + this->robot.drivetrain.rightBack.get_position()) /
+            4.0);
     //    debug("Backwards %f", (this->robot.drivetrain.leftFront.get_position() +
     //    this->robot.drivetrain.leftBack.get_position() +
     //                           this->robot.drivetrain.rightFront.get_position() +
@@ -339,9 +340,9 @@ bool AutonomousRecordingController::write_drivetrain_update() {
     return true;
   }
   case LEFT: {
-    double dist_left = util::e_units_to_turn(
+    double dist_left = units::encoderToDegrees(
         (this->robot.drivetrain.leftFront.get_position() + this->robot.drivetrain.leftBack.get_position()) / 2.0);
-    double dist_right = util::e_units_to_turn(
+    double dist_right = units::encoderToDegrees(
         (this->robot.drivetrain.rightFront.get_position() + this->robot.drivetrain.rightBack.get_position()) / 2.0);
     //    debug("Left %f %f", (this->robot.drivetrain.rightFront.get_position() +
     //    this->robot.drivetrain.rightBack.get_position()) / 2.0, (this->robot.drivetrain.leftFront.get_position() +
@@ -353,9 +354,9 @@ bool AutonomousRecordingController::write_drivetrain_update() {
     return true;
   }
   case RIGHT: {
-    double dist_left = util::e_units_to_turn(
+    double dist_left = units::encoderToDegrees(
         (this->robot.drivetrain.leftFront.get_position() + this->robot.drivetrain.leftBack.get_position()) / 2.0);
-    double dist_right = util::e_units_to_turn(
+    double dist_right = units::encoderToDegrees(
         (this->robot.drivetrain.rightFront.get_position() + this->robot.drivetrain.rightBack.get_position()) / 2.0);
     //    debug("Right %f %f", (this->robot.drivetrain.leftFront.get_position() +
     //    this->robot.drivetrain.leftBack.get_position()) / 2.0, (this->robot.drivetrain.rightFront.get_position() +
@@ -369,4 +370,4 @@ bool AutonomousRecordingController::write_drivetrain_update() {
   }
   return false;
 }
-} // namespace robot::controller
+} // namespace control::input

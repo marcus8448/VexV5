@@ -1,10 +1,10 @@
-#include "control/operator/raw_replay.hpp"
+#include "control/input/raw_replay.hpp"
 #include "debug/error.hpp"
 #include "debug/logger.hpp"
 #include "fs/filesystem.hpp"
 #include <cstring>
 
-namespace robot::controller {
+namespace control::input {
 RawReplay::RawReplay(const char *name) : input(fs::open(name, std::ios_base::in | std::ios_base::binary)) {
   if (!input.is_open() || input.bad()) {
     input.close();
@@ -16,7 +16,7 @@ RawReplay::RawReplay(const char *name) : input(fs::open(name, std::ios_base::in 
   input.read(buf, 4);
   if (input.eof() || strcmp(buf, "v5r\n") != 0) {
     input.close();
-    error("Recording in invalid format!");
+    error("Recording in invalid format! %s", buf);
     return;
   }
 }
@@ -180,4 +180,4 @@ void RawReplay::update() {
   if (this->l2 == 1)
     debug("L2 pressed");
 }
-} // namespace robot::controller
+} // namespace control::input

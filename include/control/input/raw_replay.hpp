@@ -1,18 +1,19 @@
-#ifndef CONTROL_OPERATOR_OPERATOR_HPP
-#define CONTROL_OPERATOR_OPERATOR_HPP
+#ifndef CONTROL_INPUT_RAW_REPLAY_HPP
+#define CONTROL_INPUT_RAW_REPLAY_HPP
 
 #include "controller.hpp"
 #include "pros/misc.h"
 #include <cstdint>
+#include <fstream>
 
-namespace robot::controller {
+namespace control::input {
 /**
  * The default type of controller.
  * Updates the controller state based on the V5 controller input.
  */
-class Operator : public Controller {
+class RawReplay : public Controller {
 private:
-  pros::controller_id_e_t controller_id;
+  std::ifstream input;
 
   uint16_t a = 0;
   uint16_t b = 0;
@@ -34,13 +35,11 @@ private:
   double rightStickX = 0.0;
   double rightStickY = 0.0;
 
-  int16_t flywheelSpeed = 450;
+  int16_t flywheelSpeed = 7100;
   uint32_t ticks = 0;
 
-  const char *enqueued_rumble = nullptr;
-
 public:
-  explicit Operator(pros::controller_id_e_t controller_id = pros::E_CONTROLLER_MASTER);
+  explicit RawReplay(const char *name);
 
   [[nodiscard]] uint16_t a_pressed() const override;
   [[nodiscard]] uint16_t b_pressed() const override;
@@ -72,5 +71,5 @@ public:
 
   void update() override;
 };
-} // namespace robot::controller
-#endif // CONTROL_OPERATOR_OPERATOR_HPP
+} // namespace control::input
+#endif // CONTROL_INPUT_RAW_REPLAY_HPP

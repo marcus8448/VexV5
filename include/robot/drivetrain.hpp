@@ -1,7 +1,7 @@
 #ifndef ROBOT_DRIVETRAIN_HPP
 #define ROBOT_DRIVETRAIN_HPP
 
-#include "control/operator/controller.hpp"
+#include "control/input/controller.hpp"
 #include "robot/device/gyro.hpp"
 #include "robot/device/inertial.hpp"
 #include "robot/device/motor.hpp"
@@ -122,7 +122,7 @@ public:
   void brake();
   void set_brake_mode(pros::motor_brake_mode_e brake_mode);
 
-  void updateTargeting(Controller *controller);
+  void updateTargeting(control::input::Controller *controller);
   void updatePosition();
   void updateMovement();
 

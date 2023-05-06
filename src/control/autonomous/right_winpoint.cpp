@@ -1,6 +1,5 @@
 #include "control/autonomous/right_winpoint.hpp"
-#include "util.hpp"
 
-namespace robot::autonomous {
+namespace control::autonomous {
 void RightWinpoint::run(Robot &robot) {}
-} // namespace robot::autonomous
+} // namespace control::autonomous

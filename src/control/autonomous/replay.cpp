@@ -2,7 +2,7 @@
 #include "debug/logger.hpp"
 #include "fs/filesystem.hpp"
 
-namespace robot::autonomous {
+namespace control::autonomous {
 Replay::Replay(const char *name) : Autonomous(name) {}
 
 void Replay::run(Robot &robot) {
@@ -13,4 +13,4 @@ void Replay::run(Robot &robot) {
     return;
   }
 }
-} // namespace robot::autonomous
+} // namespace control::autonomous

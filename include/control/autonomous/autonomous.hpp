@@ -1,11 +1,12 @@
 #ifndef CONTROL_AUTONOMOUS_AUTONOMOUS_HPP
 #define CONTROL_AUTONOMOUS_AUTONOMOUS_HPP
 
-#include "pros/rtos.h"
-#include "robot/robot.hpp"
-#include <string>
+#include "include/robot/robot.hpp"
+#include "string"
 
-namespace robot::autonomous {
+using namespace robot;
+
+namespace control::autonomous {
 /**
  * An autonomous run.
  * Contains all of the code necessary to run the robot for the 15 second autonomous period.
@@ -41,5 +42,5 @@ void set_active(const std::string *program);
  * @return The selected autonomous run.
  */
 Autonomous *get_autonomous();
-} // namespace robot::autonomous
+} // namespace control::autonomous
 #endif // CONTROL_AUTONOMOUS_AUTONOMOUS_HPP
