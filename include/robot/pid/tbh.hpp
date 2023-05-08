@@ -4,7 +4,7 @@
 #include "robot/pid/pid_controller.hpp"
 
 namespace robot {
-class TBHControl : public PidController {
+class TbhControl : public VelocityPid {
 private:
   double target = 0.0;
   double output = 0.0;
@@ -16,11 +16,11 @@ private:
   const double gain; // out += diff in velocity * gain
 
 public:
-  explicit TBHControl(uint8_t port, uint8_t port2, double gain);
-  ~TBHControl() override;
+  explicit TbhControl(uint8_t port, uint8_t port2, double gain);
+  ~TbhControl() override;
 
   void reset() override;
-  void target_velocity(double targetVelocity) override;
+  void startTargeting(double velocity) override;
   void update() override;
 };
 } // namespace robot

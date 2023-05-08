@@ -33,10 +33,10 @@ public:
   explicit Robot(const Robot &robot) = delete;
   ~Robot();
 
-  void set_controller(control::input::Controller *controller);
+  void setController(control::input::Controller *controller);
 
-  [[noreturn]] void background_control();
-  void run_autonomous();
+  [[noreturn]] void backgroundControl();
+  void runAutonomous();
   [[noreturn]] void opcontrol();
 };
 } // namespace robot

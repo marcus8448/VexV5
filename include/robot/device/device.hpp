@@ -3,32 +3,34 @@
 
 #define ROBOT_TICK_RATE 20
 
-#define DEVICE_TYPE_NAME(type_name)                                                                                    \
-  [[nodiscard]] const char *get_type_name() const override { return type_name; };
-
 #include "robot/updatable.hpp"
 #include <cstdint>
 
 namespace robot::device {
 class Device : public Updatable {
+private:
+  const char *typeName;
+  const char *name;
+
+protected:
+  const uint8_t port;
+
 public:
-  explicit Device(uint8_t port, const char *name);
+  explicit Device(const char *typeName, const char *name, uint8_t port);
   explicit Device(const Device &) = delete;
   ~Device() override = default;
 
   virtual void reconfigure() const = 0;
 
-  [[nodiscard]] virtual bool is_connected() const = 0;
-  [[nodiscard]] uint8_t get_port() const;
+  [[nodiscard]] virtual bool isConnected() const = 0;
+  [[nodiscard]] uint8_t getPort() const;
 
-  [[nodiscard]] virtual const char *get_type_name() const = 0;
-  [[nodiscard]] const char *get_name() const;
+  [[nodiscard]] const char *getTypeName() const;
+  [[nodiscard]] const char *getName() const;
 
 protected:
-  const uint8_t port;
-  const char *name;
-
   [[nodiscard]] static bool checkConnect();
+
 };
 
 void initialize();

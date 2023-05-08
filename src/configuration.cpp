@@ -7,7 +7,7 @@ DrivetrainControlScheme controlScheme = TANK;
 DrivetrainControlScheme controlScheme = ARCADE;
 #endif
 
-[[nodiscard]] const char *get_drive_scheme_name(DrivetrainControlScheme scheme) {
+[[nodiscard]] const char *driveSchemeName(DrivetrainControlScheme scheme) {
   switch (scheme) {
   case TANK:
     return "Tank";

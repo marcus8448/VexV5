@@ -59,10 +59,10 @@ void DrivetrainChart::update(robot::Robot &robot) {
     this->velMotorRB.erase(this->velMotorRB.begin());
   }
 
-  auto prevLF = static_cast<float>(robot.drivetrain.leftFront.get_velocity());
-  auto prevRF = static_cast<float>(robot.drivetrain.rightFront.get_velocity());
-  auto prevLB = static_cast<float>(robot.drivetrain.leftBack.get_velocity());
-  auto prevRB = static_cast<float>(robot.drivetrain.rightBack.get_velocity());
+  auto prevLF = static_cast<float>(robot.drivetrain.leftFront.getVelocity());
+  auto prevRF = static_cast<float>(robot.drivetrain.rightFront.getVelocity());
+  auto prevLB = static_cast<float>(robot.drivetrain.leftBack.getVelocity());
+  auto prevRB = static_cast<float>(robot.drivetrain.rightBack.getVelocity());
   if (prevLF == INFINITY || prevLF == -1)
     prevLF = 5;
   if (prevRF == INFINITY || prevRF == -1)

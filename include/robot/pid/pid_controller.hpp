@@ -4,12 +4,12 @@
 #include <cstdint>
 
 namespace robot {
-class PidController {
+class VelocityPid {
 public:
-  virtual ~PidController() = default;
+  virtual ~VelocityPid() = default;
 
   virtual void reset() = 0;
-  virtual void target_velocity(double targetVelocity) = 0;
+  virtual void startTargeting(double velocity) = 0;
   virtual void update() = 0;
 };
 }

@@ -4,7 +4,7 @@
 
 namespace robot::device {
 PneumaticPiston::PneumaticPiston(uint8_t port, const char *name, bool defaultState)
-    : Device(port, name), extended(defaultState) {
+    : Device("Piston", name, port), extended(defaultState) {
   pros::c::adi_port_set_config(this->port, pros::adi_port_config_e_t::E_ADI_DIGITAL_OUT);
   pros::c::adi_digital_write(this->port, this->extended);
 }
@@ -33,11 +33,11 @@ void PneumaticPiston::toggle() {
 
 void PneumaticPiston::update() {}
 
-[[nodiscard]] bool PneumaticPiston::is_extended() const { return this->extended; }
+[[nodiscard]] bool PneumaticPiston::isExtended() const { return this->extended; }
 
 void PneumaticPiston::reconfigure() const {}
 
-[[nodiscard]] bool PneumaticPiston::is_connected() const {
+[[nodiscard]] bool PneumaticPiston::isConnected() const {
   bool b = pros::c::adi_digital_write(this->port, this->extended) == 1;
   errno = 0;
   return b;

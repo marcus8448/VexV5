@@ -12,7 +12,7 @@ Autonomous::Autonomous(const char *name) : name(name) {}
 
 const char *Autonomous::get_name() { return this->name; }
 
-void register_autonomous(Autonomous *program) {
+void registerRun(Autonomous *program) {
   info("Registering autonomous '%s'.", program->get_name());
   (*autonomousPrograms)[std::string(program->get_name())] = program;
 

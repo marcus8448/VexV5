@@ -11,30 +11,30 @@ void RobotStatePlugin::initialize() {}
 
 void serialize_motor(uint8_t *buffer, const robot::device::Motor &motor) {
   floating src;
-  src = motor.get_target_position();
+  src = motor.getTargetPosition();
   std::memcpy(&buffer[sizeof(floating) * 0], &src, sizeof(floating));
-  src = motor.get_velocity();
+  src = motor.getVelocity();
   std::memcpy(&buffer[sizeof(floating) * 1], &src, sizeof(floating));
-  src = motor.get_position();
+  src = motor.getPosition();
   std::memcpy(&buffer[sizeof(floating) * 2], &src, sizeof(floating));
-  src = motor.get_efficiency();
+  src = motor.getEfficiency();
   std::memcpy(&buffer[sizeof(floating) * 3], &src, sizeof(floating));
-  src = motor.get_power();
+  src = motor.getPower();
   std::memcpy(&buffer[sizeof(floating) * 4], &src, sizeof(floating));
-  src = motor.get_temperature();
+  src = motor.getTemperature();
   std::memcpy(&buffer[sizeof(floating) * 5], &src, sizeof(floating));
-  src = motor.get_torque();
+  src = motor.getTorque();
   std::memcpy(&buffer[sizeof(floating) * 6], &src, sizeof(floating));
   uint32_t i_src;
-  i_src = motor.get_target_velocity();
+  i_src = motor.getTargetVelocity();
   std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 0], &i_src, sizeof(int));
-  i_src = motor.get_current_draw();
+  i_src = motor.getCurrentDraw();
   std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 1], &i_src, sizeof(int));
-  i_src = motor.get_voltage();
+  i_src = motor.getVoltage();
   std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 2], &i_src, sizeof(int));
-  i_src = motor.get_current_limit();
+  i_src = motor.getCurrentLimit();
   std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 3], &i_src, sizeof(int));
-  i_src = motor.get_voltage_limit();
+  i_src = motor.getVoltageLimit();
   std::memcpy(&buffer[sizeof(floating) * 7 + sizeof(int) * 4], &i_src, sizeof(int));
 }
 

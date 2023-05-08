@@ -1,5 +1,5 @@
-#ifndef UTIL_HPP
-#define UTIL_HPP
+#ifndef UNITS_HPP
+#define UNITS_HPP
 
 namespace units {
 /**
@@ -17,6 +17,6 @@ double encoderToInch(double encoderUnits);
  */
 double degreesToEncoder(double degrees);
 double encoderToDegrees(double encoderUnits);
-} // namespace util
+} // namespace units
 
-#endif // UTIL_HPP
+#endif // UNITS_HPP

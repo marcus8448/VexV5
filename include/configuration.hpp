@@ -25,6 +25,6 @@ enum DrivetrainControlScheme {
 
 extern DrivetrainControlScheme controlScheme;
 
-[[nodiscard]] const char *get_drive_scheme_name(DrivetrainControlScheme scheme);
+[[nodiscard]] const char *driveSchemeName(DrivetrainControlScheme scheme);
 } // namespace config
 #endif // CONFIGURATION_HPP

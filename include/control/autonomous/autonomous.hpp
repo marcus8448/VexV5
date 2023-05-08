@@ -33,7 +33,7 @@ public:
  * @param name The name of the autonomous run, to be shown on the screen. Must be unique.
  * @param autonomous The autonomous run
  */
-void register_autonomous(Autonomous *autonomous);
+void registerRun(Autonomous *autonomous);
 const std::string *get_active();
 void set_active(const std::string *program);
 

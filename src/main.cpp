@@ -1,8 +1,8 @@
 #include "main.hpp"
 #include "control/input/operator.hpp"
 #include "debug/logger.hpp"
-#include "pros/rtos.hpp"
 #include "robot/device/motor.hpp"
+#include "pros/rtos.h"
 
 #ifndef DISABLE_AUTONOMOUS
 #include "control/autonomous/autonomous.hpp"
@@ -43,17 +43,18 @@
 using namespace robot;
 
 robot::Robot &getRobot();
-void pros_task_begin();
+void onRootTaskStart();
+void onRootTaskEnd();
 
 /**
  * Called when the robot is first initialized.
  */
 void initialize() {
-  pros_task_begin();
-  section_push("Initialize");
-  section_push("Initialize robot");
+  onRootTaskStart();
+  scopePush("Initialize");
+  scopePush("Initialize robot");
   Robot &robot = getRobot();
-  section_pop();
+  scopePop();
 #ifndef DISABLE_SERIAL
   logger::warn("Initializing serial connection...");
   serial::add_plugin(7, new serial::RobotStatePlugin(robot));
@@ -63,48 +64,50 @@ void initialize() {
   // Optionally disable autonomous for builds
 #ifndef DISABLE_AUTONOMOUS
   // Register the different types of autonomous-es
-  control::autonomous::register_autonomous(new control::autonomous::None());
-  control::autonomous::register_autonomous(new control::autonomous::LeftWinpoint());
-  control::autonomous::register_autonomous(new control::autonomous::RightWinpoint());
-  control::autonomous::register_autonomous(new control::autonomous::Skills());
+  control::autonomous::registerRun(new control::autonomous::None());
+  control::autonomous::registerRun(new control::autonomous::LeftWinpoint());
+  control::autonomous::registerRun(new control::autonomous::RightWinpoint());
+  control::autonomous::registerRun(new control::autonomous::Skills());
 #endif
   // Optionally enable extra screen functionality
 #ifndef DISABLE_SCREEN
-  section_push("Register Screens");
+  scopePush("Register Screens");
   // Optionally register the different screens
 #if not defined(DISABLE_AUTONOMOUS) and not defined(DISABLE_AUTONOMOUS_SELECTION_SCREEN)
-  screen::add_screen(new screen::AutonomousSelect());
+  screen::addScreen(new screen::AutonomousSelect());
 #endif
 #ifndef DISABLE_CONFIG_SCREEN
-  screen::add_screen(new screen::ConfigurationScreen());
+  screen::addScreen(new screen::ConfigurationScreen());
 #endif
-  screen::add_screen(new screen::Information());
+  screen::addScreen(new screen::Information());
 #ifndef DISABLE_DRIVETRAIN_DEBUG_SCREEN
-  screen::add_screen(new screen::DrivetrainChart());
+  screen::addScreen(new screen::DrivetrainChart());
 #endif
   section_swap("Initialize Screen");
   screen::initialize(robot); // initialize the screen
-  section_pop();
+  scopePop();
 #endif // DISABLE_SCREEN
   robot.drivetrain.imu.calibrate();
-  section_pop();
+  scopePop();
+  onRootTaskEnd();
 }
 
 /**
  * Called when the robot is in it's autonomous state in a competition.
  */
 void autonomous() {
-  pros_task_begin();
+  onRootTaskStart();
 #ifndef DISABLE_AUTONOMOUS
   Robot &robot = getRobot();
-  section_push("Autonomous Setup");
+  scopePush("Autonomous Setup");
   //  autonomous::set_active(new std::string("Right Winpoint"));
-  section_pop();
+  scopePop();
 
-  robot.run_autonomous();
+  robot.runAutonomous();
 #else
   error("Autonomous is disabled");
 #endif
+  onRootTaskEnd();
 }
 
 /**
@@ -113,29 +116,41 @@ void autonomous() {
  * pressed.
  */
 void opcontrol() {
-  pros_task_begin();
+  onRootTaskStart();
   Robot &robot = getRobot();
 
-  section_push("Opcontrol Setup");
-  robot.set_controller(new control::input::Operator()); // set the robot controller to the default operator based one
-  section_pop();
+  scopePush("Opcontrol Setup");
+  robot.setController(new control::input::Operator()); // set the robot controller to the default operator based one
+  scopePop();
 
   robot.opcontrol();
+  onRootTaskEnd();
 }
 
 /**
  * Called when the robot is at an official competition.
  */
-void competition_initialize() { pros_task_begin(); }
+void competition_initialize() {
+  onRootTaskStart();
+  onRootTaskEnd();
+}
 
 /**
  * Called when the robot should be stopped during a competition
  */
-void disabled() { pros_task_begin(); }
+void disabled() {
+  onRootTaskStart();
+  onRootTaskEnd();
+}
 
-void pros_task_begin() {
+void onRootTaskStart() {
   logger::flush();
   logger::initialize(pros::c::task_get_name(pros::c::task_get_current()));
+}
+
+void onRootTaskEnd() {
+  logger::clearRoot(pros::c::task_get_name(pros::c::task_get_current()));
+  logger::flush();
 }
 
 /**

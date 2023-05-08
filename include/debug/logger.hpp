@@ -11,12 +11,12 @@
 
 #ifdef DEBUG_LOG
 #define debug(fmt, ...) logger::_debug(fmt, ##__VA_ARGS__)
-#define section_push(name) logger::_push(name)
-#define section_pop() logger::_pop()
+#define scopePush(name) logger::_push(name)
+#define scopePop() logger::_pop()
 #define section_swap(name) logger::_pop_push(name)
 
-#define timer_start(name) auto __timer_##name##__ = pros::c::millis()
-#define timer_print(name) info("%s took %i ms", #name, pros::c::millis() - __timer_##name##__)
+#define startTiming(name) auto __timer_##name##__ = pros::c::millis()
+#define endTiming(name) info("%s took %i ms", #name, pros::c::millis() - __timer_##name##__)
 #else
 #define debug(fmt, ...)                                                                                                \
   {}
@@ -167,5 +167,6 @@ void _pop_push(const char *string);
 void flush();
 
 void initialize(const char *name);
+void clearRoot(char *name);
 } // namespace logger
 #endif // DEBUG_LOGGER_HPP

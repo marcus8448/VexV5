@@ -13,7 +13,7 @@ Robot::~Robot() {
   controller = nullptr;
 }
 
-[[noreturn]] void Robot::background_control() {
+[[noreturn]] void Robot::backgroundControl() {
   while (true) {
     this->drivetrain.updatePosition();
 
@@ -23,9 +23,9 @@ Robot::~Robot() {
 }
 
 [[noreturn]] void Robot::opcontrol() {
-  this->drivetrain.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  this->drivetrain.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 
-  pros::c::task_create([](void *param) { static_cast<Robot *>(param)->background_control(); }, this,
+  pros::c::task_create([](void *param) { static_cast<Robot *>(param)->backgroundControl(); }, this,
                        TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Robot async control (OP)");
 
   while (true) {
@@ -39,10 +39,10 @@ Robot::~Robot() {
   }
 }
 
-void Robot::run_autonomous() {
-  this->drivetrain.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+void Robot::runAutonomous() {
+  this->drivetrain.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
 
-  pros::c::task_create([](void *param) { static_cast<Robot *>(param)->background_control(); }, this,
+  pros::c::task_create([](void *param) { static_cast<Robot *>(param)->backgroundControl(); }, this,
                        TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Robot async control (OP)");
 
   if (control::autonomous::get_active() == nullptr) {
@@ -53,7 +53,7 @@ void Robot::run_autonomous() {
   control::autonomous::get_autonomous()->run(*this);
 }
 
-void Robot::set_controller(control::input::Controller *controller) {
+void Robot::setController(control::input::Controller *controller) {
   delete this->controller;
   this->controller = controller;
 }

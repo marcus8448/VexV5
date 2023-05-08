@@ -38,9 +38,9 @@ lv_obj_t *create_next_btn(lv_obj_t *obj);
 void create_screen(lv_obj_t *output[], lv_obj_t *parent);
 
 void initialize(robot::Robot &robot) {
-  section_push("Initialize LVGL");
+  scopePush("Initialize LVGL");
   lv_init();
-  section_pop();
+  scopePop();
 
   lv_obj_t *base_view = lv_scr_act();
   width = lv_obj_get_width(base_view);
@@ -54,14 +54,14 @@ void initialize(robot::Robot &robot) {
   activeScreen = registry->at(0);
 
   debug("Width: %i\nHeight: %i", width, height);
-  section_push("Create screens");
+  scopePush("Create screens");
   for (auto screen : *registry) {
     auto **lvObjs = new lv_obj_t *[3];
     create_screen(lvObjs, base_view);
     screens->emplace(screen, lvObjs);
     screen->create(lvObjs[0], width, height);
   }
-  section_pop();
+  scopePop();
 
   show_screen(activeScreen);
   pros::c::task_create(update_task, static_cast<void *>(&robot), TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT,
@@ -93,9 +93,9 @@ void update(robot::Robot &robot) {
   activeScreen->update(robot);
 }
 
-void add_screen(Screen *screen) { registry->push_back(screen); }
+void addScreen(Screen *screen) { registry->push_back(screen); }
 
-void remove_screen(Screen *screen) {
+void removeScreen(Screen *screen) {
   if (activeScreen == screen) {
     hide_screen(activeScreen);
     auto newScreen = registry->front() != activeScreen ? registry->front() : registry->back();

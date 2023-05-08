@@ -19,7 +19,7 @@ public:
 };
 
 void initialize(robot::Robot &robot);
-void add_screen(Screen *screen);
-void remove_screen(Screen *screen);
+void addScreen(Screen *screen);
+void removeScreen(Screen *screen);
 } // namespace screen
 #endif // SCREEN_HPP

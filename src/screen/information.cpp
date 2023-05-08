@@ -50,7 +50,7 @@ void Information::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) 
 
 void Information::update(robot::Robot &robot) {
   set_label_text(this->uptimeLabel, "Uptime: %i", pros::c::millis());
-  set_label_text(this->controlSchemeLabel, "Control Scheme: %s", config::get_drive_scheme_name(config::controlScheme));
+  set_label_text(this->controlSchemeLabel, "Control Scheme: %s", config::driveSchemeName(config::controlScheme));
   update_motor_pos(this->motorLFLabel, robot.drivetrain.leftFront);
   update_motor_pos(this->motorRFLabel, robot.drivetrain.rightFront);
   update_motor_pos(this->motorLBLabel, robot.drivetrain.leftBack);
@@ -59,43 +59,43 @@ void Information::update(robot::Robot &robot) {
 }
 
 void update_device_digital(lv_obj_t *label, const robot::device::Device &device, bool engaged) {
-  if (!device.is_connected()) {
-    set_label_text(label, "%s: Disconnected", device.get_name());
+  if (!device.isConnected()) {
+    set_label_text(label, "%s: Disconnected", device.getName());
   } else {
     if (engaged) {
-      set_label_text(label, "%s: Enabled", device.get_name());
+      set_label_text(label, "%s: Enabled", device.getName());
     } else {
-      set_label_text(label, "%s: Disabled", device.get_name());
+      set_label_text(label, "%s: Disabled", device.getName());
     }
   }
 }
 
 void update_device(lv_obj_t *label, const robot::device::Device &device, double value) {
-  if (!device.is_connected()) {
-    set_label_text(label, "%s: Disconnected", device.get_name());
+  if (!device.isConnected()) {
+    set_label_text(label, "%s: Disconnected", device.getName());
   } else {
-    set_label_text(label, "%s: %f", device.get_name(), value);
+    set_label_text(label, "%s: %f", device.getName(), value);
   }
 }
 
 void update_device(lv_obj_t *label, const robot::device::Device &device, int32_t value) {
-  if (!device.is_connected()) {
-    set_label_text(label, "%s: Disconnected", device.get_name());
+  if (!device.isConnected()) {
+    set_label_text(label, "%s: Disconnected", device.getName());
   } else {
-    set_label_text(label, "%s: %i", device.get_name(), value);
+    set_label_text(label, "%s: %i", device.getName(), value);
   }
 }
 
 void update_motor_pos(lv_obj_t *label, const robot::device::Motor &motor) {
-  update_device(label, motor, motor.get_position());
+  update_device(label, motor, motor.getPosition());
 }
 
 void update_motor_vel(lv_obj_t *label, const robot::device::Motor &motor) {
-  update_device(label, motor, motor.get_velocity());
+  update_device(label, motor, motor.getVelocity());
 }
 
 void update_motor_temp(lv_obj_t *label, const robot::device::Motor &motor) {
-  update_device(label, motor, motor.get_temperature());
+  update_device(label, motor, motor.getTemperature());
 }
 
 } // namespace screen

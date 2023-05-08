@@ -19,7 +19,7 @@ Drivetrain::Drivetrain(const uint8_t rightFront, const uint8_t leftFront, const 
 
 Drivetrain::~Drivetrain() = default;
 
-bool Drivetrain::is_at_target() const { return this->timeAtTarget > STABILIZE_MARGIN; }
+bool Drivetrain::isAtTarget() const { return this->timeAtTarget > STABILIZE_MARGIN; }
 
 void Drivetrain::forwards(double distance, bool wait) {
   info("Moving forwards %fin.", distance);
@@ -28,9 +28,9 @@ void Drivetrain::forwards(double distance, bool wait) {
   this->targetLeft = units::inchToEncoder(distance);
   this->targetRight = units::inchToEncoder(distance);
   if (wait) {
-    timer_start(move_forwards);
-    await_move();
-    timer_print(move_forwards);
+    startTiming(move_forwards);
+    awaitMovement();
+    endTiming(move_forwards);
   }
 }
 
@@ -41,35 +41,35 @@ void Drivetrain::backwards(double distance, bool wait) {
   this->targetLeft = units::inchToEncoder(-distance);
   this->targetRight = units::inchToEncoder(-distance);
   if (wait) {
-    timer_start(move_backwards);
-    await_move();
-    timer_print(move_backwards);
+    startTiming(move_backwards);
+    awaitMovement();
+    endTiming(move_backwards);
   }
 }
 
-void Drivetrain::turn_right(double degrees, bool wait) {
+void Drivetrain::turnRight(double degrees, bool wait) {
   info("Turning right %f degrees.", degrees);
   this->setTarget(STATIC_TURN);
   this->targetHeading += degrees - floor(degrees / 360.0);
   if (wait) {
-    timer_start(turn_right);
-    await_move();
-    timer_print(turn_right);
+    startTiming(turnRight);
+    awaitMovement();
+    endTiming(turnRight);
   }
 }
 
-void Drivetrain::turn_left(double degrees, bool wait) {
+void Drivetrain::turnLeft(double degrees, bool wait) {
   info("Turning left %f degrees.", degrees);
   this->setTarget(STATIC_TURN);
   this->targetHeading -= degrees - floor(degrees / 360.0);
   if (wait) {
-    timer_start(turn_left);
-    await_move();
-    timer_print(turn_left);
+    startTiming(turnLeft);
+    awaitMovement();
+    endTiming(turnLeft);
   }
 }
 
-void Drivetrain::await_move() const {
+void Drivetrain::awaitMovement() const {
   while (this->timeAtTarget < STABILIZE_MARGIN) {
     pros::delay(ROBOT_TICK_RATE * (STABILIZE_MARGIN - this->timeAtTarget));
   }
@@ -109,15 +109,15 @@ void Drivetrain::updateMovement() {
   case OPERATOR_DIRECT: {
     if (this->powerRight == 0 && this->powerLeft == 0) {
       if (++this->timeOff == 200) {
-        this->set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+        this->setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
         this->brake();
       }
     } else {
-      this->set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+      this->setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
       this->timeOff = 0;
     }
-    this->power_right(this->powerRight);
-    this->power_left(this->powerLeft);
+    this->moveRight(this->powerRight);
+    this->moveLeft(this->powerLeft);
   }
   case STATIC_TURN: {
     double offset = this->targetHeading - this->heading;
@@ -129,16 +129,16 @@ void Drivetrain::updateMovement() {
       }
 
       double distance = units::degreesToEncoder(offset);
-      this->move_right_targeting(this->rightPos - distance);
-      this->move_left_targeting(this->leftPos + distance);
+      this->moveRightTargeting(this->rightPos - distance);
+      this->moveLeftTargeting(this->leftPos + distance);
       if (std::abs(distance) < ACCEPTABLE_OFFSET && std::abs(distance) < ACCEPTABLE_OFFSET) {
         atTarget = true;
       }
     }
   }
   case DIRECT_MOVE: {
-    this->move_right_targeting(this->targetLeft);
-    this->move_left_targeting(this->targetRight);
+    this->moveRightTargeting(this->targetLeft);
+    this->moveLeftTargeting(this->targetRight);
     if (std::abs(this->targetLeft - this->leftPos) < ACCEPTABLE_OFFSET &&
         std::abs(this->targetRight - this->rightPos) < ACCEPTABLE_OFFSET) {
       atTarget = true;
@@ -159,11 +159,11 @@ void Drivetrain::brake() {
   this->leftBack.brake();
 }
 
-void Drivetrain::set_brake_mode(pros::motor_brake_mode_e brake_mode) {
-  this->leftFront.set_brake_mode(brake_mode);
-  this->leftBack.set_brake_mode(brake_mode);
-  this->rightFront.set_brake_mode(brake_mode);
-  this->rightBack.set_brake_mode(brake_mode);
+void Drivetrain::setBrakeMode(pros::motor_brake_mode_e brake_mode) {
+  this->leftFront.setBrakeMode(brake_mode);
+  this->leftBack.setBrakeMode(brake_mode);
+  this->rightFront.setBrakeMode(brake_mode);
+  this->rightBack.setBrakeMode(brake_mode);
 }
 
 void Drivetrain::tare() {
@@ -177,7 +177,7 @@ void Drivetrain::tare() {
   this->heading = 0.0;
 }
 
-void Drivetrain::move_right_targeting(double target) {
+void Drivetrain::moveRightTargeting(double target) {
   this->prevErrorRight = this->errorRight;
   this->errorRight = target - this->rightPos;
   this->integralRight += this->errorRight;
@@ -190,10 +190,10 @@ void Drivetrain::move_right_targeting(double target) {
   if (abs(output) > MOTOR_MAX_MILLIVOLTS) {
     output = MOTOR_MAX_MILLIVOLTS;
   }
-  power_right(output);
+  moveRight(output);
 }
 
-void Drivetrain::move_left_targeting(double target) {
+void Drivetrain::moveLeftTargeting(double target) {
   this->prevErrorLeft = this->errorLeft;
   this->errorLeft = target - this->leftPos;
   this->integralLeft += this->errorLeft;
@@ -206,24 +206,24 @@ void Drivetrain::move_left_targeting(double target) {
   if (abs(output) > MOTOR_MAX_MILLIVOLTS) {
     output = MOTOR_MAX_MILLIVOLTS;
   }
-  power_left(output);
+  moveLeft(output);
 }
 
-void Drivetrain::power_right(int16_t millivolts) {
-  this->rightFront.move_millivolts(millivolts);
-  this->rightBack.move_millivolts(millivolts);
+void Drivetrain::moveRight(int16_t millivolts) {
+  this->rightFront.moveMillivolts(millivolts);
+  this->rightBack.moveMillivolts(millivolts);
 }
 
-void Drivetrain::power_left(int16_t millivolts) {
-  this->leftFront.move_millivolts(millivolts);
-  this->leftBack.move_millivolts(millivolts);
+void Drivetrain::moveLeft(int16_t millivolts) {
+  this->leftFront.moveMillivolts(millivolts);
+  this->leftBack.moveMillivolts(millivolts);
 }
 
 void Drivetrain::setTarget(Drivetrain::TargetType type) { this->targetType = type; }
 
 void Drivetrain::updatePosition() {
-  this->heading = this->imu.get_heading();
-  this->rightPos = (this->rightFront.get_position() + this->rightBack.get_position()) / 2.0;
-  this->leftPos = (this->leftFront.get_position() + this->leftBack.get_position()) / 2.0;
+  this->heading = this->imu.getHeading();
+  this->rightPos = (this->rightFront.getPosition() + this->rightBack.getPosition()) / 2.0;
+  this->leftPos = (this->leftFront.getPosition() + this->leftBack.getPosition()) / 2.0;
 }
 } // namespace robot

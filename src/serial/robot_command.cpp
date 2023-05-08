@@ -1,6 +1,5 @@
 #include "serial/robot_command.hpp"
 #include <cstring>
-#include <vector>
 
 namespace serial {
 RobotCommandsPlugin::RobotCommandsPlugin(uint8_t id, robot::Robot &robot) : PacketHandler(id), robot(robot) {}
@@ -29,7 +28,7 @@ void RobotCommandsPlugin::handle(serial::SerialConnection *connection, void *buf
   if (points > 0) {
     if (vec[0] == "drivetrain") {
       if (vec[1] == "right_front") {
-        if (vec[3] == "target_velocity") {
+        if (vec[3] == "startTargeting") {
 
         } else if (vec[3] == "target_voltage") {
 

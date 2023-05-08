@@ -63,10 +63,10 @@ private:
 public:
   /**
    * Creates a new drivetrain with the specified motors.
-   * @param rightFront The motor on the front of the robot and the right side.
-   * @param leftFront The motor on the front of the robot and the left side.
-   * @param rightBack The motor on the back of the robot and the right side.
-   * @param leftBack The motor on the back of the robot and the left side.
+   * @param rightFront The port of the motor on the front of the robot and the right side.
+   * @param leftFront The port of the motor on the front of the robot and the left side.
+   * @param rightBack The port of the motor on the back of the robot and the right side.
+   * @param leftBack The port of the motor on the back of the robot and the left side.
    */
   Drivetrain(uint8_t rightFront, uint8_t leftFront, uint8_t rightBack, uint8_t leftBack, uint8_t inertial);
   virtual ~Drivetrain();
@@ -74,42 +74,41 @@ public:
   /**
    * Drives the robot forwards by the specified distance.
    * @param distance The distance (in inches) to drive forwards for.
-   * @param max_rpm The maximum allowable RPM for the motor to run at while moving.
-   * @param block Whether this function should wait for the robot to turn or exit immediately.
+   * @param wait Whether this function should wait for the robot to move or return immediately.
    */
   void forwards(double distance, bool wait = true);
 
   /**
    * Drives the robot backwards by the specified distance.
    * @param distance The distance (in inches) to drive backwards for.
-   * @param max_rpm The maximum allowable RPM for the motor to run at while moving.
-   * @param block Whether this function should wait for the robot to turn or exit immediately.
+   * @param block Whether this function should wait for the robot to move or return immediately.
    */
   void backwards(double distance, bool wait = true);
 
   /**
    * Turns the robot to the right by spinning by the specified number of degrees.
    * @param degrees The number of degrees to turn.
-   * @param max_rpm The maximum allowable RPM for the motor to run at while turning.
-   * @param block Whether this function should wait for the robot to turn or exit immediately.
+   * @param wait Whether this function should wait for the robot to turn or return immediately.
    */
-  void turn_right(double degrees, bool wait = true);
+  void turnRight(double degrees, bool wait = true);
 
   /**
    * Turns the robot to the left by spinning by the specified number of degrees.
    * @param degrees The number of degrees to turn.
-   * @param max_rpm The maximum allowable RPM for the motor to run at while turning.
-   * @param block Whether this function should wait for the robot to turn or exit immediately.
+   * @param wait Whether this function should wait for the robot to turn or return immediately.
    */
-  void turn_left(double degrees, bool wait = true);
-
-  void await_move() const;
+  void turnLeft(double degrees, bool wait = true);
 
   /**
-   * Checks if the distance between the drivetrain's target position and actual position is within a specific distance.
-   * @return Whether the distance between the drivetrain's target position and actual position is in the desired range.
+   * Blocks until the robot finishes moving.
    */
-  [[nodiscard]] bool is_at_target() const;
+  void awaitMovement() const;
+
+  /**
+   * Checks if the drivetrain has stabilized at its target position.
+   * @return Whether the drivetrain has stabilized at its target position.
+   */
+  [[nodiscard]] bool isAtTarget() const;
 
   /**
    * Resets the all of the motors' absolute position trackers.
@@ -120,7 +119,7 @@ public:
    * Engages the brakes of all of the motors.
    */
   void brake();
-  void set_brake_mode(pros::motor_brake_mode_e brake_mode);
+  void setBrakeMode(pros::motor_brake_mode_e brake_mode);
 
   void updateTargeting(control::input::Controller *controller);
   void updatePosition();
@@ -133,25 +132,25 @@ private:
    * Moves the two right motors of the drivetrain at the specified voltage.
    * @param voltage The voltage to run at [-127 - 127]
    */
-  void power_right(int16_t millivolts);
+  void moveRight(int16_t millivolts);
 
   /**
    * Moves the two left motors of the drivetrain at the specified voltage.
    * @param voltage The voltage to run at [-127 - 127]
    */
-  void power_left(int16_t millivolts);
+  void moveLeft(int16_t millivolts);
 
   /**
    * Moves the two right motors of the drivetrain by the specified distance.
    * @param target The distance in ENCODER UNITS to move the right motors by.
    */
-  void move_right_targeting(double target);
+  void moveRightTargeting(double target);
 
   /**
    * Moves the two left motors of the drivetrain by the specified distance.
    * @param target The distance in ENCODER UNITS to move the right motors by.
    */
-  void move_left_targeting(double target);
+  void moveLeftTargeting(double target);
 };
 } // namespace robot
 #endif // ROBOT_DRIVETRAIN_HPP

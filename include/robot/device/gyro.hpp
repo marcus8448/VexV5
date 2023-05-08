@@ -7,12 +7,11 @@ private:
   int32_t handle;
 
 public:
-  DEVICE_TYPE_NAME("Gyro")
   Gyro(uint8_t port, const char *name);
 
-  [[nodiscard]] double get_rotation() const;
+  [[nodiscard]] double getRotation() const;
 
-  [[nodiscard]] bool is_connected() const override;
+  [[nodiscard]] bool isConnected() const override;
   void update() override;
   void reconfigure() const override;
 };

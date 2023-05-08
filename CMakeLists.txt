@@ -91,7 +91,7 @@ set(SOURCE_FILES
         src/robot/device/optical.cpp
         src/robot/device/pneumatics.cpp
         src/robot/pid/tbh.cpp
-        src/robot/pid/vex_pid.cpp
+        src/robot/pid/vex.cpp
         src/robot/drivetrain.cpp
         src/robot/robot.cpp
         src/screen/autonomous_select.cpp
@@ -104,7 +104,7 @@ set(SOURCE_FILES
         src/serial/robot_state.cpp
         src/serial/serial.cpp
         src/serial/serial_connection.cpp
-        src/util.cpp
+        src/units.cpp
 )
 
 set(HEADER_FILES
@@ -133,7 +133,7 @@ set(HEADER_FILES
         include/robot/device/optical.hpp
         include/robot/device/pneumatics.hpp
         include/robot/pid/tbh.hpp
-        include/robot/pid/vex_pid.hpp
+        include/robot/pid/pid.hpp
         include/robot/drivetrain.hpp
         include/robot/robot.hpp
         include/screen/autonomous_select.hpp

@@ -2,6 +2,7 @@
 #include "fs/filesystem.hpp"
 #include "pros/rtos.hpp"
 
+#include <cstring>
 #include <iostream>
 #include <vector>
 
@@ -101,6 +102,8 @@ void initialize(const char *name) {
   }
   sections->clear();
 
+  info("Root task '%s' started.", main_task_name);
+
 #ifdef FILE_LOG
   if (log_file == nullptr) {
     auto *stream = static_cast<std::ofstream *>(malloc(sizeof(std::ofstream)));
@@ -114,5 +117,18 @@ void initialize(const char *name) {
     }
   }
 #endif
+}
+
+void clearRoot(char *name) {
+  if (main_task_name != nullptr) {
+    if (std::strcmp(name, main_task_name) != 0) {
+      warn("Clearing root task (%s) after other task (%s) has started!", name, main_task_name);
+    } else {
+      info("Root task '%s' ended.", name);
+    }
+  } else {
+    warn("Clearing root task (%s) with no task active!", name);
+  }
+  main_task_name = nullptr;
 }
 } // namespace logger

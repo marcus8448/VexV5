@@ -13,18 +13,17 @@ private:
   bool extended;
 
 public:
-  DEVICE_TYPE_NAME("Pneumatic Piston")
   explicit PneumaticPiston(uint8_t port, const char *name, bool defaultState = false);
 
   void extend();
   void contract();
   void toggle();
 
-  [[nodiscard]] bool is_extended() const;
+  [[nodiscard]] bool isExtended() const;
 
   void update() override;
   void reconfigure() const override;
-  [[nodiscard]] bool is_connected() const override;
+  [[nodiscard]] bool isConnected() const override;
 };
 } // namespace robot::device
 #endif // ROBOT_DEVICE_PNEUMATICS_HPP

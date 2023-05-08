@@ -4,16 +4,15 @@
 namespace robot::device {
 class Inertial : public Device {
 public:
-  DEVICE_TYPE_NAME("Inertial")
   Inertial(uint8_t port, const char *name);
 
-  [[nodiscard]] double get_heading() const;
+  [[nodiscard]] double getHeading() const;
 
-  [[nodiscard]] double get_yaw() const;
-  [[nodiscard]] double get_pitch() const;
-  [[nodiscard]] double get_roll() const;
+  [[nodiscard]] double getYaw() const;
+  [[nodiscard]] double getPitch() const;
+  [[nodiscard]] double getRoll() const;
 
-  [[nodiscard]] bool is_connected() const override;
+  [[nodiscard]] bool isConnected() const override;
   void update() override;
   void reconfigure() const override;
   void tare();
