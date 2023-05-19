@@ -1,7 +1,6 @@
 #include "control/input/raw_replay.hpp"
-#include "debug/error.hpp"
 #include "debug/logger.hpp"
-#include "fs/filesystem.hpp"
+#include "filesystem.hpp"
 #include <cstring>
 
 namespace control::input {
@@ -21,45 +20,45 @@ RawReplay::RawReplay(const char *name) : input(fs::open(name, std::ios_base::in 
   }
 }
 
-[[nodiscard]] uint16_t RawReplay::a_pressed() const { return this->a; }
+[[nodiscard]] uint16_t RawReplay::aPressed() const { return this->a; }
 
-[[nodiscard]] uint16_t RawReplay::b_pressed() const { return this->b; }
+[[nodiscard]] uint16_t RawReplay::bPressed() const { return this->b; }
 
-[[nodiscard]] uint16_t RawReplay::x_pressed() const { return this->x; }
+[[nodiscard]] uint16_t RawReplay::xPressed() const { return this->x; }
 
-[[nodiscard]] uint16_t RawReplay::y_pressed() const { return this->y; }
+[[nodiscard]] uint16_t RawReplay::yPressed() const { return this->y; }
 
-[[nodiscard]] uint16_t RawReplay::up_pressed() const { return this->up; }
+[[nodiscard]] uint16_t RawReplay::upPressed() const { return this->up; }
 
-[[nodiscard]] uint16_t RawReplay::down_pressed() const { return this->down; }
+[[nodiscard]] uint16_t RawReplay::downPressed() const { return this->down; }
 
-[[nodiscard]] uint16_t RawReplay::left_pressed() const { return this->left; }
+[[nodiscard]] uint16_t RawReplay::leftPressed() const { return this->left; }
 
-[[nodiscard]] uint16_t RawReplay::right_pressed() const { return this->right; }
+[[nodiscard]] uint16_t RawReplay::rightPressed() const { return this->right; }
 
-[[nodiscard]] uint16_t RawReplay::l1_pressed() const { return this->l1; }
+[[nodiscard]] uint16_t RawReplay::l1Pressed() const { return this->l1; }
 
-[[nodiscard]] uint16_t RawReplay::l2_pressed() const { return this->l2; }
+[[nodiscard]] uint16_t RawReplay::l2Pressed() const { return this->l2; }
 
-[[nodiscard]] uint16_t RawReplay::r1_pressed() const { return this->r1; }
+[[nodiscard]] uint16_t RawReplay::r1Pressed() const { return this->r1; }
 
-[[nodiscard]] uint16_t RawReplay::r2_pressed() const { return this->r2; }
+[[nodiscard]] uint16_t RawReplay::r2Pressed() const { return this->r2; }
 
-[[nodiscard]] double RawReplay::left_stick_x() const { return this->leftStickX; }
+[[nodiscard]] double RawReplay::leftStickX() const { return this->lsX; }
 
-[[nodiscard]] double RawReplay::left_stick_y() const { return this->leftStickY; }
+[[nodiscard]] double RawReplay::leftStickY() const { return this->lsY; }
 
-[[nodiscard]] double RawReplay::right_stick_x() const { return this->rightStickX; }
+[[nodiscard]] double RawReplay::rightStickX() const { return this->rsX; }
 
-[[nodiscard]] double RawReplay::right_stick_y() const { return this->rightStickY; }
+[[nodiscard]] double RawReplay::rightStickY() const { return this->rsY; }
 
-[[nodiscard]] int16_t RawReplay::flywheel_speed() const { return this->flywheelSpeed; }
+[[nodiscard]] int16_t RawReplay::speedSetting() const { return this->flywheelSpeed; }
 
-void RawReplay::flywheel_speed(int16_t speed) { this->flywheelSpeed = speed; }
+void RawReplay::setSpeedSetting(int16_t speed) { this->flywheelSpeed = speed; }
 
-void RawReplay::set_line(uint8_t line, uint8_t col, const char *str) {}
+void RawReplay::setLine(uint8_t line, uint8_t col, const char *str) {}
 
-void RawReplay::clear_line(uint8_t line) {}
+void RawReplay::clearLine(uint8_t line) {}
 
 void RawReplay::rumble(const char *str) {}
 
@@ -144,15 +143,15 @@ void RawReplay::update() {
     this->r2 = 0;
   }
 
-  std::memcpy(&this->leftStickX, &buf[2 + sizeof(float) * 0], sizeof(float));
-  std::memcpy(&this->leftStickY, &buf[2 + sizeof(float) * 1], sizeof(float));
-  std::memcpy(&this->rightStickX, &buf[2 + sizeof(float) * 2], sizeof(float));
-  std::memcpy(&this->rightStickY, &buf[2 + sizeof(float) * 3], sizeof(float));
+  std::memcpy(&this->lsX, &buf[2 + sizeof(float) * 0], sizeof(float));
+  std::memcpy(&this->lsY, &buf[2 + sizeof(float) * 1], sizeof(float));
+  std::memcpy(&this->rsX, &buf[2 + sizeof(float) * 2], sizeof(float));
+  std::memcpy(&this->rsY, &buf[2 + sizeof(float) * 3], sizeof(float));
 
-  if (this->right_pressed()) {
-    this->flywheel_speed(static_cast<int16_t>(std::min(this->flywheel_speed() + 100, 12000)));
-  } else if (this->left_pressed()) {
-    this->flywheel_speed(static_cast<int16_t>(std::max(this->flywheel_speed() - 100, 4000)));
+  if (this->rightPressed()) {
+    this->setSpeedSetting(static_cast<int16_t>(std::min(this->speedSetting() + 100, 12000)));
+  } else if (this->leftPressed()) {
+    this->setSpeedSetting(static_cast<int16_t>(std::max(this->speedSetting() - 100, 4000)));
   }
 
   if (this->a == 1)

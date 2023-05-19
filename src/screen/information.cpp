@@ -1,12 +1,6 @@
 #include "screen/information.hpp"
-#include "configuration.hpp"
+#include "pros/rtos.h"
 #include "screen/lvgl_util.hpp"
-#include "screen/screen.hpp"
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wall"
-#include "display/lv_core/lv_obj.h"
-#pragma GCC diagnostic pop
 
 namespace screen {
 extern lv_coord_t halfWidth;
@@ -17,9 +11,9 @@ void update_motor_pos(lv_obj_t *label, const robot::device::Motor &motor);
 void update_motor_vel(lv_obj_t *label, const robot::device::Motor &motor);
 void update_motor_temp(lv_obj_t *label, const robot::device::Motor &motor);
 
-Information::Information() = default;
+Information::Information(robot::Robot &robot) : robot(robot) {}
 
-void Information::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
+void Information::initialize(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
   create_info_label(screen, false, 0, "Build: " __DATE__ " " __TIME__);
   this->uptimeLabel = create_info_label(screen, true, 0);
 
@@ -48,14 +42,15 @@ void Information::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) 
   //  this->_unused = create_info_label(screen, true, 8);
 }
 
-void Information::update(robot::Robot &robot) {
+void Information::update() {
   set_label_text(this->uptimeLabel, "Uptime: %i", pros::c::millis());
-  set_label_text(this->controlSchemeLabel, "Control Scheme: %s", config::driveSchemeName(config::controlScheme));
-  update_motor_pos(this->motorLFLabel, robot.drivetrain.leftFront);
-  update_motor_pos(this->motorRFLabel, robot.drivetrain.rightFront);
-  update_motor_pos(this->motorLBLabel, robot.drivetrain.leftBack);
-  update_motor_pos(this->motorRBLabel, robot.drivetrain.rightBack);
-  set_label_text(this->digitalSpeed, "Flywheel Speed: %i", robot.controller->flywheel_speed());
+  set_label_text(this->controlSchemeLabel, "Control Scheme: %s",
+                 robot::driveSchemeName(robot.drivetrain.controlScheme));
+  update_motor_pos(this->motorLFLabel, this->robot.drivetrain.leftFront);
+  update_motor_pos(this->motorRFLabel, this->robot.drivetrain.rightFront);
+  update_motor_pos(this->motorLBLabel, this->robot.drivetrain.leftBack);
+  update_motor_pos(this->motorRBLabel, this->robot.drivetrain.rightBack);
+  set_label_text(this->digitalSpeed, "Flywheel Speed: %i", this->robot.controller->speedSetting());
 }
 
 void update_device_digital(lv_obj_t *label, const robot::device::Device &device, bool engaged) {

@@ -1,15 +1,13 @@
 #include "main.hpp"
 #include "control/input/operator.hpp"
 #include "debug/logger.hpp"
-#include "robot/device/motor.hpp"
 #include "pros/rtos.h"
 
 #ifndef DISABLE_AUTONOMOUS
 #include "control/autonomous/autonomous.hpp"
-#include "control/autonomous/left_winpoint.hpp"
-#include "control/autonomous/none.hpp"
-#include "control/autonomous/right_winpoint.hpp"
+#include "control/autonomous/score.hpp"
 #include "control/autonomous/skills.hpp"
+#include "control/autonomous/winpoint.hpp"
 #endif
 
 #ifndef DISABLE_SERIAL
@@ -64,27 +62,29 @@ void initialize() {
   // Optionally disable autonomous for builds
 #ifndef DISABLE_AUTONOMOUS
   // Register the different types of autonomous-es
-  control::autonomous::registerRun(new control::autonomous::None());
-  control::autonomous::registerRun(new control::autonomous::LeftWinpoint());
-  control::autonomous::registerRun(new control::autonomous::RightWinpoint());
-  control::autonomous::registerRun(new control::autonomous::Skills());
+  control::autonomous::initialize();
+  control::autonomous::registerRun("Right Winpoint", control::autonomous::rightWinpoint);
+  control::autonomous::registerRun("Left Winpoint", control::autonomous::leftWinpoint);
+  control::autonomous::registerRun("Right Score", control::autonomous::rightScore);
+  control::autonomous::registerRun("Left Score", control::autonomous::leftScore);
+  control::autonomous::registerRun("Skills", control::autonomous::skills);
 #endif
   // Optionally enable extra screen functionality
 #ifndef DISABLE_SCREEN
   scopePush("Register Screens");
   // Optionally register the different screens
 #if not defined(DISABLE_AUTONOMOUS) and not defined(DISABLE_AUTONOMOUS_SELECTION_SCREEN)
-  screen::addScreen(new screen::AutonomousSelect());
+  screen::addScreen(new screen::AutonomousSelect(robot));
 #endif
 #ifndef DISABLE_CONFIG_SCREEN
-  screen::addScreen(new screen::ConfigurationScreen());
+  screen::addScreen(new screen::ConfigurationScreen(robot));
 #endif
-  screen::addScreen(new screen::Information());
+  screen::addScreen(new screen::Information(robot));
 #ifndef DISABLE_DRIVETRAIN_DEBUG_SCREEN
-  screen::addScreen(new screen::DrivetrainChart());
+  screen::addScreen(new screen::DrivetrainChart(robot));
 #endif
   section_swap("Initialize Screen");
-  screen::initialize(robot); // initialize the screen
+  screen::initialize(); // initialize the screen
   scopePop();
 #endif // DISABLE_SCREEN
   robot.drivetrain.imu.calibrate();

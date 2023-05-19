@@ -1,15 +1,9 @@
 #ifndef VEXV5_ROBOT_DEVICE_MOTOR_HPP
 #define VEXV5_ROBOT_DEVICE_MOTOR_HPP
 
-#include "include/debug/logger.hpp"
+#include "device.hpp"
 #include "pros/motors.h"
-#include "pros/rtos.hpp"
-#include "robot/device/device.hpp"
-#include "robot/device/motor.hpp"
 #include "robot/pid/pid.hpp"
-#include "robot/pid/pid_controller.hpp"
-#include "robot/updatable.hpp"
-#include <cerrno>
 #include <cmath>
 
 #define MOTOR_MAX_MILLIVOLTS 12000
@@ -34,8 +28,6 @@ public:
   explicit Motor(uint8_t port, const char *name, pros::motor_gearset_e_t gearset = pros::E_MOTOR_GEARSET_18,
                  pros::motor_brake_mode_e_t brake_mode = pros::E_MOTOR_BRAKE_BRAKE, bool reversed = false);
   explicit Motor(uint8_t port, const char *name, bool reversed = false);
-
-  ~Motor() override;
 
   void moveVelocity(int16_t velocity);
   void moveMillivolts(int16_t mV);

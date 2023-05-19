@@ -1,9 +1,7 @@
 #ifndef SERIAL_DEBUG_HPP
 #define SERIAL_DEBUG_HPP
 
-#include "serial/serial_connection.hpp"
-#include <map>
-#include <streambuf>
+#include "serial_connection.hpp"
 
 namespace serial {
 class PacketHandler {

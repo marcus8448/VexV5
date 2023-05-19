@@ -1,5 +1,5 @@
 #include "robot/device/gyro.hpp"
-#include "pros/adi.hpp"
+#include "pros/adi.h"
 #include <cerrno>
 
 namespace robot::device {

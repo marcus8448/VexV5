@@ -15,6 +15,7 @@ cmake_dependent_option(DISABLE_DRIVETRAIN_DEBUG_SCREEN "Disable the drivetrain d
 
 option(DISABLE_SERIAL "Disable serial communication code" ON)
 option(ENABLE_TEMPORARY_CODE "Load and run code in src/temporary.hpp" OFF)
+option(ENABLE_LTO "Enable link time optimization" OFF)
 
 if (ENABLE_DEBUG_LOGGING)
     add_compile_definitions(DEBUG_LOG)

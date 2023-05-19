@@ -15,7 +15,7 @@ int get_error();
  * Tests for a PROS error and prints out errno if one is found.
  * @return the same value as the parameter passed.
  */
-template <class T> T print_error(T value) {
+template <class T> inline T print_error(T value) {
   check_error();
   return value;
 }

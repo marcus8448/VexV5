@@ -1,21 +1,17 @@
 #include "screen/config_screen.hpp"
-#include "configuration.hpp"
 #include "debug/logger.hpp"
-#include "screen/colour.hpp"
-#include "screen/lvgl_util.hpp"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wall"
-#include "display/lv_core/lv_obj.h"
 #include "display/lv_objx/lv_btn.h"
 #include "display/lv_objx/lv_label.h"
 #pragma GCC diagnostic pop
 
 namespace screen {
 static ConfigurationScreen *instance = nullptr;
-ConfigurationScreen::ConfigurationScreen() = default;
+ConfigurationScreen::ConfigurationScreen(robot::Robot &robot) : robot(robot) {}
 
-void ConfigurationScreen::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
+void ConfigurationScreen::initialize(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
   auto halfWidth = static_cast<lv_coord_t>(width / 2);
   this->driveSchemeBtn = lv_btn_create(screen, nullptr);
   this->driveSchemeBtnLbl = lv_label_create(this->driveSchemeBtn, nullptr);
@@ -27,18 +23,20 @@ void ConfigurationScreen::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t 
   instance = this;
 }
 
-void ConfigurationScreen::update(robot::Robot &robot) {}
+void ConfigurationScreen::update() {}
 
 void ConfigurationScreen::update_drive_scheme_label() {
   lv_label_set_text(
       this->driveSchemeBtnLbl,
-      logger::string_format("Control Scheme: %s", config::driveSchemeName(config::controlScheme)).c_str());
+      logger::string_format("Control Scheme: %s", robot::driveSchemeName(this->robot.drivetrain.controlScheme))
+          .c_str());
 }
 
 lv_res_t switch_drive_scheme([[maybe_unused]] lv_obj_t *btn) {
-  config::controlScheme = config::controlScheme == config::DrivetrainControlScheme::TANK
-                              ? config::DrivetrainControlScheme::ARCADE
-                              : config::DrivetrainControlScheme::TANK;
+  instance->robot.drivetrain.controlScheme =
+      instance->robot.drivetrain.controlScheme == robot::Drivetrain::ControlScheme::TANK
+          ? robot::Drivetrain::ControlScheme::ARCADE
+          : robot::Drivetrain::ControlScheme::TANK;
   instance->update_drive_scheme_label();
   return LV_RES_INV;
 }

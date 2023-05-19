@@ -1,11 +1,9 @@
 #include "robot/device/motor.hpp"
-#include "include/debug/logger.hpp"
+#include "debug/logger.hpp"
 #include "pros/motors.h"
 #include "robot/pid/pid.hpp"
 #include <cerrno>
 #include <cmath>
-
-#define TEST_FREQUENCY 50
 
 #define DEFAULT_MOTOR_GEARSET pros::E_MOTOR_GEARSET_18
 #define DEFAULT_MOTOR_BRAKE pros::E_MOTOR_BRAKE_BRAKE
@@ -24,15 +22,13 @@ Motor::Motor(const uint8_t port, const char *name, const pros::motor_gearset_e_t
 }
 
 Motor::Motor(const uint8_t port, const char *name, bool reversed)
-    : Device("Motor", name, port), gearset(DEFAULT_MOTOR_GEARSET), maxVelocity(gearsetMaxVelocity(DEFAULT_MOTOR_GEARSET)),
-      brakeMode(DEFAULT_MOTOR_BRAKE), reversed(reversed) {
+    : Device("Motor", name, port), gearset(DEFAULT_MOTOR_GEARSET),
+      maxVelocity(gearsetMaxVelocity(DEFAULT_MOTOR_GEARSET)), brakeMode(DEFAULT_MOTOR_BRAKE), reversed(reversed) {
   pros::c::motor_set_gearing(this->port, DEFAULT_MOTOR_GEARSET);
   pros::c::motor_set_reversed(this->port, this->reversed); // todo: manually reverse
   pros::c::motor_set_encoder_units(this->port, MOTOR_ENCODER_UNITS);
   pros::c::motor_set_brake_mode(this->port, DEFAULT_MOTOR_BRAKE);
 }
-
-Motor::~Motor() = default;
 
 void Motor::update() {
   if (this->controller != nullptr) {

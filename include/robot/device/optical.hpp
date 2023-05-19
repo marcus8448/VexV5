@@ -1,7 +1,7 @@
 #ifndef ROBOT_DEVICE_COLOUR_HPP
 #define ROBOT_DEVICE_COLOUR_HPP
 
-#include "robot/device/device.hpp"
+#include "device.hpp"
 
 namespace robot::device {
 class Optical : public Device {

@@ -4,19 +4,13 @@
 #include "screen/screen.hpp"
 #include <cmath>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wall"
-#include "display/lv_core/lv_obj.h"
-#include "display/lv_objx/lv_canvas.h"
-#pragma GCC diagnostic pop
-
 namespace screen {
 extern bool *enableCanvas;
 extern void *canvasBuffer;
 
-DrivetrainChart::DrivetrainChart() { *enableCanvas = true; }
+DrivetrainChart::DrivetrainChart(robot::Robot &robot) : robot(robot) { *enableCanvas = true; }
 
-void DrivetrainChart::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
+void DrivetrainChart::initialize(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
   this->canvasWidth = static_cast<float>(width);
   auto trueHeight = static_cast<lv_coord_t>(height - BASE_HEIGHT);
   this->canvasHeight = static_cast<float>(trueHeight);
@@ -51,7 +45,7 @@ void DrivetrainChart::create(lv_obj_t *screen, lv_coord_t width, lv_coord_t heig
                qtrWidth, 16, "RB (-)", create_text_color_style(screen::colour::LIGHT_BLUE));
 }
 
-void DrivetrainChart::update(robot::Robot &robot) {
+void DrivetrainChart::update() {
   if (this->velMotorLF.size() == 100) {
     this->velMotorLF.erase(this->velMotorLF.begin());
     this->velMotorRF.erase(this->velMotorRF.begin());
@@ -59,10 +53,10 @@ void DrivetrainChart::update(robot::Robot &robot) {
     this->velMotorRB.erase(this->velMotorRB.begin());
   }
 
-  auto prevLF = static_cast<float>(robot.drivetrain.leftFront.getVelocity());
-  auto prevRF = static_cast<float>(robot.drivetrain.rightFront.getVelocity());
-  auto prevLB = static_cast<float>(robot.drivetrain.leftBack.getVelocity());
-  auto prevRB = static_cast<float>(robot.drivetrain.rightBack.getVelocity());
+  auto prevLF = static_cast<float>(this->robot.drivetrain.leftFront.getVelocity());
+  auto prevRF = static_cast<float>(this->robot.drivetrain.rightFront.getVelocity());
+  auto prevLB = static_cast<float>(this->robot.drivetrain.leftBack.getVelocity());
+  auto prevRB = static_cast<float>(this->robot.drivetrain.rightBack.getVelocity());
   if (prevLF == INFINITY || prevLF == -1)
     prevLF = 5;
   if (prevRF == INFINITY || prevRF == -1)

@@ -1,19 +1,22 @@
 #ifndef SCREEN_AUTONOMOUS_SELECT_HPP
 #define SCREEN_AUTONOMOUS_SELECT_HPP
 
-#include "screen/screen.hpp"
+#include "robot/robot.hpp"
+#include "screen.hpp"
 
 namespace screen {
 class AutonomousSelect : public Screen {
 private:
+  robot::Robot &robot;
+
   lv_obj_t *selections = nullptr;
   lv_obj_t *selected = nullptr;
 
 public:
-  explicit AutonomousSelect();
+  explicit AutonomousSelect(robot::Robot &robot);
 
-  void create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) override;
-  void update(robot::Robot &robot) override;
+  void initialize(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) override;
+  void update() override;
 
   void click(lv_obj_t *btn);
 };

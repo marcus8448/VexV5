@@ -1,61 +1,61 @@
 #include "control/input/operator.hpp"
-#include "include/debug/error.hpp"
-#include "include/debug/logger.hpp"
+#include "debug/error.hpp"
+#include "debug/logger.hpp"
 
-#define controller_digital(button) print_error(pros::c::controller_get_digital(this->controller_id, button))
-#define controller_analog(stick_axis) print_error(pros::c::controller_get_analog(this->controller_id, stick_axis))
+#define controller_digital(button) print_error(pros::c::controller_get_digital(this->controllerId, button))
+#define controller_analog(stick_axis) print_error(pros::c::controller_get_analog(this->controllerId, stick_axis))
 
 namespace control::input {
-Operator::Operator(pros::controller_id_e_t controller_id) : controller_id(controller_id) {}
+Operator::Operator(pros::controller_id_e_t controller_id) : controllerId(controller_id) {}
 
-[[nodiscard]] uint16_t Operator::a_pressed() const { return this->a; }
+[[nodiscard]] uint16_t Operator::aPressed() const { return this->a; }
 
-[[nodiscard]] uint16_t Operator::b_pressed() const { return this->b; }
+[[nodiscard]] uint16_t Operator::bPressed() const { return this->b; }
 
-[[nodiscard]] uint16_t Operator::x_pressed() const { return this->x; }
+[[nodiscard]] uint16_t Operator::xPressed() const { return this->x; }
 
-[[nodiscard]] uint16_t Operator::y_pressed() const { return this->y; }
+[[nodiscard]] uint16_t Operator::yPressed() const { return this->y; }
 
-[[nodiscard]] uint16_t Operator::up_pressed() const { return this->up; }
+[[nodiscard]] uint16_t Operator::upPressed() const { return this->up; }
 
-[[nodiscard]] uint16_t Operator::down_pressed() const { return this->down; }
+[[nodiscard]] uint16_t Operator::downPressed() const { return this->down; }
 
-[[nodiscard]] uint16_t Operator::left_pressed() const { return this->left; }
+[[nodiscard]] uint16_t Operator::leftPressed() const { return this->left; }
 
-[[nodiscard]] uint16_t Operator::right_pressed() const { return this->right; }
+[[nodiscard]] uint16_t Operator::rightPressed() const { return this->right; }
 
-[[nodiscard]] uint16_t Operator::l1_pressed() const { return this->l1; }
+[[nodiscard]] uint16_t Operator::l1Pressed() const { return this->l1; }
 
-[[nodiscard]] uint16_t Operator::l2_pressed() const { return this->l2; }
+[[nodiscard]] uint16_t Operator::l2Pressed() const { return this->l2; }
 
-[[nodiscard]] uint16_t Operator::r1_pressed() const { return this->r1; }
+[[nodiscard]] uint16_t Operator::r1Pressed() const { return this->r1; }
 
-[[nodiscard]] uint16_t Operator::r2_pressed() const { return this->r2; }
+[[nodiscard]] uint16_t Operator::r2Pressed() const { return this->r2; }
 
-[[nodiscard]] double Operator::left_stick_x() const { return this->leftStickX; }
+[[nodiscard]] double Operator::leftStickX() const { return this->lsX; }
 
-[[nodiscard]] double Operator::left_stick_y() const { return this->leftStickY; }
+[[nodiscard]] double Operator::leftStickY() const { return this->lsY; }
 
-[[nodiscard]] double Operator::right_stick_x() const { return this->rightStickX; }
+[[nodiscard]] double Operator::rightStickX() const { return this->rsX; }
 
-[[nodiscard]] double Operator::right_stick_y() const { return this->rightStickY; }
+[[nodiscard]] double Operator::rightStickY() const { return this->rsY; }
 
-[[nodiscard]] int16_t Operator::flywheel_speed() const { return this->flywheelSpeed; }
+[[nodiscard]] int16_t Operator::speedSetting() const { return this->flywheelSpeed; }
 
-void Operator::flywheel_speed(int16_t speed) { this->flywheelSpeed = speed; }
+void Operator::setSpeedSetting(int16_t speed) { this->flywheelSpeed = speed; }
 
-void Operator::set_line(uint8_t line, uint8_t col, const char *str) {
-  print_error(pros::c::controller_set_text(this->controller_id, line, col, str));
+void Operator::setLine(uint8_t line, uint8_t col, const char *str) {
+  print_error(pros::c::controller_set_text(this->controllerId, line, col, str));
 }
 
-void Operator::clear_line(uint8_t line) { print_error(pros::c::controller_clear_line(this->controller_id, line)); }
+void Operator::clearLine(uint8_t line) { print_error(pros::c::controller_clear_line(this->controllerId, line)); }
 
 void Operator::rumble(const char *str) {
   clear_error();
-  pros::c::controller_rumble(this->controller_id, str);
+  pros::c::controller_rumble(this->controllerId, str);
   if (get_error() == EAGAIN) {
     debug("Failed to send rumble. Trying again soon.");
-    this->enqueued_rumble = str;
+    this->enqueuedRumble = str;
   }
 }
 
@@ -133,15 +133,15 @@ void Operator::update() {
     this->r2 = 0;
   }
 
-  this->leftStickX = controller_analog(pros::E_CONTROLLER_ANALOG_LEFT_X);
-  this->leftStickY = controller_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
-  this->rightStickX = controller_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
-  this->rightStickY = controller_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
+  this->lsX = controller_analog(pros::E_CONTROLLER_ANALOG_LEFT_X);
+  this->lsY = controller_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+  this->rsX = controller_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
+  this->rsY = controller_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
 
-  if (this->right_pressed() % 2 == 1) {
-    this->flywheel_speed(static_cast<int16_t>(std::min(this->flywheel_speed() + 10, 600)));
-  } else if (this->left_pressed() % 2 == 1) {
-    this->flywheel_speed(static_cast<int16_t>(std::max(this->flywheel_speed() - 10, 200)));
+  if (this->rightPressed() % 2 == 1) {
+    this->setSpeedSetting(static_cast<int16_t>(std::min(this->speedSetting() + 10, 600)));
+  } else if (this->leftPressed() % 2 == 1) {
+    this->setSpeedSetting(static_cast<int16_t>(std::max(this->speedSetting() - 10, 200)));
   }
 
   if (this->a == 1)
@@ -169,20 +169,20 @@ void Operator::update() {
   if (this->l2 == 1)
     debug("L2 pressed");
 
-  if (enqueued_rumble != nullptr && this->ticks % 10 == 0) {
+  if (enqueuedRumble != nullptr && this->ticks % 10 == 0) {
     clear_error();
-    this->rumble(this->enqueued_rumble);
+    this->rumble(this->enqueuedRumble);
     if (get_error() != EAGAIN) {
-      this->enqueued_rumble = nullptr;
+      this->enqueuedRumble = nullptr;
     }
   }
 
   static bool init = false;
   if (this->ticks % 10 == 0 || !init) {
     init = true;
-    this->set_line(0, 0,
-                   logger::string_format("Flywheel: %i  ", static_cast<int32_t>(this->flywheel_speed()))
-                       .c_str()); // append ' ' to clear out buffer
+    this->setLine(0, 0,
+                  logger::string_format("Flywheel: %i  ", static_cast<int32_t>(this->speedSetting()))
+                      .c_str()); // append ' ' to clear out buffer
   }
 }
 } // namespace control::input

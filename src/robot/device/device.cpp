@@ -1,8 +1,9 @@
 #include "robot/device/device.hpp"
 #include "debug/logger.hpp"
-#include "pros/rtos.hpp"
+#include "pros/rtos.h"
 #include <cerrno>
 #include <map>
+#include <vector>
 
 #define DEVICE_CONFIGURE_RATE 500
 
@@ -12,7 +13,9 @@ static std::map<Device *, bool> devices;
 
 [[noreturn]] void reconfigureTask([[maybe_unused]] void *params);
 
-Device::Device(const char *typeName, const char *name, uint8_t port) : typeName(typeName), name(name), port(port) { pendingDevices.push_back(this); }
+Device::Device(const char *typeName, const char *name, uint8_t port) : typeName(typeName), name(name), port(port) {
+  pendingDevices.push_back(this);
+}
 
 void initialize() {
   static bool init = false;
@@ -36,7 +39,7 @@ bool Device::checkConnect() {
 [[nodiscard]] const char *Device::getName() const { return this->name; }
 
 [[noreturn]] void reconfigureTask([[maybe_unused]] void *params) {
-  pros::delay(DEVICE_CONFIGURE_RATE * 2); // printing race condition?
+  pros::c::delay(DEVICE_CONFIGURE_RATE * 2); // printing race condition?
   info("Device reconfigure task started.");
   while (true) {
     if (!pendingDevices.empty()) {
@@ -49,8 +52,7 @@ bool Device::checkConnect() {
           devices.emplace(device, true);
         } else {
           devices.emplace(device, false);
-          warn("No device on port %i (expected %s '%s').", device->getPort(), device->getTypeName(),
-               device->getName());
+          warn("No device on port %i (expected %s '%s').", device->getPort(), device->getTypeName(), device->getName());
         }
       }
     }
@@ -67,7 +69,7 @@ bool Device::checkConnect() {
         pair.second = true;
         pair.first->reconfigure();
       }
-      pros::delay(DEVICE_CONFIGURE_RATE);
+      pros::c::delay(DEVICE_CONFIGURE_RATE);
     }
   }
 }

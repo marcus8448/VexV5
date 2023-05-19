@@ -1,5 +1,6 @@
 #include "serial/robot_command.hpp"
 #include <cstring>
+#include <vector>
 
 namespace serial {
 RobotCommandsPlugin::RobotCommandsPlugin(uint8_t id, robot::Robot &robot) : PacketHandler(id), robot(robot) {}

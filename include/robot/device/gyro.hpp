@@ -1,6 +1,8 @@
 #ifndef ROBOT_DEVICE_GYRO_HPP
 #define ROBOT_DEVICE_GYRO_HPP
-#include "robot/device/device.hpp"
+
+#include "device.hpp"
+
 namespace robot::device {
 class Gyro : public Device {
 private:

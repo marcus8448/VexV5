@@ -71,20 +71,20 @@ void Drivetrain::turnLeft(double degrees, bool wait) {
 
 void Drivetrain::awaitMovement() const {
   while (this->timeAtTarget < STABILIZE_MARGIN) {
-    pros::delay(ROBOT_TICK_RATE * (STABILIZE_MARGIN - this->timeAtTarget));
+    pros::c::delay(ROBOT_TICK_RATE * (STABILIZE_MARGIN - this->timeAtTarget));
   }
 }
 
 void Drivetrain::updateTargeting(control::input::Controller *controller) {
-  if (controller->down_pressed() == 1) {
+  if (controller->downPressed() == 1) {
     this->arcade = !this->arcade;
     controller->rumble("-");
   }
 
   this->setTarget(OPERATOR_DIRECT);
   if (this->arcade) {
-    double joystickRotX = controller->right_stick_x();
-    double joystickY = controller->left_stick_y();
+    double joystickRotX = controller->rightStickX();
+    double joystickY = controller->leftStickY();
 
     double left = (joystickY + joystickRotX) / JOYSTICK_MAX;
     double right = (joystickY - joystickRotX) / JOYSTICK_MAX;
@@ -94,8 +94,8 @@ void Drivetrain::updateTargeting(control::input::Controller *controller) {
     this->powerRight = static_cast<int16_t>(right * MOTOR_MAX_MILLIVOLTS);
     this->powerLeft = static_cast<int16_t>(left * MOTOR_MAX_MILLIVOLTS);
   } else {
-    this->powerRight = static_cast<int16_t>(controller->right_stick_y() / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
-    this->powerLeft = static_cast<int16_t>(controller->left_stick_y() / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
+    this->powerRight = static_cast<int16_t>(controller->rightStickY() / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
+    this->powerLeft = static_cast<int16_t>(controller->leftStickY() / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
   }
 }
 
@@ -225,5 +225,15 @@ void Drivetrain::updatePosition() {
   this->heading = this->imu.getHeading();
   this->rightPos = (this->rightFront.getPosition() + this->rightBack.getPosition()) / 2.0;
   this->leftPos = (this->leftFront.getPosition() + this->leftBack.getPosition()) / 2.0;
+}
+
+[[nodiscard]] const char *driveSchemeName(Drivetrain::ControlScheme scheme) {
+  switch (scheme) {
+  case Drivetrain::ControlScheme::TANK:
+    return "Tank";
+  case Drivetrain::ControlScheme::ARCADE:
+    return "Arcade";
+  }
+  return "";
 }
 } // namespace robot

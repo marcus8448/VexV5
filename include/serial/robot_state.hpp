@@ -1,10 +1,8 @@
 #ifndef SERIAL_ROBOT_STATE_HPP
 #define SERIAL_ROBOT_STATE_HPP
 
-#include <streambuf>
-
 #include "robot/robot.hpp"
-#include "serial/serial.hpp"
+#include "serial.hpp"
 
 namespace serial {
 class RobotStatePlugin : public PacketHandler {

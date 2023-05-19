@@ -1,36 +1,27 @@
 #include "control/autonomous/autonomous.hpp"
 #include "debug/logger.hpp"
-#include <map>
-#include <string>
 
-std::map<const std::string, control::autonomous::Autonomous *> *autonomousPrograms =
-    new std::map<const std::string, control::autonomous::Autonomous *>();
 namespace control::autonomous {
+static std::map<const std::string, void (*)(robot::Robot &)> *programs =
+    new std::map<const std::string, void (*)(robot::Robot &)>();
 static const std::string *activeProgram = nullptr;
 
-Autonomous::Autonomous(const char *name) : name(name) {}
-
-const char *Autonomous::get_name() { return this->name; }
-
-void registerRun(Autonomous *program) {
-  info("Registering autonomous '%s'.", program->get_name());
-  (*autonomousPrograms)[std::string(program->get_name())] = program;
-
-  if (activeProgram == nullptr) {
-    info("Setting '%s' as the default autonomous.", program->get_name());
-    activeProgram = new std::string(program->get_name()); // set the default program to the first one registered
-  }
+void initialize() {
+  auto *none = new std::string("None");
+  registerRun(*none, [](Robot &robot) -> void {});
+  activeProgram = none;
 }
 
-const std::string *get_active() { return activeProgram; }
+void registerRun(const std::string &name, void (*function)(robot::Robot &)) {
+  info("Registering autonomous '%s'.", name.c_str());
+  (*programs)[name] = function;
+}
+
+std::map<const std::string, void (*)(robot::Robot &)> &getPrograms() { return *programs; }
+
+const std::string *getActive() { return activeProgram; }
 
 void set_active(const std::string *program) { activeProgram = program; }
 
-Autonomous *get_autonomous() {
-  if (activeProgram == nullptr) {
-    return nullptr;
-  }
-  return (*autonomousPrograms)[*activeProgram];
-}
-
+void run(Robot &robot) { (*programs)[*activeProgram](robot); }
 } // namespace control::autonomous

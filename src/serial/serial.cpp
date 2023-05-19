@@ -1,12 +1,6 @@
-#include <fstream>
-#include <map>
-#include <sstream>
-#include <vector>
-
-#include "debug/logger.hpp"
-#include "pros/apix.h"
-#include "pros/rtos.hpp"
 #include "serial/serial.hpp"
+#include "debug/logger.hpp"
+#include <map>
 
 #define SERIAL_RESERVED 0
 #define SERIAL_CONNECT 1
@@ -30,16 +24,16 @@ void timeout_hack(void *params) {
   auto task = static_cast<pros::task_t>(params);
   while (true) {
     if (state == NOT_CONNECTED) {
-      pros::delay(TIMEOUT_LENGTH);
+      pros::c::delay(TIMEOUT_LENGTH);
     } else {
-      if (pros::millis() - lastTime > TIMEOUT_LENGTH) {
+      if (pros::c::millis() - lastTime > TIMEOUT_LENGTH) {
         state = NOT_CONNECTED;
         pros::c::task_delete(task); // kill the task.
         info("Serial connection timed out.");
         initialize();
         break;
       } else {
-        pros::delay(pros::millis() - lastTime + 1);
+        pros::c::delay(pros::c::millis() - lastTime + 1);
       }
     }
   }
@@ -59,8 +53,8 @@ void timeout_hack(void *params) {
 
   while (true) {
     connection->sync_output();
-    pros::delay(30);
-    lastTime = pros::millis();
+    pros::c::delay(30);
+    lastTime = pros::c::millis();
     PacketData data = connection->read_packet(BUFFER, BUFFER_SIZE);
     switch (state) {
     case NOT_CONNECTED:
@@ -73,7 +67,7 @@ void timeout_hack(void *params) {
       break;
     case AWAITING_RESPONSE:
       if (SERIAL_RESPONSE == data.id) {
-        lastTime = pros::millis();
+        lastTime = pros::c::millis();
         connection->send_packet(SERIAL_RECEIVED, nullptr, 0);
         state = ESTABLISHED;
       }
@@ -84,7 +78,7 @@ void timeout_hack(void *params) {
         connection->skip_to_end();
       } else {
         packet_handlers->at(data.id)->handle(connection, data.data, data.len);
-        lastTime = pros::millis();
+        lastTime = pros::c::millis();
       }
       break;
     }

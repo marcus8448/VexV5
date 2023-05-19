@@ -1,6 +1,6 @@
-#include "include/debug/logger.hpp"
-#include "fs/filesystem.hpp"
-#include "pros/rtos.hpp"
+#include "debug/logger.hpp"
+#include "filesystem.hpp"
+#include "pros/rtos.h"
 
 #include <cstring>
 #include <iostream>
@@ -19,7 +19,7 @@ void _info(const char *string) {
   std::cout << string << std::endl;
 #ifdef FILE_LOG
   if (log_file != nullptr && log_file->is_open())
-    *log_file << "[INFO] [" << pros::millis() << "] " << string << std::endl;
+    *log_file << "[INFO] [" << pros::c::millis() << "] " << string << std::endl;
 #endif
 }
 
@@ -29,7 +29,7 @@ void _warn(const char *string) {
   std::cout << string << std::endl;
 #ifdef FILE_LOG
   if (log_file != nullptr && log_file->is_open())
-    *log_file << "[WARN] [" << pros::millis() << "] " << std::endl;
+    *log_file << "[WARN] [" << pros::c::millis() << "] " << std::endl;
 #endif
 }
 
@@ -39,7 +39,7 @@ void _error(const char *string) {
   std::cout << string << std::endl;
 #ifdef FILE_LOG
   if (log_file != nullptr && log_file->is_open())
-    *log_file << "[ERROR] [" << pros::millis() << "] " << std::endl;
+    *log_file << "[ERROR] [" << pros::c::millis() << "] " << std::endl;
 #endif
 }
 
@@ -50,27 +50,27 @@ void _debug(const char *string) {
   std::cout << string << std::endl;
 #ifdef FILE_LOG
   if (log_file != nullptr && log_file->is_open())
-    *log_file << "[DEBUG] [" << pros::millis() << "] " << std::endl;
+    *log_file << "[DEBUG] [" << pros::c::millis() << "] " << std::endl;
 #endif
 }
 
 void _debug(const std::string &string) { _debug(string.c_str()); }
 
 void _push(const char *string) {
-  if (main_task_name != pros::Task::current().get_name()) {
+  if (main_task_name != pros::c::task_get_name(pros::c::task_get_current())) {
     _error("Called section push on non-main task!");
     return;
   }
-  sections->emplace_back(std::pair(string, pros::millis()));
+  sections->emplace_back(std::pair(string, pros::c::millis()));
   debug("== BEGIN %s ==", string);
 }
 
 void _pop() {
-  if (main_task_name != pros::Task::current().get_name()) {
+  if (main_task_name != pros::c::task_get_name(pros::c::task_get_current())) {
     _error("Called section pop on non-main task!");
     return;
   }
-  uint32_t millis = pros::millis();
+  uint32_t millis = pros::c::millis();
   if (sections->empty()) {
     _error("Section stack underflow!");
   } else {

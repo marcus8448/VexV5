@@ -6,7 +6,6 @@
 #include <streambuf>
 
 namespace serial {
-
 struct PacketData {
   uint8_t id;
   void *data;

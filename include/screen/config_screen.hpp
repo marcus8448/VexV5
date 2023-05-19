@@ -1,6 +1,7 @@
 #ifndef SCREEN_CONFIG_HPP
 #define SCREEN_CONFIG_HPP
 
+#include "robot/robot.hpp"
 #include "screen.hpp"
 
 namespace screen {
@@ -12,10 +13,12 @@ private:
   lv_obj_t *driveSchemeBtnLbl = nullptr;
 
 public:
-  explicit ConfigurationScreen();
+  robot::Robot &robot;
 
-  void create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) override;
-  void update(robot::Robot &robot) override;
+  explicit ConfigurationScreen(robot::Robot &robot);
+
+  void initialize(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) override;
+  void update() override;
   void update_drive_scheme_label();
 };
 } // namespace screen

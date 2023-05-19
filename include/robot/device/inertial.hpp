@@ -1,6 +1,8 @@
 #ifndef ROBOT_DEVICE_INERTIAL_HPP
 #define ROBOT_DEVICE_INERTIAL_HPP
-#include "robot/device/device.hpp"
+
+#include "device.hpp"
+
 namespace robot::device {
 class Inertial : public Device {
 public:

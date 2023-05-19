@@ -12,7 +12,7 @@ namespace control::input {
  */
 class Operator : public Controller {
 private:
-  pros::controller_id_e_t controller_id;
+  pros::controller_id_e_t controllerId;
 
   uint16_t a = 0;
   uint16_t b = 0;
@@ -29,44 +29,44 @@ private:
   uint16_t r1 = 0;
   uint16_t r2 = 0;
 
-  double leftStickX = 0.0;
-  double leftStickY = 0.0;
-  double rightStickX = 0.0;
-  double rightStickY = 0.0;
+  double lsX = 0.0;
+  double lsY = 0.0;
+  double rsX = 0.0;
+  double rsY = 0.0;
 
   int16_t flywheelSpeed = 450;
   uint32_t ticks = 0;
 
-  const char *enqueued_rumble = nullptr;
+  const char *enqueuedRumble = nullptr;
 
 public:
   explicit Operator(pros::controller_id_e_t controller_id = pros::E_CONTROLLER_MASTER);
 
-  [[nodiscard]] uint16_t a_pressed() const override;
-  [[nodiscard]] uint16_t b_pressed() const override;
-  [[nodiscard]] uint16_t x_pressed() const override;
-  [[nodiscard]] uint16_t y_pressed() const override;
+  [[nodiscard]] uint16_t aPressed() const override;
+  [[nodiscard]] uint16_t bPressed() const override;
+  [[nodiscard]] uint16_t xPressed() const override;
+  [[nodiscard]] uint16_t yPressed() const override;
 
-  [[nodiscard]] uint16_t up_pressed() const override;
-  [[nodiscard]] uint16_t down_pressed() const override;
-  [[nodiscard]] uint16_t left_pressed() const override;
-  [[nodiscard]] uint16_t right_pressed() const override;
+  [[nodiscard]] uint16_t upPressed() const override;
+  [[nodiscard]] uint16_t downPressed() const override;
+  [[nodiscard]] uint16_t leftPressed() const override;
+  [[nodiscard]] uint16_t rightPressed() const override;
 
-  [[nodiscard]] uint16_t l1_pressed() const override;
-  [[nodiscard]] uint16_t l2_pressed() const override;
-  [[nodiscard]] uint16_t r1_pressed() const override;
-  [[nodiscard]] uint16_t r2_pressed() const override;
+  [[nodiscard]] uint16_t l1Pressed() const override;
+  [[nodiscard]] uint16_t l2Pressed() const override;
+  [[nodiscard]] uint16_t r1Pressed() const override;
+  [[nodiscard]] uint16_t r2Pressed() const override;
 
-  [[nodiscard]] double left_stick_x() const override;
-  [[nodiscard]] double left_stick_y() const override;
-  [[nodiscard]] double right_stick_x() const override;
-  [[nodiscard]] double right_stick_y() const override;
+  [[nodiscard]] double leftStickX() const override;
+  [[nodiscard]] double leftStickY() const override;
+  [[nodiscard]] double rightStickX() const override;
+  [[nodiscard]] double rightStickY() const override;
 
-  [[nodiscard]] int16_t flywheel_speed() const override;
-  void flywheel_speed(int16_t speed) override;
+  [[nodiscard]] int16_t speedSetting() const override;
+  void setSpeedSetting(int16_t speed) override;
 
-  void set_line(uint8_t line, uint8_t col, const char *str) override;
-  void clear_line(uint8_t line) override;
+  void setLine(uint8_t line, uint8_t col, const char *str) override;
+  void clearLine(uint8_t line) override;
 
   void rumble(const char *str) override;
 

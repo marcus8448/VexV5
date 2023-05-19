@@ -18,7 +18,7 @@ Robot::~Robot() {
     this->drivetrain.updatePosition();
 
     this->drivetrain.updateMovement();
-    pros::delay(ROBOT_TICK_RATE);
+    pros::c::delay(ROBOT_TICK_RATE);
   }
 }
 
@@ -35,22 +35,23 @@ Robot::~Robot() {
     } else {
       error("Controller is null!");
     }
-    pros::delay(ROBOT_TICK_RATE);
+    pros::c::delay(ROBOT_TICK_RATE);
   }
 }
 
 void Robot::runAutonomous() {
   this->drivetrain.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+  this->drivetrain.tare();
 
   pros::c::task_create([](void *param) { static_cast<Robot *>(param)->backgroundControl(); }, this,
                        TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Robot async control (OP)");
 
-  if (control::autonomous::get_active() == nullptr) {
+  if (control::autonomous::getActive() == nullptr) {
     error("No autonomous to run!");
     return;
   }
-  info("Running autonomous: '%s'", control::autonomous::get_active()->c_str());
-  control::autonomous::get_autonomous()->run(*this);
+  info("Running autonomous: '%s'", control::autonomous::getActive()->c_str());
+  control::autonomous::run(*this);
 }
 
 void Robot::setController(control::input::Controller *controller) {

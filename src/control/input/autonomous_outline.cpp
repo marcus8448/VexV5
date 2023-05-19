@@ -1,4 +1,4 @@
-#include "control/input/autonomous_recording.hpp"
+#include "control/input/autonomous_outline.hpp"
 #include "debug/error.hpp"
 #include "debug/logger.hpp"
 #include "units.hpp"
@@ -7,40 +7,40 @@
 #define AUTOSPEED 35.0
 
 namespace control::input {
-AutonomousRecordingController::AutonomousRecordingController(robot::Robot &robot, pros::controller_id_e_t controller_id)
+AutonomousOutlineController::AutonomousOutlineController(robot::Robot &robot, pros::controller_id_e_t controller_id)
     : controller_id(controller_id), robot(robot), output(fs::open_indexed("autonomous", std::ios::out)) {
   this->output << "// AUTON START\n";
 }
 
-[[nodiscard]] uint16_t AutonomousRecordingController::a_pressed() const { return this->a; }
+[[nodiscard]] uint16_t AutonomousOutlineController::aPressed() const { return this->a; }
 
-[[nodiscard]] uint16_t AutonomousRecordingController::b_pressed() const { return this->b; }
+[[nodiscard]] uint16_t AutonomousOutlineController::bPressed() const { return this->b; }
 
-[[nodiscard]] uint16_t AutonomousRecordingController::x_pressed() const {
+[[nodiscard]] uint16_t AutonomousOutlineController::xPressed() const {
   return this->x >= 2 && this->flywheelRuntime != -1;
 }
 
-[[nodiscard]] uint16_t AutonomousRecordingController::y_pressed() const { return this->y; }
+[[nodiscard]] uint16_t AutonomousOutlineController::yPressed() const { return this->y; }
 
-[[nodiscard]] uint16_t AutonomousRecordingController::up_pressed() const { return false; }
+[[nodiscard]] uint16_t AutonomousOutlineController::upPressed() const { return false; }
 
-[[nodiscard]] uint16_t AutonomousRecordingController::down_pressed() const { return false; }
+[[nodiscard]] uint16_t AutonomousOutlineController::downPressed() const { return false; }
 
-[[nodiscard]] uint16_t AutonomousRecordingController::left_pressed() const { return false; }
+[[nodiscard]] uint16_t AutonomousOutlineController::leftPressed() const { return false; }
 
-[[nodiscard]] uint16_t AutonomousRecordingController::right_pressed() const { return false; }
+[[nodiscard]] uint16_t AutonomousOutlineController::rightPressed() const { return false; }
 
-[[nodiscard]] uint16_t AutonomousRecordingController::l1_pressed() const { return this->l1; }
+[[nodiscard]] uint16_t AutonomousOutlineController::l1Pressed() const { return this->l1; }
 
-[[nodiscard]] uint16_t AutonomousRecordingController::l2_pressed() const { return this->l2; }
+[[nodiscard]] uint16_t AutonomousOutlineController::l2Pressed() const { return this->l2; }
 
-[[nodiscard]] uint16_t AutonomousRecordingController::r1_pressed() const { return this->r1; }
+[[nodiscard]] uint16_t AutonomousOutlineController::r1Pressed() const { return this->r1; }
 
-[[nodiscard]] uint16_t AutonomousRecordingController::r2_pressed() const { return this->r2; }
+[[nodiscard]] uint16_t AutonomousOutlineController::r2Pressed() const { return this->r2; }
 
-[[nodiscard]] double AutonomousRecordingController::left_stick_x() const { return 0; }
+[[nodiscard]] double AutonomousOutlineController::leftStickX() const { return 0; }
 
-[[nodiscard]] double AutonomousRecordingController::left_stick_y() const {
+[[nodiscard]] double AutonomousOutlineController::leftStickY() const {
   if (!this->targetActive)
     return 0;
   switch (this->drivetrainTarget) {
@@ -54,9 +54,9 @@ AutonomousRecordingController::AutonomousRecordingController(robot::Robot &robot
   return 0;
 }
 
-[[nodiscard]] double AutonomousRecordingController::right_stick_x() const { return 0; }
+[[nodiscard]] double AutonomousOutlineController::rightStickX() const { return 0; }
 
-[[nodiscard]] double AutonomousRecordingController::right_stick_y() const {
+[[nodiscard]] double AutonomousOutlineController::rightStickY() const {
   if (!this->targetActive)
     return 0;
   switch (this->drivetrainTarget) {
@@ -70,19 +70,19 @@ AutonomousRecordingController::AutonomousRecordingController(robot::Robot &robot
   return 0;
 }
 
-[[nodiscard]] int16_t AutonomousRecordingController::flywheel_speed() const { return this->flywheelSpeed; }
+[[nodiscard]] int16_t AutonomousOutlineController::speedSetting() const { return this->flywheelSpeed; }
 
-void AutonomousRecordingController::flywheel_speed(int16_t speed) { this->flywheelSpeed = speed; }
+void AutonomousOutlineController::setSpeedSetting(int16_t speed) { this->flywheelSpeed = speed; }
 
-void AutonomousRecordingController::set_line(uint8_t line, uint8_t col, const char *str) {
+void AutonomousOutlineController::setLine(uint8_t line, uint8_t col, const char *str) {
   print_error(pros::c::controller_set_text(this->controller_id, line, col, str));
 }
 
-void AutonomousRecordingController::clear_line(uint8_t line) {
+void AutonomousOutlineController::clearLine(uint8_t line) {
   print_error(pros::c::controller_clear_line(this->controller_id, line));
 }
 
-void AutonomousRecordingController::rumble(const char *str) {
+void AutonomousOutlineController::rumble(const char *str) {
   clear_error();
   pros::c::controller_rumble(this->controller_id, str);
   if (get_error() == EAGAIN) {
@@ -91,7 +91,7 @@ void AutonomousRecordingController::rumble(const char *str) {
   }
 }
 
-void AutonomousRecordingController::update() {
+void AutonomousOutlineController::update() {
   if (this->x > 125) {
     info("writing out recording!");
     pros::c::controller_rumble(this->controller_id, "-");
@@ -212,9 +212,9 @@ void AutonomousRecordingController::update() {
   }
 
   if (this->x % 2 == 1 && this->flywheelRuntime == -1) {
-    this->flywheel_speed(static_cast<int16_t>(std::min(this->flywheel_speed() + 100, 12000)));
-  } else if (this->y_pressed() % 2 == 1) {
-    this->flywheel_speed(static_cast<int16_t>(std::max(this->flywheel_speed() - 100, 4000)));
+    this->setSpeedSetting(static_cast<int16_t>(std::min(this->speedSetting() + 100, 12000)));
+  } else if (this->yPressed() % 2 == 1) {
+    this->setSpeedSetting(static_cast<int16_t>(std::max(this->speedSetting() - 100, 4000)));
   }
 
   if (this->r1 == 1) {
@@ -226,7 +226,7 @@ void AutonomousRecordingController::update() {
 
   if (this->flywheelRuntime != -1) {
     this->flywheelRuntime++;
-    if (this->x_pressed() > 2) {
+    if (this->xPressed() > 2) {
       this->write_drivetrain_update();
       this->flywheelRuntime = -1;
       this->output << "robot.flywheel->disengage();\n";
@@ -234,21 +234,21 @@ void AutonomousRecordingController::update() {
     }
   }
 
-  if (this->l1_pressed() && this->l2_pressed()) {
+  if (this->l1Pressed() && this->l2Pressed()) {
     this->write_drivetrain_update();
     this->output << "robot.intake->reverse();\n";
     changed = true;
-  } else if (this->l1_pressed() == 3) {
+  } else if (this->l1Pressed() == 3) {
     this->write_drivetrain_update();
     this->output << "robot.intake->engage();\n";
     changed = true;
-  } else if (this->l2_pressed() == 3) {
+  } else if (this->l2Pressed() == 3) {
     this->write_drivetrain_update();
     this->output << "robot.intake->disengage();\n";
     changed = true;
   }
 
-  if (this->r2_pressed() == 1) {
+  if (this->r2Pressed() == 1) {
     if (this->flywheelRuntime != -1) {
       this->write_drivetrain_update();
       this->output << "robot.indexer->cycle();\n";
@@ -296,13 +296,13 @@ void AutonomousRecordingController::update() {
   static bool init = false;
   if (this->ticks % 10 == 0 || !init) {
     init = true;
-    this->set_line(0, 0,
-                   logger::string_format("Flywheel: %i  ", static_cast<int32_t>(this->flywheel_speed()))
-                       .c_str()); // append ' ' to clear out buffer
+    this->setLine(0, 0,
+                  logger::string_format("Flywheel: %i  ", static_cast<int32_t>(this->speedSetting()))
+                      .c_str()); // append ' ' to clear out buffer
   }
 }
 
-bool AutonomousRecordingController::write_drivetrain_update() {
+bool AutonomousOutlineController::write_drivetrain_update() {
   if (!this->targetDirty) {
     this->robot.drivetrain.tare();
     return false;
@@ -313,7 +313,7 @@ bool AutonomousRecordingController::write_drivetrain_update() {
     double dist = units::encoderToInch(
         (this->robot.drivetrain.leftFront.getPosition() + this->robot.drivetrain.leftBack.getPosition() +
          this->robot.drivetrain.rightFront.getPosition() + this->robot.drivetrain.rightBack.getPosition()) /
-            4.0);
+        4.0);
     //    debug("Forwards %f", (this->robot.drivetrain.leftFront.get_position() +
     //    this->robot.drivetrain.leftBack.get_position() +
     //                          this->robot.drivetrain.rightFront.get_position() +
@@ -328,7 +328,7 @@ bool AutonomousRecordingController::write_drivetrain_update() {
     double dist = units::encoderToInch(
         (this->robot.drivetrain.leftFront.getPosition() + this->robot.drivetrain.leftBack.getPosition() +
          this->robot.drivetrain.rightFront.getPosition() + this->robot.drivetrain.rightBack.getPosition()) /
-            4.0);
+        4.0);
     //    debug("Backwards %f", (this->robot.drivetrain.leftFront.get_position() +
     //    this->robot.drivetrain.leftBack.get_position() +
     //                           this->robot.drivetrain.rightFront.get_position() +

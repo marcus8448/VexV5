@@ -6,7 +6,6 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wall"
-#include "display/lv_core/lv_obj.h"
 #include "display/lv_objx/lv_btn.h"
 #pragma GCC diagnostic pop
 
@@ -31,13 +30,13 @@ lv_res_t prev_page([[maybe_unused]] lv_obj_t *btn);
 lv_res_t next_page([[maybe_unused]] lv_obj_t *btn);
 void hide_screen(Screen *screen);
 void show_screen(Screen *screen);
-void update(robot::Robot &robot);
-[[noreturn]] void update_task(void *params);
+void update();
+[[noreturn]] void update_task([[maybe_unused]] void *params);
 lv_obj_t *create_prev_btn(lv_obj_t *obj);
 lv_obj_t *create_next_btn(lv_obj_t *obj);
 void create_screen(lv_obj_t *output[], lv_obj_t *parent);
 
-void initialize(robot::Robot &robot) {
+void initialize() {
   scopePush("Initialize LVGL");
   lv_init();
   scopePop();
@@ -59,13 +58,12 @@ void initialize(robot::Robot &robot) {
     auto **lvObjs = new lv_obj_t *[3];
     create_screen(lvObjs, base_view);
     screens->emplace(screen, lvObjs);
-    screen->create(lvObjs[0], width, height);
+    screen->initialize(lvObjs[0], width, height);
   }
   scopePop();
 
   show_screen(activeScreen);
-  pros::c::task_create(update_task, static_cast<void *>(&robot), TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT,
-                       "Screen update");
+  pros::c::task_create(update_task, nullptr, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Screen update");
 }
 
 void create_screen(lv_obj_t *output[], lv_obj_t *parent) {
@@ -78,19 +76,18 @@ void create_screen(lv_obj_t *output[], lv_obj_t *parent) {
   output[2] = create_next_btn(screen);
 }
 
-[[noreturn]] void update_task(void *params) {
-  auto *robot = static_cast<robot::Robot *>(params);
+[[noreturn]] void update_task([[maybe_unused]] void *params) {
   while (true) {
-    update(*robot);
-    pros::delay(SCREEN_UPDATE_RATE);
+    update();
+    pros::c::delay(SCREEN_UPDATE_RATE);
   }
 }
 
-void update(robot::Robot &robot) {
+void update() {
   if (*enableCanvas) {
     memset(canvasBuffer, 0x00000000, canvasSize);
   }
-  activeScreen->update(robot);
+  activeScreen->update();
 }
 
 void addScreen(Screen *screen) { registry->push_back(screen); }

@@ -1,11 +1,14 @@
 #ifndef SCREEN_INFO_HPP
 #define SCREEN_INFO_HPP
 
+#include "robot/robot.hpp"
 #include "screen.hpp"
 
 namespace screen {
 class Information : public Screen {
 private:
+  robot::Robot &robot;
+
   lv_obj_t *uptimeLabel = nullptr;
   lv_obj_t *controlSchemeLabel = nullptr;
   //  lv_obj_t *teamColourLabel = nullptr;
@@ -22,10 +25,10 @@ private:
   lv_obj_t *digitalSpeed = nullptr;
 
 public:
-  explicit Information();
+  explicit Information(robot::Robot &robot);
 
-  void create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) override;
-  void update(robot::Robot &robot) override;
+  void initialize(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) override;
+  void update() override;
 };
 } // namespace screen
 

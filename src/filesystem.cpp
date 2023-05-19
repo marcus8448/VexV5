@@ -1,16 +1,13 @@
-#include "fs/filesystem.hpp"
+#include "filesystem.hpp"
 #include "debug/logger.hpp"
-#include "pros/misc.hpp"
+#include "pros/misc.h"
 #include <cstring>
-#include <filesystem>
 
 namespace fs {
-std::string to_path(const char *name) { return std::string("/usd/").append(name); }
-
-bool is_available() { return pros::usd::is_installed(); }
+bool is_available() { return pros::c::usd_is_installed(); }
 
 bool can_access(const std::filesystem::path &path) {
-  if (!pros::usd::is_installed()) {
+  if (!is_available()) {
     warn("MicroSD unavailable. Cannot access %s", path.c_str());
     return false;
   } else if (std::strncmp(path.c_str(), "/usd/", strlen("/usd/")) != 0) {
@@ -74,7 +71,7 @@ std::ofstream open_indexed(const std::filesystem::path &path, std::ios_base::ope
   }
 
   if (!stream.is_open()) {
-    warn("Failed to create file %s!", path.c_str());
+    warn("Failed to initialize file %s!", path.c_str());
     stream.setstate(std::ios::badbit);
   }
   return stream;

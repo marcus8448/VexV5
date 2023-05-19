@@ -1,7 +1,7 @@
 #ifndef ROBOT_PID_VEX_HPP
 #define ROBOT_PID_VEX_HPP
 
-#include "robot/pid/pid_controller.hpp"
+#include "pid_controller.hpp"
 
 namespace robot {
 class Vex : public VelocityPid {

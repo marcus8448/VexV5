@@ -1,11 +1,15 @@
 #ifndef SCREEN_DRIVETRAIN_CHART_HPP
 #define SCREEN_DRIVETRAIN_CHART_HPP
 
-#include "screen/screen.hpp"
+#include "robot/robot.hpp"
+#include "screen.hpp"
+#include <vector>
 
 namespace screen {
 class DrivetrainChart : public Screen {
 private:
+  robot::Robot &robot;
+
   float canvasWidth = 0.0f;
   float canvasHeight = 0.0f;
 
@@ -16,10 +20,10 @@ private:
   lv_obj_t *drivetrainCanvas = nullptr;
 
 public:
-  explicit DrivetrainChart();
+  explicit DrivetrainChart(robot::Robot &robot);
 
-  void create(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) override;
-  void update(robot::Robot &robot) override;
+  void initialize(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) override;
+  void update() override;
 };
 } // namespace screen
 

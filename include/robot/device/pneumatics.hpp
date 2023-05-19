@@ -1,9 +1,6 @@
 #ifndef ROBOT_DEVICE_PNEUMATICS_HPP
 #define ROBOT_DEVICE_PNEUMATICS_HPP
 
-typedef __SIZE_TYPE__ size_t; // adi.hpp requires it
-
-#include "pros/adi.hpp"
 #include "robot/device/device.hpp"
 #include <cstdint>
 

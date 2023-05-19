@@ -1,10 +1,8 @@
 #ifndef SERIAL_ROBOT_COMMAND_HPP
 #define SERIAL_ROBOT_COMMAND_HPP
 
-#include <streambuf>
-
 #include "robot/robot.hpp"
-#include "serial/serial.hpp"
+#include "serial.hpp"
 
 namespace serial {
 class RobotCommandsPlugin : public PacketHandler {

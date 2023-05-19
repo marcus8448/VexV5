@@ -11,9 +11,19 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 include(CMakeOptions.txt)
 
+if (NOT DEFINED CMAKE_SHARED_LIBRARY_SUFFIX)
+    if (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
+        set(CMAKE_SHARED_LIBRARY_SUFFIX dll)
+    elseif (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Darwin")
+        set(CMAKE_SHARED_LIBRARY_SUFFIX dylib)
+    else()
+        set(CMAKE_SHARED_LIBRARY_SUFFIX so)
+    endif()
+endif()
+
 set(MFLAGS "-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp -nostdlib")
-set(CMAKE_CXX_FLAGS "${EXTRA_CXX_FLAGS} ${MFLAGS}")
-set(CMAKE_C_FLAGS "${EXTRA_C_FLAGS} ${MFLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_CXX_FLAGS} ${MFLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_C_FLAGS} ${MFLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,--no-enum-size-warning -z noexecstack")
 
 set(CMAKE_LINKER ${CMAKE_CXX_COMPILER})
@@ -67,23 +77,19 @@ set(ColdLibraries ${LibC} ${LibM} ${LibPROS} ${LibBase85})
 set(HotLinked ${LibC},${LibM},${LibPROS},${LibBase85})
 
 set(SOURCE_FILES
-        src/configuration.cpp
         src/main.cpp
         src/control/autonomous/autonomous.cpp
+        src/control/autonomous/score.cpp
         src/control/autonomous/skills.cpp
-        src/control/autonomous/left_score.cpp
-        src/control/autonomous/left_winpoint.cpp
-        src/control/autonomous/none.cpp
         src/control/autonomous/replay.cpp
-        src/control/autonomous/right_score.cpp
-        src/control/autonomous/right_winpoint.cpp
-        src/control/input/autonomous_recording.cpp
+        src/control/autonomous/winpoint.cpp
+        src/control/input/autonomous_outline.cpp
         src/control/input/operator.cpp
         src/control/input/raw_recording.cpp
         src/control/input/raw_replay.cpp
         src/debug/error.cpp
         src/debug/logger.cpp
-        src/fs/filesystem.cpp
+        src/filesystem.cpp
         src/robot/device/device.cpp
         src/robot/device/gyro.cpp
         src/robot/device/inertial.cpp
@@ -104,25 +110,20 @@ set(SOURCE_FILES
         src/serial/robot_state.cpp
         src/serial/serial.cpp
         src/serial/serial_connection.cpp
-        src/units.cpp
 )
 
 set(HEADER_FILES
-        include/configuration.hpp
         include/main.hpp
         include/debug/error.hpp
         include/debug/logger.hpp
-        include/fs/filesystem.hpp
+        include/filesystem.hpp
         include/control/autonomous/autonomous.hpp
+        include/control/autonomous/score.hpp
         include/control/autonomous/skills.hpp
-        include/control/autonomous/left_score.hpp
-        include/control/autonomous/left_winpoint.hpp
-        include/control/autonomous/none.hpp
         include/control/autonomous/replay.hpp
-        include/control/autonomous/right_score.hpp
-        include/control/autonomous/right_winpoint.hpp
+        include/control/autonomous/winpoint.hpp
         include/control/input/controller.hpp
-        include/control/input/autonomous_recording.hpp
+        include/control/input/autonomous_outline.hpp
         include/control/input/operator.hpp
         include/control/input/raw_recording.hpp
         include/control/input/raw_replay.hpp

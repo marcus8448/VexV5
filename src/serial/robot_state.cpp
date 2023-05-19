@@ -47,39 +47,39 @@ void RobotStatePlugin::handle(SerialConnection *connection, void *buffer, size_t
   buf[0] = 0;
   buf[1] = 0;
 
-  if (this->robot.controller->a_pressed())
+  if (this->robot.controller->aPressed())
     buf[0] |= 0b00000001;
-  if (this->robot.controller->b_pressed())
+  if (this->robot.controller->bPressed())
     buf[0] |= 0b00000010;
-  if (this->robot.controller->x_pressed())
+  if (this->robot.controller->xPressed())
     buf[0] |= 0b00000100;
-  if (this->robot.controller->y_pressed())
+  if (this->robot.controller->yPressed())
     buf[0] |= 0b00001000;
-  if (this->robot.controller->up_pressed())
+  if (this->robot.controller->upPressed())
     buf[0] |= 0b00010000;
-  if (this->robot.controller->down_pressed())
+  if (this->robot.controller->downPressed())
     buf[0] |= 0b00100000;
-  if (this->robot.controller->left_pressed())
+  if (this->robot.controller->leftPressed())
     buf[0] |= 0b01000000;
-  if (this->robot.controller->right_pressed())
+  if (this->robot.controller->rightPressed())
     buf[0] |= 0b10000000;
-  if (this->robot.controller->l1_pressed())
+  if (this->robot.controller->l1Pressed())
     buf[1] |= 0b00000001;
-  if (this->robot.controller->l2_pressed())
+  if (this->robot.controller->l2Pressed())
     buf[1] |= 0b00000010;
-  if (this->robot.controller->r1_pressed())
+  if (this->robot.controller->r1Pressed())
     buf[1] |= 0b00000100;
-  if (this->robot.controller->r2_pressed())
+  if (this->robot.controller->r2Pressed())
     buf[1] |= 0b00001000;
   // buf[2] = this->robot.controller->flywheel_speed(); todo
   floating src;
-  src = static_cast<floating>(this->robot.controller->left_stick_x());
+  src = static_cast<floating>(this->robot.controller->leftStickX());
   std::memcpy(&buf[3 + sizeof(float) * 0], &src, sizeof(float));
-  src = static_cast<floating>(this->robot.controller->left_stick_y());
+  src = static_cast<floating>(this->robot.controller->leftStickY());
   std::memcpy(&buf[3 + sizeof(float) * 1], &src, sizeof(float));
-  src = static_cast<floating>(this->robot.controller->right_stick_x());
+  src = static_cast<floating>(this->robot.controller->rightStickX());
   std::memcpy(&buf[3 + sizeof(float) * 2], &src, sizeof(float));
-  src = static_cast<floating>(this->robot.controller->right_stick_y());
+  src = static_cast<floating>(this->robot.controller->rightStickY());
   std::memcpy(&buf[3 + sizeof(float) * 3], &src, sizeof(float));
 
   serialize_motor(&buf[CONTROLLER_SIZE + MOTOR_SIZE * 0], this->robot.drivetrain.rightFront);

@@ -10,8 +10,8 @@ static const char PACKET_IDS[85]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9
                                  'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
                                  'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '!', '#', '$', '%', '&', '(',
                                  ')', '*', '+', '-', ';', '<', '=', '>', '?', '@', '^', '_', '`', '{', '|', '}', '~'};
-static std::map<const char, const uint8_t> *generate_char_map();
-static std::map<const char, const uint8_t> *BUF_TO_CHAR = generate_char_map();
+static const std::map<const char, const uint8_t> *generate_char_map();
+static const std::map<const char, const uint8_t> *BUF_TO_CHAR = generate_char_map();
 
 SerialConnection &SerialConnection::get_instance() {
   static SerialConnection connection = SerialConnection(std::cout.rdbuf(), std::cin.rdbuf());
@@ -48,7 +48,7 @@ void SerialConnection::skip_to_end() { this->input.ignore(); }
 
 void SerialConnection::write_prefix() { this->output.write(".[", 2); }
 
-static std::map<const char, const uint8_t> *generate_char_map() {
+static const std::map<const char, const uint8_t> *generate_char_map() {
   auto map = new std::map<const char, const uint8_t>;
   for (uint8_t i = 0; i < 85; i++) {
     map->emplace(PACKET_IDS[i], i);

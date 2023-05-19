@@ -2,9 +2,8 @@
 #define ROBOT_DRIVETRAIN_HPP
 
 #include "control/input/controller.hpp"
-#include "robot/device/gyro.hpp"
-#include "robot/device/inertial.hpp"
-#include "robot/device/motor.hpp"
+#include "device/inertial.hpp"
+#include "device/motor.hpp"
 #include <cstdint>
 
 namespace robot {
@@ -23,6 +22,23 @@ private:
   };
 
 public:
+  /**
+   * The different control schemes for the drivetrain
+   */
+  enum ControlScheme {
+    /**
+     * Left stick y-axis controls the left side.
+     * Right stick y-axis controls the right side.
+     */
+    TANK,
+
+    /**
+     * Left stick y-axis determines the overall power.
+     * Right stick x-axis determines the balance between the left and right motors.
+     */
+    ARCADE
+  };
+
   device::Motor rightFront;
   device::Motor leftFront;
   device::Motor rightBack;
@@ -32,6 +48,12 @@ public:
   double kp = 1.0;
   double ki = 0.0;
   double kd = 0.0;
+
+#ifndef ARCADE_DRIVE
+  ControlScheme controlScheme = TANK;
+#else
+  ControlScheme controlScheme = ARCADE;
+#endif
 
 private:
   TargetType targetType = NONE;
@@ -152,5 +174,7 @@ private:
    */
   void moveLeftTargeting(double target);
 };
+
+[[nodiscard]] const char *driveSchemeName(Drivetrain::ControlScheme scheme);
 } // namespace robot
 #endif // ROBOT_DRIVETRAIN_HPP

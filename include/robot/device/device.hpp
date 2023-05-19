@@ -3,11 +3,10 @@
 
 #define ROBOT_TICK_RATE 20
 
-#include "robot/updatable.hpp"
 #include <cstdint>
 
 namespace robot::device {
-class Device : public Updatable {
+class Device {
 private:
   const char *typeName;
   const char *name;
@@ -18,7 +17,7 @@ protected:
 public:
   explicit Device(const char *typeName, const char *name, uint8_t port);
   explicit Device(const Device &) = delete;
-  ~Device() override = default;
+  ~Device() = default;
 
   virtual void reconfigure() const = 0;
 
@@ -28,9 +27,10 @@ public:
   [[nodiscard]] const char *getTypeName() const;
   [[nodiscard]] const char *getName() const;
 
+  virtual void update() = 0;
+
 protected:
   [[nodiscard]] static bool checkConnect();
-
 };
 
 void initialize();
