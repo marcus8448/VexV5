@@ -58,7 +58,7 @@ void _debug(const std::string &string) { _debug(string.c_str()); }
 
 void _push(const char *string) {
   if (main_task_name != pros::c::task_get_name(pros::c::task_get_current())) {
-    _error("Called section push on non-main task!");
+    _error("Called section pushPop on non-main task!");
     return;
   }
   sections->emplace_back(std::pair(string, pros::c::millis()));

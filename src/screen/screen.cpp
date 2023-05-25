@@ -1,30 +1,23 @@
-#include <algorithm>
-#include <cstdlib>
-#include <cstring>
-#include <map>
-#include <vector>
+#include "screen/screen.hpp"
+#include "debug/logger.hpp"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wall"
 #include "display/lv_objx/lv_btn.h"
 #pragma GCC diagnostic pop
 
-#include "debug/logger.hpp"
-#include "screen/lvgl_util.hpp"
-#include "screen/screen.hpp"
+#include <algorithm>
+#include <cstring>
+#include <map>
+#include <vector>
 
 namespace screen {
-extern bool *enableCanvas;
-extern void *canvasBuffer;
-extern lv_coord_t halfWidth;
-
+extern void* canvasBuffer;
 static std::vector<Screen *> *registry = new std::vector<Screen *>();
 static std::map<Screen *, lv_obj_t **> *screens = new std::map<Screen *, lv_obj_t **>();
 static Screen *activeScreen = nullptr;
 
 static size_t canvasSize = 0;
-static lv_coord_t width = 0;
-static lv_coord_t height = 0;
 
 lv_res_t prev_page([[maybe_unused]] lv_obj_t *btn);
 lv_res_t next_page([[maybe_unused]] lv_obj_t *btn);
@@ -42,23 +35,14 @@ void initialize() {
   scopePop();
 
   lv_obj_t *base_view = lv_scr_act();
-  width = lv_obj_get_width(base_view);
-  height = lv_obj_get_height(base_view);
-  halfWidth = static_cast<lv_coord_t>(width / 2);
-  canvasSize = (lv_img_color_format_get_px_size(CANVAS_COLOUR) * width * (height - BASE_HEIGHT)) / 8;
-  if (*enableCanvas) {
-    canvasBuffer = calloc(canvasSize, 1);
-  }
-
   activeScreen = registry->at(0);
 
-  debug("Width: %i\nHeight: %i", width, height);
   scopePush("Create screens");
   for (auto screen : *registry) {
     auto **lvObjs = new lv_obj_t *[3];
     create_screen(lvObjs, base_view);
     screens->emplace(screen, lvObjs);
-    screen->initialize(lvObjs[0], width, height);
+    screen->initialize(lvObjs[0]);
   }
   scopePop();
 
@@ -68,7 +52,7 @@ void initialize() {
 
 void create_screen(lv_obj_t *output[], lv_obj_t *parent) {
   lv_obj_t *screen = lv_obj_create(parent, nullptr);
-  lv_obj_set_size(screen, width, height);
+  lv_obj_set_size(screen, SCREEN_WIDTH, SCREEN_HEIGHT);
   lv_obj_set_hidden(screen, true);
 
   output[0] = screen;
@@ -84,7 +68,7 @@ void create_screen(lv_obj_t *output[], lv_obj_t *parent) {
 }
 
 void update() {
-  if (*enableCanvas) {
+  if (canvasBuffer != nullptr) {
     memset(canvasBuffer, 0x00000000, canvasSize);
   }
   activeScreen->update();
@@ -111,16 +95,16 @@ void removeScreen(Screen *screen) {
 
 lv_obj_t *create_prev_btn(lv_obj_t *obj) {
   auto prevBtn = lv_btn_create(obj, nullptr);
-  lv_obj_set_pos(prevBtn, 0, static_cast<lv_coord_t>(height - BASE_HEIGHT));
-  lv_obj_set_size(prevBtn, BASE_HEIGHT, BASE_HEIGHT);
+  lv_obj_set_pos(prevBtn, 0, static_cast<lv_coord_t>(SCREEN_HEIGHT - BUTTON_SIZE));
+  lv_obj_set_size(prevBtn, BUTTON_SIZE, BUTTON_SIZE);
   lv_btn_set_action(prevBtn, LV_BTN_ACTION_CLICK, prev_page);
   return prevBtn;
 }
 
 lv_obj_t *create_next_btn(lv_obj_t *obj) {
   auto nextBtn = lv_btn_create(obj, nullptr);
-  lv_obj_set_pos(nextBtn, static_cast<lv_coord_t>(width - BASE_HEIGHT), static_cast<lv_coord_t>(height - BASE_HEIGHT));
-  lv_obj_set_size(nextBtn, BASE_HEIGHT, BASE_HEIGHT);
+  lv_obj_set_pos(nextBtn, static_cast<lv_coord_t>(SCREEN_WIDTH - BUTTON_SIZE), static_cast<lv_coord_t>(SCREEN_HEIGHT - BUTTON_SIZE));
+  lv_obj_set_size(nextBtn, BUTTON_SIZE, BUTTON_SIZE);
   lv_btn_set_action(nextBtn, LV_BTN_ACTION_CLICK, next_page);
   return nextBtn;
 }

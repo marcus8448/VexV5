@@ -3,14 +3,7 @@
 #include "robot/robot.hpp"
 #include "screen/colour.hpp"
 #include "screen/screen.hpp"
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wall"
-#include "display/lv_core/lv_obj.h"
-#include "display/lv_core/lv_style.h"
-#include "display/lv_objx/lv_btn.h"
-#include "display/lv_objx/lv_list.h"
-#pragma GCC diagnostic pop
+#include "screen/lvgl_util.hpp"
 
 namespace screen {
 AutonomousSelect *autonomous_select_instance = nullptr;
@@ -22,10 +15,10 @@ lv_res_t click(lv_obj_t *btn);
 
 AutonomousSelect::AutonomousSelect(robot::Robot &robot) : robot(robot) { autonomous_select_instance = this; }
 
-void AutonomousSelect::initialize(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
+void AutonomousSelect::initialize(lv_obj_t *screen) {
   this->selections = lv_list_create(screen, nullptr);
   lv_obj_set_pos(this->selections, 0, 0);
-  lv_obj_set_size(this->selections, width, static_cast<lv_coord_t>(height - BASE_HEIGHT));
+  lv_obj_set_size(this->selections, SCREEN_WIDTH, static_cast<lv_coord_t>(SCREEN_HEIGHT - BUTTON_SIZE));
   delete default_style;
   delete selected_style;
   default_style = new lv_style_t;

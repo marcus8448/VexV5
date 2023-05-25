@@ -3,26 +3,23 @@
 
 #include "robot/robot.hpp"
 #include "screen.hpp"
-#include <vector>
+#include "structure/fixed_queue.hpp"
 
 namespace screen {
 class DrivetrainChart : public Screen {
 private:
   robot::Robot &robot;
 
-  float canvasWidth = 0.0f;
-  float canvasHeight = 0.0f;
-
-  std::vector<float> velMotorLF;
-  std::vector<float> velMotorRF;
-  std::vector<float> velMotorLB;
-  std::vector<float> velMotorRB;
+  structure::FixedQueue<float, 100> velMotorLF = structure::FixedQueue<float, 100>(0.0f);
+  structure::FixedQueue<float, 100> velMotorRF = structure::FixedQueue<float, 100>(0.0f);
+  structure::FixedQueue<float, 100> velMotorLB = structure::FixedQueue<float, 100>(0.0f);
+  structure::FixedQueue<float, 100> velMotorRB = structure::FixedQueue<float, 100>(0.0f);
   lv_obj_t *drivetrainCanvas = nullptr;
 
 public:
   explicit DrivetrainChart(robot::Robot &robot);
 
-  void initialize(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) override;
+  void initialize(lv_obj_t *screen) override;
   void update() override;
 };
 } // namespace screen

@@ -3,9 +3,9 @@
 #include "debug/logger.hpp"
 
 namespace robot {
-Robot::Robot(const uint8_t rightFront, const uint8_t leftFront, const uint8_t rightBack, const uint8_t leftBack,
-             const uint8_t inertial)
-    : drivetrain(rightFront, leftFront, rightBack, leftBack, inertial), controller(nullptr) {}
+Robot::Robot(uint8_t rightFront, uint8_t leftFront, uint8_t rightBack, uint8_t leftBack,
+             uint8_t inertial, uint8_t claw)
+    : drivetrain(rightFront, leftFront, rightBack, leftBack, inertial), claw(claw), controller(nullptr) {}
 
 Robot::~Robot() {
   warn("Robot destructor called");
@@ -13,25 +13,20 @@ Robot::~Robot() {
   controller = nullptr;
 }
 
-[[noreturn]] void Robot::backgroundControl() {
-  while (true) {
-    this->drivetrain.updatePosition();
-
-    this->drivetrain.updateMovement();
-    pros::c::delay(ROBOT_TICK_RATE);
-  }
+void Robot::updateDevices() {
+  this->drivetrain.updateState();
+  this->claw.updateState();
 }
 
 [[noreturn]] void Robot::opcontrol() {
   this->drivetrain.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
 
-  pros::c::task_create([](void *param) { static_cast<Robot *>(param)->backgroundControl(); }, this,
-                       TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Robot async control (OP)");
-
   while (true) {
+    this->updateDevices();
     if (this->controller != nullptr) {
       this->controller->update();
       this->drivetrain.updateTargeting(this->controller);
+      this->claw.updateTargeting(this->controller);
     } else {
       error("Controller is null!");
     }
@@ -43,8 +38,13 @@ void Robot::runAutonomous() {
   this->drivetrain.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
   this->drivetrain.tare();
 
-  pros::c::task_create([](void *param) { static_cast<Robot *>(param)->backgroundControl(); }, this,
-                       TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Robot async control (OP)");
+  pros::c::task_create([](void *param) {
+    auto robot = static_cast<Robot *>(param);
+    while (true) {
+      robot->updateDevices();
+      pros::c::delay(ROBOT_TICK_RATE);
+    }
+  }, this,TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Robot async control (OP)");
 
   if (control::autonomous::getActive() == nullptr) {
     error("No autonomous to run!");

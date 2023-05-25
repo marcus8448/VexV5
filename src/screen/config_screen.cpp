@@ -11,12 +11,11 @@ namespace screen {
 static ConfigurationScreen *instance = nullptr;
 ConfigurationScreen::ConfigurationScreen(robot::Robot &robot) : robot(robot) {}
 
-void ConfigurationScreen::initialize(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
-  auto halfWidth = static_cast<lv_coord_t>(width / 2);
+void ConfigurationScreen::initialize(lv_obj_t *screen) {
   this->driveSchemeBtn = lv_btn_create(screen, nullptr);
   this->driveSchemeBtnLbl = lv_label_create(this->driveSchemeBtn, nullptr);
-  lv_obj_set_pos(this->driveSchemeBtn, 48 * 0, 48 * 0);
-  lv_obj_set_size(this->driveSchemeBtn, halfWidth, 48);
+  lv_obj_set_pos(this->driveSchemeBtn, 0, 0);
+  lv_obj_set_size(this->driveSchemeBtn, SCREEN_HALF_WIDTH, 48);
   lv_btn_set_toggle(this->driveSchemeBtn, false);
   lv_btn_set_action(this->driveSchemeBtn, LV_BTN_ACTION_CLICK, switch_drive_scheme);
   this->update_drive_scheme_label();

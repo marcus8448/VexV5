@@ -13,7 +13,7 @@ void update_motor_temp(lv_obj_t *label, const robot::device::Motor &motor);
 
 Information::Information(robot::Robot &robot) : robot(robot) {}
 
-void Information::initialize(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
+void Information::initialize(lv_obj_t *screen) {
   create_info_label(screen, false, 0, "Build: " __DATE__ " " __TIME__);
   this->uptimeLabel = create_info_label(screen, true, 0);
 

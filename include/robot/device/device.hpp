@@ -27,8 +27,6 @@ public:
   [[nodiscard]] const char *getTypeName() const;
   [[nodiscard]] const char *getName() const;
 
-  virtual void update() = 0;
-
 protected:
   [[nodiscard]] static bool checkConnect();
 };

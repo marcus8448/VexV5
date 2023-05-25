@@ -1,20 +1,26 @@
 #ifndef SCREEN_HPP
 #define SCREEN_HPP
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wall"
-#include "display/lv_core/lv_obj.h"
-#pragma GCC diagnostic pop
+#include "lvgl_util.hpp"
 #include <string>
 
 #define SCREEN_UPDATE_RATE 50
 
-namespace screen {
-#define BASE_HEIGHT static_cast<lv_coord_t>(40)
+#define SCREEN_WIDTH 480
+#define SCREEN_HALF_WIDTH 240
+#define SCREEN_HEIGHT 240
 
+#define CANVAS_WIDTH SCREEN_WIDTH
+#define CANVAS_HEIGHT SCREEN_HEIGHT
+#define CANVAS_COLOUR LV_IMG_CF_TRUE_COLOR
+#define CANVAS_SIZE_BYTES ((CANVAS_WIDTH * CANVAS_HEIGHT * lv_img_color_format_get_px_size(CANVAS_COLOUR)) / 8)
+
+#define BUTTON_SIZE static_cast<lv_coord_t>(40)
+
+namespace screen {
 class Screen {
 public:
-  virtual void initialize(lv_obj_t *screen, lv_coord_t width, lv_coord_t height) = 0;
+  virtual void initialize(lv_obj_t *screen) = 0;
   virtual void update() = 0;
 };
 

@@ -65,7 +65,7 @@ file(TOUCH ${CMAKE_BINARY_DIR}/empty.cpp)
 file(WRITE ${CMAKE_BINARY_DIR}/timestamp.cpp "char const * const _PROS_COMPILE_TIMESTAMP = __DATE__ \" \" __TIME__; char const * const _PROS_COMPILE_DIRECTORY = \"${CMAKE_SOURCE_DIR}\";\n")
 add_library(Timestamp STATIC ${CMAKE_BINARY_DIR}/timestamp.cpp)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 11)
 set(WARNING_FLAGS "-Wall -Wno-psabi -Wno-shadow-field-in-constructor")
 set(COMPILE_FLAGS "-g -ffunction-sections -fdata-sections -fdiagnostics-color -funwind-tables -fno-exceptions")
@@ -78,11 +78,6 @@ set(HotLinked ${LibC},${LibM},${LibPROS},${LibBase85})
 
 set(SOURCE_FILES
         src/main.cpp
-        src/control/autonomous/autonomous.cpp
-        src/control/autonomous/score.cpp
-        src/control/autonomous/skills.cpp
-        src/control/autonomous/replay.cpp
-        src/control/autonomous/winpoint.cpp
         src/control/input/autonomous_outline.cpp
         src/control/input/operator.cpp
         src/control/input/raw_recording.cpp
@@ -96,20 +91,9 @@ set(SOURCE_FILES
         src/robot/device/motor.cpp
         src/robot/device/optical.cpp
         src/robot/device/pneumatics.cpp
-        src/robot/pid/tbh.cpp
-        src/robot/pid/vex.cpp
+        src/robot/claw.cpp
         src/robot/drivetrain.cpp
         src/robot/robot.cpp
-        src/screen/autonomous_select.cpp
-        src/screen/config_screen.cpp
-        src/screen/drivetrain_chart.cpp
-        src/screen/information.cpp
-        src/screen/lvgl_util.cpp
-        src/screen/screen.cpp
-        src/serial/robot_command.cpp
-        src/serial/robot_state.cpp
-        src/serial/serial.cpp
-        src/serial/serial_connection.cpp
 )
 
 set(HEADER_FILES
@@ -117,11 +101,6 @@ set(HEADER_FILES
         include/debug/error.hpp
         include/debug/logger.hpp
         include/filesystem.hpp
-        include/control/autonomous/autonomous.hpp
-        include/control/autonomous/score.hpp
-        include/control/autonomous/skills.hpp
-        include/control/autonomous/replay.hpp
-        include/control/autonomous/winpoint.hpp
         include/control/input/controller.hpp
         include/control/input/autonomous_outline.hpp
         include/control/input/operator.hpp
@@ -133,26 +112,71 @@ set(HEADER_FILES
         include/robot/device/motor.hpp
         include/robot/device/optical.hpp
         include/robot/device/pneumatics.hpp
-        include/robot/pid/tbh.hpp
-        include/robot/pid/pid.hpp
+        include/robot/claw.hpp
         include/robot/drivetrain.hpp
         include/robot/robot.hpp
-        include/screen/autonomous_select.hpp
-        include/screen/colour.hpp
-        include/screen/config_screen.hpp
-        include/screen/drivetrain_chart.hpp
-        include/screen/information.hpp
-        include/screen/lvgl_util.hpp
-        include/screen/screen.hpp
-        include/serial/robot_command.hpp
-        include/serial/robot_state.hpp
-        include/serial/serial.hpp
-        include/serial/serial_connection.hpp
+        include/structure/fixed_queue.hpp
         include/units.hpp
 )
 
+if (NOT DISABLE_SERIAL)
+    set(SOURCE_FILES ${SOURCE_FILES}
+            src/serial/robot_command.cpp
+            src/serial/robot_state.cpp
+            src/serial/serial.cpp
+            src/serial/serial_connection.cpp
+    )
+
+    set(HEADER_FILES ${HEADER_FILES}
+            include/serial/robot_command.hpp
+            include/serial/robot_state.hpp
+            include/serial/serial.hpp
+            include/serial/serial_connection.hpp
+    )
+endif()
+
+if (NOT DISABLE_SCREEN)
+    set(SOURCE_FILES ${SOURCE_FILES}
+            src/screen/autonomous_select.cpp
+            src/screen/config_screen.cpp
+            src/screen/drivetrain_chart.cpp
+            src/screen/information.cpp
+            src/screen/lvgl_util.cpp
+            src/screen/screen.cpp
+    )
+
+    set(HEADER_FILES ${HEADER_FILES}
+            include/screen/autonomous_select.hpp
+            include/screen/colour.hpp
+            include/screen/config_screen.hpp
+            include/screen/drivetrain_chart.hpp
+            include/screen/graph.hpp
+            include/screen/information.hpp
+            include/screen/lvgl_util.hpp
+            include/screen/screen.hpp
+    )
+endif()
+
+if (NOT DISABLE_AUTONOMOUS)
+    set(SOURCE_FILES ${SOURCE_FILES}
+            src/control/autonomous/autonomous.cpp
+            src/control/autonomous/score.cpp
+            src/control/autonomous/skills.cpp
+            src/control/autonomous/replay.cpp
+            src/control/autonomous/winpoint.cpp
+    )
+
+    set(HEADER_FILES ${HEADER_FILES}
+            include/control/autonomous/autonomous.hpp
+            include/control/autonomous/score.hpp
+            include/control/autonomous/skills.hpp
+            include/control/autonomous/replay.hpp
+            include/control/autonomous/winpoint.hpp
+    )
+endif()
+
 if (ENABLE_TEMPORARY_CODE)
-    set(SOURCE_FILES "${SOURCE_FILES} src/temporary.hpp")
+    set(SOURCE_FILES "${SOURCE_FILES} src/temporary.cpp")
 endif()
 
 add_executable(ColdPackage)

@@ -1,39 +1,18 @@
 #include "robot/device/motor.hpp"
 #include "debug/logger.hpp"
 #include "pros/motors.h"
-#include "robot/pid/pid.hpp"
 #include <cerrno>
 #include <cmath>
 
-#define DEFAULT_MOTOR_GEARSET pros::E_MOTOR_GEARSET_18
-#define DEFAULT_MOTOR_BRAKE pros::E_MOTOR_BRAKE_BRAKE
-#define MOTOR_ENCODER_UNITS pros::E_MOTOR_ENCODER_DEGREES
-
 namespace robot::device {
-Motor::Motor(const uint8_t port, const char *name, const pros::motor_gearset_e_t gearset,
-             const pros::motor_brake_mode_e_t brake_mode, bool reversed)
+Motor::Motor(uint8_t port, const char *name, bool reversed, pros::motor_gearset_e_t gearset,
+             pros::motor_brake_mode_e_t brake_mode)
     : Device("Motor", name, port), gearset(gearset), maxVelocity(gearsetMaxVelocity(gearset)), brakeMode(brake_mode),
       reversed(reversed) {
   pros::c::motor_set_gearing(this->port, this->gearset);
   pros::c::motor_set_reversed(this->port, this->reversed); // todo: manually reverse
   pros::c::motor_set_encoder_units(this->port, MOTOR_ENCODER_UNITS);
   pros::c::motor_set_brake_mode(this->port, this->brakeMode);
-  this->controller = new robot::Vex(this->port);
-}
-
-Motor::Motor(const uint8_t port, const char *name, bool reversed)
-    : Device("Motor", name, port), gearset(DEFAULT_MOTOR_GEARSET),
-      maxVelocity(gearsetMaxVelocity(DEFAULT_MOTOR_GEARSET)), brakeMode(DEFAULT_MOTOR_BRAKE), reversed(reversed) {
-  pros::c::motor_set_gearing(this->port, DEFAULT_MOTOR_GEARSET);
-  pros::c::motor_set_reversed(this->port, this->reversed); // todo: manually reverse
-  pros::c::motor_set_encoder_units(this->port, MOTOR_ENCODER_UNITS);
-  pros::c::motor_set_brake_mode(this->port, DEFAULT_MOTOR_BRAKE);
-}
-
-void Motor::update() {
-  if (this->controller != nullptr) {
-    this->controller->update();
-  }
 }
 
 void Motor::moveVelocity(int16_t velocity) {
@@ -48,9 +27,7 @@ void Motor::moveVelocity(int16_t velocity) {
     this->target = velocity;
     this->targetType = TargetType::VELOCITY;
     this->targetPosition = INFINITY;
-    if (this->controller != nullptr) {
-      this->controller->startTargeting(velocity);
-    }
+    pros::c::motor_move_velocity(this->port, velocity);
   }
 }
 
@@ -170,16 +147,13 @@ void Motor::brake() {
     this->target = 0;
     this->targetType = VOLTAGE;
     this->targetPosition = INFINITY;
-    if (this->controller != nullptr) {
-      this->controller->startTargeting(0.0);
-    }
     pros::c::motor_brake(this->port);
   }
 }
 
 [[nodiscard]] Motor::TargetType Motor::getTargetType() const { return this->targetType; }
 
-int16_t gearsetMaxVelocity(pros::motor_gearset_e_t gearset) {
+constexpr int16_t Motor::gearsetMaxVelocity(pros::motor_gearset_e_t gearset) {
   switch (gearset) {
   case pros::E_MOTOR_GEARSET_36:
     return 100;

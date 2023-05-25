@@ -14,7 +14,7 @@ cmake_dependent_option(DISABLE_AUTONOMOUS_SELECTION_SCREEN "Disable the autonomo
 cmake_dependent_option(DISABLE_DRIVETRAIN_DEBUG_SCREEN "Disable the drivetrain debug screen" OFF "NOT DISABLE_SCREEN" ON)
 
 option(DISABLE_SERIAL "Disable serial communication code" ON)
-option(ENABLE_TEMPORARY_CODE "Load and run code in src/temporary.hpp" OFF)
+option(ENABLE_TEMPORARY_CODE "Load and run code in src/temporary.cpp" OFF)
 option(ENABLE_LTO "Enable link time optimization" OFF)
 
 if (ENABLE_DEBUG_LOGGING)
@@ -55,5 +55,6 @@ if (DISABLE_SERIAL)
 endif()
 
 if (ENABLE_TEMPORARY_CODE)
-    file(TOUCH ${CMAKE_SOURCE_DIR}/src/temporary.hpp)
+    add_compile_definitions(ENABLE_TEMPORARY_CODE)
+    file(TOUCH ${CMAKE_SOURCE_DIR}/src/temporary.cpp)
 endif()

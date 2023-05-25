@@ -15,7 +15,6 @@ public:
   [[nodiscard]] double getRoll() const;
 
   [[nodiscard]] bool isConnected() const override;
-  void update() override;
   void reconfigure() const override;
   void tare();
   void calibrate();

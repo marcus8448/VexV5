@@ -44,8 +44,6 @@ void Optical::disableGesture() {
   }
 }
 
-void Optical::update() {}
-
 void Optical::reconfigure() const {
   if (this->gesture) {
     pros::c::optical_enable_gesture(this->port);

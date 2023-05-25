@@ -29,8 +29,6 @@ bool Inertial::isConnected() const {
   return d == pros::c::imu_status_e::E_IMU_STATUS_ERROR || e == 0;
 }
 
-void Inertial::update() {}
-
 void Inertial::reconfigure() const {}
 
 void Inertial::tare() { pros::c::imu_tare(this->port); }

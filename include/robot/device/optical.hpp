@@ -24,7 +24,6 @@ public:
   void enableGesture();
   void disableGesture();
 
-  void update() override;
   void reconfigure() const override;
 
   [[nodiscard]] bool isConnected() const override;

@@ -30,12 +30,17 @@
 #include "screen/information.hpp"
 #endif
 
+#ifdef ENABLE_TEMPORARY_CODE
+#include "temporary.cpp"
+#endif
+
 // CONFIG
 #define RIGHT_FRONT_MOTOR 4
 #define LEFT_FRONT_MOTOR 2
 #define RIGHT_BACK_MOTOR 9
 #define LEFT_BACK_MOTOR 20
 #define INERTIAL 18
+#define CLAW 19
 // END CONFIG
 
 using namespace robot;
@@ -123,6 +128,10 @@ void opcontrol() {
   robot.setController(new control::input::Operator()); // set the robot controller to the default operator based one
   scopePop();
 
+#ifdef ENABLE_TEMPORARY_CODE
+  temporary::run();
+#endif
+
   robot.opcontrol();
   onRootTaskEnd();
 }
@@ -158,7 +167,7 @@ void onRootTaskEnd() {
  * @return the robot instance
  */
 Robot &getRobot() {
-  static Robot robot = Robot(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR, INERTIAL);
+  static Robot robot = Robot(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR, INERTIAL, CLAW);
   device::initialize();
   return robot;
 }

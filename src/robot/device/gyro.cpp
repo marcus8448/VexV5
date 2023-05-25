@@ -13,7 +13,5 @@ bool Gyro::isConnected() const {
   return errno == 0;
 }
 
-void Gyro::update() {}
-
 void Gyro::reconfigure() const {}
 } // namespace robot::device

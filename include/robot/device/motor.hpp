@@ -3,10 +3,13 @@
 
 #include "device.hpp"
 #include "pros/motors.h"
-#include "robot/pid/pid.hpp"
 #include <cmath>
 
 #define MOTOR_MAX_MILLIVOLTS 12000
+
+#define DEFAULT_MOTOR_GEARSET pros::E_MOTOR_GEARSET_18
+#define DEFAULT_MOTOR_BRAKE pros::E_MOTOR_BRAKE_BRAKE
+#define MOTOR_ENCODER_UNITS pros::E_MOTOR_ENCODER_DEGREES
 
 namespace robot::device {
 class Motor : public Device {
@@ -23,11 +26,9 @@ private:
   bool reversed;
 
 public:
-  VelocityPid *controller = nullptr;
-
-  explicit Motor(uint8_t port, const char *name, pros::motor_gearset_e_t gearset = pros::E_MOTOR_GEARSET_18,
-                 pros::motor_brake_mode_e_t brake_mode = pros::E_MOTOR_BRAKE_BRAKE, bool reversed = false);
-  explicit Motor(uint8_t port, const char *name, bool reversed = false);
+  explicit Motor(uint8_t port, const char *name, bool reversed = false,
+                 pros::motor_gearset_e_t gearset = DEFAULT_MOTOR_GEARSET,
+                 pros::motor_brake_mode_e_t brake_mode = DEFAULT_MOTOR_BRAKE);
 
   void moveVelocity(int16_t velocity);
   void moveMillivolts(int16_t mV);
@@ -61,15 +62,15 @@ public:
   [[nodiscard]] int32_t getCurrentLimit() const;
   [[nodiscard]] int32_t getVoltageLimit() const;
 
-  void update() override;
   void reconfigure() const override;
 
   void tare();
   void brake();
 
   [[nodiscard]] Motor::TargetType getTargetType() const;
+
+  static constexpr int16_t gearsetMaxVelocity(pros::motor_gearset_e_t gearset);
 };
 
-int16_t gearsetMaxVelocity(pros::motor_gearset_e_t gearset);
 } // namespace robot::device
 #endif // VEXV5_ROBOT_DEVICE_MOTOR_HPP

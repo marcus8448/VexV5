@@ -18,7 +18,6 @@ public:
 
   [[nodiscard]] bool isExtended() const;
 
-  void update() override;
   void reconfigure() const override;
   [[nodiscard]] bool isConnected() const override;
 };

@@ -14,7 +14,6 @@ public:
   [[nodiscard]] double getRotation() const;
 
   [[nodiscard]] bool isConnected() const override;
-  void update() override;
   void reconfigure() const override;
 };
 } // namespace robot::device

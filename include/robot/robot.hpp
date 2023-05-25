@@ -1,6 +1,7 @@
 #ifndef ROBOT_ROBOT_HPP
 #define ROBOT_ROBOT_HPP
 
+#include "claw.hpp"
 #include "control/input/controller.hpp"
 #include "drivetrain.hpp"
 
@@ -14,6 +15,10 @@ public:
    * The robot's drivetrain.
    */
   Drivetrain drivetrain;
+  /**
+   * The robot's claw.
+   */
+  Claw claw;
   /**
    * The robot's controller. Used during operator control.
    */
@@ -29,13 +34,14 @@ public:
    * @param indexer The robot's indexer.
    * @param roller The robot's roller.
    */
-  explicit Robot(uint8_t rightFront, uint8_t leftFront, uint8_t rightBack, uint8_t leftBack, uint8_t inertial);
+  explicit Robot(uint8_t rightFront, uint8_t leftFront, uint8_t rightBack, uint8_t leftBack, uint8_t inertial, uint8_t claw);
   explicit Robot(const Robot &robot) = delete;
   ~Robot();
 
   void setController(control::input::Controller *controller);
 
-  [[noreturn]] void backgroundControl();
+  void updateDevices();
+
   void runAutonomous();
   [[noreturn]] void opcontrol();
 };

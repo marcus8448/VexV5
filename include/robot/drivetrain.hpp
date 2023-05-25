@@ -91,7 +91,6 @@ public:
    * @param leftBack The port of the motor on the back of the robot and the left side.
    */
   Drivetrain(uint8_t rightFront, uint8_t leftFront, uint8_t rightBack, uint8_t leftBack, uint8_t inertial);
-  virtual ~Drivetrain();
 
   /**
    * Drives the robot forwards by the specified distance.
@@ -144,8 +143,7 @@ public:
   void setBrakeMode(pros::motor_brake_mode_e brake_mode);
 
   void updateTargeting(control::input::Controller *controller);
-  void updatePosition();
-  void updateMovement();
+  void updateState();
 
 private:
   void setTarget(Drivetrain::TargetType type);

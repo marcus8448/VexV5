@@ -11,13 +11,11 @@
 namespace robot {
 Drivetrain::Drivetrain(const uint8_t rightFront, const uint8_t leftFront, const uint8_t rightBack,
                        const uint8_t leftBack, const uint8_t inertial)
-    : rightFront(device::Motor(rightFront, "Right Front", pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST, false)),
-      leftFront(device::Motor(leftFront, "Left Front", pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST, true)),
-      rightBack(device::Motor(rightBack, "Right Back", pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST, false)),
-      leftBack(device::Motor(leftBack, "Left Back", pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST, true)),
+    : rightFront(device::Motor(rightFront, "Right Front", false, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST)),
+      leftFront(device::Motor(leftFront, "Left Front", true, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST)),
+      rightBack(device::Motor(rightBack, "Right Back", false, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST)),
+      leftBack(device::Motor(leftBack, "Left Back", true, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST)),
       imu(device::Inertial(inertial, "IDrive")) {}
-
-Drivetrain::~Drivetrain() = default;
 
 bool Drivetrain::isAtTarget() const { return this->timeAtTarget > STABILIZE_MARGIN; }
 
@@ -99,7 +97,11 @@ void Drivetrain::updateTargeting(control::input::Controller *controller) {
   }
 }
 
-void Drivetrain::updateMovement() {
+void Drivetrain::updateState() {
+  this->heading = this->imu.getHeading();
+  this->rightPos = (this->rightFront.getPosition() + this->rightBack.getPosition()) / 2.0;
+  this->leftPos = (this->leftFront.getPosition() + this->leftBack.getPosition()) / 2.0;
+
   bool atTarget = false;
   switch (this->targetType) {
   case NONE: {
@@ -220,12 +222,6 @@ void Drivetrain::moveLeft(int16_t millivolts) {
 }
 
 void Drivetrain::setTarget(Drivetrain::TargetType type) { this->targetType = type; }
-
-void Drivetrain::updatePosition() {
-  this->heading = this->imu.getHeading();
-  this->rightPos = (this->rightFront.getPosition() + this->rightBack.getPosition()) / 2.0;
-  this->leftPos = (this->leftFront.getPosition() + this->leftBack.getPosition()) / 2.0;
-}
 
 [[nodiscard]] const char *driveSchemeName(Drivetrain::ControlScheme scheme) {
   switch (scheme) {
