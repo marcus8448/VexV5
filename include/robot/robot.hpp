@@ -34,7 +34,8 @@ public:
    * @param indexer The robot's indexer.
    * @param roller The robot's roller.
    */
-  explicit Robot(uint8_t rightFront, uint8_t leftFront, uint8_t rightBack, uint8_t leftBack, uint8_t inertial, uint8_t claw);
+  explicit Robot(uint8_t rightFront, uint8_t leftFront, uint8_t rightBack, uint8_t leftBack, uint8_t inertial,
+                 uint8_t claw);
   explicit Robot(const Robot &robot) = delete;
   ~Robot();
 

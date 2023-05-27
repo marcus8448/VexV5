@@ -1,7 +1,8 @@
 #include "main.hpp"
 #include "control/input/operator.hpp"
 #include "debug/logger.hpp"
-#include "pros/rtos.h"
+#include "robot/robot.hpp"
+#include "tasks.hpp"
 
 #ifndef DISABLE_AUTONOMOUS
 #include "control/autonomous/autonomous.hpp"
@@ -46,8 +47,6 @@
 using namespace robot;
 
 robot::Robot &getRobot();
-void onRootTaskStart();
-void onRootTaskEnd();
 
 /**
  * Called when the robot is first initialized.
@@ -150,16 +149,6 @@ void competition_initialize() {
 void disabled() {
   onRootTaskStart();
   onRootTaskEnd();
-}
-
-void onRootTaskStart() {
-  logger::flush();
-  logger::initialize(pros::c::task_get_name(pros::c::task_get_current()));
-}
-
-void onRootTaskEnd() {
-  logger::clearRoot(pros::c::task_get_name(pros::c::task_get_current()));
-  logger::flush();
 }
 
 /**

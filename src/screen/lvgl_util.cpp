@@ -23,8 +23,8 @@ lv_style_t *create_text_color_style(lv_color_t colour) {
 }
 
 lv_obj_t *create_info_label(lv_obj_t *screen, bool right, lv_coord_t index, const char *text) {
-  return create_label(screen, right ? SCREEN_HALF_WIDTH : static_cast<lv_coord_t>(0), static_cast<lv_coord_t>(index * 16),
-                      SCREEN_HALF_WIDTH, 16, text);
+  return create_label(screen, right ? SCREEN_HALF_WIDTH : static_cast<lv_coord_t>(0),
+                      static_cast<lv_coord_t>(index * 16), SCREEN_HALF_WIDTH, 16, text);
 }
 
 lv_obj_t *create_canvas(lv_obj_t *screen) {
@@ -32,16 +32,14 @@ lv_obj_t *create_canvas(lv_obj_t *screen) {
     canvasBuffer = calloc(CANVAS_SIZE_BYTES, 1);
   }
 
-  lv_obj_t* canvas = lv_canvas_create(screen, nullptr);
+  lv_obj_t *canvas = lv_canvas_create(screen, nullptr);
   lv_obj_set_pos(canvas, 0, 0);
   lv_obj_set_size(canvas, CANVAS_WIDTH, CANVAS_HEIGHT);
   lv_canvas_set_buffer(canvas, canvasBuffer, CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_COLOUR);
   return canvas;
 }
 
-lv_style_t *get_base_style() {
-  return lv_obj_get_style(lv_scr_act());
-}
+lv_style_t *get_base_style() { return lv_obj_get_style(lv_scr_act()); }
 
 lv_style_t *create_style() {
   auto *style = static_cast<lv_style_t *>(malloc(sizeof(lv_style_t)));

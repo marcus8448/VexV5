@@ -1,6 +1,7 @@
 #include "robot/device/device.hpp"
 #include "debug/logger.hpp"
 #include "pros/rtos.h"
+#include "tasks.hpp"
 #include <cerrno>
 #include <map>
 #include <vector>
@@ -21,8 +22,7 @@ void initialize() {
   static bool init = false;
   if (!init) {
     init = true;
-    pros::c::task_create(reconfigureTask, nullptr, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT,
-                         "Device reconfigure task");
+    createTask("Device reconfigure task", reconfigureTask, nullptr, TASK_PRIORITY_DEFAULT - 1, 0x1000);
   }
 }
 

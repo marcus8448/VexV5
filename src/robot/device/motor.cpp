@@ -161,9 +161,8 @@ constexpr int16_t Motor::gearsetMaxVelocity(pros::motor_gearset_e_t gearset) {
     return 200;
   case pros::E_MOTOR_GEARSET_06:
     return 600;
-  case pros::E_MOTOR_GEARSET_INVALID:
+  default:
     return 0;
   }
-  return 0;
 }
 } // namespace robot::device

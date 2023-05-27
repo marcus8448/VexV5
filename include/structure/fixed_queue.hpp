@@ -3,8 +3,7 @@
 #include <cstddef>
 
 namespace structure {
-template<class Type, size_t SIZE>
-class FixedQueue {
+template <class Type, size_t SIZE> class FixedQueue {
   Type values[SIZE] = {};
   size_t position = 0;
 
@@ -43,5 +42,5 @@ template <class Type, size_t SIZE> Type FixedQueue<Type, SIZE>::pushPop(Type val
 }
 
 template <class Type, size_t SIZE> constexpr size_t FixedQueue<Type, SIZE>::size() const { return SIZE; }
-}
+} // namespace structure
 #endif // STRUCTURE_FIXED_QUEUE

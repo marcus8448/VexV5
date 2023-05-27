@@ -4,7 +4,7 @@
 #define OPEN_POSITION 200.0
 
 namespace robot {
-Claw::Claw(uint8_t port): motor(device::Motor(port, "Claw")) {}
+Claw::Claw(uint8_t port) : motor(device::Motor(port, "Claw")) {}
 
 void Claw::open() {
   if (this->state == CLOSED || this->state == CLOSING) {
@@ -43,4 +43,4 @@ void Claw::updateState() {
     }
   }
 }
-}
+} // namespace robot

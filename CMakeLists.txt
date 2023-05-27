@@ -78,13 +78,14 @@ set(HotLinked ${LibC},${LibM},${LibPROS},${LibBase85})
 
 set(SOURCE_FILES
         src/main.cpp
+        src/tasks.cpp
+        src/filesystem.cpp
         src/control/input/autonomous_outline.cpp
         src/control/input/operator.cpp
         src/control/input/raw_recording.cpp
         src/control/input/raw_replay.cpp
         src/debug/error.cpp
         src/debug/logger.cpp
-        src/filesystem.cpp
         src/robot/device/device.cpp
         src/robot/device/gyro.cpp
         src/robot/device/inertial.cpp
@@ -98,6 +99,8 @@ set(SOURCE_FILES
 
 set(HEADER_FILES
         include/main.hpp
+        include/tasks.hpp
+        include/units.hpp
         include/debug/error.hpp
         include/debug/logger.hpp
         include/filesystem.hpp
@@ -116,7 +119,6 @@ set(HEADER_FILES
         include/robot/drivetrain.hpp
         include/robot/robot.hpp
         include/structure/fixed_queue.hpp
-        include/units.hpp
 )
 
 if (NOT DISABLE_SERIAL)

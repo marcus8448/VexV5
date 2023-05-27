@@ -16,10 +16,10 @@ void DrivetrainChart::initialize(lv_obj_t *screen) {
   create_label(screen, 16 + 32, static_cast<lv_coord_t>(SCREEN_HEIGHT - 16 - 6), qtrWidth, 16, "LF (-)",
                create_text_color_style(screen::colour::BLUE));
 
-  create_label(screen, static_cast<lv_coord_t>(16 + 32 + qtrWidth), static_cast<lv_coord_t>(SCREEN_HEIGHT - 32 - 6), qtrWidth,
-               16, "RF (+)", create_text_color_style(screen::colour::ORANGE));
-  create_label(screen, static_cast<lv_coord_t>(16 + 32 + qtrWidth), static_cast<lv_coord_t>(SCREEN_HEIGHT - 16 - 6), qtrWidth,
-               16, "RF (-)", create_text_color_style(screen::colour::VIOLET));
+  create_label(screen, static_cast<lv_coord_t>(16 + 32 + qtrWidth), static_cast<lv_coord_t>(SCREEN_HEIGHT - 32 - 6),
+               qtrWidth, 16, "RF (+)", create_text_color_style(screen::colour::ORANGE));
+  create_label(screen, static_cast<lv_coord_t>(16 + 32 + qtrWidth), static_cast<lv_coord_t>(SCREEN_HEIGHT - 16 - 6),
+               qtrWidth, 16, "RF (-)", create_text_color_style(screen::colour::VIOLET));
 
   create_label(screen, static_cast<lv_coord_t>(16 + 32 + qtrWidth * 2), static_cast<lv_coord_t>(SCREEN_HEIGHT - 32 - 6),
                qtrWidth, 16, "LB (+)", create_text_color_style(screen::colour::YELLOW));

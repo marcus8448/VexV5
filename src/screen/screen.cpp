@@ -1,5 +1,6 @@
 #include "screen/screen.hpp"
 #include "debug/logger.hpp"
+#include "tasks.hpp"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wall"
@@ -12,7 +13,7 @@
 #include <vector>
 
 namespace screen {
-extern void* canvasBuffer;
+extern void *canvasBuffer;
 static std::vector<Screen *> *registry = new std::vector<Screen *>();
 static std::map<Screen *, lv_obj_t **> *screens = new std::map<Screen *, lv_obj_t **>();
 static Screen *activeScreen = nullptr;
@@ -47,7 +48,7 @@ void initialize() {
   scopePop();
 
   show_screen(activeScreen);
-  pros::c::task_create(update_task, nullptr, TASK_PRIORITY_DEFAULT, TASK_STACK_DEPTH_DEFAULT, "Screen update");
+  createTask("Screen update", update_task, nullptr, TASK_PRIORITY_DEFAULT - 1, 0x2000);
 }
 
 void create_screen(lv_obj_t *output[], lv_obj_t *parent) {
@@ -103,7 +104,8 @@ lv_obj_t *create_prev_btn(lv_obj_t *obj) {
 
 lv_obj_t *create_next_btn(lv_obj_t *obj) {
   auto nextBtn = lv_btn_create(obj, nullptr);
-  lv_obj_set_pos(nextBtn, static_cast<lv_coord_t>(SCREEN_WIDTH - BUTTON_SIZE), static_cast<lv_coord_t>(SCREEN_HEIGHT - BUTTON_SIZE));
+  lv_obj_set_pos(nextBtn, static_cast<lv_coord_t>(SCREEN_WIDTH - BUTTON_SIZE),
+                 static_cast<lv_coord_t>(SCREEN_HEIGHT - BUTTON_SIZE));
   lv_obj_set_size(nextBtn, BUTTON_SIZE, BUTTON_SIZE);
   lv_btn_set_action(nextBtn, LV_BTN_ACTION_CLICK, next_page);
   return nextBtn;

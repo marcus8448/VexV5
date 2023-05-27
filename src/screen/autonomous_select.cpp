@@ -2,8 +2,8 @@
 #include "control/autonomous/autonomous.hpp"
 #include "robot/robot.hpp"
 #include "screen/colour.hpp"
-#include "screen/screen.hpp"
 #include "screen/lvgl_util.hpp"
+#include "screen/screen.hpp"
 
 namespace screen {
 AutonomousSelect *autonomous_select_instance = nullptr;

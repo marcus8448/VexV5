@@ -1,8 +1,6 @@
 #ifndef VEXV5_MAIN_HPP
 #define VEXV5_MAIN_HPP
 
-#include "robot/robot.hpp"
-
 extern "C" {
 void autonomous(void);
 void initialize(void);

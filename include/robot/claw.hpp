@@ -7,15 +7,11 @@
 namespace robot {
 class Claw {
 public:
-  enum ClawState {
-    OPENING,
-    OPEN,
-    CLOSING,
-    CLOSED
-  };
+  enum ClawState { OPENING, OPEN, CLOSING, CLOSED };
 
 private:
   ClawState state = CLOSED;
+
 public:
   device::Motor motor;
 
@@ -29,5 +25,5 @@ public:
   void updateTargeting(control::input::Controller *controller);
   void updateState();
 };
-}
+} // namespace robot
 #endif // ROBOT_CLAW_HPP
