@@ -3,6 +3,7 @@
 #include "debug/logger.hpp"
 #include "robot/robot.hpp"
 #include "tasks.hpp"
+#include <iostream>
 
 #ifndef DISABLE_AUTONOMOUS
 #include "control/autonomous/autonomous.hpp"
@@ -52,6 +53,7 @@ robot::Robot &getRobot();
  * Called when the robot is first initialized.
  */
 void initialize() {
+  std::cout << "AAA" << std::endl;
   onRootTaskStart();
   scopePush("Initialize");
   scopePush("Initialize robot");

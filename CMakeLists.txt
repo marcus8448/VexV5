@@ -59,7 +59,7 @@ find_program(ClangCheck clang-check)
 find_library(LibC NAMES c REQUIRED)
 find_library(LibM NAMES m REQUIRED)
 find_library(LibPROS NAMES pros REQUIRED)
-find_library(LibBase85 NAMES base85 REQUIRED)
+find_library(LibBase85 NAMES base85)
 
 file(TOUCH ${CMAKE_BINARY_DIR}/empty.cpp)
 file(WRITE ${CMAKE_BINARY_DIR}/timestamp.cpp "char const * const _PROS_COMPILE_TIMESTAMP = __DATE__ \" \" __TIME__; char const * const _PROS_COMPILE_DIRECTORY = \"${CMAKE_SOURCE_DIR}\";\n")
@@ -73,8 +73,8 @@ add_compile_definitions(_POSIX_THREADS _UNIX98_THREAD_MUTEX_ATTRIBUTES)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILE_FLAGS} ${WARNING_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMPILE_FLAGS} ${WARNING_FLAGS}")
 
-set(ColdLibraries ${LibC} ${LibM} ${LibPROS} ${LibBase85})
-set(HotLinked ${LibC},${LibM},${LibPROS},${LibBase85})
+set(ColdLibraries ${LibC} ${LibM} ${LibPROS})
+set(HotLinked ${LibC},${LibM},${LibPROS})
 
 set(SOURCE_FILES
         src/main.cpp
@@ -122,19 +122,26 @@ set(HEADER_FILES
 )
 
 if (NOT DISABLE_SERIAL)
-    set(SOURCE_FILES ${SOURCE_FILES}
-            src/serial/robot_command.cpp
-            src/serial/robot_state.cpp
-            src/serial/serial.cpp
-            src/serial/serial_connection.cpp
-    )
+    if (LibBase85)
+        set(SOURCE_FILES ${SOURCE_FILES}
+                src/serial/robot_command.cpp
+                src/serial/robot_state.cpp
+                src/serial/serial.cpp
+                src/serial/serial_connection.cpp
+        )
 
-    set(HEADER_FILES ${HEADER_FILES}
-            include/serial/robot_command.hpp
-            include/serial/robot_state.hpp
-            include/serial/serial.hpp
-            include/serial/serial_connection.hpp
-    )
+        set(HEADER_FILES ${HEADER_FILES}
+                include/serial/robot_command.hpp
+                include/serial/robot_state.hpp
+                include/serial/serial.hpp
+                include/serial/serial_connection.hpp
+        )
+
+        set(ColdLibraries ${ColdLibraries} ${LibBase85})
+        set(HotLinked ${HotLinked},${LibBase85})
+    else()
+        message(WARNING "LibBase85 not found! Serial not enabled.")
+    endif()
 endif()
 
 if (NOT DISABLE_SCREEN)

@@ -13,7 +13,7 @@ namespace control::input {
  */
 class RawReplay : public Controller {
 private:
-  std::ifstream input;
+  std::ifstream *input;
 
   uint16_t a = 0;
   uint16_t b = 0;

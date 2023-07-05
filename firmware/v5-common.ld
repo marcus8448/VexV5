@@ -12,7 +12,7 @@ SECTIONS
    KEEP (*(.vectors))
    /* boot data should be exactly 32 bytes long */
    *(.boot_data)
-   . += 0x20;
+   . = 0x20;
    *(.boot)
    . = ALIGN(64);
    *(.freertos_vectors)

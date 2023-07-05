@@ -106,17 +106,22 @@ void initialize(const char *name) {
 
 #ifdef FILE_LOG
   if (log_file == nullptr) {
-    auto *stream = static_cast<std::ofstream *>(malloc(sizeof(std::ofstream)));
-    *stream = fs::open_indexed("log");
+    auto stream = fs::open_indexed("log");
 
-    if (stream->is_open()) {
-      log_file = stream;
+    if (stream != nullptr) {
+      if (stream->is_open()) {
+        log_file = stream;
+      } else {
+        log_file = nullptr;
+        stream->close();
+        free(stream);
+      }
     } else {
-      stream->close();
-      free(stream);
+      log_file = nullptr;
     }
   }
 #endif
+  info("X");
 }
 
 void clearRoot(char *name) {

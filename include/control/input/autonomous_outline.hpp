@@ -16,7 +16,7 @@ private:
   pros::controller_id_e_t controller_id;
   robot::Robot &robot;
 
-  std::ofstream output;
+  std::ofstream *output;
 
   uint16_t a = 0;
   uint16_t b = 0;

@@ -5,16 +5,16 @@
 
 namespace control::input {
 RawReplay::RawReplay(const char *name) : input(fs::open(name, std::ios_base::in | std::ios_base::binary)) {
-  if (!input.is_open() || input.bad()) {
-    input.close();
+  if (!input->is_open() || input->bad()) {
+    input->close();
     error("Failed to read recording.");
     return;
   }
 
   char buf[4];
-  input.read(buf, 4);
-  if (input.eof() || strcmp(buf, "v5r\n") != 0) {
-    input.close();
+  input->read(buf, 4);
+  if (input->eof() || strcmp(buf, "v5r\n") != 0) {
+    input->close();
     error("Recording in invalid format! %s", buf);
     return;
   }
@@ -63,13 +63,13 @@ void RawReplay::clearLine(uint8_t line) {}
 void RawReplay::rumble(const char *str) {}
 
 void RawReplay::update() {
-  if (this->input.eof())
+  if (this->input->eof())
     return;
 
   this->ticks++;
   const uint32_t SIZE = 2 + (sizeof(float) * 4);
   char buf[SIZE];
-  this->input.read(buf, SIZE);
+  this->input->read(buf, SIZE);
 
   if ((buf[0] & 0b00000001) != 0) {
     this->a++;

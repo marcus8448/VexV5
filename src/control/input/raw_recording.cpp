@@ -5,7 +5,7 @@
 namespace control::input {
 RawRecording::RawRecording(Controller *controller, const char *name)
     : controller(controller), output(fs::open_indexed(name, std::ios::out | std::ios::binary)) {
-  this->output << "v5r\n";
+  *this->output << "v5r\n";
 }
 
 [[nodiscard]] uint16_t RawRecording::aPressed() const { return this->controller->aPressed(); }
@@ -51,7 +51,7 @@ void RawRecording::clearLine(uint8_t line) { this->controller->clearLine(line); 
 void RawRecording::rumble(const char *str) { this->controller->rumble(str); }
 
 void RawRecording::update() {
-  if (!this->output.is_open())
+  if (!this->output->is_open())
     return;
 
   this->controller->update();
@@ -97,8 +97,8 @@ void RawRecording::update() {
   std::memcpy(&buf[2 + sizeof(float) * 3], &src, sizeof(float));
 
   if (this->controller->xPressed() >= 50) {
-    this->output.flush();
-    this->output.close();
+    this->output->flush();
+    this->output->close();
   }
 }
 } // namespace control::input

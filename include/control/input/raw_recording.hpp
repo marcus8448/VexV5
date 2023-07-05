@@ -15,7 +15,7 @@ namespace control::input {
 class RawRecording : public Controller {
 private:
   Controller *controller;
-  std::ofstream output;
+  std::ofstream *output;
 
 public:
   explicit RawRecording(Controller *controller = new Operator(), const char *name = "recording.v5r");

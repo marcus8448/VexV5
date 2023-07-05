@@ -9,7 +9,7 @@
 namespace control::input {
 AutonomousOutlineController::AutonomousOutlineController(robot::Robot &robot, pros::controller_id_e_t controller_id)
     : controller_id(controller_id), robot(robot), output(fs::open_indexed("autonomous", std::ios::out)) {
-  this->output << "// AUTON START\n";
+  *this->output << "// AUTON START\n";
 }
 
 [[nodiscard]] uint16_t AutonomousOutlineController::aPressed() const { return this->a; }
@@ -96,8 +96,8 @@ void AutonomousOutlineController::update() {
     info("writing out recording!");
     pros::c::controller_rumble(this->controller_id, "-");
     this->write_drivetrain_update();
-    this->output << "// AUTONOMOUS END\n";
-    this->output.close(); // pros/vex only writes to the microSD on close.
+    *this->output << "// AUTONOMOUS END\n";
+    this->output->close(); // pros/vex only writes to the microSD on close.
   }
 
   this->ticks++;
@@ -220,7 +220,7 @@ void AutonomousOutlineController::update() {
   if (this->r1 == 1) {
     this->write_drivetrain_update();
     this->flywheelRuntime = 0;
-    this->output << "robot.flywheel->engage(" << this->flywheelSpeed << ");\n";
+    *this->output << "robot.flywheel->engage(" << this->flywheelSpeed << ");\n";
     changed = true;
   }
 
@@ -229,35 +229,35 @@ void AutonomousOutlineController::update() {
     if (this->xPressed() > 2) {
       this->write_drivetrain_update();
       this->flywheelRuntime = -1;
-      this->output << "robot.flywheel->disengage();\n";
+      *this->output << "robot.flywheel->disengage();\n";
       changed = true;
     }
   }
 
   if (this->l1Pressed() && this->l2Pressed()) {
     this->write_drivetrain_update();
-    this->output << "robot.intake->reverse();\n";
+    *this->output << "robot.intake->reverse();\n";
     changed = true;
   } else if (this->l1Pressed() == 3) {
     this->write_drivetrain_update();
-    this->output << "robot.intake->engage();\n";
+    *this->output << "robot.intake->engage();\n";
     changed = true;
   } else if (this->l2Pressed() == 3) {
     this->write_drivetrain_update();
-    this->output << "robot.intake->disengage();\n";
+    *this->output << "robot.intake->disengage();\n";
     changed = true;
   }
 
   if (this->r2Pressed() == 1) {
     if (this->flywheelRuntime != -1) {
       this->write_drivetrain_update();
-      this->output << "robot.indexer->cycle();\n";
+      *this->output << "robot.indexer->cycle();\n";
       changed = true;
     }
   }
 
   if (changed) {
-    this->output.flush();
+    this->output->flush();
   }
 
   if (this->a == 1)
@@ -321,7 +321,7 @@ bool AutonomousOutlineController::write_drivetrain_update() {
     //                             4.0);
     debug("Forwards %f", dist);
     this->robot.drivetrain.tare();
-    this->output << "robot.drivetrain.forwards(" << dist << ");\n";
+    *this->output << "robot.drivetrain.forwards(" << dist << ");\n";
     return true;
   }
   case BACKWARDS: {
@@ -336,7 +336,7 @@ bool AutonomousOutlineController::write_drivetrain_update() {
     //                              -4.0);
     debug("Backwards %f", dist);
     this->robot.drivetrain.tare();
-    this->output << "robot.drivetrain.backwards(" << -dist << ");\n";
+    *this->output << "robot.drivetrain.backwards(" << -dist << ");\n";
     return true;
   }
   case LEFT: {
@@ -350,7 +350,7 @@ bool AutonomousOutlineController::write_drivetrain_update() {
     this->robot.drivetrain.tare();
     double turn = (dist_right - dist_left) / 2.0;
     debug("Left %f", turn);
-    this->output << "robot.drivetrain.turnLeft(" << turn << ");\n";
+    *this->output << "robot.drivetrain.turnLeft(" << turn << ");\n";
     return true;
   }
   case RIGHT: {
@@ -364,7 +364,7 @@ bool AutonomousOutlineController::write_drivetrain_update() {
     this->robot.drivetrain.tare();
     double turn = (dist_left - dist_right) / 2.0;
     debug("Right %f", turn);
-    this->output << "robot.drivetrain.turnRight(" << turn << ");\n";
+    *this->output << "robot.drivetrain.turnRight(" << turn << ");\n";
     return true;
   }
   }

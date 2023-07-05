@@ -19,6 +19,7 @@ public:
 
   void initialize(lv_obj_t *screen) override;
   void update() override;
+
   void update_drive_scheme_label();
 };
 } // namespace screen

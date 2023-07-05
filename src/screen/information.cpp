@@ -43,7 +43,7 @@ void Information::initialize(lv_obj_t *screen) {
 }
 
 void Information::update() {
-  set_label_text(this->uptimeLabel, "Uptime: %i", pros::c::millis());
+//  set_label_text(this->uptimeLabel, "Uptime: %i", pros::c::millis());
   set_label_text(this->controlSchemeLabel, "Control Scheme: %s",
                  robot::driveSchemeName(robot.drivetrain.controlScheme));
   update_motor_pos(this->motorLFLabel, this->robot.drivetrain.leftFront);

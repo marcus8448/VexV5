@@ -17,7 +17,7 @@ bool can_access(const std::filesystem::path &path) {
   return true;
 }
 
-bool file_exists(const std::filesystem::path &path) { return can_access(path) && std::filesystem::exists(path); }
+bool file_exists(const std::filesystem::path &path) { return can_access(path)/* && std::filesystem::exists(path)*/; }
 
 void *read_all(const char *path) {
   if (!file_exists(path)) {
@@ -42,21 +42,21 @@ void *read_all(const char *path) {
   return contents;
 }
 
-std::ifstream open(const std::filesystem::path &path, std::ios_base::openmode mode) {
-  std::ifstream stream = std::ifstream();
+std::ifstream* open(const std::filesystem::path &path, std::ios_base::openmode mode) {
+  auto stream = new std::ifstream();
   if (can_access(path)) {
-    stream.open(path, mode);
+    stream->open(path, mode);
   }
 
-  if (!stream.is_open()) {
+  if (!stream->is_open()) {
     warn("Failed to open file %s!", path.c_str());
-    stream.setstate(std::ios::badbit);
+    stream->setstate(std::ios::badbit);
   }
   return stream;
 }
 
-std::ofstream open_indexed(const std::filesystem::path &path, std::ios_base::openmode mode) {
-  std::ofstream stream = std::ofstream();
+std::ofstream* open_indexed(const std::filesystem::path &path, std::ios_base::openmode mode) {
+  auto* stream = new std::ofstream();
   if (can_access(path)) {
     if (file_exists(path)) {
       for (int16_t i = 1; i < 1000; i++) {
@@ -67,12 +67,12 @@ std::ofstream open_indexed(const std::filesystem::path &path, std::ios_base::ope
         }
       }
     }
-    stream.open(path, mode);
+    stream->open(path, mode);
   }
 
-  if (!stream.is_open()) {
-    warn("Failed to initialize file %s!", path.c_str());
-    stream.setstate(std::ios::badbit);
+  if (!stream->is_open()) {
+    warn("Failed to initialize file '%s'!", path.c_str());
+    stream->setstate(std::ios::badbit);
   }
   return stream;
 }

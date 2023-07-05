@@ -3,7 +3,7 @@
 #include "robot/device/motor.hpp"
 #include "units.hpp"
 
-#define JOYSTICK_MAX 127
+#define JOYSTICK_MAX 127.0
 #define ACCEPTABLE_ERROR 10.0
 #define ACCEPTABLE_OFFSET 1.0
 #define STABILIZE_MARGIN 10
@@ -11,10 +11,10 @@
 namespace robot {
 Drivetrain::Drivetrain(const uint8_t rightFront, const uint8_t leftFront, const uint8_t rightBack,
                        const uint8_t leftBack, const uint8_t inertial)
-    : rightFront(device::Motor(rightFront, "Right Front", false, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST)),
-      leftFront(device::Motor(leftFront, "Left Front", true, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST)),
-      rightBack(device::Motor(rightBack, "Right Back", false, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST)),
-      leftBack(device::Motor(leftBack, "Left Back", true, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST)),
+    : rightFront(device::Motor(rightFront, "Right Front", true, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST)),
+      leftFront(device::Motor(leftFront, "Left Front", false, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST)),
+      rightBack(device::Motor(rightBack, "Right Back", true, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST)),
+      leftBack(device::Motor(leftBack, "Left Back", false, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST)),
       imu(device::Inertial(inertial, "IDrive")) {}
 
 bool Drivetrain::isAtTarget() const { return this->timeAtTarget > STABILIZE_MARGIN; }
@@ -81,17 +81,21 @@ void Drivetrain::updateTargeting(control::input::Controller *controller) {
 
   this->setTarget(OPERATOR_DIRECT);
   if (this->arcade) {
-    double joystickRotX = controller->rightStickX();
+    double joystickRotX = controller->leftStickX();
     double joystickY = controller->leftStickY();
 
     double left = (joystickY + joystickRotX) / JOYSTICK_MAX;
     double right = (joystickY - joystickRotX) / JOYSTICK_MAX;
-    double max = std::max(right, left);
-    right /= max;
-    left /= max;
+    if (std::abs(right) > 1.0 || std::abs(left) > 1.0) {
+      double max = std::abs(std::max(right, left));
+      right /= max;
+      left /= max;
+    }
+    info("A %f / %f", left * 100.0, right * 100.0);
     this->powerRight = static_cast<int16_t>(right * MOTOR_MAX_MILLIVOLTS);
     this->powerLeft = static_cast<int16_t>(left * MOTOR_MAX_MILLIVOLTS);
   } else {
+    info("%f / %f", (controller->rightStickY() / JOYSTICK_MAX) * 100, (controller->leftStickY() / JOYSTICK_MAX) * 100);
     this->powerRight = static_cast<int16_t>(controller->rightStickY() / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
     this->powerLeft = static_cast<int16_t>(controller->leftStickY() / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
   }
@@ -120,6 +124,7 @@ void Drivetrain::updateState() {
     }
     this->moveRight(this->powerRight);
     this->moveLeft(this->powerLeft);
+    break;
   }
   case STATIC_TURN: {
     double offset = this->targetHeading - this->heading;
@@ -137,6 +142,7 @@ void Drivetrain::updateState() {
         atTarget = true;
       }
     }
+    break;
   }
   case DIRECT_MOVE: {
     this->moveRightTargeting(this->targetLeft);
@@ -145,6 +151,7 @@ void Drivetrain::updateState() {
         std::abs(this->targetRight - this->rightPos) < ACCEPTABLE_OFFSET) {
       atTarget = true;
     }
+    break;
   }
   }
   if (atTarget) {
