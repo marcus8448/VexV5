@@ -43,10 +43,7 @@ bool Device::checkConnect() {
   info("Device reconfigure task started.");
   while (true) {
     if (!pendingDevices.empty()) {
-      std::vector<Device *> pd;
-      pd = pendingDevices;
-      pendingDevices.clear();
-      for (Device *&device : pd) {
+      for (Device *&device : pendingDevices) {
         if (device->isConnected()) {
           debug("%s '%s' connected on port %i", device->getTypeName(), device->getName(), device->getPort());
           devices.emplace(device, true);
@@ -55,6 +52,7 @@ bool Device::checkConnect() {
           warn("No device on port %i (expected %s '%s').", device->getPort(), device->getTypeName(), device->getName());
         }
       }
+      pendingDevices.clear();
     }
 
     for (auto &pair : devices) {

@@ -121,7 +121,6 @@ void initialize(const char *name) {
     }
   }
 #endif
-  info("X");
 }
 
 void clearRoot(char *name) {

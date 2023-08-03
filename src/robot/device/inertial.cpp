@@ -5,14 +5,20 @@
 #include <cerrno>
 
 namespace robot::device {
-Inertial::Inertial(uint8_t port, const char *name) : Device("Inertial", name, port) { pros::c::imu_reset(this->port); }
+Inertial::Inertial(uint8_t port, const char *name) : Device("Inertial", name, port) {}
 
-double Inertial::getHeading() const {
+double Inertial::getRotation() const {
   if (pros::c::imu_get_status(this->port) == pros::c::E_IMU_STATUS_CALIBRATING) {
     error("Still calibrating!!");
-    check_error();
   }
-  return print_error(pros::c::imu_get_heading(this->port));
+  return print_error(this->getName(), pros::c::imu_get_rotation(this->port));
+}
+
+double Inertial::getHeading() const {
+  if (pros::c::imu_get_status(this->port) == pros::c::E_IMU_STATUS_CALIBRATING || get_error() == EAGAIN) {
+    error("Still calibrating!!");
+  }
+  return print_error(this->getName(), pros::c::imu_get_heading(this->port));
 }
 
 double Inertial::getYaw() const { return pros::c::imu_get_yaw(this->port); }

@@ -6,6 +6,9 @@
 #define WHEEL_RADIUS 2.0625
 #define WHEEL_CIRCUMFERENCE (WHEEL_RADIUS * 2.0 * M_PI)
 #define TURN_E_UNITS_RATIO 2.988
+#define DRIVETRAIN_GEARING (36.0 / 84.0)
+#define DRIVETRAIN_WHEEL_DIFF units::inchToEncoder(11.5)
+#define DRIVETRAIN_CORE_DIFF units::inchToEncoder(11.5 / 2.0)
 
 namespace units {
 /**
@@ -13,8 +16,10 @@ namespace units {
  * @param inches the number of inches to convert.
  * @return the number of encoder units equivalent to the number of inches.
  */
-inline double inchToEncoder(double inches) { return inches / WHEEL_CIRCUMFERENCE * 360.0; }
-inline double encoderToInch(double encoderUnits) { return (encoderUnits * WHEEL_CIRCUMFERENCE) / 360.0; }
+inline double inchToEncoder(double inches) { return inches / (WHEEL_CIRCUMFERENCE * DRIVETRAIN_GEARING) * 360.0; }
+inline double encoderToInch(double encoderUnits) {
+  return (encoderUnits * (WHEEL_CIRCUMFERENCE * DRIVETRAIN_GEARING)) / 360.0;
+}
 
 /**
  * Converts degrees turning into encoder unit rotations.

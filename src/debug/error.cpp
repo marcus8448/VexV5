@@ -1,15 +1,14 @@
 #include "debug/error.hpp"
 #include "debug/logger.hpp"
 #include <cerrno>
-#include <cstring>
 
-bool check_error() {
+bool check_error(const char *name) {
   int error = get_error();
   if (error != 0) {
     if (error == ENODEV) { // skip printing 19 - no such device.
       return false;
     }
-    error("Error %i: %s", error, strerror(error)); // print the error
+    error("%s: Error %i", name, error); // print the error
     return false;
   }
   return true;

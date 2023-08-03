@@ -2,8 +2,10 @@
 #include "debug/error.hpp"
 #include "debug/logger.hpp"
 
-#define controller_digital(button) print_error(pros::c::controller_get_digital(this->controllerId, button))
-#define controller_analog(stick_axis) print_error(pros::c::controller_get_analog(this->controllerId, stick_axis))
+#define controller_digital(button)                                                                                     \
+  print_error("controller", pros::c::controller_get_digital(this->controllerId, button))
+#define controller_analog(stick_axis)                                                                                  \
+  print_error("controller", pros::c::controller_get_analog(this->controllerId, stick_axis))
 
 namespace control::input {
 Operator::Operator(pros::controller_id_e_t controller_id) : controllerId(controller_id) {}
@@ -45,10 +47,12 @@ Operator::Operator(pros::controller_id_e_t controller_id) : controllerId(control
 void Operator::setSpeedSetting(int16_t speed) { this->flywheelSpeed = speed; }
 
 void Operator::setLine(uint8_t line, uint8_t col, const char *str) {
-  print_error(pros::c::controller_set_text(this->controllerId, line, col, str));
+  print_error("controller", pros::c::controller_set_text(this->controllerId, line, col, str));
 }
 
-void Operator::clearLine(uint8_t line) { print_error(pros::c::controller_clear_line(this->controllerId, line)); }
+void Operator::clearLine(uint8_t line) {
+  print_error("controller", pros::c::controller_clear_line(this->controllerId, line));
+}
 
 void Operator::rumble(const char *str) {
   clear_error();

@@ -17,7 +17,7 @@ bool can_access(const std::filesystem::path &path) {
   return true;
 }
 
-bool file_exists(const std::filesystem::path &path) { return can_access(path)/* && std::filesystem::exists(path)*/; }
+bool file_exists(const std::filesystem::path &path) { return can_access(path) /* && std::filesystem::exists(path)*/; }
 
 void *read_all(const char *path) {
   if (!file_exists(path)) {
@@ -29,7 +29,7 @@ void *read_all(const char *path) {
   std::FILE *file = std::fopen(path, "r");
   size_t read = std::fread(contents, 1, len, file);
   if (std::fclose(file) != 0) {
-    warn("Failed to close file %s!", path);
+    warn("Failed to lower file %s!", path);
   }
   if (read != len) {
     warn("File size mismatch: Expected %i bytes, found %i bytes", len, read);
@@ -42,7 +42,7 @@ void *read_all(const char *path) {
   return contents;
 }
 
-std::ifstream* open(const std::filesystem::path &path, std::ios_base::openmode mode) {
+std::ifstream *open(const std::filesystem::path &path, std::ios_base::openmode mode) {
   auto stream = new std::ifstream();
   if (can_access(path)) {
     stream->open(path, mode);
@@ -55,8 +55,8 @@ std::ifstream* open(const std::filesystem::path &path, std::ios_base::openmode m
   return stream;
 }
 
-std::ofstream* open_indexed(const std::filesystem::path &path, std::ios_base::openmode mode) {
-  auto* stream = new std::ofstream();
+std::ofstream *open_indexed(const std::filesystem::path &path, std::ios_base::openmode mode) {
+  auto *stream = new std::ofstream();
   if (can_access(path)) {
     if (file_exists(path)) {
       for (int16_t i = 1; i < 1000; i++) {

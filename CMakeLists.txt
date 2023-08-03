@@ -87,13 +87,13 @@ set(SOURCE_FILES
         src/debug/error.cpp
         src/debug/logger.cpp
         src/robot/device/device.cpp
-        src/robot/device/gyro.cpp
         src/robot/device/inertial.cpp
         src/robot/device/motor.cpp
         src/robot/device/optical.cpp
         src/robot/device/pneumatics.cpp
-        src/robot/claw.cpp
+        src/robot/arm.cpp
         src/robot/drivetrain.cpp
+        src/robot/intake.cpp
         src/robot/robot.cpp
 )
 
@@ -110,13 +110,13 @@ set(HEADER_FILES
         include/control/input/raw_recording.hpp
         include/control/input/raw_replay.hpp
         include/robot/device/device.hpp
-        include/robot/device/gyro.hpp
         include/robot/device/inertial.hpp
         include/robot/device/motor.hpp
         include/robot/device/optical.hpp
         include/robot/device/pneumatics.hpp
-        include/robot/claw.hpp
+        include/robot/arm.hpp
         include/robot/drivetrain.hpp
+        include/robot/intake.hpp
         include/robot/robot.hpp
         include/structure/fixed_queue.hpp
 )
@@ -182,10 +182,6 @@ if (NOT DISABLE_AUTONOMOUS)
             include/control/autonomous/replay.hpp
             include/control/autonomous/winpoint.hpp
     )
-endif()
-
-if (ENABLE_TEMPORARY_CODE)
-    set(SOURCE_FILES "${SOURCE_FILES} src/temporary.cpp")
 endif()
 
 add_executable(ColdPackage)

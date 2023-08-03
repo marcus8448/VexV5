@@ -1,0 +1,32 @@
+#ifndef ROBOT_INTAKE_HPP
+#define ROBOT_INTAKE_HPP
+
+#include "control/input/controller.hpp"
+#include "device/motor.hpp"
+#include "robot/device/pneumatics.hpp"
+
+#define DEFAULT_INTAKE_SPEED 12000
+
+namespace robot {
+class Intake {
+private:
+  int16_t speed = 0;
+
+public:
+  device::Motor leftMotor;
+  device::Motor rightMotor;
+  device::PneumaticPiston pneumatic;
+
+  explicit Intake(uint8_t leftPort, uint8_t rightPort);
+
+  void stop();
+  void intake(uint16_t speed = DEFAULT_INTAKE_SPEED);
+  void release(uint16_t speed = DEFAULT_INTAKE_SPEED);
+
+  [[nodiscard]] int16_t getSpeed() const;
+
+  void updateTargeting(control::input::Controller *controller);
+  void updateState();
+};
+} // namespace robot
+#endif // ROBOT_INTAKE_HPP

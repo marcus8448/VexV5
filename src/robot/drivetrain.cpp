@@ -2,29 +2,30 @@
 #include "debug/logger.hpp"
 #include "robot/device/motor.hpp"
 #include "units.hpp"
+#include <algorithm>
 
 #define JOYSTICK_MAX 127.0
-#define ACCEPTABLE_ERROR 10.0
-#define ACCEPTABLE_OFFSET 1.0
-#define STABILIZE_MARGIN 10
+#define ACCEPTABLE_POSITION_ERROR 5.0
+#define ACCEPTABLE_HEADING_ERROR 0.4
+#define STABILIZE_TICKS 25
 
 namespace robot {
-Drivetrain::Drivetrain(const uint8_t rightFront, const uint8_t leftFront, const uint8_t rightBack,
-                       const uint8_t leftBack, const uint8_t inertial)
-    : rightFront(device::Motor(rightFront, "Right Front", true, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST)),
-      leftFront(device::Motor(leftFront, "Left Front", false, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST)),
-      rightBack(device::Motor(rightBack, "Right Back", true, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST)),
-      leftBack(device::Motor(leftBack, "Left Back", false, pros::E_MOTOR_GEARSET_18, pros::E_MOTOR_BRAKE_COAST)),
-      imu(device::Inertial(inertial, "IDrive")) {}
+Drivetrain::Drivetrain(uint8_t leftFront, uint8_t rightFront, uint8_t leftBack, uint8_t rightBack, uint8_t inertial)
+    : leftFrontMotor(device::Motor(leftFront, "Drive LF", false, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
+      rightFrontMotor(device::Motor(rightFront, "Drive RF", true, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
+      leftBackMotor(device::Motor(leftBack, "Drive LB", false, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
+      rightBackMotor(device::Motor(rightBack, "Drive RB", true, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
+      imu(device::Inertial(inertial, "IDrive")), rightPID(21.5, 6.0, 16.0, 100.0, 5.0),
+      leftPID(21.5, 6.0, 16.0, 100.0, 5.0), headingPID(125.0, 20.0, 90.0, 10.0, 0.2) {}
 
-bool Drivetrain::isAtTarget() const { return this->timeAtTarget > STABILIZE_MARGIN; }
+bool Drivetrain::isAtTarget() const { return this->timeAtTarget > STABILIZE_TICKS; }
 
 void Drivetrain::forwards(double distance, bool wait) {
   info("Moving forwards %fin.", distance);
   this->setTarget(DIRECT_MOVE);
   this->targetHeading = this->heading;
-  this->targetLeft = units::inchToEncoder(distance);
-  this->targetRight = units::inchToEncoder(distance);
+  this->targetLeft += units::inchToEncoder(distance);
+  this->targetRight += units::inchToEncoder(distance);
   if (wait) {
     startTiming(move_forwards);
     awaitMovement();
@@ -36,8 +37,8 @@ void Drivetrain::backwards(double distance, bool wait) {
   info("Moving backwards %fin.", distance);
   this->setTarget(DIRECT_MOVE);
   this->targetHeading = this->heading;
-  this->targetLeft = units::inchToEncoder(-distance);
-  this->targetRight = units::inchToEncoder(-distance);
+  this->targetLeft -= units::inchToEncoder(distance);
+  this->targetRight -= units::inchToEncoder(distance);
   if (wait) {
     startTiming(move_backwards);
     awaitMovement();
@@ -48,7 +49,8 @@ void Drivetrain::backwards(double distance, bool wait) {
 void Drivetrain::turnRight(double degrees, bool wait) {
   info("Turning right %f degrees.", degrees);
   this->setTarget(STATIC_TURN);
-  this->targetHeading += degrees - floor(degrees / 360.0);
+  this->headingPID.resetState();
+  this->targetHeading += degrees;
   if (wait) {
     startTiming(turnRight);
     awaitMovement();
@@ -59,7 +61,8 @@ void Drivetrain::turnRight(double degrees, bool wait) {
 void Drivetrain::turnLeft(double degrees, bool wait) {
   info("Turning left %f degrees.", degrees);
   this->setTarget(STATIC_TURN);
-  this->targetHeading -= degrees - floor(degrees / 360.0);
+  this->headingPID.resetState();
+  this->targetHeading -= degrees;
   if (wait) {
     startTiming(turnLeft);
     awaitMovement();
@@ -67,44 +70,56 @@ void Drivetrain::turnLeft(double degrees, bool wait) {
   }
 }
 
+void Drivetrain::curveTargeting(double relInFwd, double relInLat, double curve, double relAngle) {
+  this->setTarget(CURVE_MOVE);
+  this->endCurveX = units::inchToEncoder(relInFwd);
+  this->endCurveY = units::inchToEncoder(relInLat);
+  this->curve = curve;
+  this->curveAngle = this->heading + relAngle;
+}
+
 void Drivetrain::awaitMovement() const {
-  while (this->timeAtTarget < STABILIZE_MARGIN) {
-    pros::c::delay(ROBOT_TICK_RATE * (STABILIZE_MARGIN - this->timeAtTarget));
+  while (this->timeAtTarget < STABILIZE_TICKS) {
+    pros::c::delay(ROBOT_TICK_RATE * (STABILIZE_TICKS - this->timeAtTarget));
   }
 }
 
 void Drivetrain::updateTargeting(control::input::Controller *controller) {
-  if (controller->downPressed() == 1) {
-    this->arcade = !this->arcade;
-    controller->rumble("-");
-  }
-
   this->setTarget(OPERATOR_DIRECT);
-  if (this->arcade) {
-    double joystickRotX = controller->leftStickX();
-    double joystickY = controller->leftStickY();
+  if (this->controlScheme == ARCADE) {
+    double power = controller->leftStickY();
+    double rotation = controller->rightStickX();
 
-    double left = (joystickY + joystickRotX) / JOYSTICK_MAX;
-    double right = (joystickY - joystickRotX) / JOYSTICK_MAX;
+    double left = (power + rotation) / JOYSTICK_MAX;
+    double right = (power - rotation) / JOYSTICK_MAX;
     if (std::abs(right) > 1.0 || std::abs(left) > 1.0) {
       double max = std::abs(std::max(right, left));
       right /= max;
       left /= max;
     }
-    info("A %f / %f", left * 100.0, right * 100.0);
     this->powerRight = static_cast<int16_t>(right * MOTOR_MAX_MILLIVOLTS);
     this->powerLeft = static_cast<int16_t>(left * MOTOR_MAX_MILLIVOLTS);
   } else {
-    info("%f / %f", (controller->rightStickY() / JOYSTICK_MAX) * 100, (controller->leftStickY() / JOYSTICK_MAX) * 100);
     this->powerRight = static_cast<int16_t>(controller->rightStickY() / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
     this->powerLeft = static_cast<int16_t>(controller->leftStickY() / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
   }
 }
 
 void Drivetrain::updateState() {
-  this->heading = this->imu.getHeading();
-  this->rightPos = (this->rightFront.getPosition() + this->rightBack.getPosition()) / 2.0;
-  this->leftPos = (this->leftFront.getPosition() + this->leftBack.getPosition()) / 2.0;
+  double prevHeading = this->heading;
+  double prevRightPos = this->rightPos;
+  double prevLeftPos = this->leftPos;
+  this->heading = this->imu.getRotation();
+  this->rightPos = (this->rightFrontMotor.getPosition() + this->rightBackMotor.getPosition()) / 2.0;
+  this->leftPos = (this->leftFrontMotor.getPosition() + this->leftBackMotor.getPosition()) / 2.0;
+
+  double rightDiff = this->rightPos - prevRightPos;
+  double leftDiff = this->leftPos - prevLeftPos;
+
+  double diff = (rightDiff + leftDiff) / 2.0;
+  double avgHead = (this->heading + prevHeading) / 2.0;
+  this->posY += diff * sin(avgHead);
+  this->posX += diff * cos(avgHead);
 
   bool atTarget = false;
   switch (this->targetType) {
@@ -127,28 +142,41 @@ void Drivetrain::updateState() {
     break;
   }
   case STATIC_TURN: {
-    double offset = this->targetHeading - this->heading;
-    if (std::abs(offset) > 0.2) {
-      if (offset > 180.0) {
-        offset -= 360.0;
-      } else if (offset < -180.0) {
-        offset += 360;
-      }
+    auto value = this->headingPID.update(this->targetHeading, this->heading);
 
-      double distance = units::degreesToEncoder(offset);
-      this->moveRightTargeting(this->rightPos - distance);
-      this->moveLeftTargeting(this->leftPos + distance);
-      if (std::abs(distance) < ACCEPTABLE_OFFSET && std::abs(distance) < ACCEPTABLE_OFFSET) {
-        atTarget = true;
-      }
+    this->moveRight(static_cast<int16_t>(value));
+    this->moveLeft(static_cast<int16_t>(-value));
+    if (std::abs(this->targetHeading - this->heading) < ACCEPTABLE_HEADING_ERROR) {
+      atTarget = true;
     }
     break;
   }
+  case CURVE_MOVE: {
+    double h = std::sqrt((this->posX - this->endCurveX) * (this->posX - this->endCurveX) +
+                         (this->posY - this->endCurveY) * (this->posY - this->endCurveY));
+    this->targetPosX = this->endCurveX - h * std::sin(this->curveAngle) * this->curve;
+    this->targetPosY = this->endCurveY - h * std::cos(this->curveAngle) * this->curve;
+  }
   case DIRECT_MOVE: {
-    this->moveRightTargeting(this->targetLeft);
-    this->moveLeftTargeting(this->targetRight);
-    if (std::abs(this->targetLeft - this->leftPos) < ACCEPTABLE_OFFSET &&
-        std::abs(this->targetRight - this->rightPos) < ACCEPTABLE_OFFSET) {
+    double head = this->headingPID.update(this->targetHeading, this->heading);
+    double right = this->rightPID.update(this->targetRight, this->rightPos);
+    double left = this->leftPID.update(this->targetLeft, this->leftPos);
+
+    left -= head;
+    right += head;
+    if (left < -MOTOR_MAX_MILLIVOLTS) {
+      right += -MOTOR_MAX_MILLIVOLTS - left;
+    }
+    if (right > MOTOR_MAX_MILLIVOLTS) {
+      left += right - MOTOR_MAX_MILLIVOLTS;
+    }
+
+    this->moveRight(static_cast<int16_t>(right));
+    this->moveLeft(static_cast<int16_t>(left));
+
+    info("@ %f / %f", right, left);
+    if (std::abs(this->targetLeft - this->leftPos) < ACCEPTABLE_POSITION_ERROR &&
+        std::abs(this->targetRight - this->rightPos) < ACCEPTABLE_POSITION_ERROR) {
       atTarget = true;
     }
     break;
@@ -162,70 +190,38 @@ void Drivetrain::updateState() {
 }
 
 void Drivetrain::brake() {
-  this->rightFront.brake();
-  this->leftFront.brake();
-  this->rightBack.brake();
-  this->leftBack.brake();
+  this->rightFrontMotor.brake();
+  this->leftFrontMotor.brake();
+  this->rightBackMotor.brake();
+  this->leftBackMotor.brake();
 }
 
 void Drivetrain::setBrakeMode(pros::motor_brake_mode_e brake_mode) {
-  this->leftFront.setBrakeMode(brake_mode);
-  this->leftBack.setBrakeMode(brake_mode);
-  this->rightFront.setBrakeMode(brake_mode);
-  this->rightBack.setBrakeMode(brake_mode);
+  this->leftFrontMotor.setBrakeMode(brake_mode);
+  this->leftBackMotor.setBrakeMode(brake_mode);
+  this->rightFrontMotor.setBrakeMode(brake_mode);
+  this->rightBackMotor.setBrakeMode(brake_mode);
 }
 
 void Drivetrain::tare() {
-  this->rightFront.tare();
-  this->leftFront.tare();
-  this->rightBack.tare();
-  this->leftBack.tare();
+  this->rightFrontMotor.tare();
+  this->leftFrontMotor.tare();
+  this->rightBackMotor.tare();
+  this->leftBackMotor.tare();
   this->imu.tare();
 
   this->targetHeading -= this->heading;
   this->heading = 0.0;
 }
 
-void Drivetrain::moveRightTargeting(double target) {
-  this->prevErrorRight = this->errorRight;
-  this->errorRight = target - this->rightPos;
-  this->integralRight += this->errorRight;
-  if (std::abs(this->errorRight) < ACCEPTABLE_ERROR) {
-    this->integralRight = 0;
-  }
-  double derivative = this->errorRight - this->prevErrorRight;
-  auto output =
-      static_cast<int16_t>(this->errorLeft * this->kp + this->integralLeft * this->ki + derivative * this->kd);
-  if (abs(output) > MOTOR_MAX_MILLIVOLTS) {
-    output = MOTOR_MAX_MILLIVOLTS;
-  }
-  moveRight(output);
-}
-
-void Drivetrain::moveLeftTargeting(double target) {
-  this->prevErrorLeft = this->errorLeft;
-  this->errorLeft = target - this->leftPos;
-  this->integralLeft += this->errorLeft;
-  if (std::abs(this->errorLeft) < ACCEPTABLE_ERROR) {
-    this->integralLeft = 0;
-  }
-  double derivative = this->errorLeft - this->prevErrorLeft;
-  auto output =
-      static_cast<int16_t>(this->errorLeft * this->kp + this->integralLeft * this->ki + derivative * this->kd);
-  if (abs(output) > MOTOR_MAX_MILLIVOLTS) {
-    output = MOTOR_MAX_MILLIVOLTS;
-  }
-  moveLeft(output);
-}
-
 void Drivetrain::moveRight(int16_t millivolts) {
-  this->rightFront.moveMillivolts(millivolts);
-  this->rightBack.moveMillivolts(millivolts);
+  this->rightFrontMotor.moveMillivolts(millivolts);
+  this->rightBackMotor.moveMillivolts(millivolts);
 }
 
 void Drivetrain::moveLeft(int16_t millivolts) {
-  this->leftFront.moveMillivolts(millivolts);
-  this->leftBack.moveMillivolts(millivolts);
+  this->leftFrontMotor.moveMillivolts(millivolts);
+  this->leftBackMotor.moveMillivolts(millivolts);
 }
 
 void Drivetrain::setTarget(Drivetrain::TargetType type) { this->targetType = type; }

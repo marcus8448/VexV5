@@ -1,9 +1,9 @@
 #include "main.hpp"
 #include "control/input/operator.hpp"
 #include "debug/logger.hpp"
+#include "pros/apix.h"
 #include "robot/robot.hpp"
 #include "tasks.hpp"
-#include <iostream>
 
 #ifndef DISABLE_AUTONOMOUS
 #include "control/autonomous/autonomous.hpp"
@@ -32,17 +32,16 @@
 #include "screen/information.hpp"
 #endif
 
-#ifdef ENABLE_TEMPORARY_CODE
-#include "temporary.cpp"
-#endif
-
 // CONFIG
-#define RIGHT_FRONT_MOTOR 4
-#define LEFT_FRONT_MOTOR 2
-#define RIGHT_BACK_MOTOR 9
-#define LEFT_BACK_MOTOR 20
-#define INERTIAL 18
-#define CLAW 19
+#define DRIVETRAIN_LEFT_FRONT_MOTOR 9
+#define DRIVETRAIN_RIGHT_FRONT_MOTOR 2
+#define DRIVETRAIN_LEFT_BACK_MOTOR 10
+#define DRIVETRAIN_RIGHT_BACK_MOTOR 1
+#define INTAKE_RIGHT_MOTOR 12
+#define INTAKE_LEFT_MOTOR 11
+#define INERTIAL 7
+#define ARM_1 19
+#define ARM_2 20
 // END CONFIG
 
 using namespace robot;
@@ -53,7 +52,7 @@ robot::Robot &getRobot();
  * Called when the robot is first initialized.
  */
 void initialize() {
-  std::cout << "AAA" << std::endl;
+  pros::c::serctl(SERCTL_DISABLE_COBS, nullptr);
   onRootTaskStart();
   scopePush("Initialize");
   scopePush("Initialize robot");
@@ -122,16 +121,16 @@ void autonomous() {
  * pressed.
  */
 void opcontrol() {
+#ifdef ENABLE_TEMPORARY_CODE
+  autonomous();
+#endif
+
   onRootTaskStart();
   Robot &robot = getRobot();
 
   scopePush("Opcontrol Setup");
   robot.setController(new control::input::Operator()); // set the robot controller to the default operator based one
   scopePop();
-
-#ifdef ENABLE_TEMPORARY_CODE
-  temporary::run();
-#endif
 
   robot.opcontrol();
   onRootTaskEnd();
@@ -158,7 +157,9 @@ void disabled() {
  * @return the robot instance
  */
 Robot &getRobot() {
-  static Robot robot = Robot(RIGHT_FRONT_MOTOR, LEFT_FRONT_MOTOR, RIGHT_BACK_MOTOR, LEFT_BACK_MOTOR, INERTIAL, CLAW);
+  static Robot robot =
+      Robot(DRIVETRAIN_LEFT_FRONT_MOTOR, DRIVETRAIN_RIGHT_FRONT_MOTOR, DRIVETRAIN_LEFT_BACK_MOTOR,
+            DRIVETRAIN_RIGHT_BACK_MOTOR, INTAKE_RIGHT_MOTOR, INTAKE_LEFT_MOTOR, INERTIAL, ARM_1, ARM_2);
   device::initialize();
   return robot;
 }

@@ -1,6 +1,6 @@
 #include "screen/information.hpp"
-#include "pros/rtos.h"
 #include "screen/lvgl_util.hpp"
+#include "units.hpp"
 
 namespace screen {
 extern lv_coord_t halfWidth;
@@ -27,8 +27,8 @@ void Information::initialize(lv_obj_t *screen) {
   this->motorLBLabel = create_info_label(screen, false, 3);
   this->motorRBLabel = create_info_label(screen, true, 3);
 
-  //  this->_unused1 = create_info_label(screen, false, 4);
-  //  this->_unused0 = create_info_label(screen, true, 4);
+  this->yPositionLabel = create_info_label(screen, false, 4);
+  this->xPositionLabel = create_info_label(screen, true, 4);
   //
   //  this->_unused2 = create_info_label(screen, false, 5);
   //  this->_unused3 = create_info_label(screen, true, 5);
@@ -43,14 +43,16 @@ void Information::initialize(lv_obj_t *screen) {
 }
 
 void Information::update() {
-//  set_label_text(this->uptimeLabel, "Uptime: %i", pros::c::millis());
+  //  set_label_text(this->uptimeLabel, "Uptime: %i", pros::c::millis());
   set_label_text(this->controlSchemeLabel, "Control Scheme: %s",
                  robot::driveSchemeName(robot.drivetrain.controlScheme));
-  update_motor_pos(this->motorLFLabel, this->robot.drivetrain.leftFront);
-  update_motor_pos(this->motorRFLabel, this->robot.drivetrain.rightFront);
-  update_motor_pos(this->motorLBLabel, this->robot.drivetrain.leftBack);
-  update_motor_pos(this->motorRBLabel, this->robot.drivetrain.rightBack);
+  update_motor_pos(this->motorLFLabel, this->robot.drivetrain.leftFrontMotor);
+  update_motor_pos(this->motorRFLabel, this->robot.drivetrain.rightFrontMotor);
+  update_motor_pos(this->motorLBLabel, this->robot.drivetrain.leftBackMotor);
+  update_motor_pos(this->motorRBLabel, this->robot.drivetrain.rightBackMotor);
   set_label_text(this->digitalSpeed, "Flywheel Speed: %i", this->robot.controller->speedSetting());
+  set_label_text(this->xPositionLabel, "X-position: %fin", units::encoderToInch(this->robot.drivetrain.posX));
+  set_label_text(this->yPositionLabel, "Y-position: %fin", units::encoderToInch(this->robot.drivetrain.posY));
 }
 
 void update_device_digital(lv_obj_t *label, const robot::device::Device &device, bool engaged) {

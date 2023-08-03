@@ -19,6 +19,7 @@ private:
 
     STATIC_TURN, // abs angle
     DIRECT_MOVE, // dist
+    CURVE_MOVE
   };
 
 public:
@@ -39,21 +40,25 @@ public:
     ARCADE
   };
 
-  device::Motor rightFront;
-  device::Motor leftFront;
-  device::Motor rightBack;
-  device::Motor leftBack;
+  device::Motor leftFrontMotor;
+  device::Motor rightFrontMotor;
+  device::Motor leftBackMotor;
+  device::Motor rightBackMotor;
+
   device::Inertial imu;
 
-  double kp = 1.0;
-  double ki = 0.0;
-  double kd = 0.0;
+  device::PID rightPID;
+  device::PID leftPID;
+  device::PID headingPID;
 
-#ifndef ARCADE_DRIVE
+#ifndef USE_ARCADE_DRIVE
   ControlScheme controlScheme = TANK;
 #else
   ControlScheme controlScheme = ARCADE;
 #endif
+
+  double posX = 0.0; // not anchored to anything - rel to start pos
+  double posY = 0.0;
 
 private:
   TargetType targetType = NONE;
@@ -65,22 +70,20 @@ private:
   double targetLeft = 0.0;
   double targetRight = 0.0;
 
-  bool arcade = false;
-
   double heading = 0.0;
   double rightPos = 0.0;
   double leftPos = 0.0;
 
-  double errorRight = 0.0;
-  double errorLeft = 0.0;
-  double prevErrorRight = 0.0;
-  double prevErrorLeft = 0.0;
-
-  double integralRight = 0.0;
-  double integralLeft = 0.0;
-
   uint16_t timeOff = 0;
   uint16_t timeAtTarget = 0;
+
+  double targetPosX = 0.0;
+  double targetPosY = 0.0;
+
+  double curve = 0.0;
+  double endCurveX = 0.0;
+  double endCurveY = 0.0;
+  double curveAngle = 0.0;
 
 public:
   /**
@@ -90,7 +93,7 @@ public:
    * @param rightBack The port of the motor on the back of the robot and the right side.
    * @param leftBack The port of the motor on the back of the robot and the left side.
    */
-  Drivetrain(uint8_t rightFront, uint8_t leftFront, uint8_t rightBack, uint8_t leftBack, uint8_t inertial);
+  Drivetrain(uint8_t leftFront, uint8_t rightFront, uint8_t leftBack, uint8_t rightBack, uint8_t inertial);
 
   /**
    * Drives the robot forwards by the specified distance.
@@ -119,6 +122,10 @@ public:
    * @param wait Whether this function should wait for the robot to turn or return immediately.
    */
   void turnLeft(double degrees, bool wait = true);
+
+  //  void directMove(double relInFwd, double relInLat);
+
+  void curveTargeting(double relInFwd, double relInLat, double curve, double relAngle);
 
   /**
    * Blocks until the robot finishes moving.
@@ -159,18 +166,6 @@ private:
    * @param voltage The voltage to run at [-127 - 127]
    */
   void moveLeft(int16_t millivolts);
-
-  /**
-   * Moves the two right motors of the drivetrain by the specified distance.
-   * @param target The distance in ENCODER UNITS to move the right motors by.
-   */
-  void moveRightTargeting(double target);
-
-  /**
-   * Moves the two left motors of the drivetrain by the specified distance.
-   * @param target The distance in ENCODER UNITS to move the right motors by.
-   */
-  void moveLeftTargeting(double target);
 };
 
 [[nodiscard]] const char *driveSchemeName(Drivetrain::ControlScheme scheme);

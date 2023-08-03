@@ -33,10 +33,10 @@ void DrivetrainChart::initialize(lv_obj_t *screen) {
 }
 
 void DrivetrainChart::update() {
-  auto prevLF = static_cast<float>(this->robot.drivetrain.leftFront.getVelocity());
-  auto prevRF = static_cast<float>(this->robot.drivetrain.rightFront.getVelocity());
-  auto prevLB = static_cast<float>(this->robot.drivetrain.leftBack.getVelocity());
-  auto prevRB = static_cast<float>(this->robot.drivetrain.rightBack.getVelocity());
+  auto prevLF = static_cast<float>(this->robot.drivetrain.leftFrontMotor.getVelocity());
+  auto prevRF = static_cast<float>(this->robot.drivetrain.rightFrontMotor.getVelocity());
+  auto prevLB = static_cast<float>(this->robot.drivetrain.leftBackMotor.getVelocity());
+  auto prevRB = static_cast<float>(this->robot.drivetrain.rightBackMotor.getVelocity());
   if (prevLF == INFINITY || prevLF == -1)
     prevLF = 5;
   if (prevRF == INFINITY || prevRF == -1)

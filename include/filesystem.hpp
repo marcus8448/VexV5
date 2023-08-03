@@ -12,7 +12,7 @@ bool can_access(const std::filesystem::path &path);
 
 void *read_all(const char *path);
 
-std::ifstream* open(const std::filesystem::path &path, std::ios_base::openmode mode = std::ios::in);
-std::ofstream* open_indexed(const std::filesystem::path &path, std::ios_base::openmode mode = std::ios::out);
+std::ifstream *open(const std::filesystem::path &path, std::ios_base::openmode mode = std::ios::in);
+std::ofstream *open_indexed(const std::filesystem::path &path, std::ios_base::openmode mode = std::ios::out);
 } // namespace fs
 #endif

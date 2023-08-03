@@ -12,6 +12,27 @@
 #define MOTOR_ENCODER_UNITS pros::E_MOTOR_ENCODER_DEGREES
 
 namespace robot::device {
+class PID {
+public:
+  double kp;
+  double ki;
+  double kd;
+  double integralRange;
+  double acceptableError;
+
+private:
+  double error = 0.0;
+  double prevError = 0.0;
+  double integral = 0.0;
+
+public:
+  explicit PID(double Kp, double Ki, double Kd, double integralRange, double acceptableError);
+
+  void resetState();
+
+  double update(double target, double value);
+};
+
 class Motor : public Device {
 private:
   enum TargetType { VOLTAGE, VELOCITY };

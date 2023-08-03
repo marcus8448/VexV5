@@ -165,4 +165,32 @@ constexpr int16_t Motor::gearsetMaxVelocity(pros::motor_gearset_e_t gearset) {
     return 0;
   }
 }
+
+double clampMv(double value) {
+  return value > MOTOR_MAX_MILLIVOLTS    ? MOTOR_MAX_MILLIVOLTS
+         : value < -MOTOR_MAX_MILLIVOLTS ? -MOTOR_MAX_MILLIVOLTS
+                                         : value;
+}
+
+PID::PID(double Kp, double Ki, double Kd, double integralRange, double acceptableError)
+    : kp(Kp), ki(Ki), kd(Kd), integralRange(integralRange), acceptableError(acceptableError) {}
+
+void PID::resetState() {
+  this->integral = 0;
+  this->error = 0;
+}
+
+double PID::update(double target, double value) {
+  info("err %f", target - value);
+  if (std::abs(target - value) < this->acceptableError)
+    return 0.0;
+
+  this->prevError = this->error;
+  this->error = target - value;
+  this->integral += this->error;
+  if (std::signbit(this->error) != std::signbit(this->prevError) || std::abs(this->error) > this->integralRange) {
+    this->integral = 0;
+  }
+  return clampMv(this->error * this->kp + this->integral * this->ki + (this->error - this->prevError) * this->kd);
+}
 } // namespace robot::device
