@@ -1,5 +1,6 @@
 #include "robot/device/motor.hpp"
 #include "debug/logger.hpp"
+#include "pros/apix.h"
 #include "pros/motors.h"
 #include <cerrno>
 #include <cmath>
@@ -70,13 +71,6 @@ void Motor::moveRelative(double amount, int16_t velocity) {
 
 void Motor::moveTargetRelative(double amount, int16_t velocity) {
   this->moveAbsolute(this->getTargetPosition() + amount, velocity);
-}
-
-void Motor::setReversed(const bool reverse) {
-  if (this->reversed != reverse) {
-    this->reversed = reverse;
-    pros::c::motor_set_reversed(this->port, reverse);
-  }
 }
 
 void Motor::setBrakeMode(pros::motor_brake_mode_e brake_mode) {

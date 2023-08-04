@@ -55,6 +55,8 @@ void Information::update() {
   set_label_text(this->yPositionLabel, "Y-position: %fin", units::encoderToInch(this->robot.drivetrain.posY));
 }
 
+void Information::cleanup() {}
+
 void update_device_digital(lv_obj_t *label, const robot::device::Device &device, bool engaged) {
   if (!device.isConnected()) {
     set_label_text(label, "%s: Disconnected", device.getName());

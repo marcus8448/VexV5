@@ -41,6 +41,7 @@ link_directories(BEFORE ${FIRMWARE_DIR} ${FIRMWARE_DIR}/extra)
 set(LibC ${FIRMWARE_DIR}/libc.a)
 set(LibM ${FIRMWARE_DIR}/libm.a)
 set(LibPROS ${FIRMWARE_DIR}/libpros.a)
+set(LibLVGL ${FIRMWARE_DIR}/liblvgl.a)
 set(LibBase85 ${FIRMWARE_DIR}/libbase85.a)
 
 message(STATUS "Using toolchain: ${CMAKE_TOOLCHAIN_FILE}")
@@ -59,6 +60,7 @@ find_program(ClangCheck clang-check)
 find_library(LibC NAMES c REQUIRED)
 find_library(LibM NAMES m REQUIRED)
 find_library(LibPROS NAMES pros REQUIRED)
+find_library(LibLVGL NAMES lvgl REQUIRED)
 find_library(LibBase85 NAMES base85)
 
 file(TOUCH ${CMAKE_BINARY_DIR}/empty.cpp)
@@ -68,13 +70,13 @@ add_library(Timestamp STATIC ${CMAKE_BINARY_DIR}/timestamp.cpp)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 11)
 set(WARNING_FLAGS "-Wall -Wno-psabi -Wno-shadow-field-in-constructor")
-set(COMPILE_FLAGS "-g -ffunction-sections -fdata-sections -fdiagnostics-color -funwind-tables -fno-exceptions")
+set(COMPILE_FLAGS "-g -ffunction-sections -fdata-sections -fdiagnostics-color -funwind-tables -fno-exceptions -D_PROS_INCLUDE_LIBLVGL_LLEMU_HPP -D_PROS_INCLUDE_LIBLVGL_LLEMU_H")
 add_compile_definitions(_POSIX_THREADS _UNIX98_THREAD_MUTEX_ATTRIBUTES)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILE_FLAGS} ${WARNING_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMPILE_FLAGS} ${WARNING_FLAGS}")
 
-set(ColdLibraries ${LibC} ${LibM} ${LibPROS})
-set(HotLinked ${LibC},${LibM},${LibPROS})
+set(ColdLibraries ${LibC} ${LibM} ${LibPROS} ${LibLVGL})
+set(HotLinked ${LibC},${LibM},${LibPROS},${LibLVGL})
 
 set(SOURCE_FILES
         src/main.cpp

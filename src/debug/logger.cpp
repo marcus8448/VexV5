@@ -16,42 +16,54 @@ static std::ofstream *log_file = nullptr;
 #endif
 
 void _info(const char *string) {
-  std::cout << string << std::endl;
+  std::cout << string << '\n';
 #ifdef FILE_LOG
-  if (log_file != nullptr && log_file->is_open())
-    *log_file << "[INFO] [" << pros::c::millis() << "] " << string << std::endl;
+  if (log_file != nullptr && log_file->is_open()) {
+    *log_file << "[INFO] [" << pros::c::millis() << "] " << string << '\n';
+    log_file->flush();
+  }
 #endif
+  std::cout.flush();
 }
 
 void _info(const std::string &string) { _info(string.c_str()); }
 
 void _warn(const char *string) {
-  std::cout << string << std::endl;
+  std::cout << string << '\n';
 #ifdef FILE_LOG
-  if (log_file != nullptr && log_file->is_open())
-    *log_file << "[WARN] [" << pros::c::millis() << "] " << std::endl;
+  if (log_file != nullptr && log_file->is_open()) {
+    *log_file << "[WARN] [" << pros::c::millis() << "] " << '\n';
+    log_file->flush();
+  }
 #endif
+std::cout.flush();
 }
 
 void _warn(const std::string &string) { _warn(string.c_str()); }
 
 void _error(const char *string) {
-  std::cout << string << std::endl;
+  std::cout << string << '\n';
 #ifdef FILE_LOG
-  if (log_file != nullptr && log_file->is_open())
-    *log_file << "[ERROR] [" << pros::c::millis() << "] " << std::endl;
+  if (log_file != nullptr && log_file->is_open()) {
+    *log_file << "[ERROR] [" << pros::c::millis() << "] " << '\n';
+    log_file->flush();
+  }
 #endif
+  std::cout.flush();
 }
 
 void _error(const std::string &string) { _error(string.c_str()); }
 
 #ifdef DEBUG_LOG
 void _debug(const char *string) {
-  std::cout << string << std::endl;
+  std::cout << string << '\n';
 #ifdef FILE_LOG
-  if (log_file != nullptr && log_file->is_open())
-    *log_file << "[DEBUG] [" << pros::c::millis() << "] " << std::endl;
+  if (log_file != nullptr && log_file->is_open()) {
+    *log_file << "[DEBUG] [" << pros::c::millis() << "] " << '\n';
+    log_file->flush();
+  }
 #endif
+  std::cout.flush();
 }
 
 void _debug(const std::string &string) { _debug(string.c_str()); }

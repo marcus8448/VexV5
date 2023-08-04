@@ -58,7 +58,6 @@ public:
   void moveRelative(double amount, int16_t velocity);
   void moveTargetRelative(double amount, int16_t velocity);
 
-  void setReversed(bool reverse);
   void setBrakeMode(pros::motor_brake_mode_e brake_mode);
 
   [[nodiscard]] double getVelocity() const;

@@ -3,14 +3,10 @@
 
 #include "debug/logger.hpp"
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wall"
-#include "display/lv_core/lv_obj.h"
-#include "display/lv_core/lv_style.h"
-#include "display/lv_misc/lv_color.h"
-#include "display/lv_objx/lv_btn.h"
-#include "display/lv_objx/lv_canvas.h"
-#include "display/lv_objx/lv_label.h"
-#include "display/lv_objx/lv_list.h"
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wdeprecated-enum-enum-conversion"
+#pragma GCC diagnostic ignored "-Wdeprecated-anon-enum-enum-conversion"
+#include "liblvgl/lvgl.h"
 #pragma GCC diagnostic pop
 #include <cstdlib>
 
@@ -18,11 +14,7 @@ namespace screen {
 lv_obj_t *create_canvas(lv_obj_t *screen);
 
 lv_obj_t *create_label(lv_obj_t *screen, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h,
-                       const char *text = "<uninitialized>", lv_style_t *style = nullptr);
-
-lv_style_t *get_base_style();
-lv_style_t *create_style();
-lv_style_t *create_text_color_style(lv_color_t colour);
+                       const char *text = "<uninitialized>");
 
 lv_obj_t *create_info_label(lv_obj_t *screen, bool right, lv_coord_t index, const char *text = "<uninitialized>");
 

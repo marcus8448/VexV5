@@ -4,7 +4,8 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wall"
-#include "display/lv_objx/lv_btn.h"
+#include "liblvgl/lvgl.h"
+#include "liblvgl/lv_api_map.h"
 #pragma GCC diagnostic pop
 
 #include <algorithm>
@@ -15,50 +16,89 @@
 namespace screen {
 extern void *canvasBuffer;
 static std::vector<Screen *> *registry = new std::vector<Screen *>();
-static std::map<Screen *, lv_obj_t **> *screens = new std::map<Screen *, lv_obj_t **>();
-static Screen *activeScreen = nullptr;
 
-static size_t canvasSize = 0;
+static Screen* activeScreen = nullptr;
+static int screenIndex = -1;
 
-lv_res_t prev_page([[maybe_unused]] lv_obj_t *btn);
-lv_res_t next_page([[maybe_unused]] lv_obj_t *btn);
-void hide_screen(Screen *screen);
-void show_screen(Screen *screen);
+static lv_obj_t *currentScreen = nullptr;
+
+static lv_obj_t *previousBtn = nullptr;
+static lv_obj_t *nextBtn = nullptr;
+
+void switch_to_screen(int screen);
+void prev_page([[maybe_unused]] lv_event_t * event);
+void next_page([[maybe_unused]] lv_event_t * event);
 void update();
 [[noreturn]] void update_task([[maybe_unused]] void *params);
-lv_obj_t *create_prev_btn(lv_obj_t *obj);
-lv_obj_t *create_next_btn(lv_obj_t *obj);
-void create_screen(lv_obj_t *output[], lv_obj_t *parent);
 
 void initialize() {
   scopePush("Initialize LVGL");
   lv_init();
   scopePop();
 
-  lv_obj_t *base_view = lv_scr_act();
-  activeScreen = registry->at(0);
-
-  scopePush("Create screens");
-  for (auto screen : *registry) {
-    auto **lvObjs = new lv_obj_t *[3];
-    create_screen(lvObjs, base_view);
-    screens->emplace(screen, lvObjs);
-    screen->initialize(lvObjs[0]);
+  if (registry->empty()) {
+    switch_to_screen(-1);
+  } else {
+    switch_to_screen(0);
   }
-  scopePop();
 
-  show_screen(activeScreen);
   createTask("Screen update", update_task, nullptr, TASK_PRIORITY_DEFAULT - 1, 0x2000);
 }
 
-void create_screen(lv_obj_t *output[], lv_obj_t *parent) {
-  lv_obj_t *screen = lv_obj_create(parent, nullptr);
-  lv_obj_set_size(screen, SCREEN_WIDTH, SCREEN_HEIGHT);
-  lv_obj_set_hidden(screen, true);
+void switch_to_screen(int screen) {
+  info("TXX %p", lv_disp_get_default());
+  lv_obj_t *base = lv_obj_create(nullptr);
+  printf("%p\n", base);
+  info("XX");
+  lv_scr_load(base);
+  info("TX");
 
-  output[0] = screen;
-  output[1] = create_prev_btn(screen);
-  output[2] = create_next_btn(screen);
+  lv_obj_set_size(base, SCREEN_WIDTH, SCREEN_HEIGHT);
+  lv_obj_add_flag(base, LV_OBJ_FLAG_HIDDEN);
+
+  if (currentScreen != nullptr) {
+    if (activeScreen != nullptr) {
+      activeScreen->cleanup();
+    }
+
+    lv_obj_set_parent(previousBtn, base);
+    lv_obj_set_parent(nextBtn, base);
+
+    lv_obj_del(currentScreen);
+  } else {
+    previousBtn = lv_btn_create(base);
+    lv_obj_set_pos(previousBtn, 0, static_cast<lv_coord_t>(SCREEN_HEIGHT - BUTTON_SIZE));
+    lv_obj_set_size(previousBtn, BUTTON_SIZE, BUTTON_SIZE);
+    lv_obj_add_event_cb(previousBtn, prev_page, LV_EVENT_CLICKED, nullptr);
+
+    nextBtn = lv_btn_create(base);
+    lv_obj_set_pos(nextBtn, static_cast<lv_coord_t>(SCREEN_WIDTH - BUTTON_SIZE),
+                   static_cast<lv_coord_t>(SCREEN_HEIGHT - BUTTON_SIZE));
+    lv_obj_set_size(nextBtn, BUTTON_SIZE, BUTTON_SIZE);
+    lv_obj_add_event_cb(nextBtn, next_page, LV_EVENT_CLICKED, nullptr);
+  }
+
+  screenIndex = screen;
+  currentScreen = base;
+
+  if (screen > 0 && screen < static_cast<int>(registry->size())) {
+    activeScreen = (*registry)[screen];
+    activeScreen->initialize(base);
+  }
+
+  if (screenIndex > 0) {
+    lv_obj_clear_flag(previousBtn, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_move_foreground(previousBtn);
+  } else {
+    lv_obj_add_flag(previousBtn, LV_OBJ_FLAG_HIDDEN);
+  }
+
+  if (screenIndex + 1 < static_cast<int>(registry->size())) {
+    lv_obj_clear_flag(nextBtn, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_move_foreground(nextBtn);
+  } else {
+    lv_obj_add_flag(nextBtn, LV_OBJ_FLAG_HIDDEN);
+  }
 }
 
 [[noreturn]] void update_task([[maybe_unused]] void *params) {
@@ -70,74 +110,48 @@ void create_screen(lv_obj_t *output[], lv_obj_t *parent) {
 
 void update() {
   if (canvasBuffer != nullptr) {
-    memset(canvasBuffer, 0x00000000, canvasSize);
+    memset(canvasBuffer, 0x00000000, lv_img_buf_get_img_size(CANVAS_WIDTH, CANVAS_HEIGHT, LV_IMG_CF_TRUE_COLOR));
   }
   activeScreen->update();
 }
 
-void addScreen(Screen *screen) { registry->push_back(screen); }
+void addScreen(Screen *screen) {
+  registry->push_back(screen);
+
+  if (currentScreen != nullptr) {
+    if (screenIndex + 2 == static_cast<int>(registry->size())) {
+      lv_obj_clear_flag(nextBtn, LV_OBJ_FLAG_HIDDEN);
+      lv_obj_move_foreground(nextBtn);
+    }
+
+    if (screenIndex == -1) {
+      switch_to_screen(0);
+    }
+  }
+}
 
 void removeScreen(Screen *screen) {
-  if (activeScreen == screen) {
-    hide_screen(activeScreen);
-    auto newScreen = registry->front() != activeScreen ? registry->front() : registry->back();
-    activeScreen = newScreen;
-    show_screen(newScreen);
+  int index = std::find(registry->begin(), registry->end(), screen) - registry->begin();
+  if (screenIndex == index) {
+    if (index + 1 == static_cast<int>(registry->size())) {
+      switch_to_screen(--screenIndex);
+    } else {
+      switch_to_screen(screenIndex + 1);
+    }
+  } else if (index < screenIndex) {
+    screenIndex--;
   }
 
   registry->erase(std::remove(registry->begin(), registry->end(), screen), registry->end());
-
-  delete[] *screens->at(screen);
-  screens->erase(screen);
-
-  lv_obj_set_hidden(screens->at(registry->front())[1], true);
-  lv_obj_set_hidden(screens->at(registry->back())[2], true);
 }
 
-lv_obj_t *create_prev_btn(lv_obj_t *obj) {
-  auto prevBtn = lv_btn_create(obj, nullptr);
-  lv_obj_set_pos(prevBtn, 0, static_cast<lv_coord_t>(SCREEN_HEIGHT - BUTTON_SIZE));
-  lv_obj_set_size(prevBtn, BUTTON_SIZE, BUTTON_SIZE);
-  lv_btn_set_action(prevBtn, LV_BTN_ACTION_CLICK, prev_page);
-  return prevBtn;
-}
-
-lv_obj_t *create_next_btn(lv_obj_t *obj) {
-  auto nextBtn = lv_btn_create(obj, nullptr);
-  lv_obj_set_pos(nextBtn, static_cast<lv_coord_t>(SCREEN_WIDTH - BUTTON_SIZE),
-                 static_cast<lv_coord_t>(SCREEN_HEIGHT - BUTTON_SIZE));
-  lv_obj_set_size(nextBtn, BUTTON_SIZE, BUTTON_SIZE);
-  lv_btn_set_action(nextBtn, LV_BTN_ACTION_CLICK, next_page);
-  return nextBtn;
-}
-
-lv_res_t prev_page([[maybe_unused]] lv_obj_t *btn) {
+void prev_page([[maybe_unused]] lv_event_t * event) {
   debug("Screen switching to previous page");
-  hide_screen(activeScreen);
-  auto x = std::find(registry->begin(), registry->end(), activeScreen);
-  auto newScreen = registry->at(x - registry->begin() - 1);
-  show_screen(newScreen);
-  activeScreen = newScreen;
-  return LV_RES_OK;
+  switch_to_screen(--screenIndex);
 }
 
-lv_res_t next_page([[maybe_unused]] lv_obj_t *btn) {
+void next_page([[maybe_unused]] lv_event_t * event) {
   debug("Screen switching to next page");
-  hide_screen(activeScreen);
-  auto x = std::find(registry->begin(), registry->end(), activeScreen);
-  auto newScreen = registry->at(x - registry->begin() + 1);
-  show_screen(newScreen);
-  activeScreen = newScreen;
-  return LV_RES_OK;
+  switch_to_screen(++screenIndex);
 }
-
-void show_screen(Screen *screen) {
-  auto objects = screens->at(screen);
-  lv_obj_set_hidden(objects[0], false);
-  size_t index = std::find(registry->begin(), registry->end(), screen) - registry->begin();
-  lv_obj_set_hidden(objects[1], index == 0);
-  lv_obj_set_hidden(objects[2], index == registry->size() - 1);
-}
-
-void hide_screen(Screen *screen) { lv_obj_set_hidden(screens->at(screen)[0], true); }
 } // namespace screen

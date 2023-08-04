@@ -52,7 +52,7 @@ robot::Robot &getRobot();
  * Called when the robot is first initialized.
  */
 void initialize() {
-  pros::c::serctl(SERCTL_DISABLE_COBS, nullptr);
+//  pros::c::serctl(SERCTL_DISABLE_COBS, nullptr);
   onRootTaskStart();
   scopePush("Initialize");
   scopePush("Initialize robot");
@@ -78,16 +78,16 @@ void initialize() {
 #ifndef DISABLE_SCREEN
   scopePush("Register Screens");
   // Optionally register the different screens
-#if not defined(DISABLE_AUTONOMOUS) and not defined(DISABLE_AUTONOMOUS_SELECTION_SCREEN)
-  screen::addScreen(new screen::AutonomousSelect(robot));
-#endif
-#ifndef DISABLE_CONFIG_SCREEN
-  screen::addScreen(new screen::ConfigurationScreen(robot));
-#endif
-  screen::addScreen(new screen::Information(robot));
-#ifndef DISABLE_DRIVETRAIN_DEBUG_SCREEN
-  screen::addScreen(new screen::DrivetrainChart(robot));
-#endif
+//#if not defined(DISABLE_AUTONOMOUS) and not defined(DISABLE_AUTONOMOUS_SELECTION_SCREEN)
+//  screen::addScreen(new screen::AutonomousSelect(robot));
+//#endif
+//#ifndef DISABLE_CONFIG_SCREEN
+//  screen::addScreen(new screen::ConfigurationScreen(robot));
+//#endif
+//  screen::addScreen(new screen::Information(robot));
+//#ifndef DISABLE_DRIVETRAIN_DEBUG_SCREEN
+//  screen::addScreen(new screen::DrivetrainChart(robot));
+//#endif
   section_swap("Initialize Screen");
   screen::initialize(); // initialize the screen
   scopePop();
