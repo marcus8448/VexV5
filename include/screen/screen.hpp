@@ -1,18 +1,18 @@
 #ifndef SCREEN_HPP
 #define SCREEN_HPP
 
-#include "lvgl_util.hpp"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-enum-enum-conversion"
+#include "liblvgl/lvgl.h"
+#include "liblvgl/lv_api_map.h"
+#pragma GCC diagnostic pop
 #include <string>
 
 #define SCREEN_UPDATE_RATE 50
 
-#define SCREEN_WIDTH 480
-#define SCREEN_HALF_WIDTH 240
-#define SCREEN_HEIGHT 240
-
-#define CANVAS_WIDTH SCREEN_WIDTH
-#define CANVAS_HEIGHT SCREEN_HEIGHT
-#define CANVAS_COLOUR LV_IMG_CF_TRUE_COLOR
+#define SCREEN_WIDTH static_cast<lv_coord_t>(480)
+#define SCREEN_HALF_WIDTH static_cast<lv_coord_t>(240)
+#define SCREEN_HEIGHT static_cast<lv_coord_t>(240)
 
 #define BUTTON_SIZE static_cast<lv_coord_t>(40)
 

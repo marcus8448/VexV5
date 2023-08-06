@@ -29,10 +29,11 @@ double Inertial::getRoll() const { return pros::c::imu_get_roll(this->port); }
 
 bool Inertial::isConnected() const {
   errno = 0;
-  pros::imu_status_e d = pros::c::imu_get_status(this->port);
+  pros::c::imu_get_status(this->port);
+
   int e = errno;
   errno = 0;
-  return d == pros::imu_status_e::E_IMU_STATUS_ERROR || e == 0;
+  return e != ENODEV;
 }
 
 void Inertial::reconfigure() const {}

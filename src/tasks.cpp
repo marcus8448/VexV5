@@ -1,5 +1,6 @@
 #include "tasks.hpp"
 #include "debug/logger.hpp"
+#include "pros/rtos.h"
 #include <vector>
 
 static pros::task_t rootTask = nullptr;

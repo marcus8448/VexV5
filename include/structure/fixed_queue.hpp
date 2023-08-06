@@ -1,46 +1,72 @@
 #ifndef STRUCTURE_FIXED_QUEUE
 #define STRUCTURE_FIXED_QUEUE
+#include "concept.hpp"
 #include <cstddef>
 
 namespace structure {
-template <class Type, size_t SIZE> class FixedQueue {
-  Type values[SIZE] = {};
+template <size_t SIZE> class FixedQueue {
+  float values[SIZE] = {};
   size_t position = 0;
 
 public:
-  explicit FixedQueue(Type defaultValue);
+  float max = -INFINITY;
+  float min = INFINITY;
 
-  Type operator[](size_t index) const;
+  explicit FixedQueue();
 
-  [[nodiscard]] Type get(size_t index) const;
-  Type pushPop(Type value);
+  float operator[](size_t index) const;
+
+  [[nodiscard]] float get(size_t index) const;
+  void add(float value);
   [[nodiscard]] constexpr size_t size() const;
+
+  void clear();
 };
 
-template <class Type, size_t SIZE> FixedQueue<Type, SIZE>::FixedQueue(Type defaultValue) {
-  for (auto &item : this->values) {
-    item = defaultValue;
-  }
-}
+template <size_t SIZE> FixedQueue<SIZE>::FixedQueue() = default;
 
-template <class Type, size_t SIZE> Type FixedQueue<Type, SIZE>::operator[](size_t index) const {
+template <size_t SIZE> float FixedQueue<SIZE>::operator[](size_t index) const {
   return this->get(index);
 }
 
-template <class Type, size_t SIZE> Type FixedQueue<Type, SIZE>::get(size_t index) const {
+template <size_t SIZE> float FixedQueue<SIZE>::get(size_t index) const {
   return this->values[(this->position + index) % SIZE];
 }
 
-template <class Type, size_t SIZE> Type FixedQueue<Type, SIZE>::pushPop(Type value) {
-  Type previous = this->values[this->position];
-  this->values[this->position] = value;
-  this->position++;
+template <size_t SIZE> void FixedQueue<SIZE>::add(float value) {
+  if (value >= this->max) {
+    this->max = value;
+  } else if (this->values[this->position] == this->max) {
+    this->max = -INFINITY;
+    for (size_t i = 0; i < SIZE; ++i) {
+      if (i == this->position)
+        continue;
+      this->max = std::max(this->max, this->values[i]);
+    }
+  }
+
+  if (value <= this->min) {
+    this->min = value;
+  } else if (this->values[this->position] == this->min) {
+    this->min = INFINITY;
+    for (size_t i = 0; i < SIZE; ++i) {
+      if (i == this->position)
+        continue;
+      this->min = std::min(this->min, this->values[i]);
+    }
+  }
+
+  this->values[this->position++] = value;
   if (this->position == SIZE) {
     this->position = 0;
   }
-  return previous;
 }
 
-template <class Type, size_t SIZE> constexpr size_t FixedQueue<Type, SIZE>::size() const { return SIZE; }
+template <size_t SIZE> constexpr size_t FixedQueue<SIZE>::size() const { return SIZE; }
+
+template<size_t SIZE> void FixedQueue<SIZE>::clear() {
+  this->position = 0;
+  memset(this->values, 0, SIZE * sizeof(float));
+}
 } // namespace structure
 #endif // STRUCTURE_FIXED_QUEUE

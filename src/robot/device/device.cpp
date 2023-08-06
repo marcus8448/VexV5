@@ -26,6 +26,10 @@ void initialize() {
   }
 }
 
+std::map<Device *, bool> *get_devices() {
+  return &devices;
+}
+
 bool Device::checkConnect() {
   bool b = errno != ENODEV;
   errno = 0;

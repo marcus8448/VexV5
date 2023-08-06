@@ -2,6 +2,7 @@
 #include "debug/logger.hpp"
 #include "robot/device/motor.hpp"
 #include "units.hpp"
+#include "pros/rtos.h"
 #include <algorithm>
 
 #define JOYSTICK_MAX 127.0

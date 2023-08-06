@@ -1,7 +1,6 @@
 #include "main.hpp"
 #include "control/input/operator.hpp"
 #include "debug/logger.hpp"
-#include "pros/apix.h"
 #include "robot/robot.hpp"
 #include "tasks.hpp"
 
@@ -11,7 +10,6 @@
 #include "control/autonomous/skills.hpp"
 #include "control/autonomous/winpoint.hpp"
 #endif
-
 #ifndef DISABLE_SERIAL
 #include "serial/robot_command.hpp"
 #include "serial/robot_state.hpp"
@@ -27,7 +25,8 @@
 #include "screen/autonomous_select.hpp"
 #endif
 #ifndef DISABLE_DRIVETRAIN_DEBUG_SCREEN
-#include "screen/drivetrain_chart.hpp"
+#include "screen/chart.hpp"
+#include "screen/colour.hpp"
 #endif
 #include "screen/information.hpp"
 #endif
@@ -78,16 +77,25 @@ void initialize() {
 #ifndef DISABLE_SCREEN
   scopePush("Register Screens");
   // Optionally register the different screens
-//#if not defined(DISABLE_AUTONOMOUS) and not defined(DISABLE_AUTONOMOUS_SELECTION_SCREEN)
-//  screen::addScreen(new screen::AutonomousSelect(robot));
-//#endif
-//#ifndef DISABLE_CONFIG_SCREEN
-//  screen::addScreen(new screen::ConfigurationScreen(robot));
-//#endif
-//  screen::addScreen(new screen::Information(robot));
-//#ifndef DISABLE_DRIVETRAIN_DEBUG_SCREEN
-//  screen::addScreen(new screen::DrivetrainChart(robot));
-//#endif
+#if not defined(DISABLE_AUTONOMOUS) and not defined(DISABLE_AUTONOMOUS_SELECTION_SCREEN)
+  screen::addScreen(new screen::AutonomousSelect(robot));
+#endif
+#ifndef DISABLE_CONFIG_SCREEN
+  screen::addScreen(new screen::ConfigurationScreen(robot));
+#endif
+  screen::addScreen(new screen::Information(robot));
+#ifndef DISABLE_DRIVETRAIN_DEBUG_SCREEN
+  screen::addScreen(new screen::Chart<4, 100>(robot, "Drivetrain velocity", new screen::DataSet[4]{
+      screen::DataSet("LF", screen::colour::RED, [](robot::Robot &robot) {
+        return static_cast<float>(robot.drivetrain.leftFrontMotor.getVelocity());
+      }), screen::DataSet("RF", screen::colour::GREEN, [](robot::Robot &robot) {
+        return static_cast<float>(robot.drivetrain.rightFrontMotor.getVelocity());
+      }), screen::DataSet("LB", screen::colour::BLUE, [](robot::Robot &robot) {
+        return static_cast<float>(robot.drivetrain.leftBackMotor.getVelocity());
+      }), screen::DataSet("RB", screen::colour::PINK, [](robot::Robot &robot) {
+        return static_cast<float>(robot.drivetrain.rightBackMotor.getVelocity());
+      })}));
+#endif
   section_swap("Initialize Screen");
   screen::initialize(); // initialize the screen
   scopePop();

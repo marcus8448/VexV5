@@ -2,6 +2,7 @@
 #include "control/autonomous/autonomous.hpp"
 #include "debug/logger.hpp"
 #include "tasks.hpp"
+#include "pros/rtos.h"
 
 #ifdef ENABLE_TEMPORARY_CODE
 #include "../temporary.cpp"

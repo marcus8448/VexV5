@@ -4,6 +4,7 @@
 #define ROBOT_TICK_RATE 20
 
 #include <cstdint>
+#include <map>
 
 namespace robot::device {
 class Device {
@@ -32,5 +33,7 @@ protected:
 };
 
 void initialize();
+
+std::map<Device *, bool> *get_devices();
 } // namespace robot::device
 #endif // ROBOT_DEVICE_DEVICE_HPP

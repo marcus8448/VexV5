@@ -1,71 +1,83 @@
 #include "screen/information.hpp"
-#include "screen/lvgl_util.hpp"
 #include "units.hpp"
+#include "debug/logger.hpp"
 
 namespace screen {
-extern lv_coord_t halfWidth;
-void update_device_digital(lv_obj_t *label, const robot::device::Device &device, bool engaged);
+template <typename... Args> void set_label_text(lv_obj_t *label, const char *format, Args... args) {
+  static char *buffer = new char[64];
+  snprintf(buffer, 64, format, args...);
+  lv_label_set_text(label, buffer);
+}
+
+void update_connectivity(lv_obj_t *label, const char *name, bool connected);
+void update_device(lv_obj_t *label, const robot::device::Device &device, bool enabled);
 void update_device(lv_obj_t *label, const robot::device::Device &device, double value);
 void update_device(lv_obj_t *label, const robot::device::Device &device, int32_t value);
-void update_motor_pos(lv_obj_t *label, const robot::device::Motor &motor);
-void update_motor_vel(lv_obj_t *label, const robot::device::Motor &motor);
-void update_motor_temp(lv_obj_t *label, const robot::device::Motor &motor);
 
-Information::Information(robot::Robot &robot) : robot(robot) {}
+Information::Information(robot::Robot &robot) : robot(robot) {
+}
 
 void Information::initialize(lv_obj_t *screen) {
-  create_info_label(screen, false, 0, "Build: " __DATE__ " " __TIME__);
-  this->uptimeLabel = create_info_label(screen, true, 0);
+  for (size_t i = 0; i < INFO_COLUMNS; i++) {
+    if (this->leftColumn[i] == nullptr) {
+      lv_obj_t *obj = lv_label_create(screen);
+      lv_obj_set_pos(obj, 0, i * 16);
+      lv_obj_set_width(obj, SCREEN_WIDTH / 2);
+      lv_label_set_text(obj, "");
+      this->leftColumn[i] = obj;
+    }
+  }
 
-  this->controlSchemeLabel = create_info_label(screen, false, 1);
-  //  this->teamColourLabel = create_info_label(screen, true, 1);
-
-  // Port Statuses
-  this->motorLFLabel = create_info_label(screen, false, 2);
-  this->motorRFLabel = create_info_label(screen, true, 2);
-
-  this->motorLBLabel = create_info_label(screen, false, 3);
-  this->motorRBLabel = create_info_label(screen, true, 3);
-
-  this->yPositionLabel = create_info_label(screen, false, 4);
-  this->xPositionLabel = create_info_label(screen, true, 4);
-  //
-  //  this->_unused2 = create_info_label(screen, false, 5);
-  //  this->_unused3 = create_info_label(screen, true, 5);
-  //
-  //  this->_unused4 = create_info_label(screen, false, 6);
-  //  this->_unused5 = create_info_label(screen, true, 6);
-
-  this->digitalSpeed = create_info_label(screen, false, 7);
-  //  this->_unused = create_info_label(screen, true, 7);
-  //  this->_unused = create_info_label(screen, false, 8);
-  //  this->_unused = create_info_label(screen, true, 8);
+  for (size_t i = 0; i < INFO_COLUMNS; i++) {
+    if (this->rightColumn[i] == nullptr) {
+      lv_obj_t *obj = lv_label_create(screen);
+      lv_obj_set_pos(obj, SCREEN_WIDTH / 2, i * 16);
+      lv_obj_set_width(obj, SCREEN_WIDTH / 2);
+      lv_label_set_text(obj, "");
+      this->rightColumn[i] = obj;
+    }
+  }
 }
 
 void Information::update() {
-  //  set_label_text(this->uptimeLabel, "Uptime: %i", pros::c::millis());
-  set_label_text(this->controlSchemeLabel, "Control Scheme: %s",
+  int i = 0;
+  for (const auto &item : *robot::device::get_devices()) {
+    update_connectivity(this->leftColumn[i++], item.first->getName(), item.second);
+    if (i == INFO_COLUMNS) break;
+  }
+
+  set_label_text(this->rightColumn[0], "Control Scheme: %s",
                  robot::driveSchemeName(robot.drivetrain.controlScheme));
-  update_motor_pos(this->motorLFLabel, this->robot.drivetrain.leftFrontMotor);
-  update_motor_pos(this->motorRFLabel, this->robot.drivetrain.rightFrontMotor);
-  update_motor_pos(this->motorLBLabel, this->robot.drivetrain.leftBackMotor);
-  update_motor_pos(this->motorRBLabel, this->robot.drivetrain.rightBackMotor);
-  set_label_text(this->digitalSpeed, "Flywheel Speed: %i", this->robot.controller->speedSetting());
-  set_label_text(this->xPositionLabel, "X-position: %fin", units::encoderToInch(this->robot.drivetrain.posX));
-  set_label_text(this->yPositionLabel, "Y-position: %fin", units::encoderToInch(this->robot.drivetrain.posY));
+  set_label_text(this->rightColumn[1], "X-position: %fin", units::encoderToInch(this->robot.drivetrain.posX));
+  set_label_text(this->rightColumn[2], "Y-position: %fin", units::encoderToInch(this->robot.drivetrain.posY));
 }
 
-void Information::cleanup() {}
+void Information::cleanup() {
+  for (int i = 0; i < INFO_COLUMNS; ++i) {
+    lv_obj_del_async(this->leftColumn[i]);
+    lv_obj_del_async(this->rightColumn[i]);
+    this->leftColumn[i] = nullptr;
+    this->rightColumn[i] = nullptr;
+  }
+}
 
-void update_device_digital(lv_obj_t *label, const robot::device::Device &device, bool engaged) {
+void update_device(lv_obj_t *label, const robot::device::Device &device, bool enabled) {
   if (!device.isConnected()) {
     set_label_text(label, "%s: Disconnected", device.getName());
   } else {
-    if (engaged) {
+    if (enabled) {
       set_label_text(label, "%s: Enabled", device.getName());
     } else {
       set_label_text(label, "%s: Disabled", device.getName());
     }
+  }
+}
+
+void update_connectivity(lv_obj_t *label, const char *name, bool connected) {
+  if (connected) {
+    set_label_text(label, "%s: Connected", name);
+  } else {
+    set_label_text(label, "%s: Disconnected", name);
   }
 }
 
@@ -85,16 +97,18 @@ void update_device(lv_obj_t *label, const robot::device::Device &device, int32_t
   }
 }
 
-void update_motor_pos(lv_obj_t *label, const robot::device::Motor &motor) {
-  update_device(label, motor, motor.getPosition());
+lv_obj_t *create_label(lv_obj_t *screen, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h, const char *text) {
+  lv_obj_t *label = lv_label_create(screen);
+
+  lv_obj_set_pos(label, x, y);
+  lv_obj_set_size(label, w, h);
+  lv_label_set_text(label, text);
+
+  return label;
 }
 
-void update_motor_vel(lv_obj_t *label, const robot::device::Motor &motor) {
-  update_device(label, motor, motor.getVelocity());
+lv_obj_t *create_label(lv_obj_t *screen, lv_coord_t index, bool right, const char *text) {
+  return create_label(screen, right ? SCREEN_HALF_WIDTH : static_cast<lv_coord_t>(0),
+                      static_cast<lv_coord_t>(index * 16), SCREEN_HALF_WIDTH, 16, text);
 }
-
-void update_motor_temp(lv_obj_t *label, const robot::device::Motor &motor) {
-  update_device(label, motor, motor.getTemperature());
-}
-
 } // namespace screen

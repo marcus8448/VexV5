@@ -20,15 +20,15 @@
 #else
 #define debug(fmt, ...)                                                                                                \
   {}
-#define section_push(name)                                                                                             \
+#define scopePush(name)                                                                                             \
   {}
-#define section_pop()                                                                                                  \
+#define scopePop()                                                                                                  \
   {}
 #define section_swap(name)                                                                                             \
   {}
-#define timer_start()                                                                                                  \
+#define startTiming(name)                                                                                              \
   {}
-#define timer_ms()                                                                                                     \
+#define endTiming(name)                                                                                                \
   {}
 #endif
 

@@ -24,7 +24,13 @@ void ConfigurationScreen::update_drive_scheme_label() {
           .c_str());
 }
 
-void ConfigurationScreen::cleanup() {}
+void ConfigurationScreen::cleanup() {
+  lv_obj_del_async(this->driveSchemeBtn);
+  lv_obj_del_async(this->driveSchemeBtnLbl);
+
+  this->driveSchemeBtn = nullptr;
+  this->driveSchemeBtnLbl = nullptr;
+}
 
 void switch_drive_scheme([[maybe_unused]] lv_event_t *event) {
   instance->robot.drivetrain.controlScheme =
