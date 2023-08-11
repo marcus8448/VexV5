@@ -66,12 +66,12 @@ void initialize() {
   // Optionally disable autonomous for builds
 #ifndef DISABLE_AUTONOMOUS
   // Register the different types of autonomous-es
-  control::autonomous::initialize();
   control::autonomous::registerRun("Right Winpoint", control::autonomous::rightWinpoint);
   control::autonomous::registerRun("Left Winpoint", control::autonomous::leftWinpoint);
   control::autonomous::registerRun("Right Score", control::autonomous::rightScore);
   control::autonomous::registerRun("Left Score", control::autonomous::leftScore);
   control::autonomous::registerRun("Skills", control::autonomous::skills);
+  control::autonomous::initialize();
 #endif
   // Optionally enable extra screen functionality
 #ifndef DISABLE_SCREEN
@@ -85,15 +85,21 @@ void initialize() {
 #endif
   screen::addScreen(new screen::Information(robot));
 #ifndef DISABLE_DRIVETRAIN_DEBUG_SCREEN
-  screen::addScreen(new screen::Chart<4, 100>(robot, "Drivetrain velocity", new screen::DataSet[4]{
+  screen::addScreen(new screen::Chart<4, 100>(robot, "Drivetrain Velocity", new screen::DataSet[4]{
       screen::DataSet("LF", screen::colour::RED, [](robot::Robot &robot) {
         return static_cast<float>(robot.drivetrain.leftFrontMotor.getVelocity());
       }), screen::DataSet("RF", screen::colour::GREEN, [](robot::Robot &robot) {
         return static_cast<float>(robot.drivetrain.rightFrontMotor.getVelocity());
       }), screen::DataSet("LB", screen::colour::BLUE, [](robot::Robot &robot) {
         return static_cast<float>(robot.drivetrain.leftBackMotor.getVelocity());
-      }), screen::DataSet("RB", screen::colour::PINK, [](robot::Robot &robot) {
+      }), screen::DataSet("RB", screen::colour::YELLOW, [](robot::Robot &robot) {
         return static_cast<float>(robot.drivetrain.rightBackMotor.getVelocity());
+      })}));
+  screen::addScreen(new screen::Chart<2, 100>(robot, "Drivetrain PID Error", new screen::DataSet[2]{
+      screen::DataSet("Left", screen::colour::LIGHT_BLUE, [](robot::Robot &robot) {
+        return static_cast<float>(robot.drivetrain.leftPID.getError());
+      }), screen::DataSet("Right", screen::colour::PINK, [](robot::Robot &robot) {
+        return static_cast<float>(robot.drivetrain.rightPID.getError());
       })}));
 #endif
   section_swap("Initialize Screen");

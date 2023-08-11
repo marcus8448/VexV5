@@ -39,6 +39,8 @@ template<size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
   lv_draw_line_dsc_init(&lineDesc);
   lv_draw_label_dsc_t textDesc;
   lv_draw_label_dsc_init(&textDesc);
+  lineDesc.color = textDesc.color = colour::WHITE;
+
   float max = -INFINITY;
   float min = INFINITY;
   for (size_t i = 0; i < Sets; ++i) {
@@ -56,7 +58,10 @@ template<size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
   double heightScale = (SCREEN_HEIGHT - 17 - 41) / (max - min);
   double widthScale = SCREEN_WIDTH / static_cast<double>(Points);
 
-  textDesc.color = colour::WHITE;
+  lv_coord_t zero = SCREEN_HEIGHT - (0 - min) * heightScale - 41;
+  lv_point_t pts[2] {{0, zero}, {SCREEN_WIDTH, zero}};
+  lv_canvas_draw_line(this->drivetrainCanvas, pts, 2, &lineDesc);
+
   std::string str = logger::string_format("%f", max);
   lv_canvas_draw_text(this->drivetrainCanvas, 0, 0, 100, &textDesc, str.c_str());
   str = logger::string_format("%f", min);
@@ -79,7 +84,7 @@ template<size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
     textDesc.color = lineDesc.color = set.color;
     lv_canvas_draw_line(this->drivetrainCanvas, points, Points, &lineDesc);
 
-    std::string str = logger::string_format("%s: %f", set.label, value);
+    str = logger::string_format("%s: %f", set.label, value);
     lv_canvas_draw_text(this->drivetrainCanvas, 40 + i * ((SCREEN_WIDTH - (40 * 2)) / Sets), SCREEN_HEIGHT - 16, (SCREEN_WIDTH - (40 * 2)) / Sets, &textDesc, str.c_str());
   }
   lv_obj_invalidate(this->drivetrainCanvas);
@@ -98,4 +103,5 @@ template<size_t Sets, size_t Points> void Chart<Sets, Points>::cleanup() {
 }
 
 template class Chart<4, 100>;
+template class Chart<2, 100>;
 } // namespace screen

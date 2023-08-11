@@ -30,6 +30,8 @@ public:
 
   void resetState();
 
+  [[nodiscard]] double getError() const;
+
   double update(double target, double value);
 };
 

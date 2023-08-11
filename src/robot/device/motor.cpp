@@ -187,4 +187,8 @@ double PID::update(double target, double value) {
   }
   return clampMv(this->error * this->kp + this->integral * this->ki + (this->error - this->prevError) * this->kd);
 }
+
+double PID::getError() const {
+  return error;
+}
 } // namespace robot::device
