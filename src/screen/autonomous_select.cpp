@@ -5,11 +5,14 @@
 #include "screen/screen.hpp"
 
 namespace screen {
-AutonomousSelect *autonomous_select_instance = nullptr;
+struct StateHolder {
+  AutonomousSelect *instance;
+  lv_obj_t *btn;
+};
 
-void click(lv_event_t *event);
+static void click(lv_event_t *event);
 
-AutonomousSelect::AutonomousSelect(robot::Robot &robot) : robot(robot) { autonomous_select_instance = this; }
+AutonomousSelect::AutonomousSelect(robot::Robot &robot) : robot(robot) {}
 
 void AutonomousSelect::initialize(lv_obj_t *screen) {
   this->list = lv_list_create(screen);
@@ -18,10 +21,13 @@ void AutonomousSelect::initialize(lv_obj_t *screen) {
 
   auto programs = control::autonomous::getPrograms();
   for (auto const &[name, program] : programs) {
+    if (name.starts_with('!'))
+      continue;
+
     lv_obj_t *btn = lv_list_add_btn(this->list, nullptr, name.c_str());
-    lv_obj_add_event_cb(btn, ::screen::click, LV_EVENT_CLICKED, btn);
+    lv_obj_add_event_cb(btn, ::screen::click, LV_EVENT_CLICKED, new StateHolder{this, btn});
     lv_obj_set_style_text_color(btn, colour::GREEN, LV_STATE_CHECKED);
-    if (name == *control::autonomous::getActive()) {
+    if (name == this->robot.autonomous) {
       this->selected = btn;
       lv_obj_add_state(btn, LV_STATE_CHECKED);
     } else {
@@ -38,13 +44,13 @@ void AutonomousSelect::click(lv_obj_t *btn) {
   }
   this->selected = btn;
 
-  auto name = new std::string(lv_list_get_btn_text(this->list, btn));
+  auto name = std::string(lv_list_get_btn_text(this->list, btn));
 
   if (this->robot.controller != nullptr) {
-    this->robot.controller->setLine(0, 0, name->c_str());
+    this->robot.controller->setLine(0, 0, name.c_str());
   }
 
-  control::autonomous::set_active(name);
+  this->robot.autonomous = name;
   lv_obj_add_state(this->selected, LV_STATE_CHECKED);
 }
 
@@ -56,9 +62,8 @@ void AutonomousSelect::cleanup() {
   this->selected = nullptr;
 }
 
-void click(lv_event_t *event) {
-  auto btn = static_cast<lv_obj_t *>(event->user_data);
-  autonomous_select_instance->click(btn);
+static void click(lv_event_t *event) {
+  auto state = static_cast<StateHolder *>(event->user_data);
+  state->instance->click(state->btn);
 }
-
 } // namespace screen

@@ -22,13 +22,11 @@ void initialize() {
   static bool init = false;
   if (!init) {
     init = true;
-    createTask("Device reconfigure task", reconfigureTask, nullptr, TASK_PRIORITY_DEFAULT - 1, 0x1000);
+    rtos::createTask("Device reconfigure task", reconfigureTask, nullptr, TASK_PRIORITY_DEFAULT - 1, 0x1000);
   }
 }
 
-std::map<Device *, bool> *get_devices() {
-  return &devices;
-}
+std::map<Device *, bool> *get_devices() { return &devices; }
 
 bool Device::checkConnect() {
   bool b = errno != ENODEV;

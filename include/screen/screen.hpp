@@ -6,7 +6,6 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-enum-enum-conversion"
 #pragma GCC diagnostic ignored "-Wdeprecated-anon-enum-enum-conversion"
 #include "liblvgl/lvgl.h"
-#include "liblvgl/lv_api_map.h"
 #pragma GCC diagnostic pop
 #include <string>
 

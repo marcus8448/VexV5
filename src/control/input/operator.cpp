@@ -1,6 +1,7 @@
 #include "control/input/operator.hpp"
 #include "debug/error.hpp"
 #include "debug/logger.hpp"
+#include "format.hpp"
 
 #define controller_digital(button)                                                                                     \
   print_error("controller", pros::c::controller_get_digital(this->controllerId, button))
@@ -185,8 +186,8 @@ void Operator::update() {
   if (this->ticks % 10 == 0 || !init) {
     init = true;
     this->setLine(0, 0,
-                  logger::string_format("Flywheel: %i  ", static_cast<int32_t>(this->speedSetting()))
-                      .c_str()); // append ' ' to clear out buffer
+                  fmt::static_format("Flywheel: %i  ",
+                                     static_cast<int32_t>(this->speedSetting()))); // append ' ' to clear out buffer
   }
 }
 } // namespace control::input

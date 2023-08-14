@@ -5,8 +5,6 @@
 #include "screen.hpp"
 
 namespace screen {
-void switch_drive_scheme([[maybe_unused]] lv_event_t *btn);
-
 class ConfigurationScreen : public Screen {
 private:
   lv_obj_t *driveSchemeBtn = nullptr;

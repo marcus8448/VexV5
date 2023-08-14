@@ -18,8 +18,6 @@ void initialize();
 void registerRun(const std::string &name, void (*function)(robot::Robot &));
 
 std::map<const std::string, void (*)(robot::Robot &)> &getPrograms();
-const std::string *getActive();
-void set_active(const std::string *program);
 
 /**
  * Returns the selected autonomous run.

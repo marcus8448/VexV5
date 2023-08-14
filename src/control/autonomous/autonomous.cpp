@@ -2,26 +2,17 @@
 #include "debug/logger.hpp"
 
 namespace control::autonomous {
-static std::map<const std::string, void (*)(robot::Robot &)> *programs =
-    new std::map<const std::string, void (*)(robot::Robot &)>();
-static const std::string *activeProgram = nullptr;
+static std::map<const std::string, void (*)(robot::Robot &)> programs =
+    std::map<const std::string, void (*)(robot::Robot &)>();
 
 void initialize() {
-  auto *none = new std::string("None");
-  registerRun(*none, [](Robot &robot) -> void {});
-  activeProgram = none;
+  registerRun(std::string("None"), [](Robot &robot) -> void {});
 }
 
 void registerRun(const std::string &name, void (*function)(robot::Robot &)) {
   info("Registering autonomous '%s'.", name.c_str());
-  (*programs)[name] = function;
+  programs[name] = function;
 }
 
-std::map<const std::string, void (*)(robot::Robot &)> &getPrograms() { return *programs; }
-
-const std::string *getActive() { return activeProgram; }
-
-void set_active(const std::string *program) { activeProgram = program; }
-
-void run(Robot &robot) { (*programs)[*activeProgram](robot); }
+std::map<const std::string, void (*)(robot::Robot &)> &getPrograms() { return programs; }
 } // namespace control::autonomous

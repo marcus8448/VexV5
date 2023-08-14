@@ -1,8 +1,8 @@
 #include "robot/drivetrain.hpp"
 #include "debug/logger.hpp"
+#include "pros/rtos.h"
 #include "robot/device/motor.hpp"
 #include "units.hpp"
-#include "pros/rtos.h"
 #include <algorithm>
 
 #define JOYSTICK_MAX 127.0
@@ -17,7 +17,7 @@ Drivetrain::Drivetrain(uint8_t leftFront, uint8_t rightFront, uint8_t leftBack, 
       leftBackMotor(device::Motor(leftBack, "Drive LB", false, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       rightBackMotor(device::Motor(rightBack, "Drive RB", true, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       imu(device::Inertial(inertial, "IDrive")), rightPID(21.5, 6.0, 16.0, 100.0, 5.0),
-      leftPID(21.5, 6.0, 16.0, 100.0, 5.0), headingPID(125.0, 20.0, 90.0, 10.0, 0.2) {}
+      leftPID(0.0, 0.0, 0.0, 0.0, 0.0), headingPID(125.0, 20.0, 90.0, 10.0, 0.2) {}
 
 bool Drivetrain::isAtTarget() const { return this->timeAtTarget > STABILIZE_TICKS; }
 
@@ -160,6 +160,11 @@ void Drivetrain::updateState() {
   }
   case DIRECT_MOVE: {
     double head = this->headingPID.update(this->targetHeading, this->heading);
+    this->leftPID.kp = this->rightPID.kp;
+    this->leftPID.ki = this->rightPID.ki;
+    this->leftPID.kd = this->rightPID.kd;
+    this->leftPID.integralRange = this->rightPID.integralRange;
+    this->leftPID.acceptableError = this->rightPID.acceptableError;
     double right = this->rightPID.update(this->targetRight, this->rightPos);
     double left = this->leftPID.update(this->targetLeft, this->leftPos);
 

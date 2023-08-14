@@ -4,11 +4,13 @@
 
 #include <cstring>
 #include <iostream>
+#include <unordered_map>
 #include <vector>
 
 namespace logger {
-static std::vector<std::pair<const char *, uint32_t>> *sections =
-    new std::vector<std::pair<const char *, uint32_t>>(); // stores the name and timestamp of sections.
+static std::unordered_map<pros::task_t, std::vector<std::pair<const char *, uint32_t>>> sections =
+    std::unordered_map<pros::task_t,
+                       std::vector<std::pair<const char *, uint32_t>>>(); // stores the name and timestamp of sections.
 static const char *main_task_name = nullptr;
 
 #ifdef FILE_LOG
@@ -36,7 +38,7 @@ void _warn(const char *string) {
     log_file->flush();
   }
 #endif
-std::cout.flush();
+  std::cout.flush();
 }
 
 void _warn(const std::string &string) { _warn(string.c_str()); }
@@ -69,26 +71,22 @@ void _debug(const char *string) {
 void _debug(const std::string &string) { _debug(string.c_str()); }
 
 void _push(const char *string) {
-  if (main_task_name != pros::c::task_get_name(pros::c::task_get_current())) {
-    _error("Called section add on non-main task!");
-    return;
-  }
-  sections->emplace_back(std::pair(string, pros::c::millis()));
+  sections[pros::c::task_get_current()].emplace_back(std::pair(string, pros::c::millis()));
   debug("== BEGIN %s ==", string);
 }
 
 void _pop() {
-  if (main_task_name != pros::c::task_get_name(pros::c::task_get_current())) {
-    _error("Called section pop on non-main task!");
-    return;
-  }
+  auto stack = sections[pros::c::task_get_current()];
   uint32_t millis = pros::c::millis();
-  if (sections->empty()) {
+  if (stack.empty()) {
     _error("Section stack underflow!");
   } else {
-    std::pair<const char *, uint32_t> &back = sections->back();
+    std::pair<const char *, uint32_t> &back = stack.back();
     debug("== END %s [%ims] ==", back.first, millis - back.second);
-    sections->pop_back();
+    stack.pop_back();
+    if (stack.empty()) {
+      sections.erase(pros::c::task_get_current());
+    }
   }
 }
 
@@ -109,11 +107,6 @@ void flush() {
 
 void initialize(const char *name) {
   main_task_name = name;
-  if (!sections->empty()) {
-    warn("Debug sections not properly cleared!");
-  }
-  sections->clear();
-
   info("Root task '%s' started.", main_task_name);
 
 #ifdef FILE_LOG

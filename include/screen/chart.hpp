@@ -6,17 +6,17 @@
 #include "structure/fixed_queue.hpp"
 
 namespace screen {
-class DataSet  {
+class DataSet {
 public:
-  const char* label;
+  const char *label;
   const lv_color_t color;
   float (*function)(robot::Robot &);
 
 public:
-  explicit DataSet(const char* label, lv_color_t color, float (*function)(robot::Robot &));
+  explicit DataSet(const char *label, lv_color_t color, float (*function)(robot::Robot &));
 };
 
-template<size_t Sets, size_t Points> class Chart : public Screen {
+template <size_t Sets, size_t Points> class Chart : public Screen {
 private:
   robot::Robot &robot;
   const char *title;
@@ -29,7 +29,7 @@ private:
   lv_obj_t *titleLabel = nullptr;
 
 public:
-  explicit Chart(robot::Robot &robot, const char* title, DataSet dataSets[Sets]);
+  explicit Chart(robot::Robot &robot, const char *title, DataSet dataSets[Sets]);
 
   void initialize(lv_obj_t *screen) override;
   void update() override;

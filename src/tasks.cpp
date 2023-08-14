@@ -3,17 +3,21 @@
 #include "pros/rtos.h"
 #include <vector>
 
+namespace rtos {
 static pros::task_t rootTask = nullptr;
-static std::vector<pros::task_t> *parallelRootTasks = new std::vector<pros::task_t>();
+static std::vector<pros::task_t> parallelRootTasks = std::vector<pros::task_t>();
 
-void createChildTask(const char *name, void (*function)(void *), void *param, int priority, int stackDepth) {
+pros::task_t createChildTask(const char *name, void (*function)(void *), void *param, int priority, int stackDepth) {
   pros::task_t task = pros::c::task_create(function, param, priority, stackDepth, name);
-  parallelRootTasks->emplace_back(task);
+  parallelRootTasks.emplace_back(task);
+  return task;
 }
 
-void createTask(const char *name, void (*function)(void *), void *param, int priority, int stackDepth) {
-  pros::c::task_create(function, param, priority, stackDepth, name);
+pros::task_t createTask(const char *name, void (*function)(void *), void *param, int priority, int stackDepth) {
+  return pros::c::task_create(function, param, priority, stackDepth, name);
 }
+
+void killTask(pros::task_t task) { pros::c::task_delete(task); }
 
 void onRootTaskStart() {
   if (rootTask != nullptr) {
@@ -30,9 +34,10 @@ void onRootTaskEnd() {
     logger::flush();
   }
 
-  for (pros::task_t task : *parallelRootTasks) {
+  for (pros::task_t task : parallelRootTasks) {
     pros::c::task_delete(task);
   }
-  parallelRootTasks->clear();
+  parallelRootTasks.clear();
   rootTask = nullptr;
 }
+} // namespace rtos

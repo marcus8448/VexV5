@@ -9,6 +9,7 @@
 #define error(fmt, ...) logger::_error(fmt, ##__VA_ARGS__)
 
 #ifdef DEBUG_LOG
+#include "format.hpp"
 #include "pros/rtos.h"
 #define debug(fmt, ...) logger::_debug(fmt, ##__VA_ARGS__)
 #define scopePush(name) logger::_push(name)
@@ -20,9 +21,9 @@
 #else
 #define debug(fmt, ...)                                                                                                \
   {}
-#define scopePush(name)                                                                                             \
+#define scopePush(name)                                                                                                \
   {}
-#define scopePop()                                                                                                  \
+#define scopePop()                                                                                                     \
   {}
 #define section_swap(name)                                                                                             \
   {}
@@ -33,23 +34,6 @@
 #endif
 
 namespace logger {
-/**
- * Formats a string, similar to printf, but without printing it.
- * @tparam Args The type of arguments to use.
- * @param format The format string.
- * @param args The type arguments to insert into the format string.
- * @return The formatted string.
- */
-template <typename... Args> std::string string_format(const char *format, Args... args) {
-  uint32_t size_s = std::snprintf(nullptr, 0, format, args...) + 1; // Extra space for '\0'
-  if (size_s <= 0) {
-    return "INVALID STRING";
-  }
-  auto size = static_cast<size_t>(size_s);
-  std::unique_ptr<char[]> buf(new char[size]);
-  std::snprintf(buf.get(), size, format, args...);
-  return {buf.get(), buf.get() + size - 1}; // We don't want the '\0' inside
-}
 
 /**
  * Prints out a message via standard output.
@@ -71,7 +55,7 @@ void _info(const std::string &string);
  * @param string The string to print out.
  * @see string_format
  */
-template <typename... Args> void _info(const char *format, Args... args) { _info(string_format(format, args...)); }
+template <typename... Args> void _info(const char *format, Args... args) { _info(fmt::string_format(format, args...)); }
 
 /**
  * Prints out a message via standard output.
@@ -93,7 +77,7 @@ void _warn(const std::string &string);
  * @param string The string to print out.
  * @see string_format
  */
-template <typename... Args> void _warn(const char *format, Args... args) { _warn(string_format(format, args...)); }
+template <typename... Args> void _warn(const char *format, Args... args) { _warn(fmt::string_format(format, args...)); }
 
 /**
  * Prints out a message via standard output.
@@ -115,7 +99,9 @@ void _error(const std::string &string);
  * @param string The string to print out.
  * @see string_format
  */
-template <typename... Args> void _error(const char *format, Args... args) { _error(string_format(format, args...)); }
+template <typename... Args> void _error(const char *format, Args... args) {
+  _error(fmt::string_format(format, args...));
+}
 
 #ifdef DEBUG_LOG
 /**
@@ -138,7 +124,9 @@ void _debug(const std::string &string);
  * @param string The string to print out.
  * @see string_format
  */
-template <typename... Args> void _debug(const char *format, Args... args) { _debug(string_format(format, args...)); }
+template <typename... Args> void _debug(const char *format, Args... args) {
+  _debug(fmt::string_format(format, args...));
+}
 
 /**
  * Pushes a logging section onto the stack.

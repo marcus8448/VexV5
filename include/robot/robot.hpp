@@ -5,6 +5,7 @@
 #include "control/input/controller.hpp"
 #include "drivetrain.hpp"
 #include "intake.hpp"
+#include <string>
 
 namespace robot {
 /**
@@ -28,6 +29,8 @@ public:
    * The robot's controller. Used during operator control.
    */
   control::input::Controller *controller;
+
+  std::string autonomous = "None";
 
 public:
   /**

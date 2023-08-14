@@ -1,6 +1,7 @@
 #include "control/input/autonomous_outline.hpp"
 #include "debug/error.hpp"
 #include "debug/logger.hpp"
+#include "format.hpp"
 #include "units.hpp"
 
 #define controller_digital(button) print_error("autoC", pros::c::controller_get_digital(this->controller_id, button))
@@ -297,8 +298,8 @@ void AutonomousOutlineController::update() {
   if (this->ticks % 10 == 0 || !init) {
     init = true;
     this->setLine(0, 0,
-                  logger::string_format("Flywheel: %i  ", static_cast<int32_t>(this->speedSetting()))
-                      .c_str()); // append ' ' to clear out buffer
+                  fmt::static_format("Flywheel: %i  ",
+                                     static_cast<int32_t>(this->speedSetting()))); // append ' ' to clear out buffer
   }
 }
 

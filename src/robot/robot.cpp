@@ -1,8 +1,8 @@
 #include "robot/robot.hpp"
 #include "control/autonomous/autonomous.hpp"
 #include "debug/logger.hpp"
-#include "tasks.hpp"
 #include "pros/rtos.h"
+#include "tasks.hpp"
 
 #ifdef ENABLE_TEMPORARY_CODE
 #include "../temporary.cpp"
@@ -52,24 +52,31 @@ void Robot::updateDevices() {
     pros::c::delay(ROBOT_TICK_RATE);
   }
 }
-
+#ifdef ENABLE_TEMPORARY_CODE
 void Robot::runAutonomous() {
+  warn("overriding autonomous");
   this->drivetrain.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
   this->drivetrain.tare();
 
-  createChildTask("Robot async control", autonomousBackground, this);
-
-#ifdef ENABLE_TEMPORARY_CODE
+  pros::task_t task = rtos::createChildTask("Robot async control", autonomousBackground, this);
   temporary::run(*this);
-  return;
+  rtos::killTask(task);
+}
 #endif
 
-  if (control::autonomous::getActive() == nullptr) {
+void Robot::runAutonomous() {
+  if (control::autonomous::getPrograms().contains(this->autonomous)) {
+    this->drivetrain.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
+    this->drivetrain.tare();
+
+    pros::task_t task = rtos::createChildTask("Robot async control", autonomousBackground, this);
+
+    info("Running autonomous: '%s'", this->autonomous.c_str());
+    control::autonomous::getPrograms()[this->autonomous](*this);
+    rtos::killTask(task);
+  } else {
     error("No autonomous to run!");
-    return;
   }
-  info("Running autonomous: '%s'", control::autonomous::getActive()->c_str());
-  control::autonomous::run(*this);
 }
 
 void Robot::setController(control::input::Controller *controller) {

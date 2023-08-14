@@ -1,5 +1,5 @@
-#ifndef CONTROL_INPUT_AUTONOMOUS_RECORDING_HPP
-#define CONTROL_INPUT_AUTONOMOUS_RECORDING_HPP
+#ifndef CONTROL_INPUT_AUTONOMOUS_OUTLINE_HPP
+#define CONTROL_INPUT_AUTONOMOUS_OUTLINE_HPP
 
 #include "controller.hpp"
 #include "filesystem.hpp"
@@ -81,4 +81,4 @@ private:
   bool write_drivetrain_update();
 };
 } // namespace control::input
-#endif // CONTROL_INPUT_AUTONOMOUS_RECORDING_HPP
+#endif // CONTROL_INPUT_AUTONOMOUS_OUTLINE_HPP

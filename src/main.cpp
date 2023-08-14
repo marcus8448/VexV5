@@ -10,11 +10,6 @@
 #include "control/autonomous/skills.hpp"
 #include "control/autonomous/winpoint.hpp"
 #endif
-#ifndef DISABLE_SERIAL
-#include "serial/robot_command.hpp"
-#include "serial/robot_state.hpp"
-#include "serial/serial.hpp"
-#endif
 
 #ifndef DISABLE_SCREEN
 #include "screen/screen.hpp"
@@ -29,6 +24,7 @@
 #include "screen/colour.hpp"
 #endif
 #include "screen/information.hpp"
+#include "screen/pid_tuning.hpp"
 #endif
 
 // CONFIG
@@ -51,18 +47,12 @@ robot::Robot &getRobot();
  * Called when the robot is first initialized.
  */
 void initialize() {
-//  pros::c::serctl(SERCTL_DISABLE_COBS, nullptr);
-  onRootTaskStart();
+  //  pros::c::serctl(SERCTL_DISABLE_COBS, nullptr);
+  rtos::onRootTaskStart();
   scopePush("Initialize");
   scopePush("Initialize robot");
   Robot &robot = getRobot();
   scopePop();
-#ifndef DISABLE_SERIAL
-  logger::warn("Initializing serial connection...");
-  serial::add_plugin(7, new serial::RobotStatePlugin(robot));
-  serial::add_plugin(8, new serial::RobotCommandsPlugin(robot));
-  serial::initialize();
-#endif // DISABLE_SERIAL
   // Optionally disable autonomous for builds
 #ifndef DISABLE_AUTONOMOUS
   // Register the different types of autonomous-es
@@ -71,6 +61,11 @@ void initialize() {
   control::autonomous::registerRun("Right Score", control::autonomous::rightScore);
   control::autonomous::registerRun("Left Score", control::autonomous::leftScore);
   control::autonomous::registerRun("Skills", control::autonomous::skills);
+  control::autonomous::registerRun("!PidTuning", [](robot::Robot &robot) {
+    robot.drivetrain.tare();
+    robot.drivetrain.imu.tare();
+    robot.drivetrain.forwards(24.0, true);
+  });
   control::autonomous::initialize();
 #endif
   // Optionally enable extra screen functionality
@@ -85,22 +80,33 @@ void initialize() {
 #endif
   screen::addScreen(new screen::Information(robot));
 #ifndef DISABLE_DRIVETRAIN_DEBUG_SCREEN
-  screen::addScreen(new screen::Chart<4, 100>(robot, "Drivetrain Velocity", new screen::DataSet[4]{
-      screen::DataSet("LF", screen::colour::RED, [](robot::Robot &robot) {
-        return static_cast<float>(robot.drivetrain.leftFrontMotor.getVelocity());
-      }), screen::DataSet("RF", screen::colour::GREEN, [](robot::Robot &robot) {
-        return static_cast<float>(robot.drivetrain.rightFrontMotor.getVelocity());
-      }), screen::DataSet("LB", screen::colour::BLUE, [](robot::Robot &robot) {
-        return static_cast<float>(robot.drivetrain.leftBackMotor.getVelocity());
-      }), screen::DataSet("RB", screen::colour::YELLOW, [](robot::Robot &robot) {
-        return static_cast<float>(robot.drivetrain.rightBackMotor.getVelocity());
-      })}));
-  screen::addScreen(new screen::Chart<2, 100>(robot, "Drivetrain PID Error", new screen::DataSet[2]{
-      screen::DataSet("Left", screen::colour::LIGHT_BLUE, [](robot::Robot &robot) {
-        return static_cast<float>(robot.drivetrain.leftPID.getError());
-      }), screen::DataSet("Right", screen::colour::PINK, [](robot::Robot &robot) {
-        return static_cast<float>(robot.drivetrain.rightPID.getError());
-      })}));
+  screen::addScreen(new screen::Chart<4, 100>(
+      robot, "Drivetrain Velocity",
+      new screen::DataSet[4]{screen::DataSet("LF", screen::colour::RED,
+                                             [](robot::Robot &robot) {
+                                               return static_cast<float>(robot.drivetrain.leftFrontMotor.getVelocity());
+                                             }),
+                             screen::DataSet("RF", screen::colour::GREEN,
+                                             [](robot::Robot &robot) {
+                                               return static_cast<float>(
+                                                   robot.drivetrain.rightFrontMotor.getVelocity());
+                                             }),
+                             screen::DataSet("LB", screen::colour::BLUE,
+                                             [](robot::Robot &robot) {
+                                               return static_cast<float>(robot.drivetrain.leftBackMotor.getVelocity());
+                                             }),
+                             screen::DataSet("RB", screen::colour::YELLOW, [](robot::Robot &robot) {
+                               return static_cast<float>(robot.drivetrain.rightBackMotor.getVelocity());
+                             })}));
+  screen::addScreen(new screen::Chart<2, 100>(
+      robot, "Drivetrain PID Error",
+      new screen::DataSet[2]{
+          screen::DataSet("Left", screen::colour::LIGHT_BLUE,
+                          [](robot::Robot &robot) { return static_cast<float>(robot.drivetrain.leftPID.getError()); }),
+          screen::DataSet("Right", screen::colour::PINK, [](robot::Robot &robot) {
+            return static_cast<float>(robot.drivetrain.rightPID.getError());
+          })}));
+  screen::addScreen(new screen::PidTuning(robot, robot.drivetrain.rightPID, std::string("!PidTuning")));
 #endif
   section_swap("Initialize Screen");
   screen::initialize(); // initialize the screen
@@ -108,14 +114,14 @@ void initialize() {
 #endif // DISABLE_SCREEN
   robot.drivetrain.imu.calibrate();
   scopePop();
-  onRootTaskEnd();
+  rtos::onRootTaskEnd();
 }
 
 /**
  * Called when the robot is in it's autonomous state in a competition.
  */
 void autonomous() {
-  onRootTaskStart();
+  rtos::onRootTaskStart();
 #ifndef DISABLE_AUTONOMOUS
   Robot &robot = getRobot();
   scopePush("Autonomous Setup");
@@ -126,7 +132,7 @@ void autonomous() {
 #else
   error("Autonomous is disabled");
 #endif
-  onRootTaskEnd();
+  rtos::onRootTaskEnd();
 }
 
 /**
@@ -139,7 +145,7 @@ void opcontrol() {
   autonomous();
 #endif
 
-  onRootTaskStart();
+  rtos::onRootTaskStart();
   Robot &robot = getRobot();
 
   scopePush("Opcontrol Setup");
@@ -147,23 +153,23 @@ void opcontrol() {
   scopePop();
 
   robot.opcontrol();
-  onRootTaskEnd();
+  rtos::onRootTaskEnd();
 }
 
 /**
  * Called when the robot is at an official competition.
  */
 void competition_initialize() {
-  onRootTaskStart();
-  onRootTaskEnd();
+  rtos::onRootTaskStart();
+  rtos::onRootTaskEnd();
 }
 
 /**
  * Called when the robot should be stopped during a competition
  */
 void disabled() {
-  onRootTaskStart();
-  onRootTaskEnd();
+  rtos::onRootTaskStart();
+  rtos::onRootTaskEnd();
 }
 
 /**

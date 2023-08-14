@@ -1,21 +1,14 @@
 #include "screen/information.hpp"
-#include "units.hpp"
 #include "debug/logger.hpp"
+#include "units.hpp"
 
 namespace screen {
-template <typename... Args> void set_label_text(lv_obj_t *label, const char *format, Args... args) {
-  static char *buffer = new char[64];
-  snprintf(buffer, 64, format, args...);
-  lv_label_set_text(label, buffer);
-}
-
 void update_connectivity(lv_obj_t *label, const char *name, bool connected);
 void update_device(lv_obj_t *label, const robot::device::Device &device, bool enabled);
 void update_device(lv_obj_t *label, const robot::device::Device &device, double value);
 void update_device(lv_obj_t *label, const robot::device::Device &device, int32_t value);
 
-Information::Information(robot::Robot &robot) : robot(robot) {
-}
+Information::Information(robot::Robot &robot) : robot(robot) {}
 
 void Information::initialize(lv_obj_t *screen) {
   for (size_t i = 0; i < INFO_COLUMNS; i++) {
@@ -43,13 +36,16 @@ void Information::update() {
   int i = 0;
   for (const auto &item : *robot::device::get_devices()) {
     update_connectivity(this->leftColumn[i++], item.first->getName(), item.second);
-    if (i == INFO_COLUMNS) break;
+    if (i == INFO_COLUMNS)
+      break;
   }
 
-  set_label_text(this->rightColumn[0], "Control Scheme: %s",
-                 robot::driveSchemeName(robot.drivetrain.controlScheme));
-  set_label_text(this->rightColumn[1], "X-position: %fin", units::encoderToInch(this->robot.drivetrain.posX));
-  set_label_text(this->rightColumn[2], "Y-position: %fin", units::encoderToInch(this->robot.drivetrain.posY));
+  lv_label_set_text(this->rightColumn[0],
+                    fmt::static_format("Control Scheme: %s", robot::driveSchemeName(robot.drivetrain.controlScheme)));
+  lv_label_set_text(this->rightColumn[1],
+                    fmt::static_format("X-position: %fin", units::encoderToInch(this->robot.drivetrain.posX)));
+  lv_label_set_text(this->rightColumn[2],
+                    fmt::static_format("Y-position: %fin", units::encoderToInch(this->robot.drivetrain.posY)));
 }
 
 void Information::cleanup() {
@@ -63,37 +59,37 @@ void Information::cleanup() {
 
 void update_device(lv_obj_t *label, const robot::device::Device &device, bool enabled) {
   if (!device.isConnected()) {
-    set_label_text(label, "%s: Disconnected", device.getName());
+    lv_label_set_text(label, fmt::static_format("%s: Disconnected", device.getName()));
   } else {
     if (enabled) {
-      set_label_text(label, "%s: Enabled", device.getName());
+      lv_label_set_text(label, fmt::static_format("%s: Enabled", device.getName()));
     } else {
-      set_label_text(label, "%s: Disabled", device.getName());
+      lv_label_set_text(label, fmt::static_format("%s: Disabled", device.getName()));
     }
   }
 }
 
 void update_connectivity(lv_obj_t *label, const char *name, bool connected) {
   if (connected) {
-    set_label_text(label, "%s: Connected", name);
+    lv_label_set_text(label, fmt::static_format("%s: Connected", name));
   } else {
-    set_label_text(label, "%s: Disconnected", name);
+    lv_label_set_text(label, fmt::static_format("%s: Disconnected", name));
   }
 }
 
 void update_device(lv_obj_t *label, const robot::device::Device &device, double value) {
   if (!device.isConnected()) {
-    set_label_text(label, "%s: Disconnected", device.getName());
+    lv_label_set_text(label, fmt::static_format("%s: Disconnected", device.getName()));
   } else {
-    set_label_text(label, "%s: %f", device.getName(), value);
+    lv_label_set_text(label, fmt::static_format("%s: %f", device.getName(), value));
   }
 }
 
 void update_device(lv_obj_t *label, const robot::device::Device &device, int32_t value) {
   if (!device.isConnected()) {
-    set_label_text(label, "%s: Disconnected", device.getName());
+    lv_label_set_text(label, fmt::static_format("%s: Disconnected", device.getName()));
   } else {
-    set_label_text(label, "%s: %i", device.getName(), value);
+    lv_label_set_text(label, fmt::static_format("%s: %i", device.getName(), value));
   }
 }
 

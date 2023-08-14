@@ -42,7 +42,6 @@ set(LibC ${FIRMWARE_DIR}/libc.a)
 set(LibM ${FIRMWARE_DIR}/libm.a)
 set(LibPROS ${FIRMWARE_DIR}/libpros.a)
 set(LibLVGL ${FIRMWARE_DIR}/liblvgl.a)
-set(LibBase85 ${FIRMWARE_DIR}/libbase85.a)
 
 message(STATUS "Using toolchain: ${CMAKE_TOOLCHAIN_FILE}")
 
@@ -61,14 +60,13 @@ find_library(LibC NAMES c REQUIRED)
 find_library(LibM NAMES m REQUIRED)
 find_library(LibPROS NAMES pros REQUIRED)
 find_library(LibLVGL NAMES lvgl REQUIRED)
-find_library(LibBase85 NAMES base85)
 
 file(TOUCH ${CMAKE_BINARY_DIR}/empty.cpp)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 11)
 set(WARNING_FLAGS "-Wall -Wno-psabi -Wno-shadow-field-in-constructor")
-set(COMPILE_FLAGS "-g -ffunction-sections -fdata-sections -fdiagnostics-color -funwind-tables -fno-exceptions -D_PROS_INCLUDE_LIBLVGL_LLEMU_HPP -D_PROS_INCLUDE_LIBLVGL_LLEMU_H")
+set(COMPILE_FLAGS "-g -ffunction-sections -fdata-sections -fdiagnostics-color -funwind-tables -fno-exceptions")
 add_compile_definitions(_POSIX_THREADS _UNIX98_THREAD_MUTEX_ATTRIBUTES _POSIX_TIMERS _POSIX_MONOTONIC_CLOCK)
 add_compile_definitions(CONFIG_LV_THEME_DEFAULT_DARK=1)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILE_FLAGS} ${WARNING_FLAGS}")
@@ -76,6 +74,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMPILE_FLAGS} ${WARNING_FLAGS}")
 
 set(ColdLibraries ${LibC} ${LibM} ${LibPROS} ${LibLVGL})
 set(HotLinked ${LibC},${LibM},${LibPROS},${LibLVGL})
+set(CoreLibraries ${LibPROS},${LibLVGL})
 
 set(SOURCE_FILES
         src/main.cpp
@@ -83,8 +82,6 @@ set(SOURCE_FILES
         src/filesystem.cpp
         src/control/input/autonomous_outline.cpp
         src/control/input/operator.cpp
-        src/control/input/raw_recording.cpp
-        src/control/input/raw_replay.cpp
         src/debug/error.cpp
         src/debug/logger.cpp
         src/robot/device/device.cpp
@@ -99,17 +96,16 @@ set(SOURCE_FILES
 )
 
 set(HEADER_FILES
+        include/filesystem.hpp
+        include/format.hpp
         include/main.hpp
         include/tasks.hpp
         include/units.hpp
         include/debug/error.hpp
         include/debug/logger.hpp
-        include/filesystem.hpp
         include/control/input/controller.hpp
         include/control/input/autonomous_outline.hpp
         include/control/input/operator.hpp
-        include/control/input/raw_recording.hpp
-        include/control/input/raw_replay.hpp
         include/robot/device/device.hpp
         include/robot/device/inertial.hpp
         include/robot/device/motor.hpp
@@ -123,35 +119,13 @@ set(HEADER_FILES
         include/structure/fixed_queue.hpp
 )
 
-if (NOT DISABLE_SERIAL)
-    if (LibBase85)
-        set(SOURCE_FILES ${SOURCE_FILES}
-                src/serial/robot_command.cpp
-                src/serial/robot_state.cpp
-                src/serial/serial.cpp
-                src/serial/serial_connection.cpp
-        )
-
-        set(HEADER_FILES ${HEADER_FILES}
-                include/serial/robot_command.hpp
-                include/serial/robot_state.hpp
-                include/serial/serial.hpp
-                include/serial/serial_connection.hpp
-        )
-
-        set(ColdLibraries ${ColdLibraries} ${LibBase85})
-        set(HotLinked ${HotLinked},${LibBase85})
-    else()
-        message(WARNING "LibBase85 not found! Serial not enabled.")
-    endif()
-endif()
-
 if (NOT DISABLE_SCREEN)
     set(SOURCE_FILES ${SOURCE_FILES}
             src/screen/autonomous_select.cpp
             src/screen/chart.cpp
             src/screen/config_screen.cpp
             src/screen/information.cpp
+            src/screen/pid_tuning.cpp
             src/screen/screen.cpp
     )
 
@@ -161,6 +135,7 @@ if (NOT DISABLE_SCREEN)
             include/screen/colour.hpp
             include/screen/config_screen.hpp
             include/screen/information.hpp
+            include/screen/pid_tuning.hpp
             include/screen/screen.hpp
     )
 endif()
@@ -210,7 +185,7 @@ set_property(TARGET HotPackage PROPERTY LINK_DEPENDS ${FIRMWARE_DIR}/v5-common.l
 set_property(TARGET ColdPackage PROPERTY LINK_DEPENDS ${FIRMWARE_DIR}/v5-common.ld ${FIRMWARE_DIR}/v5.ld)
 set(TARGET_FILE)
 target_link_options(HotPackage PRIVATE -Wl,-R,$<TARGET_FILE:ColdPackage> -nostartfiles -Wl,-T${FIRMWARE_DIR}/v5-hot.ld,--gc-sections,--start-group,${HotLinked},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld)
-target_link_options(ColdPackage PRIVATE -Wl,--gc-keep-exported,--whole-archive,${LibPROS},${LibLVGL},-lstdc++,--no-whole-archive -Wl,-T${FIRMWARE_DIR}/v5.ld,--gc-sections,--start-group,${HotLinked},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld)
+target_link_options(ColdPackage PRIVATE -Wl,--gc-keep-exported,--whole-archive,${CoreLibraries},-lstdc++,--no-whole-archive -Wl,-T${FIRMWARE_DIR}/v5.ld,--gc-sections,--start-group,${HotLinked},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld)
 
 # Strip packages after build
 add_custom_command(TARGET ColdPackage POST_BUILD COMMAND ${CMAKE_OBJCOPY} --strip-symbol=install_hot_table --strip-symbol=__libc_init_array $<TARGET_FILE:ColdPackage>)

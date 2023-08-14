@@ -1,0 +1,32 @@
+#ifndef FORMAT_HPP
+#define FORMAT_HPP
+#include <memory>
+#include <string>
+
+namespace fmt {
+template <typename... Args> const char *static_format(const char *format, Args... args) {
+  static char *format_buffer = new char[128];
+  snprintf(format_buffer, 128, format, args...);
+  return format_buffer;
+}
+
+/**
+ * Formats a string, similar to printf, but without printing it.
+ * @tparam Args The type of arguments to use.
+ * @param format The format string.
+ * @param args The type arguments to insert into the format string.
+ * @return The formatted string.
+ */
+template <typename... Args> std::string string_format(const char *format, Args... args) {
+  uint32_t size_s = snprintf(nullptr, 0, format, args...) + 1; // Extra space for '\0'
+  if (size_s <= 0) {
+    return "INVALID STRING";
+  }
+  auto size = static_cast<unsigned int>(size_s);
+  std::unique_ptr<char[]> buf(new char[size]);
+  snprintf(buf.get(), size, format, args...);
+  return {buf.get(), buf.get() + size - 1}; // We don't want the '\0' inside
+}
+} // namespace fmt
+
+#endif // FORMAT_HPP
