@@ -28,10 +28,12 @@
 #endif
 
 // CONFIG
-#define DRIVETRAIN_LEFT_FRONT_MOTOR 9
-#define DRIVETRAIN_RIGHT_FRONT_MOTOR 2
-#define DRIVETRAIN_LEFT_BACK_MOTOR 10
-#define DRIVETRAIN_RIGHT_BACK_MOTOR 1
+#define DRIVETRAIN_MOTOR_L1 2
+#define DRIVETRAIN_MOTOR_L2 12
+#define DRIVETRAIN_MOTOR_L3 13
+#define DRIVETRAIN_MOTOR_R1 10
+#define DRIVETRAIN_MOTOR_R2 20
+#define DRIVETRAIN_MOTOR_R3 19
 #define INTAKE_RIGHT_MOTOR 12
 #define INTAKE_LEFT_MOTOR 11
 #define INERTIAL 7
@@ -63,8 +65,8 @@ void initialize() {
   control::autonomous::registerRun("Skills", control::autonomous::skills);
   control::autonomous::registerRun("!PidTuning", [](robot::Robot &robot) {
     robot.drivetrain.tare();
-    robot.drivetrain.imu.tare();
     robot.drivetrain.forwards(24.0, true);
+    robot.drivetrain.backwards(24.0, true);
   });
   control::autonomous::initialize();
 #endif
@@ -80,32 +82,32 @@ void initialize() {
 #endif
   screen::addScreen(new screen::Information(robot));
 #ifndef DISABLE_DRIVETRAIN_DEBUG_SCREEN
-  screen::addScreen(new screen::Chart<4, 100>(
-      robot, "Drivetrain Velocity",
-      new screen::DataSet[4]{screen::DataSet("LF", screen::colour::RED,
-                                             [](robot::Robot &robot) {
-                                               return static_cast<float>(robot.drivetrain.leftFrontMotor.getVelocity());
-                                             }),
-                             screen::DataSet("RF", screen::colour::GREEN,
-                                             [](robot::Robot &robot) {
-                                               return static_cast<float>(
-                                                   robot.drivetrain.rightFrontMotor.getVelocity());
-                                             }),
-                             screen::DataSet("LB", screen::colour::BLUE,
-                                             [](robot::Robot &robot) {
-                                               return static_cast<float>(robot.drivetrain.leftBackMotor.getVelocity());
-                                             }),
-                             screen::DataSet("RB", screen::colour::YELLOW, [](robot::Robot &robot) {
-                               return static_cast<float>(robot.drivetrain.rightBackMotor.getVelocity());
-                             })}));
-  screen::addScreen(new screen::Chart<2, 100>(
-      robot, "Drivetrain PID Error",
-      new screen::DataSet[2]{
-          screen::DataSet("Left", screen::colour::LIGHT_BLUE,
-                          [](robot::Robot &robot) { return static_cast<float>(robot.drivetrain.leftPID.getError()); }),
-          screen::DataSet("Right", screen::colour::PINK, [](robot::Robot &robot) {
-            return static_cast<float>(robot.drivetrain.rightPID.getError());
-          })}));
+//  screen::addScreen(new screen::Chart<4, 100>(
+//      robot, "Drivetrain Velocity",
+//      new screen::DataSet[4]{screen::DataSet("LF", screen::colour::RED,
+//                                             [](robot::Robot &robot) {
+//                                               return static_cast<float>(robot.drivetrain.leftFrontMotor.getVelocity());
+//                                             }),
+//                             screen::DataSet("RF", screen::colour::GREEN,
+//                                             [](robot::Robot &robot) {
+//                                               return static_cast<float>(
+//                                                   robot.drivetrain.rightFrontMotor.getVelocity());
+//                                             }),
+//                             screen::DataSet("LB", screen::colour::BLUE,
+//                                             [](robot::Robot &robot) {
+//                                               return static_cast<float>(robot.drivetrain.leftBackMotor.getVelocity());
+//                                             }),
+//                             screen::DataSet("RB", screen::colour::YELLOW, [](robot::Robot &robot) {
+//                               return static_cast<float>(robot.drivetrain.rightBackMotor.getVelocity());
+//                             })}));
+//  screen::addScreen(new screen::Chart<2, 100>(
+//      robot, "Drivetrain PID Error",
+//      new screen::DataSet[2]{
+//          screen::DataSet("Left", screen::colour::LIGHT_BLUE,
+//                          [](robot::Robot &robot) { return static_cast<float>(robot.drivetrain.leftPID.getError()); }),
+//          screen::DataSet("Right", screen::colour::PINK, [](robot::Robot &robot) {
+//            return static_cast<float>(robot.drivetrain.rightPID.getError());
+//          })}));
   screen::addScreen(new screen::PidTuning(robot, robot.drivetrain.rightPID, std::string("!PidTuning")));
 #endif
   section_swap("Initialize Screen");
@@ -124,10 +126,6 @@ void autonomous() {
   rtos::onRootTaskStart();
 #ifndef DISABLE_AUTONOMOUS
   Robot &robot = getRobot();
-  scopePush("Autonomous Setup");
-  //  autonomous::set_active(new std::string("Right Winpoint"));
-  scopePop();
-
   robot.runAutonomous();
 #else
   error("Autonomous is disabled");
@@ -178,8 +176,8 @@ void disabled() {
  */
 Robot &getRobot() {
   static Robot robot =
-      Robot(DRIVETRAIN_LEFT_FRONT_MOTOR, DRIVETRAIN_RIGHT_FRONT_MOTOR, DRIVETRAIN_LEFT_BACK_MOTOR,
-            DRIVETRAIN_RIGHT_BACK_MOTOR, INTAKE_RIGHT_MOTOR, INTAKE_LEFT_MOTOR, INERTIAL, ARM_1, ARM_2);
+      Robot(DRIVETRAIN_MOTOR_L1, DRIVETRAIN_MOTOR_L2, DRIVETRAIN_MOTOR_L3, DRIVETRAIN_MOTOR_R1, DRIVETRAIN_MOTOR_R2, DRIVETRAIN_MOTOR_R3,
+            INTAKE_RIGHT_MOTOR, INTAKE_LEFT_MOTOR, INERTIAL, ARM_1, ARM_2);
   device::initialize();
   return robot;
 }

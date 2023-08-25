@@ -8,10 +8,8 @@
 namespace robot::device {
 Motor::Motor(uint8_t port, const char *name, bool reversed, pros::motor_gearset_e_t gearset,
              pros::motor_brake_mode_e_t brake_mode)
-    : Device("Motor", name, port), gearset(gearset), maxVelocity(gearsetMaxVelocity(gearset)), brakeMode(brake_mode),
-      reversed(reversed) {
+    : Device("Motor", name, reversed ? -port : port), gearset(gearset), maxVelocity(gearsetMaxVelocity(gearset)), brakeMode(brake_mode) {
   pros::c::motor_set_gearing(this->port, this->gearset);
-  pros::c::motor_set_reversed(this->port, this->reversed); // todo: manually reverse
   pros::c::motor_set_encoder_units(this->port, MOTOR_ENCODER_UNITS);
   pros::c::motor_set_brake_mode(this->port, this->brakeMode);
 }
@@ -106,11 +104,9 @@ void Motor::setBrakeMode(pros::motor_brake_mode_e brake_mode) {
 
 [[nodiscard]] pros::motor_gearset_e_t Motor::getGearset() const { return this->gearset; }
 
-[[nodiscard]] bool Motor::isReversed() const { return this->reversed; }
-
 [[nodiscard]] bool Motor::isConnected() const {
   errno = 0;
-  return pros::c::motor_get_voltage(this->port) != INT32_MAX && checkConnect();
+  return pros::c::motor_get_position(this->port) != PROS_ERR_F && checkConnect();
 }
 
 [[nodiscard]] double Motor::getTemperature() const { return pros::c::motor_get_temperature(this->port); }
@@ -131,10 +127,9 @@ void Motor::reconfigure() const {
   pros::c::motor_set_brake_mode(this->port, this->brakeMode);
   pros::c::motor_set_encoder_units(this->port, MOTOR_ENCODER_UNITS);
   pros::c::motor_set_gearing(this->port, this->gearset);
-  pros::c::motor_set_reversed(this->port, this->reversed);
 }
 
-void Motor::tare() { pros::c::motor_set_zero_position(this->port, pros::c::motor_get_position(this->port)); }
+void Motor::tare() { pros::c::motor_tare_position(this->port); }
 
 void Motor::brake() {
   if (this->targetPosition != INFINITY || this->targetType != VOLTAGE || this->target != 0) {
@@ -160,7 +155,8 @@ constexpr int16_t Motor::gearsetMaxVelocity(pros::motor_gearset_e_t gearset) {
   }
 }
 
-double clampMv(double value) {
+double clampMv(double value, double moveMin) {
+  if (std::abs(value) < moveMin) value = value < 0 ? -600 : 600;
   return value > MOTOR_MAX_MILLIVOLTS    ? MOTOR_MAX_MILLIVOLTS
          : value < -MOTOR_MAX_MILLIVOLTS ? -MOTOR_MAX_MILLIVOLTS
                                          : value;
@@ -175,17 +171,17 @@ void PID::resetState() {
 }
 
 double PID::update(double target, double value) {
-  info("err %f", target - value);
-  if (std::abs(target - value) < this->acceptableError)
+  this->error = target - value;
+  if (std::abs(this->error) < this->acceptableError || value == PROS_ERR_F)
     return 0.0;
 
   this->prevError = this->error;
-  this->error = target - value;
   this->integral += this->error;
   if (std::signbit(this->error) != std::signbit(this->prevError) || std::abs(this->error) > this->integralRange) {
     this->integral = 0;
   }
-  return clampMv(this->error * this->kp + this->integral * this->ki + (this->error - this->prevError) * this->kd);
+  info("%.2f %.2f/%.2f, %.1f %.1f %.1f * %.2f %.2f %.2f -> %.2f/%.2f/%.2f -> %.2f", this->error, value, target, this->kp, this->ki, this->kd, this->error, this->integral, this->error - this->prevError, this->error * this->kp, this->integral * this->ki, (this->error - this->prevError) * this->kd, clampMv(this->error * this->kp + this->integral * this->ki + (this->error - this->prevError) * this->kd, this->moveMin));
+  return clampMv(this->error * this->kp + this->integral * this->ki + (this->error - this->prevError) * this->kd, this->moveMin);
 }
 
 double PID::getError() const { return error; }

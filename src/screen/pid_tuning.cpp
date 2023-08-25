@@ -1,9 +1,11 @@
 #include "screen/pid_tuning.hpp"
 
+#include "main.hpp"
 #include "debug/logger.hpp"
 #include "format.hpp"
 #include "robot/robot.hpp"
 #include "screen/screen.hpp"
+#include "tasks.hpp"
 #include <utility>
 
 namespace screen {
@@ -94,6 +96,17 @@ void PidTuning::cleanup() {
   this->changeLabel = nullptr;
   this->overshootLabel = nullptr;
   this->oscillationsLabel = nullptr;
+
+  if (this->taskHandle != nullptr) {
+    this->testing = false;
+    pros::task_state_e_t state = pros::c::task_get_state(this->taskHandle);
+    if (state != pros::E_TASK_STATE_DELETED && state != pros::E_TASK_STATE_INVALID) {
+      rtos::killTask(this->taskHandle);
+    }
+    this->taskHandle = nullptr;
+
+    rtos::createTask("Opcontrol", [](void *param) { opcontrol(); }, nullptr);
+  }
 }
 
 ControlGroup::ControlGroup(lv_obj_t *screen, lv_coord_t x, lv_coord_t y, lv_coord_t width, lv_coord_t height,
@@ -150,16 +163,39 @@ static void decreaseValue(lv_event_t *event) {
 
 static void testRobot(lv_event_t *event) {
   auto inst = static_cast<PidTuning *>(event->user_data);
-  inst->overshoot = 0;
-  inst->oscillations = 0;
-  inst->prevError = INFINITY;
-  std::string autonomous = inst->robot.autonomous;
-  inst->robot.autonomous = inst->runName;
-  scopePush("PID test");
-  inst->testing = true;
-  inst->robot.runAutonomous(); // fixme hijack opcontrol
-  inst->testing = false;
-  scopePop();
-  inst->robot.autonomous = autonomous;
+  if (!inst->testing) {
+    info("starting test");
+    rtos::killRootTask();
+    info("starting test!");
+    inst->taskHandle = rtos::createTask(
+        "PID Tuning",
+        [](void *param) {
+          info("Task created");
+          auto inst = static_cast<PidTuning *>(param);
+          inst->overshoot = 0;
+          inst->oscillations = 0;
+          inst->prevError = INFINITY;
+          std::string prevAuton = inst->robot.autonomous;
+          inst->robot.autonomous = inst->runName;
+          scopePush("PID test");
+          inst->testing = true;
+          autonomous();
+          inst->testing = false;
+          scopePop();
+          inst->robot.autonomous = prevAuton;
+          inst->taskHandle = nullptr;
+        },
+        inst);
+  } else {
+    if (inst->taskHandle != nullptr) {
+      info("kill task");
+      pros::task_state_e_t state = pros::c::task_get_state(inst->taskHandle);
+      if (state != pros::E_TASK_STATE_DELETED && state != pros::E_TASK_STATE_INVALID) {
+        rtos::killTask(inst->taskHandle);
+      }
+      inst->taskHandle = nullptr;
+    }
+    inst->testing = false;
+  }
 }
 } // namespace screen

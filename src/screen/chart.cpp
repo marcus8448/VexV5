@@ -3,6 +3,7 @@
 #include "format.hpp"
 #include "screen/colour.hpp"
 #include "screen/screen.hpp"
+#include <cstring>
 
 namespace screen {
 
@@ -16,7 +17,7 @@ Chart<Sets, Points>::Chart(robot::Robot &robot, const char *title, DataSet dataS
 }
 
 template <size_t Sets, size_t Points> void Chart<Sets, Points>::initialize(lv_obj_t *screen) {
-  this->canvasBuffer = malloc(LV_CANVAS_BUF_SIZE_TRUE_COLOR(SCREEN_WIDTH, SCREEN_HEIGHT));
+  this->canvasBuffer = std::malloc(LV_CANVAS_BUF_SIZE_TRUE_COLOR(SCREEN_WIDTH, SCREEN_HEIGHT));
   this->drivetrainCanvas = lv_canvas_create(screen);
   lv_canvas_set_buffer(this->drivetrainCanvas, this->canvasBuffer, SCREEN_WIDTH, SCREEN_HEIGHT, LV_IMG_CF_TRUE_COLOR);
 
@@ -27,7 +28,7 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::initialize(lv_ob
 }
 
 template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
-  memset(canvasBuffer, 0x00000000, LV_CANVAS_BUF_SIZE_TRUE_COLOR(SCREEN_WIDTH, SCREEN_HEIGHT));
+  std::memset(this->canvasBuffer, 0x00000000, LV_CANVAS_BUF_SIZE_TRUE_COLOR(SCREEN_WIDTH, SCREEN_HEIGHT));
 
   lv_point_t points[Points];
   lv_draw_line_dsc_t lineDesc;
@@ -86,12 +87,10 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
     lv_canvas_draw_text(this->drivetrainCanvas, 40 + i * ((SCREEN_WIDTH - (40 * 2)) / Sets), SCREEN_HEIGHT - 16,
                         (SCREEN_WIDTH - (40 * 2)) / Sets, &textDesc, str);
   }
-  lv_obj_invalidate(this->drivetrainCanvas);
 }
 
 template <size_t Sets, size_t Points> void Chart<Sets, Points>::cleanup() {
   free(this->canvasBuffer);
-  info("FREE");
   lv_obj_del_async(this->drivetrainCanvas);
   lv_obj_del_async(this->titleLabel);
 

@@ -12,7 +12,7 @@ public:
   float max = -INFINITY;
   float min = INFINITY;
 
-  explicit FixedQueue();
+  FixedQueue();
 
   float operator[](size_t index) const;
 

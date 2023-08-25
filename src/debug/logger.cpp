@@ -71,12 +71,17 @@ void _debug(const char *string) {
 void _debug(const std::string &string) { _debug(string.c_str()); }
 
 void _push(const char *string) {
-  sections[pros::c::task_get_current()].emplace_back(std::pair(string, pros::c::millis()));
+  pros::task_t task = pros::c::task_get_current();
+  if (!sections.contains(task)) {
+    sections.emplace(task, std::vector<std::pair<const char *, uint32_t>>());
+  }
+  sections.at(task).emplace_back(std::pair(string, pros::c::millis()));
   debug("== BEGIN %s ==", string);
 }
 
 void _pop() {
-  auto stack = sections[pros::c::task_get_current()];
+  pros::task_t task = pros::c::task_get_current();
+  auto stack = sections.at(task);
   uint32_t millis = pros::c::millis();
   if (stack.empty()) {
     _error("Section stack underflow!");
@@ -85,7 +90,7 @@ void _pop() {
     debug("== END %s [%ims] ==", back.first, millis - back.second);
     stack.pop_back();
     if (stack.empty()) {
-      sections.erase(pros::c::task_get_current());
+      sections.erase(task);
     }
   }
 }

@@ -8,6 +8,7 @@ pros::task_t createChildTask(const char *name, void (*function)(void *), void *p
 pros::task_t createTask(const char *name, void (*function)(void *), void *param, int priority = 8,
                         int stackDepth = 0x1000);
 void killTask(pros::task_t task);
+void killRootTask();
 void onRootTaskStart();
 void onRootTaskEnd();
 } // namespace rtos

@@ -40,10 +40,12 @@ public:
     ARCADE
   };
 
-  device::Motor leftFrontMotor;
-  device::Motor rightFrontMotor;
-  device::Motor leftBackMotor;
-  device::Motor rightBackMotor;
+  device::Motor motorL1;
+  device::Motor motorL2;
+  device::Motor motorL3;
+  device::Motor motorR1;
+  device::Motor motorR2;
+  device::Motor motorR3;
 
   device::Inertial imu;
 
@@ -93,7 +95,7 @@ public:
    * @param rightBack The port of the motor on the back of the robot and the right side.
    * @param leftBack The port of the motor on the back of the robot and the left side.
    */
-  Drivetrain(uint8_t leftFront, uint8_t rightFront, uint8_t leftBack, uint8_t rightBack, uint8_t inertial);
+  Drivetrain(uint8_t left1, uint8_t left2, uint8_t left3, uint8_t right1, uint8_t right2, uint8_t right3, uint8_t inertial);
 
   /**
    * Drives the robot forwards by the specified distance.

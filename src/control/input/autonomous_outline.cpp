@@ -312,14 +312,10 @@ bool AutonomousOutlineController::write_drivetrain_update() {
   switch (this->drivetrainTarget) {
   case FORWARDS: {
     double dist = units::encoderToInch(
-        (this->robot.drivetrain.leftFrontMotor.getPosition() + this->robot.drivetrain.leftBackMotor.getPosition() +
-         this->robot.drivetrain.rightFrontMotor.getPosition() + this->robot.drivetrain.rightBackMotor.getPosition()) /
-        4.0);
-    //    debug("Forwards %f", (this->robot.drivetrain.leftFrontMotor.get_position() +
-    //    this->robot.drivetrain.leftBackMotor.get_position() +
-    //                          this->robot.drivetrain.rightFrontMotor.get_position() +
-    //                          this->robot.drivetrain.rightBackMotor.get_position()) /
-    //                             4.0);
+        (this->robot.drivetrain.motorL1.getPosition() + this->robot.drivetrain.motorL2.getPosition() +
+         this->robot.drivetrain.motorL3.getPosition() + this->robot.drivetrain.motorR1.getPosition() +
+         this->robot.drivetrain.motorR2.getPosition() + this->robot.drivetrain.motorR3.getPosition()) /
+        6.0);
     debug("Forwards %f", dist);
     this->robot.drivetrain.tare();
     *this->output << "robot.drivetrain.forwards(" << dist << ");\n";
@@ -327,30 +323,18 @@ bool AutonomousOutlineController::write_drivetrain_update() {
   }
   case BACKWARDS: {
     double dist = units::encoderToInch(
-        (this->robot.drivetrain.leftFrontMotor.getPosition() + this->robot.drivetrain.leftBackMotor.getPosition() +
-         this->robot.drivetrain.rightFrontMotor.getPosition() + this->robot.drivetrain.rightBackMotor.getPosition()) /
-        4.0);
-    //    debug("Backwards %f", (this->robot.drivetrain.leftFrontMotor.get_position() +
-    //    this->robot.drivetrain.leftBackMotor.get_position() +
-    //                           this->robot.drivetrain.rightFrontMotor.get_position() +
-    //                           this->robot.drivetrain.rightBackMotor.get_position()) /
-    //                              -4.0);
+        (this->robot.drivetrain.motorL1.getPosition() + this->robot.drivetrain.motorL2.getPosition() +
+         this->robot.drivetrain.motorL3.getPosition() + this->robot.drivetrain.motorR1.getPosition() +
+         this->robot.drivetrain.motorR2.getPosition() + this->robot.drivetrain.motorR3.getPosition()) /
+        6.0);
     debug("Backwards %f", dist);
     this->robot.drivetrain.tare();
     *this->output << "robot.drivetrain.backwards(" << -dist << ");\n";
     return true;
   }
   case LEFT: {
-    double dist_left = units::encoderToDegrees(
-        (this->robot.drivetrain.leftFrontMotor.getPosition() + this->robot.drivetrain.leftBackMotor.getPosition()) /
-        2.0);
-    double dist_right = units::encoderToDegrees(
-        (this->robot.drivetrain.rightFrontMotor.getPosition() + this->robot.drivetrain.rightBackMotor.getPosition()) /
-        2.0);
-    //    debug("Left %f %f", (this->robot.drivetrain.rightFrontMotor.get_position() +
-    //    this->robot.drivetrain.rightBackMotor.get_position()) / 2.0,
-    //    (this->robot.drivetrain.leftFrontMotor.get_position() + this->robot.drivetrain.leftBackMotor.get_position()) /
-    //    -2.0);
+    double dist_left = (this->robot.drivetrain.motorL1.getPosition() + this->robot.drivetrain.motorL2.getPosition() + this->robot.drivetrain.motorL3.getPosition()) / 3.0;
+    double dist_right = (this->robot.drivetrain.motorR1.getPosition() + this->robot.drivetrain.motorR2.getPosition() + this->robot.drivetrain.motorR3.getPosition()) / 3.0;
     this->robot.drivetrain.tare();
     double turn = (dist_right - dist_left) / 2.0;
     debug("Left %f", turn);
@@ -358,16 +342,8 @@ bool AutonomousOutlineController::write_drivetrain_update() {
     return true;
   }
   case RIGHT: {
-    double dist_left = units::encoderToDegrees(
-        (this->robot.drivetrain.leftFrontMotor.getPosition() + this->robot.drivetrain.leftBackMotor.getPosition()) /
-        2.0);
-    double dist_right = units::encoderToDegrees(
-        (this->robot.drivetrain.rightFrontMotor.getPosition() + this->robot.drivetrain.rightBackMotor.getPosition()) /
-        2.0);
-    //    debug("Right %f %f", (this->robot.drivetrain.leftFrontMotor.get_position() +
-    //    this->robot.drivetrain.leftBackMotor.get_position()) / 2.0,
-    //    (this->robot.drivetrain.rightFrontMotor.get_position() + this->robot.drivetrain.rightBackMotor.get_position())
-    //    / -2.0);
+    double dist_left = (this->robot.drivetrain.motorL1.getPosition() + this->robot.drivetrain.motorL2.getPosition() + this->robot.drivetrain.motorL3.getPosition()) / 3.0;
+    double dist_right = (this->robot.drivetrain.motorR1.getPosition() + this->robot.drivetrain.motorR2.getPosition() + this->robot.drivetrain.motorR3.getPosition()) / 3.0;
     this->robot.drivetrain.tare();
     double turn = (dist_left - dist_right) / 2.0;
     debug("Right %f", turn);

@@ -11,13 +11,15 @@
 #define STABILIZE_TICKS 25
 
 namespace robot {
-Drivetrain::Drivetrain(uint8_t leftFront, uint8_t rightFront, uint8_t leftBack, uint8_t rightBack, uint8_t inertial)
-    : leftFrontMotor(device::Motor(leftFront, "Drive LF", false, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
-      rightFrontMotor(device::Motor(rightFront, "Drive RF", true, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
-      leftBackMotor(device::Motor(leftBack, "Drive LB", false, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
-      rightBackMotor(device::Motor(rightBack, "Drive RB", true, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
-      imu(device::Inertial(inertial, "IDrive")), rightPID(21.5, 6.0, 16.0, 100.0, 5.0),
-      leftPID(0.0, 0.0, 0.0, 0.0, 0.0), headingPID(125.0, 20.0, 90.0, 10.0, 0.2) {}
+Drivetrain::Drivetrain(uint8_t left1, uint8_t left2, uint8_t left3, uint8_t right1, uint8_t right2, uint8_t right3, uint8_t inertial)
+    : motorL1(device::Motor(left1, "Drive L1", true, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
+      motorL2(device::Motor(left2, "Drive L2", true, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
+      motorL3(device::Motor(left3, "Drive L3", false, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
+      motorR1(device::Motor(right1, "Drive R1", false, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
+      motorR2(device::Motor(right2, "Drive R2", false, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
+      motorR3(device::Motor(right3, "Drive R3", true, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
+      imu(device::Inertial(inertial, "IMU")), rightPID(12.0, 3.0, 3.0, 90.0, 5.0),
+      leftPID(0.0, 0.0, 0.0, 0.0, 0.0), headingPID(80.0, 10.0, 0.0, 10.0, 10000.2) {}
 
 bool Drivetrain::isAtTarget() const { return this->timeAtTarget > STABILIZE_TICKS; }
 
@@ -111,8 +113,8 @@ void Drivetrain::updateState() {
   double prevRightPos = this->rightPos;
   double prevLeftPos = this->leftPos;
   this->heading = this->imu.getRotation();
-  this->rightPos = (this->rightFrontMotor.getPosition() + this->rightBackMotor.getPosition()) / 2.0;
-  this->leftPos = (this->leftFrontMotor.getPosition() + this->leftBackMotor.getPosition()) / 2.0;
+  this->rightPos = (this->motorR1.getPosition() + this->motorR2.getPosition() + this->motorR3.getPosition()) / 3.0;
+  this->leftPos = (this->motorL1.getPosition() + this->motorL2.getPosition() + this->motorL3.getPosition()) / 3.0;
 
   double rightDiff = this->rightPos - prevRightPos;
   double leftDiff = this->leftPos - prevLeftPos;
@@ -131,8 +133,8 @@ void Drivetrain::updateState() {
   case OPERATOR_DIRECT: {
     if (this->powerRight == 0 && this->powerLeft == 0) {
       if (++this->timeOff == 200) {
-        this->setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
-        this->brake();
+//        this->setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
+//        this->brake();
       }
     } else {
       this->setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
@@ -165,6 +167,7 @@ void Drivetrain::updateState() {
     this->leftPID.kd = this->rightPID.kd;
     this->leftPID.integralRange = this->rightPID.integralRange;
     this->leftPID.acceptableError = this->rightPID.acceptableError;
+    this->leftPID.moveMin = this->rightPID.moveMin = 500;
     double right = this->rightPID.update(this->targetRight, this->rightPos);
     double left = this->leftPID.update(this->targetLeft, this->leftPos);
 
@@ -180,7 +183,7 @@ void Drivetrain::updateState() {
     this->moveRight(static_cast<int16_t>(right));
     this->moveLeft(static_cast<int16_t>(left));
 
-    info("@ %f / %f", right, left);
+    info("L%.2f / R%.2f H%.2f", this->targetLeft - this->leftPos, this->targetRight - this->rightPos, this->heading);
     if (std::abs(this->targetLeft - this->leftPos) < ACCEPTABLE_POSITION_ERROR &&
         std::abs(this->targetRight - this->rightPos) < ACCEPTABLE_POSITION_ERROR) {
       atTarget = true;
@@ -196,41 +199,57 @@ void Drivetrain::updateState() {
 }
 
 void Drivetrain::brake() {
-  this->rightFrontMotor.brake();
-  this->leftFrontMotor.brake();
-  this->rightBackMotor.brake();
-  this->leftBackMotor.brake();
+  this->motorL1.brake();
+  this->motorL2.brake();
+  this->motorL3.brake();
+  this->motorR1.brake();
+  this->motorR2.brake();
+  this->motorR3.brake();
 }
 
 void Drivetrain::setBrakeMode(pros::motor_brake_mode_e brake_mode) {
-  this->leftFrontMotor.setBrakeMode(brake_mode);
-  this->leftBackMotor.setBrakeMode(brake_mode);
-  this->rightFrontMotor.setBrakeMode(brake_mode);
-  this->rightBackMotor.setBrakeMode(brake_mode);
+  this->motorL1.setBrakeMode(brake_mode);
+  this->motorL2.setBrakeMode(brake_mode);
+  this->motorL3.setBrakeMode(brake_mode);
+  this->motorR1.setBrakeMode(brake_mode);
+  this->motorR2.setBrakeMode(brake_mode);
+  this->motorR3.setBrakeMode(brake_mode);
 }
 
 void Drivetrain::tare() {
-  this->rightFrontMotor.tare();
-  this->leftFrontMotor.tare();
-  this->rightBackMotor.tare();
-  this->leftBackMotor.tare();
-  this->imu.tare();
-
+  this->targetRight -= this->rightPos;
+  this->targetLeft -= this->leftPos;
   this->targetHeading -= this->heading;
+
+  this->rightPos = 0;
+  this->leftPos = 0;
   this->heading = 0.0;
+
+  this->motorL1.tare();
+  this->motorL2.tare();
+  this->motorL3.tare();
+  this->motorR1.tare();
+  this->motorR2.tare();
+  this->motorR3.tare();
+  this->imu.tare();
 }
 
 void Drivetrain::moveRight(int16_t millivolts) {
-  this->rightFrontMotor.moveMillivolts(millivolts);
-  this->rightBackMotor.moveMillivolts(millivolts);
+  this->motorR1.moveMillivolts(millivolts);
+  this->motorR2.moveMillivolts(millivolts);
+  this->motorR3.moveMillivolts(millivolts);
 }
 
 void Drivetrain::moveLeft(int16_t millivolts) {
-  this->leftFrontMotor.moveMillivolts(millivolts);
-  this->leftBackMotor.moveMillivolts(millivolts);
+  this->motorL1.moveMillivolts(millivolts);
+  this->motorL2.moveMillivolts(millivolts);
+  this->motorL3.moveMillivolts(millivolts);
 }
 
-void Drivetrain::setTarget(Drivetrain::TargetType type) { this->targetType = type; }
+void Drivetrain::setTarget(Drivetrain::TargetType type) {
+  this->targetType = type;
+  this->timeAtTarget = 0;
+}
 
 [[nodiscard]] const char *driveSchemeName(Drivetrain::ControlScheme scheme) {
   switch (scheme) {

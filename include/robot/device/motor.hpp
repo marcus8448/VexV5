@@ -19,6 +19,7 @@ public:
   double kd;
   double integralRange;
   double acceptableError;
+  double moveMin = 0.0;
 
 private:
   double error = 0.0;
@@ -46,7 +47,6 @@ private:
   const pros::motor_gearset_e_t gearset;
   const int16_t maxVelocity;
   pros::motor_brake_mode_e_t brakeMode;
-  bool reversed;
 
 public:
   explicit Motor(uint8_t port, const char *name, bool reversed = false,
@@ -72,7 +72,6 @@ public:
 
   [[nodiscard]] pros::motor_brake_mode_e_t getBrakeMode() const;
   [[nodiscard]] pros::motor_gearset_e_t getGearset() const;
-  [[nodiscard]] bool isReversed() const;
   [[nodiscard]] bool isConnected() const override;
 
   [[nodiscard]] double getTemperature() const;

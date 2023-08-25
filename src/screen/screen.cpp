@@ -6,8 +6,6 @@
 #include "liblvgl/lv_api_map.h"
 
 #include <algorithm>
-#include <cstring>
-#include <map>
 #include <vector>
 
 namespace screen {
@@ -128,12 +126,14 @@ void removeScreen(Screen *screen) {
 }
 
 void prev_page([[maybe_unused]] lv_event_t *event) {
-  debug("Screen switching to previous page");
+  scopePush("Screen switching to previous page");
   switch_to_screen(--screenIndex);
+  scopePop();
 }
 
 void next_page([[maybe_unused]] lv_event_t *event) {
-  debug("Screen switching to next page");
+  scopePush("Screen switching to next page");
   switch_to_screen(++screenIndex);
+  scopePop();
 }
 } // namespace screen
