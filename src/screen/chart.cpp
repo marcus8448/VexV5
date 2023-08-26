@@ -3,7 +3,6 @@
 #include "format.hpp"
 #include "screen/colour.hpp"
 #include "screen/screen.hpp"
-#include <cstring>
 
 namespace screen {
 
@@ -17,9 +16,9 @@ Chart<Sets, Points>::Chart(robot::Robot &robot, const char *title, DataSet dataS
 }
 
 template <size_t Sets, size_t Points> void Chart<Sets, Points>::initialize(lv_obj_t *screen) {
-  this->canvasBuffer = std::malloc(LV_CANVAS_BUF_SIZE_TRUE_COLOR(SCREEN_WIDTH, SCREEN_HEIGHT));
-  this->drivetrainCanvas = lv_canvas_create(screen);
-  lv_canvas_set_buffer(this->drivetrainCanvas, this->canvasBuffer, SCREEN_WIDTH, SCREEN_HEIGHT, LV_IMG_CF_TRUE_COLOR);
+  this->canvasBuffer = new lv_color_t[LV_CANVAS_BUF_SIZE_TRUE_COLOR(SCREEN_WIDTH, SCREEN_HEIGHT)];
+  this->canvas = lv_canvas_create(screen);
+  lv_canvas_set_buffer(this->canvas, this->canvasBuffer, 100, 100, LV_IMG_CF_TRUE_COLOR);
 
   this->titleLabel = lv_label_create(screen);
   lv_label_set_text(this->titleLabel, this->title);
@@ -28,12 +27,13 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::initialize(lv_ob
 }
 
 template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
-  std::memset(this->canvasBuffer, 0x00000000, LV_CANVAS_BUF_SIZE_TRUE_COLOR(SCREEN_WIDTH, SCREEN_HEIGHT));
+  lv_canvas_fill_bg(this->canvas, lv_color_black(), 255);
 
   lv_point_t points[Points];
+
   lv_draw_line_dsc_t lineDesc;
-  lv_draw_line_dsc_init(&lineDesc);
   lv_draw_label_dsc_t textDesc;
+  lv_draw_line_dsc_init(&lineDesc);
   lv_draw_label_dsc_init(&textDesc);
   lineDesc.color = textDesc.color = colour::WHITE;
 
@@ -44,13 +44,13 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
     min = std::min(min, this->data[i].min);
   }
 
-  if (max == -INFINITY)
+  if (std::abs(max) == INFINITY)
     max = 0;
-  if (min == INFINITY)
+  if (std::abs(min) == INFINITY)
     min = 0;
 
-  if (max == min) {
-    max += 1.0f;
+  if (max <= min) {
+    max = min + 1.0f;
   }
 
   double heightScale = (SCREEN_HEIGHT - 17 - 41) / (max - min);
@@ -58,12 +58,12 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
 
   lv_coord_t zero = SCREEN_HEIGHT - (0 - min) * heightScale - 41;
   lv_point_t pts[2]{{0, zero}, {SCREEN_WIDTH, zero}};
-  lv_canvas_draw_line(this->drivetrainCanvas, pts, 2, &lineDesc);
+  lv_canvas_draw_line(this->canvas, pts, 2, &lineDesc);
 
   const char *str = fmt::static_format("%f", max);
-  lv_canvas_draw_text(this->drivetrainCanvas, 0, 0, 100, &textDesc, str);
+  lv_canvas_draw_text(this->canvas, 0, 0, 100, &textDesc, str);
   str = fmt::static_format("%f", min);
-  lv_canvas_draw_text(this->drivetrainCanvas, 40, SCREEN_HEIGHT - 36, 100, &textDesc, str);
+  lv_canvas_draw_text(this->canvas, 40, SCREEN_HEIGHT - 36, 100, &textDesc, str);
 
   for (size_t i = 0; i < Sets; ++i) {
     DataSet set = this->dataSets[i];
@@ -81,22 +81,21 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
     }
 
     textDesc.color = lineDesc.color = set.color;
-    lv_canvas_draw_line(this->drivetrainCanvas, points, Points, &lineDesc);
+    lv_canvas_draw_line(this->canvas, points, Points, &lineDesc);
 
     str = fmt::static_format("%s: %f", set.label, value);
-    lv_canvas_draw_text(this->drivetrainCanvas, 40 + i * ((SCREEN_WIDTH - (40 * 2)) / Sets), SCREEN_HEIGHT - 16,
+    lv_canvas_draw_text(this->canvas, 40 + i * ((SCREEN_WIDTH - (40 * 2)) / Sets), SCREEN_HEIGHT - 16,
                         (SCREEN_WIDTH - (40 * 2)) / Sets, &textDesc, str);
   }
 }
 
 template <size_t Sets, size_t Points> void Chart<Sets, Points>::cleanup() {
-  free(this->canvasBuffer);
-  lv_obj_del_async(this->drivetrainCanvas);
+  lv_obj_del_async(this->canvas);
   lv_obj_del_async(this->titleLabel);
 
-  this->canvasBuffer = nullptr;
+//  delete this->canvasBuffer;
 
-  this->drivetrainCanvas = nullptr;
+  this->canvas = nullptr;
   this->titleLabel = nullptr;
 }
 

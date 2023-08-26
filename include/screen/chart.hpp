@@ -24,8 +24,8 @@ private:
   DataSet *dataSets = nullptr;
   structure::FixedQueue<Points> data[Sets];
 
-  void *canvasBuffer = nullptr;
-  lv_obj_t *drivetrainCanvas = nullptr;
+  lv_color_t *canvasBuffer = nullptr;
+  lv_obj_t *canvas = nullptr;
   lv_obj_t *titleLabel = nullptr;
 
 public:

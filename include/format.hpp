@@ -20,9 +20,9 @@ template <typename... Args> const char *static_format(const char *format, Args..
 template <typename... Args> std::string string_format(const char *format, Args... args) {
   uint32_t size_s = snprintf(nullptr, 0, format, args...) + 1; // Extra space for '\0'
   if (size_s <= 0) {
-    return "INVALID STRING";
+    return "format failure";
   }
-  auto size = static_cast<unsigned int>(size_s);
+  auto size = static_cast<uint32_t>(size_s);
   std::unique_ptr<char[]> buf(new char[size]);
   snprintf(buf.get(), size, format, args...);
   return {buf.get(), buf.get() + size - 1}; // We don't want the '\0' inside

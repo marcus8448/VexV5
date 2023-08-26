@@ -91,7 +91,7 @@ void Drivetrain::updateTargeting(control::input::Controller *controller) {
   this->setTarget(OPERATOR_DIRECT);
   if (this->controlScheme == ARCADE) {
     double power = controller->leftStickY();
-    double rotation = controller->rightStickX();
+    double rotation = controller->rightStickX() * 0.5;
 
     double left = (power + rotation) / JOYSTICK_MAX;
     double right = (power - rotation) / JOYSTICK_MAX;
@@ -103,8 +103,8 @@ void Drivetrain::updateTargeting(control::input::Controller *controller) {
     this->powerRight = static_cast<int16_t>(right * MOTOR_MAX_MILLIVOLTS);
     this->powerLeft = static_cast<int16_t>(left * MOTOR_MAX_MILLIVOLTS);
   } else {
-    this->powerRight = static_cast<int16_t>(controller->rightStickY() / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
-    this->powerLeft = static_cast<int16_t>(controller->leftStickY() / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
+    this->powerRight = static_cast<int16_t>((controller->rightStickY() * 0.8) / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
+    this->powerLeft = static_cast<int16_t>((controller->leftStickY() * 0.8) / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
   }
 }
 

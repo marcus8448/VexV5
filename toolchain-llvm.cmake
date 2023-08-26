@@ -26,6 +26,6 @@ set(CMAKE_CXX_COMPILER_ID Clang)
 set(CMAKE_LINKER ${CMAKE_CXX_COMPILER})
 
 if (ENABLE_LTO)
-    # LTO requires lld - does not work with the linker script
+    # LTO requires lld (which does not work with the linker script)
     message(NOTICE "LTO is disabled when using clang")
 endif()

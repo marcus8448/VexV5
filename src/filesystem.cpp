@@ -25,7 +25,7 @@ void *read_all(const char *path) {
     return nullptr;
   }
   size_t len = std::filesystem::file_size(path) + 1;
-  void *contents = malloc(len);
+  void *contents = std::malloc(len);
   std::FILE *file = std::fopen(path, "r");
   size_t read = std::fread(contents, 1, len, file);
   if (std::fclose(file) != 0) {

@@ -145,7 +145,6 @@ if (NOT DISABLE_AUTONOMOUS)
             src/control/autonomous/autonomous.cpp
             src/control/autonomous/score.cpp
             src/control/autonomous/skills.cpp
-            src/control/autonomous/replay.cpp
             src/control/autonomous/winpoint.cpp
     )
 
@@ -153,7 +152,6 @@ if (NOT DISABLE_AUTONOMOUS)
             include/control/autonomous/autonomous.hpp
             include/control/autonomous/score.hpp
             include/control/autonomous/skills.hpp
-            include/control/autonomous/replay.hpp
             include/control/autonomous/winpoint.hpp
     )
 endif()
