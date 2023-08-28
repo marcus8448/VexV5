@@ -17,6 +17,8 @@ static int screenIndex = -1;
 static lv_obj_t *previousBtn = nullptr;
 static lv_obj_t *nextBtn = nullptr;
 
+static pros::mutex_t mutex = nullptr;
+
 void switch_to_screen(int screen);
 void prev_page([[maybe_unused]] lv_event_t *event);
 void next_page([[maybe_unused]] lv_event_t *event);
@@ -24,6 +26,7 @@ void update();
 [[noreturn]] void update_task([[maybe_unused]] void *params);
 
 void initialize() {
+  mutex = pros::c::mutex_create();
   lv_theme_default_init(lv_disp_get_default(), LV_THEME_DEFAULT_COLOR_PRIMARY, LV_THEME_DEFAULT_COLOR_SECONDARY,
                         LV_THEME_DEFAULT_DARK, LV_THEME_DEFAULT_FONT_NORMAL);
 
@@ -49,6 +52,10 @@ void initialize() {
 }
 
 void switch_to_screen(int screen) {
+  while (!pros::c::mutex_take(mutex, 1000)) {
+    pros::c::delay(5);
+  }
+
   if (activeScreen != nullptr) {
     Screen *temp = activeScreen;
     activeScreen = nullptr;
@@ -62,6 +69,7 @@ void switch_to_screen(int screen) {
     scrn->initialize(lv_scr_act());
     activeScreen = scrn;
   }
+  pros::c::mutex_give(mutex);
 
   if (screenIndex > 0) {
     lv_obj_clear_flag(previousBtn, LV_OBJ_FLAG_HIDDEN);
@@ -86,8 +94,9 @@ void switch_to_screen(int screen) {
 }
 
 void update() {
-  if (activeScreen != nullptr) {
+  if (activeScreen != nullptr && pros::c::mutex_take(mutex, 100)) {
     activeScreen->update();
+    pros::c::mutex_give(mutex);
   }
 }
 

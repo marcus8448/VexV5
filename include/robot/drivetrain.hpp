@@ -95,7 +95,8 @@ public:
    * @param rightBack The port of the motor on the back of the robot and the right side.
    * @param leftBack The port of the motor on the back of the robot and the left side.
    */
-  Drivetrain(uint8_t left1, uint8_t left2, uint8_t left3, uint8_t right1, uint8_t right2, uint8_t right3, uint8_t inertial);
+  Drivetrain(uint8_t left1, uint8_t left2, uint8_t left3, uint8_t right1, uint8_t right2, uint8_t right3,
+             uint8_t inertial);
 
   /**
    * Drives the robot forwards by the specified distance.

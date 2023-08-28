@@ -21,7 +21,7 @@ void ConfigurationScreen::update() {}
 void ConfigurationScreen::update_drive_scheme_label() {
   lv_label_set_text(
       this->driveSchemeBtnLbl,
-      fmt::static_format("Control Scheme: %s", robot::driveSchemeName(this->robot.drivetrain.controlScheme)));
+      fmt::string_format("Control Scheme: %s", robot::driveSchemeName(this->robot.drivetrain.controlScheme)).c_str());
 }
 
 void ConfigurationScreen::cleanup() {

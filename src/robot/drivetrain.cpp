@@ -11,15 +11,16 @@
 #define STABILIZE_TICKS 25
 
 namespace robot {
-Drivetrain::Drivetrain(uint8_t left1, uint8_t left2, uint8_t left3, uint8_t right1, uint8_t right2, uint8_t right3, uint8_t inertial)
+Drivetrain::Drivetrain(uint8_t left1, uint8_t left2, uint8_t left3, uint8_t right1, uint8_t right2, uint8_t right3,
+                       uint8_t inertial)
     : motorL1(device::Motor(left1, "Drive L1", true, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       motorL2(device::Motor(left2, "Drive L2", true, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       motorL3(device::Motor(left3, "Drive L3", false, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       motorR1(device::Motor(right1, "Drive R1", false, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       motorR2(device::Motor(right2, "Drive R2", false, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       motorR3(device::Motor(right3, "Drive R3", true, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
-      imu(device::Inertial(inertial, "IMU")), rightPID(12.0, 3.0, 3.0, 90.0, 5.0),
-      leftPID(0.0, 0.0, 0.0, 0.0, 0.0), headingPID(80.0, 10.0, 0.0, 10.0, 10000.2) {}
+      imu(device::Inertial(inertial, "IMU")), rightPID(12.0, 3.0, 3.0, 90.0, 5.0), leftPID(0.0, 0.0, 0.0, 0.0, 0.0),
+      headingPID(80.0, 10.0, 0.0, 10.0, 10000.2) {}
 
 bool Drivetrain::isAtTarget() const { return this->timeAtTarget > STABILIZE_TICKS; }
 
@@ -133,8 +134,8 @@ void Drivetrain::updateState() {
   case OPERATOR_DIRECT: {
     if (this->powerRight == 0 && this->powerLeft == 0) {
       if (++this->timeOff == 200) {
-//        this->setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
-//        this->brake();
+        //        this->setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
+        //        this->brake();
       }
     } else {
       this->setBrakeMode(pros::E_MOTOR_BRAKE_COAST);

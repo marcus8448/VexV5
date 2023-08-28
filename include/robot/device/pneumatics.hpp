@@ -10,7 +10,7 @@ private:
   bool extended;
 
 public:
-  explicit PneumaticPiston(uint8_t port, const char *name, bool defaultState = false);
+  explicit PneumaticPiston(int8_t port, const char *name, bool defaultState = false);
 
   void extend();
   void contract();

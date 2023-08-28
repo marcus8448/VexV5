@@ -5,7 +5,7 @@
 #include <cerrno>
 
 namespace robot::device {
-Inertial::Inertial(uint8_t port, const char *name) : Device("Inertial", name, port) {}
+Inertial::Inertial(int8_t port, const char *name) : Device("Inertial", name, port) {}
 
 double Inertial::getRotation() const {
   if (pros::c::imu_get_status(this->port) == pros::E_IMU_STATUS_CALIBRATING) {

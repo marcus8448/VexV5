@@ -298,8 +298,9 @@ void AutonomousOutlineController::update() {
   if (this->ticks % 10 == 0 || !init) {
     init = true;
     this->setLine(0, 0,
-                  fmt::static_format("Flywheel: %i  ",
-                                     static_cast<int32_t>(this->speedSetting()))); // append ' ' to clear out buffer
+                  fmt::string_format("Flywheel: %i  ",
+                                     static_cast<int32_t>(this->speedSetting()))
+                      .c_str()); // append ' ' to clear out buffer
   }
 }
 
@@ -333,8 +334,12 @@ bool AutonomousOutlineController::write_drivetrain_update() {
     return true;
   }
   case LEFT: {
-    double dist_left = (this->robot.drivetrain.motorL1.getPosition() + this->robot.drivetrain.motorL2.getPosition() + this->robot.drivetrain.motorL3.getPosition()) / 3.0;
-    double dist_right = (this->robot.drivetrain.motorR1.getPosition() + this->robot.drivetrain.motorR2.getPosition() + this->robot.drivetrain.motorR3.getPosition()) / 3.0;
+    double dist_left = (this->robot.drivetrain.motorL1.getPosition() + this->robot.drivetrain.motorL2.getPosition() +
+                        this->robot.drivetrain.motorL3.getPosition()) /
+                       3.0;
+    double dist_right = (this->robot.drivetrain.motorR1.getPosition() + this->robot.drivetrain.motorR2.getPosition() +
+                         this->robot.drivetrain.motorR3.getPosition()) /
+                        3.0;
     this->robot.drivetrain.tare();
     double turn = (dist_right - dist_left) / 2.0;
     debug("Left %f", turn);
@@ -342,8 +347,12 @@ bool AutonomousOutlineController::write_drivetrain_update() {
     return true;
   }
   case RIGHT: {
-    double dist_left = (this->robot.drivetrain.motorL1.getPosition() + this->robot.drivetrain.motorL2.getPosition() + this->robot.drivetrain.motorL3.getPosition()) / 3.0;
-    double dist_right = (this->robot.drivetrain.motorR1.getPosition() + this->robot.drivetrain.motorR2.getPosition() + this->robot.drivetrain.motorR3.getPosition()) / 3.0;
+    double dist_left = (this->robot.drivetrain.motorL1.getPosition() + this->robot.drivetrain.motorL2.getPosition() +
+                        this->robot.drivetrain.motorL3.getPosition()) /
+                       3.0;
+    double dist_right = (this->robot.drivetrain.motorR1.getPosition() + this->robot.drivetrain.motorR2.getPosition() +
+                         this->robot.drivetrain.motorR3.getPosition()) /
+                        3.0;
     this->robot.drivetrain.tare();
     double turn = (dist_left - dist_right) / 2.0;
     debug("Right %f", turn);

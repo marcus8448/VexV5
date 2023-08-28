@@ -47,7 +47,7 @@ public:
   double overshoot = 0;
   uint16_t oscillations = 0;
   bool testing = false;
-  void* taskHandle = nullptr;
+  void *taskHandle = nullptr;
 
   explicit PidTuning(robot::Robot &robot, robot::device::PID &pid, std::string runName);
 

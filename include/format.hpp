@@ -4,12 +4,6 @@
 #include <string>
 
 namespace fmt {
-template <typename... Args> const char *static_format(const char *format, Args... args) {
-  static char *format_buffer = new char[128];
-  snprintf(format_buffer, 128, format, args...);
-  return format_buffer;
-}
-
 /**
  * Formats a string, similar to printf, but without printing it.
  * @tparam Args The type of arguments to use.

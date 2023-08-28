@@ -40,12 +40,13 @@ void Information::update() {
       break;
   }
 
-  lv_label_set_text(this->rightColumn[0],
-                    fmt::static_format("Control Scheme: %s", robot::driveSchemeName(robot.drivetrain.controlScheme)));
+  lv_label_set_text(
+      this->rightColumn[0],
+      fmt::string_format("Control Scheme: %s", robot::driveSchemeName(robot.drivetrain.controlScheme)).c_str());
   lv_label_set_text(this->rightColumn[1],
-                    fmt::static_format("X-position: %fin", units::encoderToInch(this->robot.drivetrain.posX)));
+                    fmt::string_format("X-position: %fin", units::encoderToInch(this->robot.drivetrain.posX)).c_str());
   lv_label_set_text(this->rightColumn[2],
-                    fmt::static_format("Y-position: %fin", units::encoderToInch(this->robot.drivetrain.posY)));
+                    fmt::string_format("Y-position: %fin", units::encoderToInch(this->robot.drivetrain.posY)).c_str());
 }
 
 void Information::cleanup() {
@@ -59,37 +60,37 @@ void Information::cleanup() {
 
 void update_device(lv_obj_t *label, const robot::device::Device &device, bool enabled) {
   if (!device.isConnected()) {
-    lv_label_set_text(label, fmt::static_format("%s: Disconnected", device.getName()));
+    lv_label_set_text(label, fmt::string_format("%s: Disconnected", device.getName()).c_str());
   } else {
     if (enabled) {
-      lv_label_set_text(label, fmt::static_format("%s: Enabled", device.getName()));
+      lv_label_set_text(label, fmt::string_format("%s: Enabled", device.getName()).c_str());
     } else {
-      lv_label_set_text(label, fmt::static_format("%s: Disabled", device.getName()));
+      lv_label_set_text(label, fmt::string_format("%s: Disabled", device.getName()).c_str());
     }
   }
 }
 
 void update_connectivity(lv_obj_t *label, const char *name, bool connected) {
   if (connected) {
-    lv_label_set_text(label, fmt::static_format("%s: Connected", name));
+    lv_label_set_text(label, fmt::string_format("%s: Connected", name).c_str());
   } else {
-    lv_label_set_text(label, fmt::static_format("%s: Disconnected", name));
+    lv_label_set_text(label, fmt::string_format("%s: Disconnected", name).c_str());
   }
 }
 
 void update_device(lv_obj_t *label, const robot::device::Device &device, double value) {
   if (!device.isConnected()) {
-    lv_label_set_text(label, fmt::static_format("%s: Disconnected", device.getName()));
+    lv_label_set_text(label, fmt::string_format("%s: Disconnected", device.getName()).c_str());
   } else {
-    lv_label_set_text(label, fmt::static_format("%s: %f", device.getName(), value));
+    lv_label_set_text(label, fmt::string_format("%s: %f", device.getName(), value).c_str());
   }
 }
 
 void update_device(lv_obj_t *label, const robot::device::Device &device, int32_t value) {
   if (!device.isConnected()) {
-    lv_label_set_text(label, fmt::static_format("%s: Disconnected", device.getName()));
+    lv_label_set_text(label, fmt::string_format("%s: Disconnected", device.getName()).c_str());
   } else {
-    lv_label_set_text(label, fmt::static_format("%s: %i", device.getName(), value));
+    lv_label_set_text(label, fmt::string_format("%s: %i", device.getName(), value).c_str());
   }
 }
 

@@ -186,8 +186,9 @@ void Operator::update() {
   if (this->ticks % 10 == 0 || !init) {
     init = true;
     this->setLine(0, 0,
-                  fmt::static_format("Flywheel: %i  ",
-                                     static_cast<int32_t>(this->speedSetting()))); // append ' ' to clear out buffer
+                  fmt::string_format("Flywheel: %i  ",
+                                     static_cast<int32_t>(this->speedSetting()))
+                      .c_str()); // append ' ' to clear out buffer
   }
 }
 } // namespace control::input

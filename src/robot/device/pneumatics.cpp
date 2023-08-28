@@ -3,7 +3,7 @@
 #include <cerrno>
 
 namespace robot::device {
-PneumaticPiston::PneumaticPiston(uint8_t port, const char *name, bool defaultState)
+PneumaticPiston::PneumaticPiston(int8_t port, const char *name, bool defaultState)
     : Device("Piston", name, port), extended(defaultState) {
   pros::c::adi_port_set_config(this->port, pros::adi_port_config_e_t::E_ADI_DIGITAL_OUT);
   pros::c::adi_digital_write(this->port, this->extended);

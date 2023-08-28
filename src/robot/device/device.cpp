@@ -14,7 +14,7 @@ static std::map<Device *, bool> devices;
 
 [[noreturn]] void reconfigureTask([[maybe_unused]] void *params);
 
-Device::Device(const char *typeName, const char *name, uint8_t port) : typeName(typeName), name(name), port(port) {
+Device::Device(const char *typeName, const char *name, int8_t port) : typeName(typeName), name(name), port(port) {
   pendingDevices.push_back(this);
 }
 
@@ -34,7 +34,7 @@ bool Device::checkConnect() {
   return b;
 }
 
-[[nodiscard]] uint8_t Device::getPort() const { return this->port; }
+[[nodiscard]] int8_t Device::getPort() const { return this->port; }
 
 [[nodiscard]] const char *Device::getTypeName() const { return this->typeName; }
 

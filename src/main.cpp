@@ -99,12 +99,13 @@ void initialize() {
                              })}));
   screen::addScreen(new screen::Chart<2, 100>(
       robot, "Drivetrain PID Error",
-      new screen::DataSet[2]{
-          screen::DataSet("Left", screen::colour::LIGHT_BLUE,
-                          [](robot::Robot &robot) { return static_cast<float>(robot.drivetrain.leftPID.getError()); }),
-          screen::DataSet("Right", screen::colour::PINK, [](robot::Robot &robot) {
-            return static_cast<float>(robot.drivetrain.rightPID.getError());
-          })}));
+      new screen::DataSet[2]{screen::DataSet("Left", screen::colour::LIGHT_BLUE,
+                                             [](robot::Robot &robot) {
+                                               return static_cast<float>(robot.drivetrain.leftPID.getError());
+                                             }),
+                             screen::DataSet("Right", screen::colour::PINK, [](robot::Robot &robot) {
+                               return static_cast<float>(robot.drivetrain.rightPID.getError());
+                             })}));
   screen::addScreen(new screen::PidTuning(robot, robot.drivetrain.rightPID, std::string("!PidTuning")));
 #endif
   section_swap("Initialize Screen");
@@ -173,8 +174,8 @@ void disabled() {
  */
 Robot &getRobot() {
   static Robot robot =
-      Robot(DRIVETRAIN_MOTOR_L1, DRIVETRAIN_MOTOR_L2, DRIVETRAIN_MOTOR_L3, DRIVETRAIN_MOTOR_R1, DRIVETRAIN_MOTOR_R2, DRIVETRAIN_MOTOR_R3,
-            INTAKE_RIGHT_MOTOR, INTAKE_LEFT_MOTOR, INERTIAL, ARM_1, ARM_2);
+      Robot(DRIVETRAIN_MOTOR_L1, DRIVETRAIN_MOTOR_L2, DRIVETRAIN_MOTOR_L3, DRIVETRAIN_MOTOR_R1, DRIVETRAIN_MOTOR_R2,
+            DRIVETRAIN_MOTOR_R3, INTAKE_RIGHT_MOTOR, INTAKE_LEFT_MOTOR, INERTIAL, ARM_1, ARM_2);
   device::initialize();
   return robot;
 }

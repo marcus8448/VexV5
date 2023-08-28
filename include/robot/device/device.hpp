@@ -13,17 +13,17 @@ private:
   const char *name;
 
 protected:
-  const uint8_t port;
+  const int8_t port;
 
 public:
-  explicit Device(const char *typeName, const char *name, uint8_t port);
+  explicit Device(const char *typeName, const char *name, int8_t port);
   explicit Device(const Device &) = delete;
   ~Device() = default;
 
   virtual void reconfigure() const = 0;
 
   [[nodiscard]] virtual bool isConnected() const = 0;
-  [[nodiscard]] uint8_t getPort() const;
+  [[nodiscard]] int8_t getPort() const;
 
   [[nodiscard]] const char *getTypeName() const;
   [[nodiscard]] const char *getName() const;

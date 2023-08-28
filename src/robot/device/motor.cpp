@@ -6,9 +6,10 @@
 #include <cmath>
 
 namespace robot::device {
-Motor::Motor(uint8_t port, const char *name, bool reversed, pros::motor_gearset_e_t gearset,
+Motor::Motor(int8_t port, const char *name, bool reversed, pros::motor_gearset_e_t gearset,
              pros::motor_brake_mode_e_t brake_mode)
-    : Device("Motor", name, reversed ? -port : port), gearset(gearset), maxVelocity(gearsetMaxVelocity(gearset)), brakeMode(brake_mode) {
+    : Device("Motor", name, reversed ? -port : port), gearset(gearset), maxVelocity(gearsetMaxVelocity(gearset)),
+      brakeMode(brake_mode) {
   pros::c::motor_set_gearing(this->port, this->gearset);
   pros::c::motor_set_encoder_units(this->port, MOTOR_ENCODER_UNITS);
   pros::c::motor_set_brake_mode(this->port, this->brakeMode);
@@ -156,7 +157,8 @@ constexpr int16_t Motor::gearsetMaxVelocity(pros::motor_gearset_e_t gearset) {
 }
 
 double clampMv(double value, double moveMin) {
-  if (std::abs(value) < moveMin) value = value < 0 ? -600 : 600;
+  if (std::abs(value) < moveMin)
+    value = value < 0 ? -600 : 600;
   return value > MOTOR_MAX_MILLIVOLTS    ? MOTOR_MAX_MILLIVOLTS
          : value < -MOTOR_MAX_MILLIVOLTS ? -MOTOR_MAX_MILLIVOLTS
                                          : value;
@@ -180,8 +182,13 @@ double PID::update(double target, double value) {
   if (std::signbit(this->error) != std::signbit(this->prevError) || std::abs(this->error) > this->integralRange) {
     this->integral = 0;
   }
-  info("%.2f %.2f/%.2f, %.1f %.1f %.1f * %.2f %.2f %.2f -> %.2f/%.2f/%.2f -> %.2f", this->error, value, target, this->kp, this->ki, this->kd, this->error, this->integral, this->error - this->prevError, this->error * this->kp, this->integral * this->ki, (this->error - this->prevError) * this->kd, clampMv(this->error * this->kp + this->integral * this->ki + (this->error - this->prevError) * this->kd, this->moveMin));
-  return clampMv(this->error * this->kp + this->integral * this->ki + (this->error - this->prevError) * this->kd, this->moveMin);
+  info("%.2f %.2f/%.2f, %.1f %.1f %.1f * %.2f %.2f %.2f -> %.2f/%.2f/%.2f -> %.2f", this->error, value, target,
+       this->kp, this->ki, this->kd, this->error, this->integral, this->error - this->prevError, this->error * this->kp,
+       this->integral * this->ki, (this->error - this->prevError) * this->kd,
+       clampMv(this->error * this->kp + this->integral * this->ki + (this->error - this->prevError) * this->kd,
+               this->moveMin));
+  return clampMv(this->error * this->kp + this->integral * this->ki + (this->error - this->prevError) * this->kd,
+                 this->moveMin);
 }
 
 double PID::getError() const { return error; }

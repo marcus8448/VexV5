@@ -4,16 +4,17 @@
 #include "robot/robot.hpp"
 #include "screen.hpp"
 #include "structure/fixed_queue.hpp"
+#include <functional>
 
 namespace screen {
 class DataSet {
 public:
   const char *label;
-  const lv_color_t color;
-  float (*function)(robot::Robot &);
+  lv_color_t color;
+  std::function<float(robot::Robot &)> function;
 
 public:
-  explicit DataSet(const char *label, lv_color_t color, float (*function)(robot::Robot &));
+  explicit DataSet(const char *label, lv_color_t color, std::function<float(robot::Robot &)> function);
 };
 
 template <size_t Sets, size_t Points> class Chart : public Screen {

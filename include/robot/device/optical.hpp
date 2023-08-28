@@ -10,7 +10,7 @@ private:
   bool gesture = false;
 
 public:
-  explicit Optical(uint8_t port, const char *name, uint8_t led_pwm = 0, bool gesture = false);
+  explicit Optical(int8_t port, const char *name, uint8_t led_pwm = 0, bool gesture = false);
 
   [[nodiscard]] double getHue() const;
   [[nodiscard]] double getSaturation() const;

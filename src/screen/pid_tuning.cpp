@@ -1,8 +1,8 @@
 #include "screen/pid_tuning.hpp"
 
-#include "main.hpp"
 #include "debug/logger.hpp"
 #include "format.hpp"
+#include "main.hpp"
 #include "robot/robot.hpp"
 #include "screen/screen.hpp"
 #include "tasks.hpp"
@@ -67,11 +67,11 @@ void PidTuning::update() {
         this->overshoot = std::max(this->overshoot, std::abs(error));
       }
 
-      lv_label_set_text(this->changeLabel, fmt::static_format("Change: %.4f", error - this->prevError));
+      lv_label_set_text(this->changeLabel, fmt::string_format("Change: %.4f", error - this->prevError).c_str());
     }
-    lv_label_set_text(this->errorLabel, fmt::static_format("Error: %.4f", error));
-    lv_label_set_text(this->overshootLabel, fmt::static_format("Overshoot: %.4f", this->overshootLabel));
-    lv_label_set_text(this->oscillationsLabel, fmt::static_format("Oscillations: %i", this->oscillations));
+    lv_label_set_text(this->errorLabel, fmt::string_format("Error: %.4f", error).c_str());
+    lv_label_set_text(this->overshootLabel, fmt::string_format("Overshoot: %.4f", this->overshootLabel).c_str());
+    lv_label_set_text(this->oscillationsLabel, fmt::string_format("Oscillations: %i", this->oscillations).c_str());
     this->prevError = error;
   }
 }
@@ -105,7 +105,8 @@ void PidTuning::cleanup() {
     }
     this->taskHandle = nullptr;
 
-    rtos::createTask("Opcontrol", [](void *param) { opcontrol(); }, nullptr);
+    rtos::createTask(
+        "Opcontrol", [](void *param) { opcontrol(); }, nullptr);
   }
 }
 
@@ -132,8 +133,8 @@ ControlGroup::ControlGroup(lv_obj_t *screen, lv_coord_t x, lv_coord_t y, lv_coor
   lv_obj_set_pos(this->decreaseBtn, this->x, this->y + splitHeight * 2);
   lv_obj_set_size(this->decreaseBtn, this->width, splitHeight);
 
-  lv_label_set_text(increaseBtnLabel, fmt::static_format("+%.2f", this->delta));
-  lv_label_set_text(decreaseBtnLabel, fmt::static_format("-%.2f", this->delta));
+  lv_label_set_text(increaseBtnLabel, fmt::string_format("+%.2f", this->delta).c_str());
+  lv_label_set_text(decreaseBtnLabel, fmt::string_format("-%.2f", this->delta).c_str());
 
   lv_obj_add_event_cb(this->increaseBtn, increaseValue, LV_EVENT_CLICKED, this);
   lv_obj_add_event_cb(this->decreaseBtn, decreaseValue, LV_EVENT_CLICKED, this);
@@ -149,7 +150,7 @@ ControlGroup::~ControlGroup() {
   this->decreaseBtn = nullptr;
 }
 
-void ControlGroup::update() { lv_label_set_text(this->valueLabel, fmt::static_format("%.2f", *this->value)); }
+void ControlGroup::update() { lv_label_set_text(this->valueLabel, fmt::string_format("%.2f", *this->value).c_str()); }
 
 static void increaseValue(lv_event_t *event) {
   auto group = static_cast<ControlGroup *>(event->user_data);

@@ -49,7 +49,7 @@ private:
   pros::motor_brake_mode_e_t brakeMode;
 
 public:
-  explicit Motor(uint8_t port, const char *name, bool reversed = false,
+  explicit Motor(int8_t port, const char *name, bool reversed = false,
                  pros::motor_gearset_e_t gearset = DEFAULT_MOTOR_GEARSET,
                  pros::motor_brake_mode_e_t brake_mode = DEFAULT_MOTOR_BRAKE);
 
