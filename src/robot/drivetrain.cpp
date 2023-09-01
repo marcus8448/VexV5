@@ -114,16 +114,33 @@ void Drivetrain::updateState() {
   double prevRightPos = this->rightPos;
   double prevLeftPos = this->leftPos;
   this->heading = this->imu.getRotation();
-  this->rightPos = (this->motorR1.getPosition() + this->motorR2.getPosition() + this->motorR3.getPosition()) / 3.0;
-  this->leftPos = (this->motorL1.getPosition() + this->motorL2.getPosition() + this->motorL3.getPosition()) / 3.0;
+  this->rightPos = this->motorR1.getPosition();//(this->motorR1.getPosition() + this->motorR2.getPosition() + this->motorR3.getPosition()) / 3.0;
+  this->leftPos = this->motorL1.getPosition();//(this->motorL1.getPosition() + this->motorL2.getPosition() + this->motorL3.getPosition()) / 3.0;
 
-  double rightDiff = this->rightPos - prevRightPos;
-  double leftDiff = this->leftPos - prevLeftPos;
+  double rightDiff = units::encoderToInch(this->rightPos - prevRightPos);
+  double leftDiff = units::encoderToInch(this->leftPos - prevLeftPos);
 
-  double diff = (rightDiff + leftDiff) / 2.0;
-  double avgHead = (this->heading + prevHeading) / 2.0;
-  this->posY += diff * sin(avgHead);
-  this->posX += diff * cos(avgHead);
+  info("D %.2f /%.2f | P %.2f / %.2f | H %.2f", leftDiff, rightDiff, this->leftPos, this->rightPos, this->heading);
+  //drivetrain: 12in x 11.5in
+  //860.40 = 90
+  //4.5in, 6.25in
+  double avgHeadDeg = (this->heading + prevHeading) * M_PI / 360.0;
+
+  double dLPosX = leftDiff * std::sin(avgHeadDeg);
+  double dLPosY = leftDiff * std::cos(avgHeadDeg);
+  lPosX += dLPosX;
+  lPosY += dLPosY;
+  double dRPosX = rightDiff * std::sin(avgHeadDeg);
+  double dRPosY = rightDiff * std::cos(avgHeadDeg);
+  rPosX += dRPosX;
+  rPosY += dRPosY;
+
+  double dist = std::sqrt(((lPosX - rPosX) * (lPosX - rPosX)) + ((lPosY - rPosY) * (lPosY - rPosY)));
+  info("dist: %.2f", dist);
+
+  this->cPosX = (lPosX + rPosX) / 2.0;
+  this->cPosY = (lPosY + rPosY) / 2.0;
+  info("L %.2f, %.2f | R %.2f, %.2f | C %.2f, %2.f", lPosX, lPosY, rPosX, rPosY, this->cPosX, this->cPosY);
 
   bool atTarget = false;
   switch (this->targetType) {
@@ -156,10 +173,10 @@ void Drivetrain::updateState() {
     break;
   }
   case CURVE_MOVE: {
-    double h = std::sqrt((this->posX - this->endCurveX) * (this->posX - this->endCurveX) +
-                         (this->posY - this->endCurveY) * (this->posY - this->endCurveY));
-    this->targetPosX = this->endCurveX - h * std::sin(this->curveAngle) * this->curve;
-    this->targetPosY = this->endCurveY - h * std::cos(this->curveAngle) * this->curve;
+//    double h = std::sqrt((this->posX - this->endCurveX) * (this->posX - this->endCurveX) +
+//                         (this->posY - this->endCurveY) * (this->posY - this->endCurveY));
+//    this->targetPosX = this->endCurveX - h * std::sin(this->curveAngle) * this->curve;
+//    this->targetPosY = this->endCurveY - h * std::cos(this->curveAngle) * this->curve;
   }
   case DIRECT_MOVE: {
     double head = this->headingPID.update(this->targetHeading, this->heading);

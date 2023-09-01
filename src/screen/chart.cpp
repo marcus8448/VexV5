@@ -109,6 +109,5 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::cleanup() {
   this->titleLabel = nullptr;
 }
 
-template class Chart<4, 100>;
 template class Chart<2, 100>;
 } // namespace screen

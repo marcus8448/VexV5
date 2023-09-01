@@ -59,8 +59,12 @@ public:
   ControlScheme controlScheme = ARCADE;
 #endif
 
-  double posX = 0.0; // not anchored to anything - rel to start pos
-  double posY = 0.0;
+  double cPosX = 0.0; // not anchored to anything - rel to start pos
+  double cPosY = 0.0;
+  double rPosX = +6.25;
+  double rPosY = 0.0;
+  double lPosX = -6.25;
+  double lPosY = 0.0;
 
 private:
   TargetType targetType = NONE;
