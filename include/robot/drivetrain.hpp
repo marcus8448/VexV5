@@ -49,6 +49,9 @@ public:
 
   device::Inertial imu;
 
+  device::PID velRightPID;
+  device::PID velLeftPID;
+
   device::PID rightPID;
   device::PID leftPID;
   device::PID headingPID;
@@ -99,8 +102,8 @@ public:
    * @param rightBack The port of the motor on the back of the robot and the right side.
    * @param leftBack The port of the motor on the back of the robot and the left side.
    */
-  Drivetrain(uint8_t left1, uint8_t left2, uint8_t left3, uint8_t right1, uint8_t right2, uint8_t right3,
-             uint8_t inertial);
+  Drivetrain(int8_t left1, int8_t left2, int8_t left3, int8_t right1, int8_t right2, int8_t right3,
+             int8_t inertial);
 
   /**
    * Drives the robot forwards by the specified distance.

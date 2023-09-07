@@ -28,6 +28,9 @@ private:
 
 public:
   explicit PID(double Kp, double Ki, double Kd, double integralRange, double acceptableError);
+  explicit PID();
+
+  void copyParams(const PID &other);
 
   void resetState();
 

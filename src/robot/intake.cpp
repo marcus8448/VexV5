@@ -1,7 +1,7 @@
 #include "robot/intake.hpp"
 
 namespace robot {
-Intake::Intake(uint8_t leftPort, uint8_t rightPort)
+Intake::Intake(int8_t leftPort, int8_t rightPort)
     : leftMotor(device::Motor(leftPort, "Intake L")), rightMotor(device::Motor(rightPort, "Intake R", true)),
       pneumatic(device::PneumaticPiston('A', "Launcher")) {}
 

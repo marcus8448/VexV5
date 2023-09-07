@@ -82,31 +82,31 @@ void initialize() {
 #endif
   screen::addScreen(new screen::Information(robot));
 #ifndef DISABLE_DRIVETRAIN_DEBUG_SCREEN
-//  screen::addScreen(new screen::Chart<2, 100>(
-//      robot, "Drivetrain Velocity",
-//      new screen::DataSet[2]{screen::DataSet("Left", screen::colour::RED,
-//                                             [](robot::Robot &robot) {
-//                                               return static_cast<float>((robot.drivetrain.motorL1.getVelocity() +
-//                                                                          robot.drivetrain.motorL2.getVelocity() +
-//                                                                          robot.drivetrain.motorL3.getVelocity()) /
-//                                                                         3.0);
-//                                             }),
-//                             screen::DataSet("Right", screen::colour::GREEN, [](robot::Robot &robot) {
-//                               return static_cast<float>((robot.drivetrain.motorR1.getVelocity() +
-//                                                          robot.drivetrain.motorR2.getVelocity() +
-//                                                          robot.drivetrain.motorR3.getVelocity()) /
-//                                                         3.0);
-//                             })}));
-//  screen::addScreen(new screen::Chart<2, 100>(
-//      robot, "Drivetrain PID Error",
-//      new screen::DataSet[2]{screen::DataSet("Left", screen::colour::LIGHT_BLUE,
-//                                             [](robot::Robot &robot) {
-//                                               return static_cast<float>(robot.drivetrain.leftPID.getError());
-//                                             }),
-//                             screen::DataSet("Right", screen::colour::PINK, [](robot::Robot &robot) {
-//                               return static_cast<float>(robot.drivetrain.rightPID.getError());
-//                             })}));
   screen::addScreen(new screen::PidTuning(robot, robot.drivetrain.rightPID, std::string("!PidTuning")));
+  screen::addScreen(new screen::Chart<2, 100>(
+      robot, "Drivetrain Velocity",
+      new screen::DataSet[2]{screen::DataSet("Left", screen::colour::RED,
+                                             [](robot::Robot &robot) {
+                                               return static_cast<float>((robot.drivetrain.motorL1.getVelocity() +
+                                                                          robot.drivetrain.motorL2.getVelocity() +
+                                                                          robot.drivetrain.motorL3.getVelocity()) /
+                                                                         3.0);
+                                             }),
+                             screen::DataSet("Right", screen::colour::GREEN, [](robot::Robot &robot) {
+                               return static_cast<float>((robot.drivetrain.motorR1.getVelocity() +
+                                                          robot.drivetrain.motorR2.getVelocity() +
+                                                          robot.drivetrain.motorR3.getVelocity()) /
+                                                         3.0);
+                             })}));
+  screen::addScreen(new screen::Chart<2, 100>(
+      robot, "Drivetrain PID Error",
+      new screen::DataSet[2]{screen::DataSet("Left", screen::colour::LIGHT_BLUE,
+                                             [](robot::Robot &robot) {
+                                               return static_cast<float>(robot.drivetrain.leftPID.getError());
+                                             }),
+                             screen::DataSet("Right", screen::colour::PINK, [](robot::Robot &robot) {
+                               return static_cast<float>(robot.drivetrain.rightPID.getError());
+                             })}));
 #endif
   section_swap("Initialize Screen");
   screen::initialize(); // initialize the screen

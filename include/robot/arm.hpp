@@ -16,7 +16,7 @@ public:
   device::Motor primary;
   device::Motor secondary;
 
-  explicit Arm(uint8_t primaryPort, uint8_t secondaryPort);
+  explicit Arm(int8_t primaryPort, int8_t secondaryPort);
 
   void raise();
   void lower();

@@ -5,6 +5,7 @@
 #include "control/input/controller.hpp"
 #include "drivetrain.hpp"
 #include "intake.hpp"
+#include <memory>
 #include <string>
 
 namespace robot {
@@ -28,7 +29,7 @@ public:
   /**
    * The robot's controller. Used during operator control.
    */
-  control::input::Controller *controller;
+  std::unique_ptr<control::input::Controller> controller;
 
   std::string autonomous = "None";
 
@@ -42,8 +43,8 @@ public:
    * @param indexer The robot's indexer.
    * @param roller The robot's roller.
    */
-  explicit Robot(uint8_t driveL1, uint8_t driveL2, uint8_t driveL3, uint8_t driveR1, uint8_t driveR2, uint8_t driveR3,
-                 uint8_t intakeRight, uint8_t intakeLeft, uint8_t inertial, uint8_t arm1, uint8_t arm2);
+  explicit Robot(int8_t driveL1, int8_t driveL2, int8_t driveL3, int8_t driveR1, int8_t driveR2, int8_t driveR3,
+                 int8_t intakeRight, int8_t intakeLeft, int8_t inertial, int8_t arm1, int8_t arm2);
   explicit Robot(const Robot &robot) = delete;
   ~Robot();
 

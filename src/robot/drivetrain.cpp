@@ -11,15 +11,19 @@
 #define STABILIZE_TICKS 25
 
 namespace robot {
-Drivetrain::Drivetrain(uint8_t left1, uint8_t left2, uint8_t left3, uint8_t right1, uint8_t right2, uint8_t right3,
-                       uint8_t inertial)
+Drivetrain::Drivetrain(int8_t left1, int8_t left2, int8_t left3, int8_t right1, int8_t right2, int8_t right3,
+                       int8_t inertial)
     : motorL1(device::Motor(left1, "Drive L1", true, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       motorL2(device::Motor(left2, "Drive L2", true, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       motorL3(device::Motor(left3, "Drive L3", false, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       motorR1(device::Motor(right1, "Drive R1", false, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       motorR2(device::Motor(right2, "Drive R2", false, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       motorR3(device::Motor(right3, "Drive R3", true, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
-      imu(device::Inertial(inertial, "IMU")), rightPID(12.0, 3.0, 3.0, 90.0, 5.0), leftPID(0.0, 0.0, 0.0, 0.0, 0.0),
+      imu(device::Inertial(inertial, "IMU")),
+      velRightPID(120.0, 15.0, 20.0, 50.0, 0.0),
+      velLeftPID(),
+      rightPID(12.0, 3.0, 3.0, 90.0, 5.0),
+      leftPID(),
       headingPID(80.0, 10.0, 0.0, 10.0, 10000.2) {}
 
 bool Drivetrain::isAtTarget() const { return this->timeAtTarget > STABILIZE_TICKS; }
@@ -83,7 +87,7 @@ void Drivetrain::curveTargeting(double relInFwd, double relInLat, double curve, 
 }
 
 void Drivetrain::awaitMovement() const {
-  while (this->timeAtTarget < STABILIZE_TICKS) {
+  while (!this->isAtTarget()) {
     pros::c::delay(ROBOT_TICK_RATE * (STABILIZE_TICKS - this->timeAtTarget));
   }
 }
@@ -92,7 +96,7 @@ void Drivetrain::updateTargeting(control::input::Controller *controller) {
   this->setTarget(OPERATOR_DIRECT);
   if (this->controlScheme == ARCADE) {
     double power = controller->leftStickY();
-    double rotation = controller->rightStickX() * 0.5;
+    double rotation = controller->rightStickX() * 0.8;
 
     double left = (power + rotation) / JOYSTICK_MAX;
     double right = (power - rotation) / JOYSTICK_MAX;
@@ -101,11 +105,15 @@ void Drivetrain::updateTargeting(control::input::Controller *controller) {
       right /= max;
       left /= max;
     }
+    //    this->powerRight = this->velRightPID.update(right * 200.0, this->motorR1.getVelocity());
+    //    this->powerLeft = this->velLeftPID.update(left * 200.0, this->motorL1.getVelocity());
     this->powerRight = static_cast<int16_t>(right * MOTOR_MAX_MILLIVOLTS);
     this->powerLeft = static_cast<int16_t>(left * MOTOR_MAX_MILLIVOLTS);
   } else {
-    this->powerRight = static_cast<int16_t>((controller->rightStickY() * 0.8) / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
-    this->powerLeft = static_cast<int16_t>((controller->leftStickY() * 0.8) / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
+//    this->powerRight = this->velRightPID.update(controller->rightStickY() / JOYSTICK_MAX * 200.0, this->motorR1.getVelocity());
+//    this->powerLeft = this->velLeftPID.update(controller->leftStickY() / JOYSTICK_MAX * 200.0, this->motorL1.getVelocity());
+    this->powerRight = static_cast<int16_t>((controller->rightStickY() * 0.9) / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
+    this->powerLeft = static_cast<int16_t>((controller->leftStickY() * 0.9) / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
   }
 }
 
@@ -141,6 +149,9 @@ void Drivetrain::updateState() {
   this->cPosX = (lPosX + rPosX) / 2.0;
   this->cPosY = (lPosY + rPosY) / 2.0;
   info("L %.2f, %.2f | R %.2f, %.2f | C %.2f, %2.f", lPosX, lPosY, rPosX, rPosY, this->cPosX, this->cPosY);
+
+  this->leftPID.copyParams(this->rightPID);
+  this->velLeftPID.copyParams(this->velRightPID);
 
   bool atTarget = false;
   switch (this->targetType) {
@@ -180,12 +191,6 @@ void Drivetrain::updateState() {
   }
   case DIRECT_MOVE: {
     double head = this->headingPID.update(this->targetHeading, this->heading);
-    this->leftPID.kp = this->rightPID.kp;
-    this->leftPID.ki = this->rightPID.ki;
-    this->leftPID.kd = this->rightPID.kd;
-    this->leftPID.integralRange = this->rightPID.integralRange;
-    this->leftPID.acceptableError = this->rightPID.acceptableError;
-    this->leftPID.moveMin = this->rightPID.moveMin = 500;
     double right = this->rightPID.update(this->targetRight, this->rightPos);
     double left = this->leftPID.update(this->targetLeft, this->leftPos);
 

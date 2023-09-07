@@ -17,7 +17,7 @@ public:
   device::Motor rightMotor;
   device::PneumaticPiston pneumatic;
 
-  explicit Intake(uint8_t leftPort, uint8_t rightPort);
+  explicit Intake(int8_t leftPort, int8_t rightPort);
 
   void stop();
   void intake(uint16_t speed = DEFAULT_INTAKE_SPEED);

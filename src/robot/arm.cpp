@@ -1,7 +1,7 @@
 #include "robot/arm.hpp"
 
 namespace robot {
-Arm::Arm(uint8_t primaryPort, uint8_t secondaryPort)
+Arm::Arm(int8_t primaryPort, int8_t secondaryPort)
     : primary(device::Motor(primaryPort, "Arm 1")), secondary(device::Motor(secondaryPort, "Arm 2")) {
   this->primary.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
   this->secondary.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);

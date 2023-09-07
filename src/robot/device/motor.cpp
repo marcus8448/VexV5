@@ -192,4 +192,15 @@ double PID::update(double target, double value) {
 }
 
 double PID::getError() const { return error; }
+
+void PID::copyParams(const PID &other) {
+  this->kp = other.kp;
+  this->ki = other.ki;
+  this->kd = other.kd;
+  this->integralRange = other.integralRange;
+  this->acceptableError = other.acceptableError;
+  this->moveMin = other.moveMin;
+}
+
+PID::PID() {}
 } // namespace robot::device
