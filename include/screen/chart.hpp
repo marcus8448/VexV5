@@ -19,7 +19,6 @@ public:
 
 template <size_t Sets, size_t Points> class Chart : public Screen {
 private:
-  robot::Robot &robot;
   const char *title;
 
   DataSet *dataSets = nullptr;
@@ -30,12 +29,11 @@ private:
   lv_obj_t *titleLabel = nullptr;
 
 public:
-  explicit Chart(robot::Robot &robot, const char *title, DataSet dataSets[Sets]);
+  explicit Chart(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height, const char *title,
+                 DataSet dataSets[Sets]);
+  ~Chart() override;
 
-  void initialize(lv_obj_t *screen) override;
   void update() override;
-  void cleanup() override;
 };
 } // namespace screen
-
 #endif // SCREEN_CHART_HPP

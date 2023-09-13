@@ -9,47 +9,10 @@
 #include <utility>
 
 namespace screen {
+SCREEN_CB(PidTuning, startTest)
+
 static void increaseValue(lv_event_t *event);
 static void decreaseValue(lv_event_t *event);
-static void testRobot(lv_event_t *event);
-
-PidTuning::PidTuning(robot::Robot &robot, robot::device::PID &pid, std::string runName)
-    : pid(pid), runName(std::move(runName)), robot(robot) {}
-
-void PidTuning::initialize(lv_obj_t *screen) {
-  this->Kp =
-      new ControlGroup(screen, 0, 0, (SCREEN_HEIGHT - BUTTON_SIZE) / 3, SCREEN_HEIGHT - BUTTON_SIZE, 1.0, &pid.kp);
-  this->Ki = new ControlGroup(screen, (SCREEN_WIDTH / 2 / 3), 0, (SCREEN_HEIGHT - BUTTON_SIZE) / 3,
-                              SCREEN_HEIGHT - BUTTON_SIZE, 1.0, &pid.ki);
-  this->Kd = new ControlGroup(screen, SCREEN_WIDTH / 2 / 3 * 2, 0, (SCREEN_HEIGHT - BUTTON_SIZE) / 3,
-                              SCREEN_HEIGHT - BUTTON_SIZE, 1.0, &pid.kd);
-
-  this->testBtn = lv_btn_create(screen);
-
-  lv_obj_t *testLabel = lv_label_create(this->testBtn);
-  lv_label_set_text(testLabel, "Test");
-  lv_obj_set_style_text_font(testLabel, LV_THEME_DEFAULT_FONT_TITLE, LV_STATE_ANY);
-  lv_obj_set_align(testLabel, LV_ALIGN_CENTER);
-
-  lv_obj_add_event_cb(this->testBtn, testRobot, LV_EVENT_CLICKED, this);
-  lv_obj_set_pos(this->testBtn, SCREEN_WIDTH / 2, SCREEN_HEIGHT - BUTTON_SIZE - 80);
-  lv_obj_set_size(this->testBtn, SCREEN_WIDTH / 2, 80);
-
-  this->errorLabel = lv_label_create(screen);
-  this->changeLabel = lv_label_create(screen);
-  this->oscillationsLabel = lv_label_create(screen);
-  this->overshootLabel = lv_label_create(screen);
-
-  lv_obj_set_pos(this->errorLabel, SCREEN_WIDTH / 2, 0);
-  lv_obj_set_pos(this->changeLabel, SCREEN_WIDTH / 2, 16);
-  lv_obj_set_pos(this->oscillationsLabel, SCREEN_WIDTH / 2, 32);
-  lv_obj_set_pos(this->overshootLabel, SCREEN_WIDTH / 2, 48);
-
-  lv_label_set_text(this->errorLabel, "Error: ?");
-  lv_label_set_text(this->changeLabel, "Change: ?");
-  lv_label_set_text(this->overshootLabel, "Overshoot: ?");
-  lv_label_set_text(this->oscillationsLabel, "Oscillations: ?");
-}
 
 void PidTuning::update() {
   this->Kp->update();
@@ -76,14 +39,47 @@ void PidTuning::update() {
   }
 }
 
-void PidTuning::cleanup() {
+PidTuning::PidTuning(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height,
+                     robot::device::PID &pid, std::string runName)
+    : Screen(robot, screen, width, height), pid(pid), runName(std::move(runName)) {
+  this->Kp =
+      new ControlGroup(screen, 0, 0, (SCREEN_HEIGHT - BUTTON_SIZE) / 3, SCREEN_HEIGHT - BUTTON_SIZE, 1.0, &pid.kp);
+  this->Ki = new ControlGroup(screen, (SCREEN_WIDTH / 2 / 3), 0, (SCREEN_HEIGHT - BUTTON_SIZE) / 3,
+                              SCREEN_HEIGHT - BUTTON_SIZE, 1.0, &pid.ki);
+  this->Kd = new ControlGroup(screen, SCREEN_WIDTH / 2 / 3 * 2, 0, (SCREEN_HEIGHT - BUTTON_SIZE) / 3,
+                              SCREEN_HEIGHT - BUTTON_SIZE, 1.0, &pid.kd);
+
+  this->testBtn = lv_btn_create(screen);
+
+  lv_obj_t *testLabel = lv_label_create(this->testBtn);
+  lv_label_set_text(testLabel, "Test");
+  lv_obj_set_style_text_font(testLabel, LV_THEME_DEFAULT_FONT_TITLE, LV_STATE_ANY);
+  lv_obj_set_align(testLabel, LV_ALIGN_CENTER);
+
+  lv_obj_add_event_cb(this->testBtn, ::screen::startTest, LV_EVENT_CLICKED, this);
+  lv_obj_set_pos(this->testBtn, SCREEN_WIDTH / 2, SCREEN_HEIGHT - BUTTON_SIZE - 80);
+  lv_obj_set_size(this->testBtn, SCREEN_WIDTH / 2, 80);
+
+  this->errorLabel = lv_label_create(screen);
+  this->changeLabel = lv_label_create(screen);
+  this->oscillationsLabel = lv_label_create(screen);
+  this->overshootLabel = lv_label_create(screen);
+
+  lv_obj_set_pos(this->errorLabel, SCREEN_WIDTH / 2, 0);
+  lv_obj_set_pos(this->changeLabel, SCREEN_WIDTH / 2, 16);
+  lv_obj_set_pos(this->oscillationsLabel, SCREEN_WIDTH / 2, 32);
+  lv_obj_set_pos(this->overshootLabel, SCREEN_WIDTH / 2, 48);
+
+  lv_label_set_text(this->errorLabel, "Error: ?");
+  lv_label_set_text(this->changeLabel, "Change: ?");
+  lv_label_set_text(this->overshootLabel, "Overshoot: ?");
+  lv_label_set_text(this->oscillationsLabel, "Oscillations: ?");
+}
+
+PidTuning::~PidTuning() {
   delete this->Kp;
   delete this->Ki;
   delete this->Kd;
-
-  this->Kp = nullptr;
-  this->Ki = nullptr;
-  this->Kd = nullptr;
 
   lv_obj_del_async(this->testBtn);
   lv_obj_del_async(this->errorLabel);
@@ -91,22 +87,52 @@ void PidTuning::cleanup() {
   lv_obj_del_async(this->overshootLabel);
   lv_obj_del_async(this->oscillationsLabel);
 
-  this->testBtn = nullptr;
-  this->errorLabel = nullptr;
-  this->changeLabel = nullptr;
-  this->overshootLabel = nullptr;
-  this->oscillationsLabel = nullptr;
-
   if (this->taskHandle != nullptr) {
     this->testing = false;
     pros::task_state_e_t state = pros::c::task_get_state(this->taskHandle);
     if (state != pros::E_TASK_STATE_DELETED && state != pros::E_TASK_STATE_INVALID) {
       rtos::killTask(this->taskHandle);
     }
-    this->taskHandle = nullptr;
 
     rtos::createTask(
         "Opcontrol", [](void *param) { opcontrol(); }, nullptr);
+  }
+}
+
+void PidTuning::startTest() {
+  if (!this->testing) {
+    info("starting test");
+    rtos::killRootTask();
+    info("starting test!");
+    this->taskHandle = rtos::createTask(
+        "PID Tuning",
+        [](void *param) {
+          info("Task created");
+          auto inst = static_cast<PidTuning *>(param);
+          inst->overshoot = 0;
+          inst->oscillations = 0;
+          inst->prevError = INFINITY;
+          std::string prevAuton = inst->robot.autonomous;
+          inst->robot.autonomous = inst->runName;
+          scopePush("PID test");
+          inst->testing = true;
+          autonomous();
+          inst->testing = false;
+          scopePop();
+          inst->robot.autonomous = prevAuton;
+          inst->taskHandle = nullptr;
+        },
+        this);
+  } else {
+    if (this->taskHandle != nullptr) {
+      info("kill task");
+      pros::task_state_e_t state = pros::c::task_get_state(this->taskHandle);
+      if (state != pros::E_TASK_STATE_DELETED && state != pros::E_TASK_STATE_INVALID) {
+        rtos::killTask(this->taskHandle);
+      }
+      this->taskHandle = nullptr;
+    }
+    this->testing = false;
   }
 }
 
@@ -160,43 +186,5 @@ static void increaseValue(lv_event_t *event) {
 static void decreaseValue(lv_event_t *event) {
   auto group = static_cast<ControlGroup *>(event->user_data);
   *group->value -= group->delta;
-}
-
-static void testRobot(lv_event_t *event) {
-  auto inst = static_cast<PidTuning *>(event->user_data);
-  if (!inst->testing) {
-    info("starting test");
-    rtos::killRootTask();
-    info("starting test!");
-    inst->taskHandle = rtos::createTask(
-        "PID Tuning",
-        [](void *param) {
-          info("Task created");
-          auto inst = static_cast<PidTuning *>(param);
-          inst->overshoot = 0;
-          inst->oscillations = 0;
-          inst->prevError = INFINITY;
-          std::string prevAuton = inst->robot.autonomous;
-          inst->robot.autonomous = inst->runName;
-          scopePush("PID test");
-          inst->testing = true;
-          autonomous();
-          inst->testing = false;
-          scopePop();
-          inst->robot.autonomous = prevAuton;
-          inst->taskHandle = nullptr;
-        },
-        inst);
-  } else {
-    if (inst->taskHandle != nullptr) {
-      info("kill task");
-      pros::task_state_e_t state = pros::c::task_get_state(inst->taskHandle);
-      if (state != pros::E_TASK_STATE_DELETED && state != pros::E_TASK_STATE_INVALID) {
-        rtos::killTask(inst->taskHandle);
-      }
-      inst->taskHandle = nullptr;
-    }
-    inst->testing = false;
-  }
 }
 } // namespace screen

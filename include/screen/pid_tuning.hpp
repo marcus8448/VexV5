@@ -42,18 +42,18 @@ private:
 
 public:
   const std::string runName;
-  robot::Robot &robot;
   double prevError = INFINITY;
   double overshoot = 0;
   uint16_t oscillations = 0;
   bool testing = false;
   void *taskHandle = nullptr;
 
-  explicit PidTuning(robot::Robot &robot, robot::device::PID &pid, std::string runName);
+  explicit PidTuning(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height,
+                     robot::device::PID &pid, std::string runName);
+  ~PidTuning() override;
 
-  void initialize(lv_obj_t *screen) override;
   void update() override;
-  void cleanup() override;
+  void startTest();
 };
 } // namespace screen
 #endif // SCREEN_PID_TUNING_HPP

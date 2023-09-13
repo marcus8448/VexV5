@@ -5,19 +5,13 @@
 #include "screen/screen.hpp"
 
 namespace screen {
-struct StateHolder {
-  AutonomousSelect *instance;
-  lv_obj_t *btn;
-};
+SCREEN_CB_ADV(AutonomousSelect, click)
 
-static void click(lv_event_t *event);
-
-AutonomousSelect::AutonomousSelect(robot::Robot &robot) : robot(robot) {}
-
-void AutonomousSelect::initialize(lv_obj_t *screen) {
+AutonomousSelect::AutonomousSelect(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)
+    : Screen(robot, screen, width, height) {
   this->list = lv_list_create(screen);
   lv_obj_set_pos(this->list, 0, 0);
-  lv_obj_set_size(this->list, SCREEN_WIDTH, SCREEN_HEIGHT);
+  lv_obj_set_size(this->list, width, height);
 
   auto programs = control::autonomous::getPrograms();
   for (auto const &[name, program] : programs) {
@@ -25,7 +19,7 @@ void AutonomousSelect::initialize(lv_obj_t *screen) {
       continue;
 
     lv_obj_t *btn = lv_list_add_btn(this->list, nullptr, name.c_str());
-    lv_obj_add_event_cb(btn, ::screen::click, LV_EVENT_CLICKED, new StateHolder{this, btn});
+    lv_obj_add_event_cb(btn, ::screen::click, LV_EVENT_CLICKED, this);
     lv_obj_set_style_text_color(btn, colour::GREEN, LV_STATE_CHECKED);
     if (name == this->robot.autonomous) {
       this->selected = btn;
@@ -36,15 +30,20 @@ void AutonomousSelect::initialize(lv_obj_t *screen) {
   }
 }
 
+AutonomousSelect::~AutonomousSelect() {
+  lv_obj_del_async(this->list);
+  lv_obj_del_async(this->selected);
+}
+
 void AutonomousSelect::update() {}
 
-void AutonomousSelect::click(lv_obj_t *btn) {
+void AutonomousSelect::click(lv_event_t *event) {
   if (this->selected != nullptr) {
     lv_obj_clear_state(this->selected, LV_STATE_CHECKED);
   }
-  this->selected = btn;
+  this->selected = lv_event_get_target(event);
 
-  auto name = std::string(lv_list_get_btn_text(this->list, btn));
+  auto name = std::string(lv_list_get_btn_text(this->list, this->selected));
 
   if (this->robot.controller != nullptr) {
     this->robot.controller->setLine(0, 0, name.c_str());
@@ -52,18 +51,5 @@ void AutonomousSelect::click(lv_obj_t *btn) {
 
   this->robot.autonomous = name;
   lv_obj_add_state(this->selected, LV_STATE_CHECKED);
-}
-
-void AutonomousSelect::cleanup() {
-  lv_obj_del_async(this->list);
-  lv_obj_del_async(this->selected);
-
-  this->list = nullptr;
-  this->selected = nullptr;
-}
-
-static void click(lv_event_t *event) {
-  auto state = static_cast<StateHolder *>(event->user_data);
-  state->instance->click(state->btn);
 }
 } // namespace screen

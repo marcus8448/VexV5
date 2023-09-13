@@ -11,15 +11,12 @@ private:
   lv_obj_t *driveSchemeBtnLbl = nullptr;
 
 public:
-  robot::Robot &robot;
+  explicit ConfigurationScreen(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height);
+  ~ConfigurationScreen() override;
 
-  explicit ConfigurationScreen(robot::Robot &robot);
-
-  void initialize(lv_obj_t *screen) override;
   void update() override;
-  void cleanup() override;
 
-  void update_drive_scheme_label();
+  void click();
 };
 } // namespace screen
 #endif // SCREEN_CONFIG_HPP

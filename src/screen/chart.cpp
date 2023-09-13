@@ -11,16 +11,15 @@ DataSet::DataSet(const char *label, lv_color_t color, std::function<float(robot:
     : label(label), color(color), function(std::move(function)) {}
 
 template <size_t Sets, size_t Points>
-Chart<Sets, Points>::Chart(robot::Robot &robot, const char *title, DataSet dataSets[Sets])
-    : robot(robot), title(title) {
+Chart<Sets, Points>::Chart(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height,
+                           const char *title, DataSet *dataSets)
+    : Screen(robot, screen, width, height), title(title) {
   this->dataSets = dataSets;
 
   for (size_t i = 0; i < Sets; i++) {
     this->data[i] = structure::FixedQueue<Points>();
   }
-}
 
-template <size_t Sets, size_t Points> void Chart<Sets, Points>::initialize(lv_obj_t *screen) {
   this->canvasBuffer = new lv_color_t[LV_CANVAS_BUF_SIZE_TRUE_COLOR(SCREEN_WIDTH, SCREEN_HEIGHT)];
   this->canvas = lv_canvas_create(screen);
   lv_canvas_set_buffer(this->canvas, this->canvasBuffer, SCREEN_WIDTH, SCREEN_HEIGHT, LV_IMG_CF_TRUE_COLOR);
@@ -30,6 +29,13 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::initialize(lv_ob
 
   lv_obj_set_pos(this->titleLabel, SCREEN_WIDTH / 2 - lv_obj_get_width(this->titleLabel) / 2, 0);
 }
+
+template <size_t Sets, size_t Points> Chart<Sets, Points>::~Chart() {
+  lv_obj_del_async(this->canvas);
+  lv_obj_del_async(this->titleLabel);
+
+  delete this->canvasBuffer;
+};
 
 template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
   lv_canvas_fill_bg(this->canvas, lv_color_black(), 255);
@@ -97,16 +103,6 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
     lv_canvas_draw_text(this->canvas, 40 + i * ((SCREEN_WIDTH - (40 * 2)) / Sets), SCREEN_HEIGHT - 16,
                         (SCREEN_WIDTH - (40 * 2)) / Sets, &textDesc, str.c_str());
   }
-}
-
-template <size_t Sets, size_t Points> void Chart<Sets, Points>::cleanup() {
-  lv_obj_del_async(this->canvas);
-  lv_obj_del_async(this->titleLabel);
-
-  delete this->canvasBuffer;
-
-  this->canvas = nullptr;
-  this->titleLabel = nullptr;
 }
 
 template class Chart<2, 100>;

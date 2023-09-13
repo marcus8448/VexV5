@@ -8,9 +8,8 @@ void update_device(lv_obj_t *label, const robot::device::Device &device, bool en
 void update_device(lv_obj_t *label, const robot::device::Device &device, double value);
 void update_device(lv_obj_t *label, const robot::device::Device &device, int32_t value);
 
-Information::Information(robot::Robot &robot) : robot(robot) {}
-
-void Information::initialize(lv_obj_t *screen) {
+Information::Information(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)
+    : Screen(robot, screen, width, height) {
   for (size_t i = 0; i < INFO_COLUMNS; i++) {
     if (this->leftColumn[i] == nullptr) {
       lv_obj_t *obj = lv_label_create(screen);
@@ -49,7 +48,7 @@ void Information::update() {
                     fmt::string_format("Y-position: %fin", units::encoderToInch(this->robot.drivetrain.cPosY)).c_str());
 }
 
-void Information::cleanup() {
+Information::~Information() {
   for (int i = 0; i < INFO_COLUMNS; ++i) {
     lv_obj_del_async(this->leftColumn[i]);
     lv_obj_del_async(this->rightColumn[i]);

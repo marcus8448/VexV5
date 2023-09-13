@@ -9,17 +9,14 @@
 namespace screen {
 class Information : public Screen {
 private:
-  robot::Robot &robot;
-
   lv_obj_t **leftColumn = static_cast<lv_obj_t **>(calloc(sizeof(lv_obj_t *), INFO_COLUMNS));
   lv_obj_t **rightColumn = static_cast<lv_obj_t **>(calloc(sizeof(lv_obj_t *), INFO_COLUMNS));
 
 public:
-  explicit Information(robot::Robot &robot);
+  explicit Information(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height);
+  ~Information() override;
 
-  void initialize(lv_obj_t *screen) override;
   void update() override;
-  void cleanup() override;
 };
 } // namespace screen
 

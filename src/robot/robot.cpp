@@ -14,9 +14,7 @@ Robot::Robot(int8_t driveL1, int8_t driveL2, int8_t driveL3, int8_t driveR1, int
     : drivetrain(driveL1, driveL2, driveL3, driveR1, driveR2, driveR3, inertial), arm(arm1, arm2),
       intake(intakeRight, intakeLeft), controller(nullptr) {}
 
-Robot::~Robot() {
-  warn("Robot destructor called");
-}
+Robot::~Robot() { warn("Robot destructor called"); }
 
 void Robot::updateDevices() {
   this->drivetrain.updateState();
@@ -77,7 +75,5 @@ void Robot::runAutonomous() {
   }
 }
 
-void Robot::setController(control::input::Controller *controller) {
-  this->controller.reset(controller);
-}
+void Robot::setController(control::input::Controller *controller) { this->controller.reset(controller); }
 } // namespace robot

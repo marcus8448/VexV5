@@ -9,7 +9,10 @@
 #include <vector>
 
 namespace screen {
-static std::vector<Screen *> registry = std::vector<Screen *>();
+static std::vector<
+    const std::function<Screen *(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)> *>
+    registry = std::vector<
+        const std::function<Screen *(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)> *>();
 
 static Screen *activeScreen = nullptr;
 static int screenIndex = -1;
@@ -18,6 +21,7 @@ static lv_obj_t *previousBtn = nullptr;
 static lv_obj_t *nextBtn = nullptr;
 
 static pros::mutex_t mutex = nullptr;
+static robot::Robot *robot;
 
 void switch_to_screen(int screen);
 void prev_page([[maybe_unused]] lv_event_t *event);
@@ -25,7 +29,8 @@ void next_page([[maybe_unused]] lv_event_t *event);
 void update();
 [[noreturn]] void update_task([[maybe_unused]] void *params);
 
-void initialize() {
+void initialize(robot::Robot &bot) {
+  robot = &bot;
   mutex = pros::c::mutex_create();
   lv_theme_default_init(lv_disp_get_default(), LV_THEME_DEFAULT_COLOR_PRIMARY, LV_THEME_DEFAULT_COLOR_SECONDARY,
                         LV_THEME_DEFAULT_DARK, LV_THEME_DEFAULT_FONT_NORMAL);
@@ -59,15 +64,13 @@ void switch_to_screen(int screen) {
   if (activeScreen != nullptr) {
     Screen *temp = activeScreen;
     activeScreen = nullptr;
-    temp->cleanup();
+    delete temp;
   }
 
   screenIndex = screen;
 
   if (screen >= 0 && screen < static_cast<int>(registry.size())) {
-    Screen *scrn = registry[screen];
-    scrn->initialize(lv_scr_act());
-    activeScreen = scrn;
+    activeScreen = (*registry[screen])(*robot, lv_scr_act(), SCREEN_WIDTH, SCREEN_HEIGHT);
   }
   pros::c::mutex_give(mutex);
 
@@ -100,8 +103,9 @@ void update() {
   }
 }
 
-void addScreen(Screen *screen) {
-  registry.push_back(screen);
+void addScreen(
+    const std::function<Screen *(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)> &screen) {
+  registry.emplace_back(&screen);
 
   if (nextBtn != nullptr) {
     if (screenIndex + 2 == static_cast<int>(registry.size())) {
@@ -115,8 +119,9 @@ void addScreen(Screen *screen) {
   }
 }
 
-void removeScreen(Screen *screen) {
-  int index = std::find(registry.begin(), registry.end(), screen) - registry.begin();
+void removeScreen(
+    const std::function<Screen *(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)> &screen) {
+  int index = std::find(registry.begin(), registry.end(), &screen) - registry.begin();
   if (screenIndex == index) {
     if (index + 1 == static_cast<int>(registry.size())) {
       switch_to_screen(--screenIndex);
@@ -131,7 +136,7 @@ void removeScreen(Screen *screen) {
     lv_obj_add_flag(previousBtn, LV_OBJ_FLAG_HIDDEN);
   }
 
-  registry.erase(std::remove(registry.begin(), registry.end(), screen), registry.end());
+  registry.erase(std::remove(registry.begin(), registry.end(), &screen), registry.end());
 }
 
 void prev_page([[maybe_unused]] lv_event_t *event) {
@@ -145,4 +150,9 @@ void next_page([[maybe_unused]] lv_event_t *event) {
   switch_to_screen(++screenIndex);
   scopePop();
 }
+
+Screen::Screen(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)
+    : width(width), height(height), robot(robot) {}
+
+Screen::~Screen() = default;
 } // namespace screen
