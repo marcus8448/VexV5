@@ -1,10 +1,9 @@
 set(TARGET_TRIPLE arm-none-eabi)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -target ${TARGET_TRIPLE} -Wno-unused-command-line-argument")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -target ${TARGET_TRIPLE} -Wno-unused-command-line-argument")
+add_compile_options(-target ${TARGET_TRIPLE} -Wno-unused-command-line-argument)
+add_link_options(-target ${TARGET_TRIPLE} -Wno-unused-command-line-argument)
 
-set(CMAKE_C_LINK_FLAGS "-fuse-ld=bfd")
-set(CMAKE_CXX_LINK_FLAGS "-fuse-ld=bfd")
+add_link_options("-fuse-ld=bfd")
 
 execute_process(COMMAND ${TARGET_TRIPLE}-g++ -print-sysroot OUTPUT_VARIABLE CMAKE_SYSROOT OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${TARGET_TRIPLE}-g++ -print-multi-directory OUTPUT_VARIABLE ARM_MULTI_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -23,9 +22,9 @@ set(CMAKE_CXX_COMPILER clang++)
 set(CMAKE_STRIP llvm-strip)
 set(CMAKE_OBJCOPY llvm-objcopy)
 set(CMAKE_CXX_COMPILER_ID Clang)
-set(CMAKE_LINKER ${CMAKE_CXX_COMPILER})
+set(CMAKE_LINKER clang++)
 
 if (ENABLE_LTO)
     # LTO requires lld (which does not work with the linker script)
-    message(NOTICE "LTO is disabled when using clang")
+    message(SEND_ERROR "LTO does not work with clang")
 endif()
