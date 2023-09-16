@@ -6,9 +6,8 @@ namespace screen {
 SCREEN_CB(ConfigurationScreen, click)
 
 ConfigurationScreen::ConfigurationScreen(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)
-    : Screen(robot, screen, width, height) {
-  this->driveSchemeBtn = lv_btn_create(screen);
-  this->driveSchemeBtnLbl = lv_label_create(this->driveSchemeBtn);
+    : Screen(robot, width, height), driveSchemeBtn(lv_btn_create(screen)),
+      driveSchemeBtnLbl(lv_label_create(this->driveSchemeBtn)) {
   lv_obj_set_pos(this->driveSchemeBtn, 0, 0);
   lv_obj_set_size(this->driveSchemeBtn, width / 2, 48);
   lv_obj_add_event_cb(this->driveSchemeBtn, ::screen::click, LV_EVENT_CLICKED, this);

@@ -8,8 +8,7 @@ namespace screen {
 SCREEN_CB_ADV(AutonomousSelect, click)
 
 AutonomousSelect::AutonomousSelect(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)
-    : Screen(robot, screen, width, height) {
-  this->list = lv_list_create(screen);
+    : Screen(robot, width, height), list(lv_list_create(screen)) {
   lv_obj_set_pos(this->list, 0, 0);
   lv_obj_set_size(this->list, width, height);
 

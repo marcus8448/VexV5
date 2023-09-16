@@ -1,6 +1,7 @@
 #ifndef DEBUG_LOGGER_HPP
 #define DEBUG_LOGGER_HPP
 
+#include "format.hpp"
 #include <memory>
 #include <string>
 
@@ -9,7 +10,6 @@
 #define error(fmt, ...) logger::_error(fmt, ##__VA_ARGS__)
 
 #ifdef DEBUG_LOG
-#include "format.hpp"
 #include "pros/rtos.h"
 #define debug(fmt, ...) logger::_debug(fmt, ##__VA_ARGS__)
 #define scopePush(name) logger::_push(name)

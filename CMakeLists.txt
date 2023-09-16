@@ -34,7 +34,7 @@ file(MAKE_DIRECTORY ${BIN_DIR})
 
 find_program(ProsCLI pros)
 find_program(ClangFormat clang-format)
-find_program(ClangCheck clang-check)
+find_program(ClangTidy clang-tidy)
 
 if (NOT EXISTS ${CMAKE_BINARY_DIR}/empty.cpp)
     file(TOUCH ${CMAKE_BINARY_DIR}/empty.cpp)
@@ -92,7 +92,6 @@ set(HEADER_FILES
         include/robot/drivetrain.hpp
         include/robot/intake.hpp
         include/robot/robot.hpp
-        include/structure/concept.hpp
         include/structure/fixed_queue.hpp
 )
 
@@ -145,9 +144,9 @@ target_sources(MonolithPackage PRIVATE ${SOURCE_FILES})
 target_sources(MonolithPackage PUBLIC FILE_SET headers TYPE HEADERS FILES ${HEADER_FILES})
 
 if (ENABLE_LTO)
-message(NOTICE "LTO is enabled")
-set_property(TARGET HotPackage PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-set_property(TARGET MonolithPackage PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    message(NOTICE "LTO is enabled")
+    set_property(TARGET HotPackage PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    set_property(TARGET MonolithPackage PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
 target_include_directories(HotPackage PRIVATE include)
@@ -156,11 +155,19 @@ target_include_directories(MonolithPackage PRIVATE include)
 target_link_directories(MonolithPackage PRIVATE firmware)
 
 if (ProsCLI)
-add_custom_target(Upload DEPENDS HotPackage COMMAND ${ProsCLI} upload --slot 1)
+    add_custom_target(Upload DEPENDS HotPackage COMMAND ${ProsCLI} upload --slot 1)
 endif()
 
 if (ClangFormat)
-add_custom_target(FormatCode COMMAND ${ClangFormat} -i ${HEADER_FILES} ${SOURCE_FILES} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMENT "Formatting code")
+    add_custom_target(FormatCode COMMAND ${ClangFormat} -i ${HEADER_FILES} ${SOURCE_FILES} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMENT "Formatting code")
+endif()
+
+if (ClangTidy)
+    execute_process(COMMAND ${TARGET_TRIPLE}-g++ -print-sysroot OUTPUT_VARIABLE CMAKE_SYSROOT OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND ${TARGET_TRIPLE}-g++ -print-multi-directory OUTPUT_VARIABLE ARM_MULTI_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND ${TARGET_TRIPLE}-g++ -dumpversion OUTPUT_VARIABLE ARM_GCC_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+    add_custom_target(Tidy COMMAND ${ClangTidy} ${HEADER_FILES} ${SOURCE_FILES} --checks=-*,bugprone-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*,-bugprone-easily-swappable-parameters,-readability-function-cognitive-complexity,llvm-header-guard,-readability-identifier-length,-bugprone-macro-parentheses,-modernize-use-trailing-return-type,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers -- -I${CMAKE_SOURCE_DIR}/include ${CMAKE_CXX_FLAGS} -std=c++20 -Wall -mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp -nostdlib -target ${TARGET_TRIPLE} -isystem${CMAKE_SYSROOT}/include/c++/${ARM_GCC_VERSION} -isystem${CMAKE_SYSROOT}/include/c++/${ARM_GCC_VERSION}/${TARGET_TRIPLE}/${ARM_MULTI_DIR} -isystem${CMAKE_SYSROOT}/include/ WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMENT "Checking code")
 endif()
 
 add_dependencies(HotPackage ColdPackage)

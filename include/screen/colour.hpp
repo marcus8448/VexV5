@@ -1,5 +1,6 @@
 #ifndef SCREEN_COLOUR_HPP
 #define SCREEN_COLOUR_HPP
+#include "liblvgl/misc/lv_color.h"
 
 namespace screen::colour {
 static const lv_color_t WHITE = lv_color_hex(0xFFFFFF);

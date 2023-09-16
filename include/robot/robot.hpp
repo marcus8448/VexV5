@@ -33,7 +33,6 @@ public:
 
   std::string autonomous = "None";
 
-public:
   /**
    * Creates a new robot with the specified components.
    * @param drivetrain The robot's drivetrain.

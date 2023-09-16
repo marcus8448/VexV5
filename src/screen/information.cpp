@@ -9,25 +9,21 @@ void update_device(lv_obj_t *label, const robot::device::Device &device, double 
 void update_device(lv_obj_t *label, const robot::device::Device &device, int32_t value);
 
 Information::Information(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)
-    : Screen(robot, screen, width, height) {
+    : Screen(robot, width, height) {
   for (size_t i = 0; i < INFO_COLUMNS; i++) {
-    if (this->leftColumn[i] == nullptr) {
-      lv_obj_t *obj = lv_label_create(screen);
-      lv_obj_set_pos(obj, 0, i * 16);
-      lv_obj_set_width(obj, SCREEN_WIDTH / 2);
-      lv_label_set_text(obj, "");
-      this->leftColumn[i] = obj;
-    }
+    lv_obj_t *obj = lv_label_create(screen);
+    lv_obj_set_pos(obj, 0, i * 16);
+    lv_obj_set_width(obj, width / 2);
+    lv_label_set_text(obj, "");
+    this->leftColumn[i] = obj;
   }
 
   for (size_t i = 0; i < INFO_COLUMNS; i++) {
-    if (this->rightColumn[i] == nullptr) {
-      lv_obj_t *obj = lv_label_create(screen);
-      lv_obj_set_pos(obj, SCREEN_WIDTH / 2, i * 16);
-      lv_obj_set_width(obj, SCREEN_WIDTH / 2);
-      lv_label_set_text(obj, "");
-      this->rightColumn[i] = obj;
-    }
+    lv_obj_t *obj = lv_label_create(screen);
+    lv_obj_set_pos(obj, width / 2, i * 16);
+    lv_obj_set_width(obj, width / 2);
+    lv_label_set_text(obj, "");
+    this->rightColumn[i] = obj;
   }
 }
 
@@ -49,11 +45,9 @@ void Information::update() {
 }
 
 Information::~Information() {
-  for (int i = 0; i < INFO_COLUMNS; ++i) {
+  for (size_t i = 0; i < INFO_COLUMNS; ++i) {
     lv_obj_del_async(this->leftColumn[i]);
     lv_obj_del_async(this->rightColumn[i]);
-    this->leftColumn[i] = nullptr;
-    this->rightColumn[i] = nullptr;
   }
 }
 
@@ -91,20 +85,5 @@ void update_device(lv_obj_t *label, const robot::device::Device &device, int32_t
   } else {
     lv_label_set_text(label, fmt::string_format("%s: %i", device.getName(), value).c_str());
   }
-}
-
-lv_obj_t *create_label(lv_obj_t *screen, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h, const char *text) {
-  lv_obj_t *label = lv_label_create(screen);
-
-  lv_obj_set_pos(label, x, y);
-  lv_obj_set_size(label, w, h);
-  lv_label_set_text(label, text);
-
-  return label;
-}
-
-lv_obj_t *create_label(lv_obj_t *screen, lv_coord_t index, bool right, const char *text) {
-  return create_label(screen, right ? SCREEN_HALF_WIDTH : static_cast<lv_coord_t>(0),
-                      static_cast<lv_coord_t>(index * 16), SCREEN_HALF_WIDTH, 16, text);
 }
 } // namespace screen

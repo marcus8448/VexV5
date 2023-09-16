@@ -84,7 +84,7 @@ void Drivetrain::curveTargeting(double relInFwd, double relInLat, double curve, 
 
 void Drivetrain::awaitMovement() const {
   while (!this->isAtTarget()) {
-    pros::c::delay(ROBOT_TICK_RATE * (STABILIZE_TICKS - this->timeAtTarget));
+    pros::c::delay(robot::device::TICK_RATE * (STABILIZE_TICKS - this->timeAtTarget));
   }
 }
 
@@ -103,14 +103,14 @@ void Drivetrain::updateTargeting(control::input::Controller *controller) {
     }
     //    this->powerRight = this->velRightPID.update(right * 200.0, this->motorR1.getVelocity());
     //    this->powerLeft = this->velLeftPID.update(left * 200.0, this->motorL1.getVelocity());
-    this->powerRight = static_cast<int16_t>(right * MOTOR_MAX_MILLIVOLTS);
-    this->powerLeft = static_cast<int16_t>(left * MOTOR_MAX_MILLIVOLTS);
+    this->powerRight = static_cast<int16_t>(right * device::MOTOR_MAX_MV);
+    this->powerLeft = static_cast<int16_t>(left * device::MOTOR_MAX_MV);
   } else {
     //    this->powerRight = this->velRightPID.update(controller->rightStickY() / JOYSTICK_MAX * 200.0,
     //    this->motorR1.getVelocity()); this->powerLeft = this->velLeftPID.update(controller->leftStickY() /
     //    JOYSTICK_MAX * 200.0, this->motorL1.getVelocity());
-    this->powerRight = static_cast<int16_t>((controller->rightStickY() * 0.9) / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
-    this->powerLeft = static_cast<int16_t>((controller->leftStickY() * 0.9) / JOYSTICK_MAX * MOTOR_MAX_MILLIVOLTS);
+    this->powerRight = static_cast<int16_t>((controller->rightStickY() * 0.9) / JOYSTICK_MAX * device::MOTOR_MAX_MV);
+    this->powerLeft = static_cast<int16_t>((controller->leftStickY() * 0.9) / JOYSTICK_MAX * device::MOTOR_MAX_MV);
   }
 }
 
@@ -195,11 +195,11 @@ void Drivetrain::updateState() {
 
     left -= head;
     right += head;
-    if (left < -MOTOR_MAX_MILLIVOLTS) {
-      right += -MOTOR_MAX_MILLIVOLTS - left;
+    if (left < -device::MOTOR_MAX_MV) {
+      right += -device::MOTOR_MAX_MV - left;
     }
-    if (right > MOTOR_MAX_MILLIVOLTS) {
-      left += right - MOTOR_MAX_MILLIVOLTS;
+    if (right > device::MOTOR_MAX_MV) {
+      left += right - device::MOTOR_MAX_MV;
     }
 
     this->moveRight(static_cast<int16_t>(right));

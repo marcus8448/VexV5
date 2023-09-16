@@ -1,5 +1,5 @@
-#ifndef ROBOT_DEVICE_COLOUR_HPP
-#define ROBOT_DEVICE_COLOUR_HPP
+#ifndef ROBOT_DEVICE_OPTICAL_HPP
+#define ROBOT_DEVICE_OPTICAL_HPP
 
 #include "device.hpp"
 
@@ -30,4 +30,4 @@ public:
 };
 } // namespace robot::device
 
-#endif // ROBOT_DEVICE_COLOUR_HPP
+#endif // ROBOT_DEVICE_OPTICAL_HPP

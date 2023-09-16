@@ -14,7 +14,7 @@ static std::unordered_map<pros::task_t, std::vector<std::pair<const char *, uint
 static const char *main_task_name = nullptr;
 
 #ifdef FILE_LOG
-static std::ofstream *log_file = nullptr;
+static std::unique_ptr<std::ofstream> log_file = nullptr;
 #endif
 
 void _info(const char *string) {
@@ -75,7 +75,7 @@ void _push(const char *string) {
   if (!sections.contains(task)) {
     sections.emplace(task, std::vector<std::pair<const char *, uint32_t>>());
   }
-  sections.at(task).emplace_back(std::pair(string, pros::c::millis()));
+  sections.at(task).emplace_back(string, pros::c::millis());
   debug("== BEGIN %s ==", string);
 }
 
@@ -120,14 +120,13 @@ void initialize(const char *name) {
 
     if (stream != nullptr) {
       if (stream->is_open()) {
-        log_file = stream;
+        log_file.swap(stream);
       } else {
-        log_file = nullptr;
-        stream->close();
-        free(stream);
+        log_file.reset(nullptr);
       }
+      stream.reset(nullptr);
     } else {
-      log_file = nullptr;
+      log_file.reset(nullptr);
     }
   }
 #endif

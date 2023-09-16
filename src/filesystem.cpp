@@ -4,7 +4,7 @@
 #include <cstring>
 
 namespace fs {
-bool is_available() { return pros::c::usd_is_installed(); }
+bool is_available() { return pros::c::usd_is_installed() != 0; }
 
 bool can_access(const std::filesystem::path &path) {
   if (!is_available()) {
@@ -26,11 +26,9 @@ void *read_all(const char *path) {
   }
   size_t len = std::filesystem::file_size(path) + 1;
   void *contents = std::malloc(len);
-  std::FILE *file = std::fopen(path, "r");
-  size_t read = std::fread(contents, 1, len, file);
-  if (std::fclose(file) != 0) {
-    warn("Failed to lower file %s!", path);
-  }
+  std::unique_ptr<std::FILE, decltype(&fclose)> file =
+      std::unique_ptr<std::FILE, decltype(&fclose)>(std::fopen(path, "r"), &fclose);
+  size_t read = std::fread(contents, 1, len, file.get());
   if (read != len) {
     warn("File size mismatch: Expected %i bytes, found %i bytes", len, read);
     void *reallocated = realloc(contents, read);
@@ -42,8 +40,8 @@ void *read_all(const char *path) {
   return contents;
 }
 
-std::ifstream *open(const std::filesystem::path &path, std::ios_base::openmode mode) {
-  auto stream = new std::ifstream();
+std::unique_ptr<std::ifstream> open(const std::filesystem::path &path, std::ios_base::openmode mode) {
+  std::unique_ptr<std::ifstream> stream = std::make_unique<std::ifstream>();
   if (can_access(path)) {
     stream->open(path, mode);
   }
@@ -55,8 +53,8 @@ std::ifstream *open(const std::filesystem::path &path, std::ios_base::openmode m
   return stream;
 }
 
-std::ofstream *open_indexed(const std::filesystem::path &path, std::ios_base::openmode mode) {
-  auto *stream = new std::ofstream();
+std::unique_ptr<std::ofstream> open_indexed(const std::filesystem::path &path, std::ios_base::openmode mode) {
+  std::unique_ptr<std::ofstream> stream = std::make_unique<std::ofstream>();
   if (can_access(path)) {
     if (file_exists(path)) {
       for (int16_t i = 1; i < 1000; i++) {

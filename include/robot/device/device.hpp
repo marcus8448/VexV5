@@ -1,12 +1,12 @@
 #ifndef ROBOT_DEVICE_DEVICE_HPP
 #define ROBOT_DEVICE_DEVICE_HPP
 
-#define ROBOT_TICK_RATE 20
-
 #include <cstdint>
 #include <map>
 
 namespace robot::device {
+constexpr uint32_t TICK_RATE = 20;
+
 class Device {
 private:
   const char *typeName;
@@ -18,7 +18,8 @@ protected:
 public:
   explicit Device(const char *typeName, const char *name, int8_t port);
   explicit Device(const Device &) = delete;
-  ~Device() = default;
+
+  virtual ~Device() = default;
 
   virtual void reconfigure() const = 0;
 

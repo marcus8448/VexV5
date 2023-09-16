@@ -1,17 +1,17 @@
-#ifndef VEXV5_ROBOT_DEVICE_MOTOR_HPP
-#define VEXV5_ROBOT_DEVICE_MOTOR_HPP
+#ifndef ROBOT_DEVICE_MOTOR_HPP
+#define ROBOT_DEVICE_MOTOR_HPP
 
 #include "device.hpp"
 #include "pros/motors.h"
 #include <cmath>
-
-#define MOTOR_MAX_MILLIVOLTS 12000
 
 #define DEFAULT_MOTOR_GEARSET pros::E_MOTOR_GEARSET_18
 #define DEFAULT_MOTOR_BRAKE pros::E_MOTOR_BRAKE_BRAKE
 #define MOTOR_ENCODER_UNITS pros::E_MOTOR_ENCODER_DEGREES
 
 namespace robot::device {
+constexpr int16_t MOTOR_MAX_MV = 12000;
+
 class PID {
 public:
   double kp;
@@ -97,4 +97,4 @@ public:
 };
 
 } // namespace robot::device
-#endif // VEXV5_ROBOT_DEVICE_MOTOR_HPP
+#endif // ROBOT_DEVICE_MOTOR_HPP

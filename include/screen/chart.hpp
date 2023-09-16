@@ -4,6 +4,7 @@
 #include "robot/robot.hpp"
 #include "screen.hpp"
 #include "structure/fixed_queue.hpp"
+#include <array>
 #include <functional>
 
 namespace screen {
@@ -21,16 +22,16 @@ template <size_t Sets, size_t Points> class Chart : public Screen {
 private:
   const char *title;
 
-  DataSet *dataSets = nullptr;
-  structure::FixedQueue<Points> data[Sets];
+  std::array<DataSet, Sets> dataSets;
+  std::array<structure::FixedQueue<Points>, Sets> data = {};
 
-  lv_color_t *canvasBuffer = nullptr;
-  lv_obj_t *canvas = nullptr;
-  lv_obj_t *titleLabel = nullptr;
+  lv_color_t *canvasBuffer;
+  lv_obj_t *canvas;
+  lv_obj_t *titleLabel;
 
 public:
   explicit Chart(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height, const char *title,
-                 DataSet dataSets[Sets]);
+                 std::array<DataSet, Sets> dataSets);
   ~Chart() override;
 
   void update() override;

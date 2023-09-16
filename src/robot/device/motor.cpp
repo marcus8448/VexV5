@@ -32,12 +32,12 @@ void Motor::moveVelocity(int16_t velocity) {
 }
 
 void Motor::moveMillivolts(int16_t mV) {
-  if (mV > MOTOR_MAX_MILLIVOLTS) {
+  if (mV > MOTOR_MAX_MV) {
     warn("Target voltage %imV is over max voltage 12000mV!", mV);
-    mV = MOTOR_MAX_MILLIVOLTS;
-  } else if (mV < -MOTOR_MAX_MILLIVOLTS) {
+    mV = MOTOR_MAX_MV;
+  } else if (mV < -MOTOR_MAX_MV) {
     warn("Target voltage %imV is over max voltage -12000mV!", mV);
-    mV = -MOTOR_MAX_MILLIVOLTS;
+    mV = -MOTOR_MAX_MV;
   }
   if (this->targetType != TargetType::VOLTAGE || this->target != mV) {
     debug("Targeting %imV", mV);
@@ -159,9 +159,7 @@ constexpr int16_t Motor::gearsetMaxVelocity(pros::motor_gearset_e_t gearset) {
 double clampMv(double value, double moveMin) {
   if (std::abs(value) < moveMin)
     value = value < 0 ? -600 : 600;
-  return value > MOTOR_MAX_MILLIVOLTS    ? MOTOR_MAX_MILLIVOLTS
-         : value < -MOTOR_MAX_MILLIVOLTS ? -MOTOR_MAX_MILLIVOLTS
-                                         : value;
+  return value > MOTOR_MAX_MV ? MOTOR_MAX_MV : value < -MOTOR_MAX_MV ? -MOTOR_MAX_MV : value;
 }
 
 PID::PID(double Kp, double Ki, double Kd, double integralRange, double acceptableError)

@@ -50,9 +50,8 @@ void onRootTaskEnd() {
 }
 
 void killRootTask() {
-  info("Kill root task?");
   if (rootTask != nullptr) {
-    info("Kill root task %s", pros::c::task_get_name(rootTask));
+    warn("Killing root task %s", pros::c::task_get_name(rootTask));
     void *task = rootTask;
     onRootTaskEnd();
     pros::task_state_e_t state = pros::c::task_get_state(task);

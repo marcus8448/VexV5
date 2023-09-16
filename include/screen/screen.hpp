@@ -11,13 +11,7 @@
 #include <functional>
 #include <string>
 
-#define SCREEN_UPDATE_RATE 50
-
-#define SCREEN_WIDTH static_cast<lv_coord_t>(480)
-#define SCREEN_HALF_WIDTH static_cast<lv_coord_t>(240)
-#define SCREEN_HEIGHT static_cast<lv_coord_t>(240)
-
-#define BUTTON_SIZE static_cast<lv_coord_t>(40)
+#define lv_coord(num) static_cast<lv_coord_t>(num)
 
 #define SCREEN_CB_ADV(TYPE, NAME)                                                                                      \
   static void NAME(lv_event_t *event) {                                                                                \
@@ -29,28 +23,29 @@
     auto inst = static_cast<TYPE *>(event->user_data);                                                                 \
     inst->NAME();                                                                                                      \
   }
-#define SCREEN_ADD(TYPE)                                                                                               \
-  screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {                   \
-    return new screen::TYPE(robot, screen, width, height);                                                             \
-  })
 
 namespace screen {
+constexpr lv_coord_t BUTTON_SIZE = 40;
+constexpr uint32_t UPDATE_RATE = 50;
+
 class Screen {
 public:
   const lv_coord_t width;
   const lv_coord_t height;
   robot::Robot &robot;
 
-  explicit Screen(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height);
+  explicit Screen(robot::Robot &robot, lv_coord_t width, lv_coord_t height);
+  Screen(const Screen &) = delete;
+
   virtual ~Screen() = 0;
 
   virtual void update() = 0;
 };
 
 void initialize(robot::Robot &robot);
-void addScreen(
-    const std::function<Screen *(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)> &screen);
-void removeScreen(
-    const std::function<Screen *(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)> &screen);
+void addScreen(const std::function<std::unique_ptr<Screen>(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width,
+                                                           lv_coord_t height)> &screen);
+void removeScreen(const std::function<std::unique_ptr<Screen>(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width,
+                                                              lv_coord_t height)> &screen);
 } // namespace screen
 #endif // SCREEN_HPP

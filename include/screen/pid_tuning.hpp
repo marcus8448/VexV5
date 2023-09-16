@@ -30,15 +30,15 @@ class PidTuning : public Screen {
 private:
   robot::device::PID &pid;
 
-  ControlGroup *Kp = nullptr;
-  ControlGroup *Ki = nullptr;
-  ControlGroup *Kd = nullptr;
+  ControlGroup Kp;
+  ControlGroup Ki;
+  ControlGroup Kd;
 
-  lv_obj_t *testBtn = nullptr;
-  lv_obj_t *errorLabel = nullptr;
-  lv_obj_t *changeLabel = nullptr;
-  lv_obj_t *oscillationsLabel = nullptr;
-  lv_obj_t *overshootLabel = nullptr;
+  lv_obj_t *testBtn;
+  lv_obj_t *errorLabel;
+  lv_obj_t *changeLabel;
+  lv_obj_t *oscillationsLabel;
+  lv_obj_t *overshootLabel;
 
 public:
   const std::string runName;

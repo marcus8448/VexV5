@@ -1,13 +1,12 @@
 #ifndef UNITS_HPP
 #define UNITS_HPP
-
-#include <cmath>
-
-#define WHEEL_DIAMETER 3.25
-#define WHEEL_CIRCUMFERENCE (WHEEL_DIAMETER * M_PI)
-#define DRIVETRAIN_GEARING (36.0 / 60.0)
+#include <numbers>
 
 namespace units {
+constexpr double WHEEL_DIAMETER = 3.25;
+constexpr double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * std::numbers::pi;
+constexpr double DRIVETRAIN_GEARING = 36.0 / 60.0;
+
 /**
  * Converts inches to encoder units (degrees).
  * @param inches the number of inches to convert.

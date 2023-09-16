@@ -7,7 +7,7 @@
 namespace screen {
 class AutonomousSelect : public Screen {
 private:
-  lv_obj_t *list = nullptr;
+  lv_obj_t *list;
   lv_obj_t *selected = nullptr;
 
 public:

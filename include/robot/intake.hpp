@@ -5,9 +5,9 @@
 #include "device/motor.hpp"
 #include "robot/device/pneumatics.hpp"
 
-#define DEFAULT_INTAKE_SPEED 12000
-
 namespace robot {
+constexpr uint16_t DEFAULT_INTAKE_SPEED = 12000;
+
 class Intake {
 private:
   int16_t speed = 0;

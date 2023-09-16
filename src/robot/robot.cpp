@@ -37,7 +37,7 @@ void Robot::updateDevices() {
       error("Controller is null!");
     }
 
-    pros::c::delay(ROBOT_TICK_RATE);
+    pros::c::delay(robot::device::TICK_RATE);
   }
 }
 
@@ -45,7 +45,7 @@ void Robot::updateDevices() {
   auto robot = static_cast<Robot *>(param);
   while (true) {
     robot->updateDevices();
-    pros::c::delay(ROBOT_TICK_RATE);
+    pros::c::delay(robot::device::TICK_RATE);
   }
 }
 #ifdef ENABLE_TEMPORARY_CODE

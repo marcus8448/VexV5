@@ -1,18 +1,18 @@
-#ifndef STRUCTURE_FIXED_QUEUE
-#define STRUCTURE_FIXED_QUEUE
-#include "concept.hpp"
-#include <cstddef>
+#ifndef STRUCTURE_FIXED_QUEUE_HPP
+#define STRUCTURE_FIXED_QUEUE_HPP
+#include <cmath>
+#include <limits>
 
 namespace structure {
 template <size_t SIZE> class FixedQueue {
-  float values[SIZE] = {};
+  std::array<float, SIZE> values = {};
   size_t position = 0;
 
 public:
-  float max = -INFINITY;
-  float min = INFINITY;
+  float max = -std::numeric_limits<float>::infinity();
+  float min = std::numeric_limits<float>::infinity();
 
-  explicit FixedQueue();
+  FixedQueue();
 
   float operator[](size_t index) const;
 
@@ -35,10 +35,11 @@ template <size_t SIZE> void FixedQueue<SIZE>::add(float value) {
   if (value >= this->max) {
     this->max = value;
   } else if (this->values[this->position] == this->max) {
-    this->max = -INFINITY;
+    this->max = -std::numeric_limits<float>::infinity();
     for (size_t i = 0; i < SIZE; ++i) {
-      if (i == this->position)
+      if (i == this->position) {
         continue;
+      }
       this->max = std::max(this->max, this->values[i]);
     }
   }
@@ -46,10 +47,11 @@ template <size_t SIZE> void FixedQueue<SIZE>::add(float value) {
   if (value <= this->min) {
     this->min = value;
   } else if (this->values[this->position] == this->min) {
-    this->min = INFINITY;
+    this->min = std::numeric_limits<float>::infinity();
     for (size_t i = 0; i < SIZE; ++i) {
-      if (i == this->position)
+      if (i == this->position) {
         continue;
+      }
       this->min = std::min(this->min, this->values[i]);
     }
   }
@@ -67,4 +69,4 @@ template <size_t SIZE> void FixedQueue<SIZE>::clear() {
   memset(this->values, 0, SIZE * sizeof(float));
 }
 } // namespace structure
-#endif // STRUCTURE_FIXED_QUEUE
+#endif // STRUCTURE_FIXED_QUEUE_HPP
