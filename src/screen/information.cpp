@@ -10,7 +10,7 @@ void update_device(lv_obj_t *label, const robot::device::Device &device, int32_t
 
 Information::Information(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)
     : Screen(robot, width, height) {
-  for (size_t i = 0; i < INFO_COLUMNS; i++) {
+  for (auto i = 0; i < INFO_COLUMNS; i++) {
     lv_obj_t *obj = lv_label_create(screen);
     lv_obj_set_pos(obj, 0, i * 16);
     lv_obj_set_width(obj, width / 2);
@@ -18,7 +18,7 @@ Information::Information(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width
     this->leftColumn[i] = obj;
   }
 
-  for (size_t i = 0; i < INFO_COLUMNS; i++) {
+  for (auto i = 0; i < INFO_COLUMNS; i++) {
     lv_obj_t *obj = lv_label_create(screen);
     lv_obj_set_pos(obj, width / 2, i * 16);
     lv_obj_set_width(obj, width / 2);
@@ -29,7 +29,7 @@ Information::Information(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width
 
 void Information::update() {
   int i = 0;
-  for (const auto &item : *robot::device::get_devices()) {
+  for (const auto &item : robot::device::getDevices()) {
     update_connectivity(this->leftColumn[i++], item.first->getName(), item.second);
     if (i == INFO_COLUMNS)
       break;
@@ -39,13 +39,13 @@ void Information::update() {
       this->rightColumn[0],
       fmt::string_format("Control Scheme: %s", robot::driveSchemeName(robot.drivetrain.controlScheme)).c_str());
   lv_label_set_text(this->rightColumn[1],
-                    fmt::string_format("X-position: %fin", units::encoderToInch(this->robot.drivetrain.cPosX)).c_str());
+                    fmt::string_format("X-position: %fin", units::encoderToInch(this->robot.drivetrain.posX)).c_str());
   lv_label_set_text(this->rightColumn[2],
-                    fmt::string_format("Y-position: %fin", units::encoderToInch(this->robot.drivetrain.cPosY)).c_str());
+                    fmt::string_format("Y-position: %fin", units::encoderToInch(this->robot.drivetrain.posY)).c_str());
 }
 
 Information::~Information() {
-  for (size_t i = 0; i < INFO_COLUMNS; ++i) {
+  for (auto i = 0; i < INFO_COLUMNS; ++i) {
     lv_obj_del_async(this->leftColumn[i]);
     lv_obj_del_async(this->rightColumn[i]);
   }

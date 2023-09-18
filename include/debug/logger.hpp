@@ -5,28 +5,11 @@
 #include <memory>
 #include <string>
 
-#define info(fmt, ...) logger::_info(fmt, ##__VA_ARGS__)
-#define warn(fmt, ...) logger::_warn(fmt, ##__VA_ARGS__)
-#define error(fmt, ...) logger::_error(fmt, ##__VA_ARGS__)
-
-#ifdef DEBUG_LOG
+#ifdef ENABLE_TIMERS
 #include "pros/rtos.h"
-#define debug(fmt, ...) logger::_debug(fmt, ##__VA_ARGS__)
-#define scopePush(name) logger::_push(name)
-#define scopePop() logger::_pop()
-#define section_swap(name) logger::_pop_push(name)
-
 #define startTiming(name) auto __timer_##name##__ = pros::c::millis()
-#define endTiming(name) info("%s took %i ms", #name, pros::c::millis() - __timer_##name##__)
+#define endTiming(name) logger::info("%s took %i ms", #name, pros::c::millis() - __timer_##name##__)
 #else
-#define debug(fmt, ...)                                                                                                \
-  {}
-#define scopePush(name)                                                                                                \
-  {}
-#define scopePop()                                                                                                     \
-  {}
-#define section_swap(name)                                                                                             \
-  {}
 #define startTiming(name)                                                                                              \
   {}
 #define endTiming(name)                                                                                                \
@@ -40,14 +23,14 @@ namespace logger {
  * May also be printed to the robot screen with white text colour.
  * @param string The string to print out.
  */
-void _info(const char *string);
+void info(const char *string);
 
 /**
  * Prints out a message via standard output.
  * May also be printed to the robot screen with white text colour.
  * @param string The string to print out.
  */
-void _info(const std::string &string);
+void info(const std::string &string);
 
 /**
  * Prints out a formatted message via standard output.
@@ -55,68 +38,69 @@ void _info(const std::string &string);
  * @param string The string to print out.
  * @see string_format
  */
-template <typename... Args> void _info(const char *format, Args... args) { _info(fmt::string_format(format, args...)); }
-
-/**
- * Prints out a message via standard output.
- * May also be printed to the robot screen with yellow text colour.
- * @param string The string to print out.
- */
-void _warn(const char *string);
-
-/**
- * Prints out a message via standard output.
- * May also be printed to the robot screen with yellow text colour.
- * @param string The string to print out.
- */
-void _warn(const std::string &string);
-
-/**
- * Prints out a formatted message via standard output.
- * May also be printed to the robot screen with yellow text colour.
- * @param string The string to print out.
- * @see string_format
- */
-template <typename... Args> void _warn(const char *format, Args... args) { _warn(fmt::string_format(format, args...)); }
-
-/**
- * Prints out a message via standard output.
- * May also be printed to the robot screen with red text colour.
- * @param string The string to print out.
- */
-void _error(const char *string);
-
-/**
- * Prints out a message via standard output.
- * May also be printed to the robot screen with red text colour.
- * @param string The string to print out.
- */
-void _error(const std::string &string);
-
-/**
- * Prints out a formatted message via standard output.
- * May also be printed to the robot screen with red text colour.
- * @param string The string to print out.
- * @see string_format
- */
-template <typename... Args> void _error(const char *format, Args... args) {
-  _error(fmt::string_format(format, args...));
+template <typename... Args> void info(const char *format, Args... args) {
+  logger::info(fmt::string_format(format, args...));
 }
 
-#ifdef DEBUG_LOG
 /**
- * Prints out a message via standard output, if the DEBUG_LOG flag is set.
- * May also be printed to the robot screen with green text colour.
+ * Prints out a message via standard output.
+ * May also be printed to the robot screen with yellow text colour.
  * @param string The string to print out.
  */
-void _debug(const char *string);
+void warn(const char *string);
+
+/**
+ * Prints out a message via standard output.
+ * May also be printed to the robot screen with yellow text colour.
+ * @param string The string to print out.
+ */
+void warn(const std::string &string);
+
+/**
+ * Prints out a formatted message via standard output.
+ * May also be printed to the robot screen with yellow text colour.
+ * @param string The string to print out.
+ * @see string_format
+ */
+template <typename... Args> void warn(const char *format, Args... args) { warn(fmt::string_format(format, args...)); }
+
+/**
+ * Prints out a message via standard output.
+ * May also be printed to the robot screen with red text colour.
+ * @param string The string to print out.
+ */
+void error(const char *string);
+
+/**
+ * Prints out a message via standard output.
+ * May also be printed to the robot screen with red text colour.
+ * @param string The string to print out.
+ */
+void error(const std::string &string);
+
+/**
+ * Prints out a formatted message via standard output.
+ * May also be printed to the robot screen with red text colour.
+ * @param string The string to print out.
+ * @see string_format
+ */
+template <typename... Args> void error(const char *format, Args... args) {
+  logger::error(fmt::string_format(format, args...));
+}
 
 /**
  * Prints out a message via standard output, if the DEBUG_LOG flag is set.
  * May also be printed to the robot screen with green text colour.
  * @param string The string to print out.
  */
-void _debug(const std::string &string);
+void debug(const char *string);
+
+/**
+ * Prints out a message via standard output, if the DEBUG_LOG flag is set.
+ * May also be printed to the robot screen with green text colour.
+ * @param string The string to print out.
+ */
+void debug(const std::string &string);
 
 /**
  * Prints out a formatted message via standard output, if the DEBUG_LOG flag is set.
@@ -124,9 +108,13 @@ void _debug(const std::string &string);
  * @param string The string to print out.
  * @see string_format
  */
-template <typename... Args> void _debug(const char *format, Args... args) {
-  _debug(fmt::string_format(format, args...));
+#ifdef DEBUG_LOG
+template <typename... Args> void debug(const char *format, Args... args) { debug(fmt::string_format(format, args...)); }
+#else
+template <typename... Args> void debug(const char *, Args...) {
+  //  debug(fmt::string_format(format, args...));
 }
+#endif
 
 /**
  * Pushes a logging section onto the stack.
@@ -134,14 +122,14 @@ template <typename... Args> void _debug(const char *format, Args... args) {
  * Used for timing and debugging purposes.
  * @param string the name of the section
  */
-void _push(const char *string);
+void scope(const char *string);
 
 /**
  * Pops a logging section from the stack.
  * If the DEBUG_LOG flag is set, it will print the name and time to standard output
  * Used for timing and debugging purposes.
  */
-void _pop();
+void endScope();
 
 /**
  * Pops a logging section from the stack, and then immediately pushes a new one.
@@ -149,8 +137,7 @@ void _pop();
  * Used for timing and debugging purposes.
  * @param string the name of the new section
  */
-void _pop_push(const char *string);
-#endif // DEBUG_LOG
+void swapScope(const char *string);
 
 void flush();
 

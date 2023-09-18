@@ -51,10 +51,10 @@ robot::Robot &getRobot();
 void initialize() {
   //  pros::c::serctl(SERCTL_DISABLE_COBS, nullptr);
   rtos::onRootTaskStart();
-  scopePush("Initialize");
-  scopePush("Initialize robot");
+  logger::scope("Initialize");
+  logger::scope("Initialize robot");
   Robot &robot = getRobot();
-  scopePop();
+  logger::endScope();
   // Optionally disable autonomous for builds
 #ifndef DISABLE_AUTONOMOUS
   // Register the different types of autonomous-es
@@ -72,39 +72,25 @@ void initialize() {
 #endif
   // Optionally enable extra screen functionality
 #ifndef DISABLE_SCREEN
-  scopePush("Register Screens");
+  logger::scope("Register Screens");
   // Optionally register the different screens
 #if not defined(DISABLE_AUTONOMOUS) and not defined(DISABLE_AUTONOMOUS_SELECTION_SCREEN)
-  screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
-    return std::make_unique<screen::AutonomousSelect>(robot, screen, width, height);
-  });
+  screen::addScreen(std::make_unique<screen::AutonomousSelect, robot::Robot &, lv_obj_t *, lv_coord_t, lv_coord_t>);
 #endif
 #ifndef DISABLE_CONFIG_SCREEN
-  screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
-    return std::make_unique<screen::ConfigurationScreen>(robot, screen, width, height);
-  });
+  screen::addScreen(std::make_unique<screen::ConfigurationScreen, robot::Robot &, lv_obj_t *, lv_coord_t, lv_coord_t>);
 #endif
-  screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
-    return std::make_unique<screen::Information>(robot, screen, width, height);
-  });
+  screen::addScreen(std::make_unique<screen::Information, robot::Robot &, lv_obj_t *, lv_coord_t, lv_coord_t>);
 #ifndef DISABLE_DRIVETRAIN_DEBUG_SCREEN
   screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
     return std::make_unique<screen::Chart<2, 100>>(
         robot, screen, width, height, "Drivetrain Velocity",
-        std::array<screen::DataSet, 2>{screen::DataSet("Left", screen::colour::RED,
-                                                       [](robot::Robot &robot) {
-                                                         return static_cast<float>(
-                                                             (robot.drivetrain.motorL1.getVelocity() +
-                                                              robot.drivetrain.motorL2.getVelocity() +
-                                                              robot.drivetrain.motorL3.getVelocity()) /
-                                                             3.0);
-                                                       }),
-                                       screen::DataSet("Right", screen::colour::GREEN, [](robot::Robot &robot) {
-                                         return static_cast<float>((robot.drivetrain.motorR1.getVelocity() +
-                                                                    robot.drivetrain.motorR2.getVelocity() +
-                                                                    robot.drivetrain.motorR3.getVelocity()) /
-                                                                   3.0);
-                                       })});
+        std::array<screen::DataSet, 2>{
+            screen::DataSet("Left", screen::colour::RED,
+                            [](robot::Robot &robot) { return static_cast<float>(robot.drivetrain.getLeftVelocity()); }),
+            screen::DataSet("Right", screen::colour::GREEN, [](robot::Robot &robot) {
+              return static_cast<float>(robot.drivetrain.getRightVelocity());
+            })});
   });
   screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
     return std::make_unique<screen::Chart<2, 100>>(
@@ -122,12 +108,12 @@ void initialize() {
     return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.rightPID,
                                                std::string("!PidTuning"));
   });
-  section_swap("Initialize Screen");
+  logger::endScope();
+  logger::scope("Initialize Screen");
   screen::initialize(robot); // initialize the screen
-  scopePop();
+  logger::endScope();
 #endif // DISABLE_SCREEN
-  robot.drivetrain.imu.calibrate();
-  scopePop();
+  logger::endScope();
   rtos::onRootTaskEnd();
 }
 
@@ -140,7 +126,7 @@ void autonomous() {
   Robot &robot = getRobot();
   robot.runAutonomous();
 #else
-  error("Autonomous is disabled");
+  logger::error("Autonomous is disabled");
 #endif
   rtos::onRootTaskEnd();
 }
@@ -158,9 +144,9 @@ void opcontrol() {
   rtos::onRootTaskStart();
   Robot &robot = getRobot();
 
-  scopePush("Opcontrol Setup");
+  logger::scope("Opcontrol Setup");
   robot.setController(new control::input::Operator()); // set the robot controller to the default operator based one
-  scopePop();
+  logger::endScope();
 
   robot.opcontrol();
   rtos::onRootTaskEnd();

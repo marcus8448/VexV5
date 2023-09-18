@@ -9,7 +9,12 @@ namespace control::input {
  */
 class Controller {
 public:
+  static constexpr double JOYSTICK_MAX = 127.0;
+  static constexpr std::size_t LINE_COUNT = 3;
+
   virtual ~Controller() = default;
+  Controller(const Controller &) = delete;
+  Controller &operator=(const Controller &) = delete;
 
   /**
    * Returns a number greater than zero if the a button is pressed.
@@ -84,24 +89,11 @@ public:
   [[nodiscard]] virtual uint16_t r2Pressed() const = 0;
 
   /**
-   * Returns the current speed motors should run at when activated by a button (digital input).
-   * @return the current speed motors should run at when activated by a button (digital input).
-   */
-  [[nodiscard]] virtual int16_t speedSetting() const = 0;
-
-  /**
-   * Sets the speed motors should run at when activated by a button (digital input).
-   * @param flywheelSpeed the speed motors should run at when activated by a button (digital input).
-   */
-  virtual void setSpeedSetting(int16_t flywheelSpeed) = 0;
-
-  /**
    * Sets the row on the V5 controller to the specified text.
    * @param row The row to set [0-2].
-   * @param col The column to start at [0-14].
    * @param str The text to write.
    */
-  virtual void setLine(uint8_t row, uint8_t col, const char *str) = 0;
+  virtual void setLine(uint8_t row, const char *str) = 0;
 
   /**
    * Blanks the specified row of text on the controller.

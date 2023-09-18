@@ -8,7 +8,7 @@ bool check_error(const char *name) {
     if (error == ENODEV) { // skip printing 19 - no such device.
       return false;
     }
-    error("%s: Error %i", name, error); // print the error
+    logger::error("%s: Error %i", name, error); // print the error
     return false;
   }
   return true;

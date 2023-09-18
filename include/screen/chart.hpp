@@ -19,7 +19,6 @@ public:
 };
 
 template <size_t Sets, size_t Points> class Chart : public Screen {
-private:
   const char *title;
 
   std::array<DataSet, Sets> dataSets;

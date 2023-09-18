@@ -43,23 +43,21 @@ Operator::Operator(pros::controller_id_e_t controller_id) : controllerId(control
 
 [[nodiscard]] double Operator::rightStickY() const { return this->rsY; }
 
-[[nodiscard]] int16_t Operator::speedSetting() const { return this->flywheelSpeed; }
-
-void Operator::setSpeedSetting(int16_t speed) { this->flywheelSpeed = speed; }
-
-void Operator::setLine(uint8_t line, uint8_t col, const char *str) {
-  print_error("controller", pros::c::controller_set_text(this->controllerId, line, col, str));
+void Operator::setLine(uint8_t line, const char *str) {
+  text[line] = str;
+  textDirty[line] = true;
 }
 
 void Operator::clearLine(uint8_t line) {
-  print_error("controller", pros::c::controller_clear_line(this->controllerId, line));
+  text[line] = nullptr;
+  textDirty[line] = true;
 }
 
 void Operator::rumble(const char *str) {
   clear_error();
   pros::c::controller_rumble(this->controllerId, str);
   if (get_error() == EAGAIN) {
-    debug("Failed to send rumble. Trying again soon.");
+    logger::debug("Failed to send rumble. Trying again soon.");
     this->enqueuedRumble = str;
   }
 }
@@ -143,36 +141,30 @@ void Operator::update() {
   this->rsX = controller_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
   this->rsY = controller_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
 
-  if (this->rightPressed() % 2 == 1) {
-    this->setSpeedSetting(static_cast<int16_t>(std::min(this->speedSetting() + 10, 600)));
-  } else if (this->leftPressed() % 2 == 1) {
-    this->setSpeedSetting(static_cast<int16_t>(std::max(this->speedSetting() - 10, 200)));
-  }
-
   if (this->a == 1)
-    debug("A pressed");
+    logger::debug("A pressed");
   if (this->b == 1)
-    debug("B pressed");
+    logger::debug("B pressed");
   if (this->x == 1)
-    debug("X pressed");
+    logger::debug("X pressed");
   if (this->y == 1)
-    debug("Y pressed");
+    logger::debug("Y pressed");
   if (this->up == 1)
-    debug("Up pressed");
+    logger::debug("Up pressed");
   if (this->down == 1)
-    debug("Down pressed");
+    logger::debug("Down pressed");
   if (this->left == 1)
-    debug("Left pressed");
+    logger::debug("Left pressed");
   if (this->right == 1)
-    debug("Right pressed");
+    logger::debug("Right pressed");
   if (this->r1 == 1)
-    debug("R1 pressed");
+    logger::debug("R1 pressed");
   if (this->r2 == 1)
-    debug("R2 pressed");
+    logger::debug("R2 pressed");
   if (this->l1 == 1)
-    debug("L1 pressed");
+    logger::debug("L1 pressed");
   if (this->l2 == 1)
-    debug("L2 pressed");
+    logger::debug("L2 pressed");
 
   if (enqueuedRumble != nullptr && this->ticks % 10 == 0) {
     clear_error();
@@ -182,13 +174,20 @@ void Operator::update() {
     }
   }
 
-  static bool init = false;
-  if (this->ticks % 10 == 0 || !init) {
-    init = true;
-    this->setLine(0, 0,
-                  fmt::string_format("Flywheel: %i  ",
-                                     static_cast<int32_t>(this->speedSetting()))
-                      .c_str()); // append ' ' to clear out buffer
+  for (auto i = 0; i < LINE_COUNT; ++i) {
+    if (this->textDirty[i]) {
+      bool success = false;
+      if (this->text[i] != nullptr) {
+        success = pros::c::controller_set_text(this->controllerId, i, 0, this->text[i]) == 1;
+      } else {
+        success = pros::c::controller_clear_line(this->controllerId, i) == 1;
+      }
+      errno = 0;
+      if (success) {
+        this->textDirty[i] = false;
+        break; // only one success per cycle
+      }
+    }
   }
 }
 } // namespace control::input

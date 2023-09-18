@@ -5,12 +5,7 @@
 #include "pros/motors.h"
 #include <cmath>
 
-#define DEFAULT_MOTOR_GEARSET pros::E_MOTOR_GEARSET_18
-#define DEFAULT_MOTOR_BRAKE pros::E_MOTOR_BRAKE_BRAKE
-#define MOTOR_ENCODER_UNITS pros::E_MOTOR_ENCODER_DEGREES
-
 namespace robot::device {
-constexpr int16_t MOTOR_MAX_MV = 12000;
 
 class PID {
 public:
@@ -52,9 +47,11 @@ private:
   pros::motor_brake_mode_e_t brakeMode;
 
 public:
+  static constexpr int16_t MAX_MILLIVOLTS = 12000;
+
   explicit Motor(int8_t port, const char *name, bool reversed = false,
-                 pros::motor_gearset_e_t gearset = DEFAULT_MOTOR_GEARSET,
-                 pros::motor_brake_mode_e_t brake_mode = DEFAULT_MOTOR_BRAKE);
+                 pros::motor_gearset_e_t gearset = pros::E_MOTOR_GEARSET_18,
+                 pros::motor_brake_mode_e_t brake_mode = pros::E_MOTOR_BRAKE_BRAKE);
 
   void moveVelocity(int16_t velocity);
   void moveMillivolts(int16_t mV);

@@ -2,12 +2,15 @@
 #define ROBOT_DEVICE_DEVICE_HPP
 
 #include <cstdint>
-#include <map>
+#include <unordered_map>
 
 namespace robot::device {
 constexpr uint32_t TICK_RATE = 20;
 
 class Device {
+public:
+  static constexpr uint32_t CONFIGURE_RATE = 500;
+
 private:
   const char *typeName;
   const char *name;
@@ -35,6 +38,6 @@ protected:
 
 void initialize();
 
-std::map<Device *, bool> *get_devices();
+std::unordered_map<Device *, bool> &getDevices();
 } // namespace robot::device
 #endif // ROBOT_DEVICE_DEVICE_HPP

@@ -3,6 +3,7 @@ set(CMAKE_BUILD_TYPE MinSizeRel)
 
 # Logging and debug
 option(ENABLE_DEBUG_LOGGING "Enable debug logging" ON)
+option(ENABLE_TIMERS "Enable timers" ON)
 option(ENABLE_FILE_LOGGING "Enable writing logs to the microSD card" ON)
 
 # Controls
@@ -27,6 +28,10 @@ option(ENABLE_LTO "Enable link time optimization" OFF)
 
 if (ENABLE_DEBUG_LOGGING)
     add_compile_definitions(DEBUG_LOG)
+endif()
+
+if (ENABLE_TIMERS)
+    add_compile_definitions(ENABLE_TIMERS)
 endif()
 
 if (ENABLE_FILE_LOGGING)

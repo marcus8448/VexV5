@@ -3,6 +3,7 @@
 
 #include "controller.hpp"
 #include "pros/misc.h"
+#include <array>
 #include <cstdint>
 
 namespace control::input {
@@ -34,8 +35,10 @@ private:
   double rsX = 0.0;
   double rsY = 0.0;
 
-  int16_t flywheelSpeed = 450;
   uint32_t ticks = 0;
+
+  std::array<const char *, LINE_COUNT> text = {};
+  std::array<bool, LINE_COUNT> textDirty = {};
 
   const char *enqueuedRumble = nullptr;
 
@@ -62,10 +65,7 @@ public:
   [[nodiscard]] double rightStickX() const override;
   [[nodiscard]] double rightStickY() const override;
 
-  [[nodiscard]] int16_t speedSetting() const override;
-  void setSpeedSetting(int16_t speed) override;
-
-  void setLine(uint8_t line, uint8_t col, const char *str) override;
+  void setLine(uint8_t line, const char *str) override;
   void clearLine(uint8_t line) override;
 
   void rumble(const char *str) override;

@@ -2,17 +2,17 @@
 #include "debug/logger.hpp"
 
 namespace control::autonomous {
-static std::map<const std::string, void (*)(robot::Robot &)> programs =
-    std::map<const std::string, void (*)(robot::Robot &)>();
+static std::unordered_map<std::string, std::function<void(robot::Robot &)>> programs =
+    std::unordered_map<std::string, std::function<void(robot::Robot &)>>();
 
 void initialize() {
   registerRun(std::string("None"), [](Robot &robot) -> void {});
 }
 
-void registerRun(const std::string &name, void (*function)(robot::Robot &)) {
-  info("Registering autonomous '%s'.", name.c_str());
-  programs[name] = function;
+void registerRun(const std::string &name, std::function<void(robot::Robot &)> function) {
+  logger::info("Registering autonomous '%s'.", name.c_str());
+  programs[name] = std::move(function);
 }
 
-std::map<const std::string, void (*)(robot::Robot &)> &getPrograms() { return programs; }
+std::unordered_map<std::string, std::function<void(robot::Robot &)>> &getPrograms() { return programs; }
 } // namespace control::autonomous

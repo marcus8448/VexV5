@@ -16,8 +16,11 @@ Chart<Sets, Points>::Chart(robot::Robot &robot, lv_obj_t *screen, lv_coord_t wid
     : Screen(robot, width, height), title(title), dataSets(dataSets),
       canvasBuffer(new lv_color_t[LV_CANVAS_BUF_SIZE_TRUE_COLOR(width, height)]), canvas(lv_canvas_create(screen)),
       titleLabel(lv_label_create(screen)) {
-  for (size_t i = 0; i < Sets; i++) {
-    this->data[i] = structure::FixedQueue<Points>();
+  static_assert(Points > 1);
+  static_assert(Sets > 0);
+
+  for (auto i = 0; i < Sets; i++) {
+    this->data.at(i) = structure::FixedQueue<Points>();
   }
 
   lv_canvas_set_buffer(this->canvas, this->canvasBuffer, width, height, LV_IMG_CF_TRUE_COLOR);
@@ -37,8 +40,8 @@ template <size_t Sets, size_t Points> Chart<Sets, Points>::~Chart() {
 template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
   lv_canvas_fill_bg(this->canvas, lv_color_black(), 255);
 
-  lv_point_t points[Points];
-  for (size_t i = 0; i < Points; ++i) {
+  std::array<lv_point_t, Points> points = {};
+  for (auto i = 0; i < Points; ++i) {
     points[i] = lv_point_t(0, 0);
   }
 
@@ -50,7 +53,7 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
 
   float max = -INFINITY;
   float min = INFINITY;
-  for (size_t i = 0; i < Sets; ++i) {
+  for (auto i = 0; i < Sets; ++i) {
     max = std::max(max, this->data[i].max);
     min = std::min(min, this->data[i].min);
   }
@@ -68,16 +71,17 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
   double widthScale = width / static_cast<double>(Points);
 
   lv_coord_t zero = height - (0 - min) * heightScale - 41;
-  lv_point_t pts[2]{{0, zero}, {width, zero}};
+  points[0] = {0, zero};
+  points[1] = {width, zero};
 
-  lv_canvas_draw_line(this->canvas, pts, 2, &lineDesc);
+  lv_canvas_draw_line(this->canvas, points.data(), 2, &lineDesc);
 
   std::string str = fmt::string_format("%f", max);
   lv_canvas_draw_text(this->canvas, 0, 0, 100, &textDesc, str.c_str());
   str = fmt::string_format("%f", min);
   lv_canvas_draw_text(this->canvas, 40, height - 36, 100, &textDesc, str.c_str());
 
-  for (size_t i = 0; i < Sets; ++i) {
+  for (auto i = 0; i < Sets; ++i) {
     DataSet set = this->dataSets[i];
     pros::c::delay(1);
     float value = set.function(this->robot);
@@ -87,13 +91,13 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
 
     this->data[i].add(value);
 
-    for (size_t j = 0; j < Points; j++) {
-      points[j].x = lv_coord(width - (j * widthScale));
-      points[j].y = lv_coord(height - (this->data[i].get(Points - 1 - j) - min) * heightScale - 41);
+    for (auto j = 0; j < Points; j++) {
+      points[j].x = coord(width - (j * widthScale));
+      points[j].y = coord(height - (this->data[i].get(Points - 1 - j) - min) * heightScale - 41);
     }
 
     textDesc.color = lineDesc.color = set.color;
-    lv_canvas_draw_line(this->canvas, points, Points, &lineDesc);
+    lv_canvas_draw_line(this->canvas, points.data(), Points, &lineDesc);
 
     str = fmt::string_format("%s: %f", set.label, value);
     lv_canvas_draw_text(this->canvas, 40 + i * ((width - (40 * 2)) / Sets), height - 16, (width - (40 * 2)) / Sets,

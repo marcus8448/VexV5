@@ -44,7 +44,10 @@ public:
    */
   explicit Robot(int8_t driveL1, int8_t driveL2, int8_t driveL3, int8_t driveR1, int8_t driveR2, int8_t driveR3,
                  int8_t intakeRight, int8_t intakeLeft, int8_t inertial, int8_t arm1, int8_t arm2);
-  explicit Robot(const Robot &robot) = delete;
+  Robot() = delete;
+  Robot(const Robot &robot) = delete;
+  Robot &operator=(const Robot &) = delete;
+
   ~Robot();
 
   void setController(control::input::Controller *controller);

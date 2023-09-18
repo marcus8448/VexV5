@@ -5,13 +5,12 @@
 
 #include "liblvgl/lv_api_map.h"
 
-#include <algorithm>
 #include <vector>
 
-#define SCREEN_WIDTH lv_coord(480)
-#define SCREEN_HEIGHT lv_coord(240)
-
 namespace screen {
+constexpr lv_coord_t WIDTH = 480;
+constexpr lv_coord_t HEIGHT = 240;
+
 static std::vector<
     std::function<std::unique_ptr<Screen>(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)>>
     registry = std::vector<std::function<std::unique_ptr<Screen>(robot::Robot &robot, lv_obj_t *screen,
@@ -38,17 +37,17 @@ void initialize(robot::Robot &bot) {
                         LV_THEME_DEFAULT_DARK, LV_THEME_DEFAULT_FONT_NORMAL);
 
   previousBtn = lv_btn_create(lv_scr_act());
-  lv_obj_set_pos(previousBtn, 0, lv_coord(SCREEN_HEIGHT - BUTTON_SIZE));
+  lv_obj_set_pos(previousBtn, 0, coord(HEIGHT - BUTTON_SIZE));
   lv_obj_set_size(previousBtn, BUTTON_SIZE, BUTTON_SIZE);
   lv_obj_add_event_cb(previousBtn, prev_page, LV_EVENT_CLICKED, nullptr);
 
   nextBtn = lv_btn_create(lv_scr_act());
-  lv_obj_set_pos(nextBtn, lv_coord(SCREEN_WIDTH - BUTTON_SIZE), lv_coord(SCREEN_HEIGHT - BUTTON_SIZE));
+  lv_obj_set_pos(nextBtn, coord(WIDTH - BUTTON_SIZE), coord(HEIGHT - BUTTON_SIZE));
   lv_obj_set_size(nextBtn, BUTTON_SIZE, BUTTON_SIZE);
   lv_obj_add_event_cb(nextBtn, next_page, LV_EVENT_CLICKED, nullptr);
 
   if (registry.empty()) {
-    info("no screens!");
+    logger::info("no screens!");
     switch_to_screen(-1);
   } else {
     switch_to_screen(0);
@@ -67,7 +66,7 @@ void switch_to_screen(int screen) {
   screenIndex = screen;
 
   if (screen >= 0 && screen < static_cast<int>(registry.size())) {
-    activeScreen = registry[screen](*robot, lv_scr_act(), SCREEN_WIDTH, SCREEN_HEIGHT);
+    activeScreen = registry[screen](*robot, lv_scr_act(), WIDTH, HEIGHT);
   }
 
   if (screenIndex > 0) {
@@ -147,15 +146,15 @@ void removeScreen(const std::function<std::unique_ptr<Screen>(robot::Robot &robo
 }
 
 void prev_page([[maybe_unused]] lv_event_t *event) {
-  scopePush("Screen switching to previous page");
+  logger::scope("Screen switching to previous page");
   switch_to_screen(--screenIndex);
-  scopePop();
+  logger::endScope();
 }
 
 void next_page([[maybe_unused]] lv_event_t *event) {
-  scopePush("Screen switching to next page");
+  logger::scope("Screen switching to next page");
   switch_to_screen(++screenIndex);
-  scopePop();
+  logger::endScope();
 }
 
 Screen::Screen(robot::Robot &robot, lv_coord_t width, lv_coord_t height) : width(width), height(height), robot(robot) {}

@@ -8,10 +8,10 @@ bool is_available() { return pros::c::usd_is_installed() != 0; }
 
 bool can_access(const std::filesystem::path &path) {
   if (!is_available()) {
-    warn("MicroSD unavailable. Cannot access %s", path.c_str());
+    logger::warn("MicroSD unavailable. Cannot access %s", path.c_str());
     return false;
   } else if (std::strncmp(path.c_str(), "/usd/", strlen("/usd/")) != 0) {
-    warn("Attempted to access file '%s' outside of MicroSD!", path.c_str());
+    logger::warn("Attempted to access file '%s' outside of MicroSD!", path.c_str());
     return false;
   }
   return true;
@@ -21,7 +21,7 @@ bool file_exists(const std::filesystem::path &path) { return can_access(path) /*
 
 void *read_all(const char *path) {
   if (!file_exists(path)) {
-    warn("File does not exist: %s", path);
+    logger::warn("File does not exist: %s", path);
     return nullptr;
   }
   size_t len = std::filesystem::file_size(path) + 1;
@@ -30,7 +30,7 @@ void *read_all(const char *path) {
       std::unique_ptr<std::FILE, decltype(&fclose)>(std::fopen(path, "r"), &fclose);
   size_t read = std::fread(contents, 1, len, file.get());
   if (read != len) {
-    warn("File size mismatch: Expected %i bytes, found %i bytes", len, read);
+    logger::warn("File size mismatch: Expected %i bytes, found %i bytes", len, read);
     void *reallocated = realloc(contents, read);
     if (reallocated != nullptr) {
       contents = reallocated;
@@ -47,7 +47,7 @@ std::unique_ptr<std::ifstream> open(const std::filesystem::path &path, std::ios_
   }
 
   if (!stream->is_open()) {
-    warn("Failed to open file %s!", path.c_str());
+    logger::warn("Failed to open file %s!", path.c_str());
     stream->setstate(std::ios::badbit);
   }
   return stream;
@@ -57,7 +57,7 @@ std::unique_ptr<std::ofstream> open_indexed(const std::filesystem::path &path, s
   std::unique_ptr<std::ofstream> stream = std::make_unique<std::ofstream>();
   if (can_access(path)) {
     if (file_exists(path)) {
-      for (int16_t i = 1; i < 1000; i++) {
+      for (auto i = 1; i < 1000; i++) {
         std::string indexedPath = std::string(path) + "." + std::to_string(i);
         if (!file_exists(indexedPath)) {
           std::filesystem::rename(path, indexedPath);
@@ -69,7 +69,7 @@ std::unique_ptr<std::ofstream> open_indexed(const std::filesystem::path &path, s
   }
 
   if (!stream->is_open()) {
-    warn("Failed to initialize file '%s'!", path.c_str());
+    logger::warn("Failed to initialize file '%s'!", path.c_str());
     stream->setstate(std::ios::badbit);
   }
   return stream;

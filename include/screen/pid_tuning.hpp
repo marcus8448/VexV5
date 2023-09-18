@@ -21,6 +21,8 @@ public:
 
   explicit ControlGroup(lv_obj_t *screen, lv_coord_t x, lv_coord_t y, lv_coord_t width, lv_coord_t height, double delta,
                         double *value);
+  ControlGroup(const Screen &) = delete;
+  ControlGroup &operator=(const Screen &) = delete;
   ~ControlGroup();
 
   void update();

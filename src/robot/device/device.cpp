@@ -3,14 +3,11 @@
 #include "pros/rtos.h"
 #include "tasks.hpp"
 #include <cerrno>
-#include <map>
 #include <vector>
-
-#define DEVICE_CONFIGURE_RATE 500
 
 namespace robot::device {
 static std::vector<Device *> pendingDevices;
-static std::map<Device *, bool> devices;
+static std::unordered_map<Device *, bool> devices;
 
 [[noreturn]] void reconfigureTask([[maybe_unused]] void *params);
 
@@ -26,7 +23,7 @@ void initialize() {
   }
 }
 
-std::map<Device *, bool> *get_devices() { return &devices; }
+std::unordered_map<Device *, bool> &getDevices() { return devices; }
 
 bool Device::checkConnect() {
   bool b = errno != ENODEV;
@@ -41,17 +38,18 @@ bool Device::checkConnect() {
 [[nodiscard]] const char *Device::getName() const { return this->name; }
 
 [[noreturn]] void reconfigureTask([[maybe_unused]] void *params) {
-  pros::c::delay(DEVICE_CONFIGURE_RATE * 2); // printing race condition?
-  info("Device reconfigure task started.");
+  pros::c::delay(Device::CONFIGURE_RATE * 2); // printing race condition?
+  logger::info("Device reconfigure task started.");
   while (true) {
     if (!pendingDevices.empty()) {
-      for (Device *&device : pendingDevices) {
+      for (Device *device : pendingDevices) {
         if (device->isConnected()) {
-          debug("%s '%s' connected on port %i", device->getTypeName(), device->getName(), device->getPort());
+          logger::debug("%s '%s' connected on port %i", device->getTypeName(), device->getName(), device->getPort());
           devices.emplace(device, true);
         } else {
           devices.emplace(device, false);
-          warn("No device on port %i (expected %s '%s').", device->getPort(), device->getTypeName(), device->getName());
+          logger::warn("No device on port %i (expected %s '%s').", device->getPort(), device->getTypeName(),
+                       device->getName());
         }
       }
       pendingDevices.clear();
@@ -61,16 +59,20 @@ bool Device::checkConnect() {
       bool connected = pair.first->isConnected();
       if (pair.second && !connected) {
         pair.second = false;
-        error("%s '%s' (port %i) disconnected.", pair.first->getTypeName(), pair.first->getName(),
-              pair.first->getPort());
+        logger::error("%s '%s' (port %i) disconnected.", pair.first->getTypeName(), pair.first->getName(),
+                      pair.first->getPort());
       } else if (!pair.second && connected) {
-        warn("%s '%s' (port %i) reconnected. Reconfiguring...", pair.first->getTypeName(), pair.first->getName(),
-             pair.first->getPort());
+        logger::warn("%s '%s' (port %i) reconnected. Reconfiguring...", pair.first->getTypeName(),
+                     pair.first->getName(), pair.first->getPort());
         pair.second = true;
         pair.first->reconfigure();
       }
-      pros::c::delay(DEVICE_CONFIGURE_RATE);
+      pros::c::delay(Device::CONFIGURE_RATE);
     }
   }
 }
 } // namespace robot::device
+
+template <> struct std::hash<robot::device::Device> {
+  std::size_t operator()(const robot::device::Device &device) const { return device.getPort(); }
+};

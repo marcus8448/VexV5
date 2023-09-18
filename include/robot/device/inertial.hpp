@@ -15,6 +15,7 @@ public:
   [[nodiscard]] double getPitch() const;
   [[nodiscard]] double getRoll() const;
 
+  [[nodiscard]] bool isCalibrating() const;
   [[nodiscard]] bool isConnected() const override;
   void reconfigure() const override;
   void tare();

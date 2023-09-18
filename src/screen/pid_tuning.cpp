@@ -9,8 +9,6 @@
 #include <utility>
 
 namespace screen {
-SCREEN_CB(PidTuning, startTest)
-
 static void increaseValue(lv_event_t *event);
 static void decreaseValue(lv_event_t *event);
 
@@ -42,11 +40,10 @@ void PidTuning::update() {
 PidTuning::PidTuning(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height,
                      robot::device::PID &pid, std::string runName)
     : Screen(robot, width, height), pid(pid),
-      Kp(screen, 0, 0, lv_coord((height - BUTTON_SIZE) / 3), height - BUTTON_SIZE, 1.0, &pid.kp),
-      Ki(screen, lv_coord(width / 2 / 3), 0, lv_coord(height - BUTTON_SIZE) / 3, lv_coord(height - BUTTON_SIZE), 1.0,
-         &pid.ki),
-      Kd(screen, lv_coord(width / 2 / 3 * 2), 0, lv_coord(height - BUTTON_SIZE) / 3, lv_coord(height - BUTTON_SIZE),
-         1.0, &pid.kd),
+      Kp(screen, 0, 0, coord((height - BUTTON_SIZE) / 3), height - BUTTON_SIZE, 1.0, &pid.kp),
+      Ki(screen, coord(width / 2 / 3), 0, coord(height - BUTTON_SIZE) / 3, coord(height - BUTTON_SIZE), 1.0, &pid.ki),
+      Kd(screen, coord(width / 2 / 3 * 2), 0, coord(height - BUTTON_SIZE) / 3, coord(height - BUTTON_SIZE), 1.0,
+         &pid.kd),
       testBtn(lv_btn_create(screen)), errorLabel(lv_label_create(screen)), changeLabel(lv_label_create(screen)),
       oscillationsLabel(lv_label_create(screen)), overshootLabel(lv_label_create(screen)), runName(std::move(runName)) {
 
@@ -55,14 +52,14 @@ PidTuning::PidTuning(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv
   lv_obj_set_style_text_font(testLabel, LV_THEME_DEFAULT_FONT_TITLE, LV_STATE_ANY);
   lv_obj_set_align(testLabel, LV_ALIGN_CENTER);
 
-  lv_obj_add_event_cb(this->testBtn, ::screen::startTest, LV_EVENT_CLICKED, this);
-  lv_obj_set_pos(this->testBtn, lv_coord(width / 2), lv_coord(height - BUTTON_SIZE - 80));
-  lv_obj_set_size(this->testBtn, lv_coord(width / 2), 80);
+  lv_obj_add_event_cb(this->testBtn, SCREEN_CB(PidTuning, startTest), LV_EVENT_CLICKED, this);
+  lv_obj_set_pos(this->testBtn, coord(width / 2), coord(height - BUTTON_SIZE - 80));
+  lv_obj_set_size(this->testBtn, coord(width / 2), 80);
 
-  lv_obj_set_pos(this->errorLabel, lv_coord(width / 2), 0);
-  lv_obj_set_pos(this->changeLabel, lv_coord(width / 2), 16);
-  lv_obj_set_pos(this->oscillationsLabel, lv_coord(width / 2), 32);
-  lv_obj_set_pos(this->overshootLabel, lv_coord(width / 2), 48);
+  lv_obj_set_pos(this->errorLabel, coord(width / 2), 0);
+  lv_obj_set_pos(this->changeLabel, coord(width / 2), 16);
+  lv_obj_set_pos(this->oscillationsLabel, coord(width / 2), 32);
+  lv_obj_set_pos(this->overshootLabel, coord(width / 2), 48);
 
   lv_label_set_text(this->errorLabel, "Error: ?");
 
@@ -93,29 +90,29 @@ PidTuning::~PidTuning() {
 void PidTuning::startTest() {
   if (!this->testing) {
     rtos::killRootTask();
-    info("starting test");
+    logger::info("starting test");
     this->taskHandle = rtos::createTask(
         "PID Tuning",
         [](void *param) {
-          info("Task created");
-          auto inst = static_cast<PidTuning *>(param);
-          inst->overshoot = 0;
-          inst->oscillations = 0;
-          inst->prevError = INFINITY;
-          std::string prevAuton = inst->robot.autonomous;
-          inst->robot.autonomous = inst->runName;
-          scopePush("PID test");
-          inst->testing = true;
+          logger::info("Task created");
+          auto &self = *static_cast<PidTuning *>(param);
+          self.overshoot = 0;
+          self.oscillations = 0;
+          self.prevError = INFINITY;
+          std::string prevAuton = self.robot.autonomous;
+          self.robot.autonomous = self.runName;
+          logger::scope("PID test");
+          self.testing = true;
           autonomous();
-          inst->testing = false;
-          scopePop();
-          inst->robot.autonomous = prevAuton;
-          inst->taskHandle = nullptr;
+          self.testing = false;
+          logger::endScope();
+          self.robot.autonomous = prevAuton;
+          self.taskHandle = nullptr;
         },
         this);
   } else {
     if (this->taskHandle != nullptr) {
-      warn("Ending test early");
+      logger::warn("Ending test early");
       pros::task_state_e_t state = pros::c::task_get_state(this->taskHandle);
       if (state != pros::E_TASK_STATE_DELETED && state != pros::E_TASK_STATE_INVALID) {
         rtos::killTask(this->taskHandle);
@@ -135,15 +132,15 @@ ControlGroup::ControlGroup(lv_obj_t *screen, lv_coord_t x, lv_coord_t y, lv_coor
   lv_obj_set_align(increaseBtnLabel, LV_ALIGN_CENTER);
   lv_obj_set_align(decreaseBtnLabel, LV_ALIGN_CENTER);
 
-  auto splitHeight = lv_coord(this->height / 3);
+  auto splitHeight = coord(this->height / 3);
 
-  lv_obj_set_pos(this->valueLabel, this->x, lv_coord(this->y + splitHeight));
+  lv_obj_set_pos(this->valueLabel, this->x, coord(this->y + splitHeight));
   lv_obj_set_size(this->valueLabel, this->width, splitHeight);
 
   lv_obj_set_pos(this->increaseBtn, this->x, this->y);
   lv_obj_set_size(this->increaseBtn, this->width, splitHeight);
 
-  lv_obj_set_pos(this->decreaseBtn, this->x, lv_coord(this->y + splitHeight * 2));
+  lv_obj_set_pos(this->decreaseBtn, this->x, coord(this->y + splitHeight * 2));
   lv_obj_set_size(this->decreaseBtn, this->width, splitHeight);
 
   lv_label_set_text(increaseBtnLabel, fmt::string_format("+%.2f", this->delta).c_str());
@@ -162,12 +159,12 @@ ControlGroup::~ControlGroup() {
 void ControlGroup::update() { lv_label_set_text(this->valueLabel, fmt::string_format("%.2f", *this->value).c_str()); }
 
 static void increaseValue(lv_event_t *event) {
-  auto group = static_cast<ControlGroup *>(event->user_data);
-  *group->value += group->delta;
+  auto &group = *static_cast<ControlGroup *>(event->user_data);
+  *group.value += group.delta;
 }
 
 static void decreaseValue(lv_event_t *event) {
-  auto group = static_cast<ControlGroup *>(event->user_data);
-  *group->value -= group->delta;
+  auto &group = *static_cast<ControlGroup *>(event->user_data);
+  *group.value -= group.delta;
 }
 } // namespace screen

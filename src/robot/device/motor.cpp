@@ -8,19 +8,19 @@
 namespace robot::device {
 Motor::Motor(int8_t port, const char *name, bool reversed, pros::motor_gearset_e_t gearset,
              pros::motor_brake_mode_e_t brake_mode)
-    : Device("Motor", name, reversed ? -port : port), gearset(gearset), maxVelocity(gearsetMaxVelocity(gearset)),
-      brakeMode(brake_mode) {
+    : Device("Motor", name, static_cast<int8_t>(reversed ? -port : port)), gearset(gearset),
+      maxVelocity(gearsetMaxVelocity(gearset)), brakeMode(brake_mode) {
   pros::c::motor_set_gearing(this->port, this->gearset);
-  pros::c::motor_set_encoder_units(this->port, MOTOR_ENCODER_UNITS);
+  pros::c::motor_set_encoder_units(this->port, pros::E_MOTOR_ENCODER_DEGREES);
   pros::c::motor_set_brake_mode(this->port, this->brakeMode);
 }
 
 void Motor::moveVelocity(int16_t velocity) {
   if (velocity > this->maxVelocity) {
-    warn("Target velocity %i is over max velocity %i!", velocity, this->maxVelocity);
+    logger::warn("Target velocity %i is over max velocity %i!", velocity, this->maxVelocity);
     velocity = this->maxVelocity;
   } else if (velocity < -this->maxVelocity) {
-    warn("Target velocity %i is over max velocity -%i!", velocity, this->maxVelocity);
+    logger::warn("Target velocity %i is over max velocity -%i!", velocity, this->maxVelocity);
     velocity = static_cast<int16_t>(-this->maxVelocity);
   }
   if (this->targetType != TargetType::VELOCITY || this->target != velocity) {
@@ -32,15 +32,15 @@ void Motor::moveVelocity(int16_t velocity) {
 }
 
 void Motor::moveMillivolts(int16_t mV) {
-  if (mV > MOTOR_MAX_MV) {
-    warn("Target voltage %imV is over max voltage 12000mV!", mV);
-    mV = MOTOR_MAX_MV;
-  } else if (mV < -MOTOR_MAX_MV) {
-    warn("Target voltage %imV is over max voltage -12000mV!", mV);
-    mV = -MOTOR_MAX_MV;
+  if (mV > MAX_MILLIVOLTS) {
+    logger::warn("Target voltage %imV is over max voltage %imV!", mV, MAX_MILLIVOLTS);
+    mV = MAX_MILLIVOLTS;
+  } else if (mV < -MAX_MILLIVOLTS) {
+    logger::warn("Target voltage %imV is over max voltage -%imV!", mV, MAX_MILLIVOLTS);
+    mV = -MAX_MILLIVOLTS;
   }
   if (this->targetType != TargetType::VOLTAGE || this->target != mV) {
-    debug("Targeting %imV", mV);
+    logger::debug("Targeting %imV", mV);
     this->target = mV;
     this->targetType = TargetType::VOLTAGE;
     this->targetPosition = INFINITY;
@@ -51,10 +51,10 @@ void Motor::moveMillivolts(int16_t mV) {
 void Motor::moveAbsolute(double position, int16_t velocity) {
   velocity = static_cast<int16_t>(std::abs(velocity));
   if (velocity > this->maxVelocity) {
-    warn("Target velocity %i is over max velocity %i!", velocity, this->maxVelocity);
+    logger::warn("Target velocity %i is over max velocity %i!", velocity, this->maxVelocity);
     velocity = this->maxVelocity;
   } else if (velocity == 0) {
-    error("Target velocity is zero!");
+    logger::error("Target velocity is zero!");
   }
   if (this->targetType != TargetType::VELOCITY || this->target != velocity || this->targetPosition != position) {
     this->targetType = TargetType::VELOCITY;
@@ -85,14 +85,14 @@ void Motor::setBrakeMode(pros::motor_brake_mode_e brake_mode) {
 
 [[nodiscard]] int32_t Motor::getTargetVelocity() const {
   if (this->targetType != TargetType::VELOCITY) {
-    error("Requested target velocity while motor is targeting voltage!");
+    logger::error("Requested target velocity while motor is targeting voltage!");
   }
   return this->target;
 }
 
 [[nodiscard]] int32_t Motor::getTargetVoltage() const {
   if (this->targetType != TargetType::VOLTAGE) {
-    error("Requested target voltage while motor is targeting velocity!");
+    logger::error("Requested target voltage while motor is targeting velocity!");
   }
   return this->target;
 }
@@ -126,7 +126,7 @@ void Motor::setBrakeMode(pros::motor_brake_mode_e brake_mode) {
 
 void Motor::reconfigure() const {
   pros::c::motor_set_brake_mode(this->port, this->brakeMode);
-  pros::c::motor_set_encoder_units(this->port, MOTOR_ENCODER_UNITS);
+  pros::c::motor_set_encoder_units(this->port, pros::E_MOTOR_ENCODER_DEGREES);
   pros::c::motor_set_gearing(this->port, this->gearset);
 }
 
@@ -157,9 +157,12 @@ constexpr int16_t Motor::gearsetMaxVelocity(pros::motor_gearset_e_t gearset) {
 }
 
 double clampMv(double value, double moveMin) {
-  if (std::abs(value) < moveMin)
+  if (std::abs(value) < moveMin) {
     value = value < 0 ? -600 : 600;
-  return value > MOTOR_MAX_MV ? MOTOR_MAX_MV : value < -MOTOR_MAX_MV ? -MOTOR_MAX_MV : value;
+  }
+  return value > Motor::MAX_MILLIVOLTS    ? Motor::MAX_MILLIVOLTS
+         : value < -Motor::MAX_MILLIVOLTS ? -Motor::MAX_MILLIVOLTS
+                                          : value;
 }
 
 PID::PID(double Kp, double Ki, double Kd, double integralRange, double acceptableError)
@@ -172,19 +175,20 @@ void PID::resetState() {
 
 double PID::update(double target, double value) {
   this->error = target - value;
-  if (std::abs(this->error) < this->acceptableError || value == PROS_ERR_F)
+  if (std::abs(this->error) < this->acceptableError || value == PROS_ERR_F) {
     return 0.0;
+  }
 
   this->prevError = this->error;
   this->integral += this->error;
   if (std::signbit(this->error) != std::signbit(this->prevError) || std::abs(this->error) > this->integralRange) {
     this->integral = 0;
   }
-  info("%.2f %.2f/%.2f, %.1f %.1f %.1f * %.2f %.2f %.2f -> %.2f/%.2f/%.2f -> %.2f", this->error, value, target,
-       this->kp, this->ki, this->kd, this->error, this->integral, this->error - this->prevError, this->error * this->kp,
-       this->integral * this->ki, (this->error - this->prevError) * this->kd,
-       clampMv(this->error * this->kp + this->integral * this->ki + (this->error - this->prevError) * this->kd,
-               this->moveMin));
+  logger::info("%.2f %.2f/%.2f, %.1f %.1f %.1f * %.2f %.2f %.2f -> %.2f/%.2f/%.2f -> %.2f", this->error, value, target,
+               this->kp, this->ki, this->kd, this->error, this->integral, this->error - this->prevError,
+               this->error * this->kp, this->integral * this->ki, (this->error - this->prevError) * this->kd,
+               clampMv(this->error * this->kp + this->integral * this->ki + (this->error - this->prevError) * this->kd,
+                       this->moveMin));
   return clampMv(this->error * this->kp + this->integral * this->ki + (this->error - this->prevError) * this->kd,
                  this->moveMin);
 }
@@ -200,5 +204,5 @@ void PID::copyParams(const PID &other) {
   this->moveMin = other.moveMin;
 }
 
-PID::PID() {}
+PID::PID() : kp(0.0), ki(0.0), kd(0.0), integralRange(0.0), acceptableError(0.0) {}
 } // namespace robot::device

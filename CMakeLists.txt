@@ -57,7 +57,6 @@ set(SOURCE_FILES
         src/main.cpp
         src/tasks.cpp
         src/filesystem.cpp
-        src/control/input/autonomous_outline.cpp
         src/control/input/operator.cpp
         src/debug/error.cpp
         src/debug/logger.cpp
@@ -81,7 +80,6 @@ set(HEADER_FILES
         include/debug/error.hpp
         include/debug/logger.hpp
         include/control/input/controller.hpp
-        include/control/input/autonomous_outline.hpp
         include/control/input/operator.hpp
         include/robot/device/device.hpp
         include/robot/device/inertial.hpp
@@ -167,7 +165,7 @@ if (ClangTidy)
     execute_process(COMMAND ${TARGET_TRIPLE}-g++ -print-multi-directory OUTPUT_VARIABLE ARM_MULTI_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
     execute_process(COMMAND ${TARGET_TRIPLE}-g++ -dumpversion OUTPUT_VARIABLE ARM_GCC_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    add_custom_target(Tidy COMMAND ${ClangTidy} ${HEADER_FILES} ${SOURCE_FILES} --checks=-*,bugprone-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*,-bugprone-easily-swappable-parameters,-readability-function-cognitive-complexity,llvm-header-guard,-readability-identifier-length,-bugprone-macro-parentheses,-modernize-use-trailing-return-type,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers -- -I${CMAKE_SOURCE_DIR}/include ${CMAKE_CXX_FLAGS} -std=c++20 -Wall -mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp -nostdlib -target ${TARGET_TRIPLE} -isystem${CMAKE_SYSROOT}/include/c++/${ARM_GCC_VERSION} -isystem${CMAKE_SYSROOT}/include/c++/${ARM_GCC_VERSION}/${TARGET_TRIPLE}/${ARM_MULTI_DIR} -isystem${CMAKE_SYSROOT}/include/ WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMENT "Checking code")
+    add_custom_target(Tidy COMMAND ${ClangTidy} ${HEADER_FILES} ${SOURCE_FILES} --checks=-*,bugprone-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*,-bugprone-easily-swappable-parameters,-readability-function-cognitive-complexity,llvm-header-guard,-readability-identifier-length,-bugprone-macro-parentheses,-modernize-use-trailing-return-type,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,-cppcoreguidelines-avoid-non-const-global-variables,-cppcoreguidelines-pro-bounds-constant-array-index -- -I${CMAKE_SOURCE_DIR}/include ${CMAKE_CXX_FLAGS} -std=c++20 -Wall -mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp -nostdlib -target ${TARGET_TRIPLE} -isystem${CMAKE_SYSROOT}/include/c++/${ARM_GCC_VERSION} -isystem${CMAKE_SYSROOT}/include/c++/${ARM_GCC_VERSION}/${TARGET_TRIPLE}/${ARM_MULTI_DIR} -isystem${CMAKE_SYSROOT}/include/ WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMENT "Checking code")
 endif()
 
 add_dependencies(HotPackage ColdPackage)

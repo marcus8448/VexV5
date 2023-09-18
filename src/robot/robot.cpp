@@ -14,11 +14,10 @@ Robot::Robot(int8_t driveL1, int8_t driveL2, int8_t driveL3, int8_t driveR1, int
     : drivetrain(driveL1, driveL2, driveL3, driveR1, driveR2, driveR3, inertial), arm(arm1, arm2),
       intake(intakeRight, intakeLeft), controller(nullptr) {}
 
-Robot::~Robot() { warn("Robot destructor called"); }
+Robot::~Robot() { logger::error("Robot destructor called"); }
 
 void Robot::updateDevices() {
   this->drivetrain.updateState();
-  this->arm.updateState();
   this->intake.updateState();
 }
 
@@ -34,7 +33,7 @@ void Robot::updateDevices() {
       this->arm.updateTargeting(this->controller.get());
       this->intake.updateTargeting(this->controller.get());
     } else {
-      error("Controller is null!");
+      logger::error("Controller is null!");
     }
 
     pros::c::delay(robot::device::TICK_RATE);
@@ -42,15 +41,15 @@ void Robot::updateDevices() {
 }
 
 [[noreturn]] void autonomousBackground(void *param) {
-  auto robot = static_cast<Robot *>(param);
+  auto &robot = *static_cast<Robot *>(param);
   while (true) {
-    robot->updateDevices();
+    robot.updateDevices();
     pros::c::delay(robot::device::TICK_RATE);
   }
 }
 #ifdef ENABLE_TEMPORARY_CODE
 void Robot::runAutonomous() {
-  warn("overriding autonomous");
+  logger::warn("overriding autonomous");
   this->drivetrain.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
   this->drivetrain.tare();
 
@@ -67,11 +66,11 @@ void Robot::runAutonomous() {
 
     pros::task_t task = rtos::createChildTask("Robot async control", autonomousBackground, this);
 
-    info("Running autonomous: '%s'", this->autonomous.c_str());
+    logger::info("Running autonomous: '%s'", this->autonomous.c_str());
     control::autonomous::getPrograms()[this->autonomous](*this);
     rtos::killTask(task);
   } else {
-    error("No autonomous to run!");
+    logger::error("No autonomous to run!");
   }
 }
 

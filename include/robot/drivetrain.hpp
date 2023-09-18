@@ -11,17 +11,6 @@ namespace robot {
  * Represents the drivetrain of the robot.
  */
 class Drivetrain {
-private:
-  enum TargetType {
-    NONE,
-
-    OPERATOR_DIRECT, // power L/R
-
-    STATIC_TURN, // abs angle
-    DIRECT_MOVE, // dist
-    CURVE_MOVE
-  };
-
 public:
   /**
    * The different control schemes for the drivetrain
@@ -40,6 +29,17 @@ public:
     ARCADE
   };
 
+private:
+  enum TargetType {
+    NONE,
+
+    OPERATOR_DIRECT, // power L/R
+
+    STATIC_TURN, // abs angle
+    DIRECT_MOVE, // dist
+    CURVE_MOVE
+  };
+
   device::Motor motorL1;
   device::Motor motorL2;
   device::Motor motorL3;
@@ -49,6 +49,7 @@ public:
 
   device::Inertial imu;
 
+public:
   device::PID velRightPID;
   device::PID velLeftPID;
 
@@ -62,12 +63,8 @@ public:
   ControlScheme controlScheme = ARCADE;
 #endif
 
-  double cPosX = 0.0; // not anchored to anything - rel to start pos
-  double cPosY = 0.0;
-  double rPosX = +6.25;
-  double rPosY = 0.0;
-  double lPosX = -6.25;
-  double lPosY = 0.0;
+  double posX = 0.0; // not anchored to anything - rel to start pos
+  double posY = 0.0;
 
 private:
   TargetType targetType = NONE;
@@ -93,6 +90,11 @@ private:
   double endCurveX = 0.0;
   double endCurveY = 0.0;
   double curveAngle = 0.0;
+
+  double rPosX = +6.25;
+  double rPosY = 0.0;
+  double lPosX = -6.25;
+  double lPosY = 0.0;
 
 public:
   /**
@@ -146,6 +148,9 @@ public:
    * @return Whether the drivetrain has stabilized at its target position.
    */
   [[nodiscard]] bool isAtTarget() const;
+
+  [[nodiscard]] double getLeftVelocity() const;
+  [[nodiscard]] double getRightVelocity() const;
 
   /**
    * Resets the all of the motors' absolute position trackers.

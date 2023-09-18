@@ -17,7 +17,7 @@ static const char *main_task_name = nullptr;
 static std::unique_ptr<std::ofstream> log_file = nullptr;
 #endif
 
-void _info(const char *string) {
+void info(const char *string) {
   std::cout << string << '\n';
 #ifdef FILE_LOG
   if (log_file != nullptr && log_file->is_open()) {
@@ -28,9 +28,9 @@ void _info(const char *string) {
   std::cout.flush();
 }
 
-void _info(const std::string &string) { _info(string.c_str()); }
+void info(const std::string &string) { info(string.c_str()); }
 
-void _warn(const char *string) {
+void warn(const char *string) {
   std::cout << string << '\n';
 #ifdef FILE_LOG
   if (log_file != nullptr && log_file->is_open()) {
@@ -41,9 +41,9 @@ void _warn(const char *string) {
   std::cout.flush();
 }
 
-void _warn(const std::string &string) { _warn(string.c_str()); }
+void warn(const std::string &string) { warn(string.c_str()); }
 
-void _error(const char *string) {
+void error(const char *string) {
   std::cout << string << '\n';
 #ifdef FILE_LOG
   if (log_file != nullptr && log_file->is_open()) {
@@ -54,10 +54,10 @@ void _error(const char *string) {
   std::cout.flush();
 }
 
-void _error(const std::string &string) { _error(string.c_str()); }
+void error(const std::string &string) { error(string.c_str()); }
 
 #ifdef DEBUG_LOG
-void _debug(const char *string) {
+void debug(const char *string) {
   std::cout << string << '\n';
 #ifdef FILE_LOG
   if (log_file != nullptr && log_file->is_open()) {
@@ -68,26 +68,35 @@ void _debug(const char *string) {
   std::cout.flush();
 }
 
-void _debug(const std::string &string) { _debug(string.c_str()); }
+void debug(const std::string &string) { debug(string.c_str()); }
 
-void _push(const char *string) {
+void scope(const char *string) {
   pros::task_t task = pros::c::task_get_current();
   if (!sections.contains(task)) {
     sections.emplace(task, std::vector<std::pair<const char *, uint32_t>>());
   }
-  sections.at(task).emplace_back(string, pros::c::millis());
-  debug("== BEGIN %s ==", string);
+  std::vector<std::pair<const char *, uint32_t>> &val = sections.at(task);
+  val.emplace_back(string, pros::c::millis());
+  std::string str;
+  for (const auto &pair : val) {
+    str.append("/").append(pair.first);
+  }
+  debug("> START %s", str.c_str());
 }
 
-void _pop() {
+void endScope() {
   pros::task_t task = pros::c::task_get_current();
   auto stack = sections.at(task);
   uint32_t millis = pros::c::millis();
   if (stack.empty()) {
-    _error("Section stack underflow!");
+    error("Section stack underflow!");
   } else {
     std::pair<const char *, uint32_t> &back = stack.back();
-    debug("== END %s [%ims] ==", back.first, millis - back.second);
+    std::string str;
+    for (const auto &pair : stack) {
+      str.append("/").append(pair.first);
+    }
+    debug("> END %s [%ims]", str.c_str(), millis - back.second);
     stack.pop_back();
     if (stack.empty()) {
       sections.erase(task);
@@ -95,11 +104,20 @@ void _pop() {
   }
 }
 
-void _pop_push(const char *string) {
-  _pop();
-  _push(string);
+void swapScope(const char *string) {
+  endScope();
+  scope(string);
 }
+#else
+void debug(const char *) {}
 
+void debug(const std::string &) {}
+
+void scope(const char *) {}
+
+void endScope() {}
+
+void swapScope(const char *) {}
 #endif // DEBUG_LOG
 
 void flush() {
