@@ -19,7 +19,7 @@ Chart<Sets, Points>::Chart(robot::Robot &robot, lv_obj_t *screen, lv_coord_t wid
   static_assert(Points > 1);
   static_assert(Sets > 0);
 
-  for (auto i = 0; i < Sets; i++) {
+  for (size_t i = 0; i < Sets; i++) {
     this->data.at(i) = structure::FixedQueue<Points>();
   }
 
@@ -41,7 +41,7 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
   lv_canvas_fill_bg(this->canvas, lv_color_black(), 255);
 
   std::array<lv_point_t, Points> points = {};
-  for (auto i = 0; i < Points; ++i) {
+  for (size_t i = 0; i < Points; ++i) {
     points[i] = lv_point_t(0, 0);
   }
 
@@ -53,7 +53,7 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
 
   float max = -INFINITY;
   float min = INFINITY;
-  for (auto i = 0; i < Sets; ++i) {
+  for (size_t i = 0; i < Sets; ++i) {
     max = std::max(max, this->data[i].max);
     min = std::min(min, this->data[i].min);
   }
@@ -81,7 +81,7 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
   str = fmt::string_format("%f", min);
   lv_canvas_draw_text(this->canvas, 40, height - 36, 100, &textDesc, str.c_str());
 
-  for (auto i = 0; i < Sets; ++i) {
+  for (size_t i = 0; i < Sets; ++i) {
     DataSet set = this->dataSets[i];
     pros::c::delay(1);
     float value = set.function(this->robot);
@@ -91,7 +91,7 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
 
     this->data[i].add(value);
 
-    for (auto j = 0; j < Points; j++) {
+    for (size_t j = 0; j < Points; j++) {
       points[j].x = coord(width - (j * widthScale));
       points[j].y = coord(height - (this->data[i].get(Points - 1 - j) - min) * heightScale - 41);
     }

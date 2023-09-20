@@ -47,8 +47,12 @@ void Inertial::reconfigure() const {}
 void Inertial::tare() { pros::c::imu_tare(this->port); }
 
 void Inertial::calibrate() {
-  logger::scope("Calibrate IMU");
-  pros::c::imu_reset_blocking(this->port);
-  logger::endScope();
+  if (this->isConnected()) {
+    logger::scope("Calibrate IMU");
+    pros::c::imu_reset_blocking(this->port);
+    logger::endScope();
+  } else {
+    logger::warn("IMU not connected");
+  }
 }
 } // namespace robot::device

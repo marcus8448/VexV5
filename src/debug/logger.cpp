@@ -8,9 +8,12 @@
 #include <vector>
 
 namespace logger {
+#ifdef DEBUG_LOG
 static std::unordered_map<pros::task_t, std::vector<std::pair<const char *, uint32_t>>> sections =
     std::unordered_map<pros::task_t,
                        std::vector<std::pair<const char *, uint32_t>>>(); // stores the name and timestamp of sections.
+#endif
+
 static const char *main_task_name = nullptr;
 
 #ifdef FILE_LOG
@@ -28,7 +31,16 @@ void info(const char *string) {
   std::cout.flush();
 }
 
-void info(const std::string &string) { info(string.c_str()); }
+void info(const std::string_view &string) {
+  std::cout << string << '\n';
+#ifdef FILE_LOG
+  if (log_file != nullptr && log_file->is_open()) {
+    *log_file << "[INFO] [" << pros::c::millis() << "] " << string << '\n';
+    log_file->flush();
+  }
+#endif
+  std::cout.flush();
+}
 
 void warn(const char *string) {
   std::cout << string << '\n';
@@ -41,7 +53,16 @@ void warn(const char *string) {
   std::cout.flush();
 }
 
-void warn(const std::string &string) { warn(string.c_str()); }
+void warn(const std::string_view &string) {
+  std::cout << string << '\n';
+#ifdef FILE_LOG
+  if (log_file != nullptr && log_file->is_open()) {
+    *log_file << "[WARN] [" << pros::c::millis() << "] " << '\n';
+    log_file->flush();
+  }
+#endif
+  std::cout.flush();
+}
 
 void error(const char *string) {
   std::cout << string << '\n';
@@ -54,7 +75,16 @@ void error(const char *string) {
   std::cout.flush();
 }
 
-void error(const std::string &string) { error(string.c_str()); }
+void error(const std::string_view &string) {
+  std::cout << string << '\n';
+#ifdef FILE_LOG
+  if (log_file != nullptr && log_file->is_open()) {
+    *log_file << "[ERROR] [" << pros::c::millis() << "] " << '\n';
+    log_file->flush();
+  }
+#endif
+  std::cout.flush();
+}
 
 #ifdef DEBUG_LOG
 void debug(const char *string) {
@@ -68,7 +98,16 @@ void debug(const char *string) {
   std::cout.flush();
 }
 
-void debug(const std::string &string) { debug(string.c_str()); }
+void debug(const std::string_view &string) {
+  std::cout << string << '\n';
+#ifdef FILE_LOG
+  if (log_file != nullptr && log_file->is_open()) {
+    *log_file << "[DEBUG] [" << pros::c::millis() << "] " << '\n';
+    log_file->flush();
+  }
+#endif
+  std::cout.flush();
+}
 
 void scope(const char *string) {
   pros::task_t task = pros::c::task_get_current();
@@ -86,7 +125,7 @@ void scope(const char *string) {
 
 void endScope() {
   pros::task_t task = pros::c::task_get_current();
-  auto stack = sections.at(task);
+  std::vector<std::pair<const char *, uint32_t>> &stack = sections.at(task);
   uint32_t millis = pros::c::millis();
   if (stack.empty()) {
     error("Section stack underflow!");
@@ -111,7 +150,7 @@ void swapScope(const char *string) {
 #else
 void debug(const char *) {}
 
-void debug(const std::string &) {}
+void debug(const std::string_view &) {}
 
 void scope(const char *) {}
 

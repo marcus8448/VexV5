@@ -57,7 +57,7 @@ set(SOURCE_FILES
         src/main.cpp
         src/tasks.cpp
         src/filesystem.cpp
-        src/control/input/operator.cpp
+        src/control/input/controller.cpp
         src/debug/error.cpp
         src/debug/logger.cpp
         src/robot/device/device.cpp
@@ -80,7 +80,6 @@ set(HEADER_FILES
         include/debug/error.hpp
         include/debug/logger.hpp
         include/control/input/controller.hpp
-        include/control/input/operator.hpp
         include/robot/device/device.hpp
         include/robot/device/inertial.hpp
         include/robot/device/motor.hpp

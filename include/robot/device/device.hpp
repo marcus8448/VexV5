@@ -20,7 +20,10 @@ protected:
 
 public:
   explicit Device(const char *typeName, const char *name, int8_t port);
-  explicit Device(const Device &) = delete;
+  Device(const Device &) = delete;
+  Device(Device &&) = delete;
+  Device &operator=(const Device &) = delete;
+  Device &operator=(Device &&) = delete;
 
   virtual ~Device() = default;
 

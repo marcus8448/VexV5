@@ -30,7 +30,7 @@ void info(const char *string);
  * May also be printed to the robot screen with white text colour.
  * @param string The string to print out.
  */
-void info(const std::string &string);
+void info(const std::string_view &string);
 
 /**
  * Prints out a formatted message via standard output.
@@ -54,7 +54,7 @@ void warn(const char *string);
  * May also be printed to the robot screen with yellow text colour.
  * @param string The string to print out.
  */
-void warn(const std::string &string);
+void warn(const std::string_view &string);
 
 /**
  * Prints out a formatted message via standard output.
@@ -76,7 +76,7 @@ void error(const char *string);
  * May also be printed to the robot screen with red text colour.
  * @param string The string to print out.
  */
-void error(const std::string &string);
+void error(const std::string_view &string);
 
 /**
  * Prints out a formatted message via standard output.
@@ -100,7 +100,7 @@ void debug(const char *string);
  * May also be printed to the robot screen with green text colour.
  * @param string The string to print out.
  */
-void debug(const std::string &string);
+void debug(const std::string_view &string);
 
 /**
  * Prints out a formatted message via standard output, if the DEBUG_LOG flag is set.

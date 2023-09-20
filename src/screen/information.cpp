@@ -10,7 +10,7 @@ void update_device(lv_obj_t *label, const robot::device::Device &device, int32_t
 
 Information::Information(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)
     : Screen(robot, width, height) {
-  for (auto i = 0; i < INFO_COLUMNS; i++) {
+  for (size_t i = 0; i < INFO_COLUMNS; i++) {
     lv_obj_t *obj = lv_label_create(screen);
     lv_obj_set_pos(obj, 0, i * 16);
     lv_obj_set_width(obj, width / 2);
@@ -18,7 +18,7 @@ Information::Information(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width
     this->leftColumn[i] = obj;
   }
 
-  for (auto i = 0; i < INFO_COLUMNS; i++) {
+  for (size_t i = 0; i < INFO_COLUMNS; i++) {
     lv_obj_t *obj = lv_label_create(screen);
     lv_obj_set_pos(obj, width / 2, i * 16);
     lv_obj_set_width(obj, width / 2);
@@ -45,7 +45,7 @@ void Information::update() {
 }
 
 Information::~Information() {
-  for (auto i = 0; i < INFO_COLUMNS; ++i) {
+  for (size_t i = 0; i < INFO_COLUMNS; ++i) {
     lv_obj_del_async(this->leftColumn[i]);
     lv_obj_del_async(this->rightColumn[i]);
   }

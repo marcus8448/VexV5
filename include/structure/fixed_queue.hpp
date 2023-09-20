@@ -37,7 +37,7 @@ template <size_t SIZE> void FixedQueue<SIZE>::add(float value) {
     this->max = value;
   } else if (this->values[this->position] == this->max) {
     this->max = -std::numeric_limits<float>::infinity();
-    for (auto i = 0; i < SIZE; ++i) {
+    for (size_t i = 0; i < SIZE; ++i) {
       if (i == this->position) {
         continue;
       }
@@ -49,7 +49,7 @@ template <size_t SIZE> void FixedQueue<SIZE>::add(float value) {
     this->min = value;
   } else if (this->values[this->position] == this->min) {
     this->min = std::numeric_limits<float>::infinity();
-    for (auto i = 0; i < SIZE; ++i) {
+    for (size_t i = 0; i < SIZE; ++i) {
       if (i == this->position) {
         continue;
       }

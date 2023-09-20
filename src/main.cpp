@@ -1,5 +1,5 @@
 #include "main.hpp"
-#include "control/input/operator.hpp"
+#include "control/input/controller.hpp"
 #include "debug/logger.hpp"
 #include "robot/robot.hpp"
 #include "tasks.hpp"
@@ -52,11 +52,12 @@ void initialize() {
   //  pros::c::serctl(SERCTL_DISABLE_COBS, nullptr);
   rtos::onRootTaskStart();
   logger::scope("Initialize");
-  logger::scope("Initialize robot");
+  logger::scope("Robot");
   Robot &robot = getRobot();
   logger::endScope();
   // Optionally disable autonomous for builds
 #ifndef DISABLE_AUTONOMOUS
+  logger::scope("Autonomous");
   // Register the different types of autonomous-es
   control::autonomous::registerRun("Right Winpoint", control::autonomous::rightWinpoint);
   control::autonomous::registerRun("Left Winpoint", control::autonomous::leftWinpoint);
@@ -69,10 +70,11 @@ void initialize() {
     robot.drivetrain.backwards(24.0, true);
   });
   control::autonomous::initialize();
+  logger::endScope();
 #endif
   // Optionally enable extra screen functionality
 #ifndef DISABLE_SCREEN
-  logger::scope("Register Screens");
+  logger::scope("Screen");
   // Optionally register the different screens
 #if not defined(DISABLE_AUTONOMOUS) and not defined(DISABLE_AUTONOMOUS_SELECTION_SCREEN)
   screen::addScreen(std::make_unique<screen::AutonomousSelect, robot::Robot &, lv_obj_t *, lv_coord_t, lv_coord_t>);
@@ -106,11 +108,11 @@ void initialize() {
 #endif
   screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
     return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.rightPID,
-                                               std::string("!PidTuning"));
+                                               "!PidTuning");
   });
-  logger::endScope();
-  logger::scope("Initialize Screen");
+  logger::scope("Initialize");
   screen::initialize(robot); // initialize the screen
+  logger::endScope();
   logger::endScope();
 #endif // DISABLE_SCREEN
   logger::endScope();
@@ -144,8 +146,8 @@ void opcontrol() {
   rtos::onRootTaskStart();
   Robot &robot = getRobot();
 
-  logger::scope("Opcontrol Setup");
-  robot.setController(new control::input::Operator()); // set the robot controller to the default operator based one
+  logger::scope("Opcontrol/Setup");
+  robot.setController(new control::input::Controller(pros::E_CONTROLLER_MASTER)); // set the robot controller to the default operator based one
   logger::endScope();
 
   robot.opcontrol();

@@ -11,6 +11,7 @@ private:
 
 public:
   explicit Optical(int8_t port, const char *name, uint8_t led_pwm = 0, bool gesture = false);
+  ~Optical() override = default;
 
   [[nodiscard]] double getHue() const;
   [[nodiscard]] double getSaturation() const;

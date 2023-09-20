@@ -43,7 +43,7 @@ private:
   lv_obj_t *overshootLabel;
 
 public:
-  const std::string runName;
+  std::string_view runName;
   double prevError = INFINITY;
   double overshoot = 0;
   uint16_t oscillations = 0;
@@ -51,7 +51,7 @@ public:
   void *taskHandle = nullptr;
 
   explicit PidTuning(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height,
-                     robot::device::PID &pid, std::string runName);
+                     robot::device::PID &pid, std::string_view runName);
   ~PidTuning() override;
 
   void update() override;

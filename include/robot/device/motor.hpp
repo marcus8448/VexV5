@@ -52,6 +52,7 @@ public:
   explicit Motor(int8_t port, const char *name, bool reversed = false,
                  pros::motor_gearset_e_t gearset = pros::E_MOTOR_GEARSET_18,
                  pros::motor_brake_mode_e_t brake_mode = pros::E_MOTOR_BRAKE_BRAKE);
+  ~Motor() override = default;
 
   void moveVelocity(int16_t velocity);
   void moveMillivolts(int16_t mV);

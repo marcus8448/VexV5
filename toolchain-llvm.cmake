@@ -24,6 +24,12 @@ set(CMAKE_OBJCOPY llvm-objcopy)
 set(CMAKE_CXX_COMPILER_ID Clang)
 set(CMAKE_LINKER clang++)
 
+option(ENABLE_REMARKS "Enable compiler optimization remarks" OFF)
+
+if (ENABLE_REMARKS)
+        add_compile_options(-fsave-optimization-record)
+endif()
+
 if (ENABLE_LTO)
     # LTO requires lld (which does not work with the linker script)
     message(SEND_ERROR "LTO does not work with clang")

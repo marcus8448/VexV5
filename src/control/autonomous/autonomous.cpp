@@ -6,7 +6,7 @@ static std::unordered_map<std::string, std::function<void(robot::Robot &)>> prog
     std::unordered_map<std::string, std::function<void(robot::Robot &)>>();
 
 void initialize() {
-  registerRun(std::string("None"), [](Robot &robot) -> void {});
+  registerRun(std::string("None"), [](Robot &robot) {});
 }
 
 void registerRun(const std::string &name, std::function<void(robot::Robot &)> function) {

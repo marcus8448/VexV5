@@ -38,14 +38,14 @@ void PidTuning::update() {
 }
 
 PidTuning::PidTuning(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height,
-                     robot::device::PID &pid, std::string runName)
+                     robot::device::PID &pid, std::string_view runName)
     : Screen(robot, width, height), pid(pid),
-      Kp(screen, 0, 0, coord((height - BUTTON_SIZE) / 3), height - BUTTON_SIZE, 1.0, &pid.kp),
-      Ki(screen, coord(width / 2 / 3), 0, coord(height - BUTTON_SIZE) / 3, coord(height - BUTTON_SIZE), 1.0, &pid.ki),
-      Kd(screen, coord(width / 2 / 3 * 2), 0, coord(height - BUTTON_SIZE) / 3, coord(height - BUTTON_SIZE), 1.0,
+      Kp(screen, 0, 0, coord((height - BUTTON_SIZE) / 3), coord(height - BUTTON_SIZE), 1.0, &pid.kp),
+      Ki(screen, coord(width / 2 / 3), 0, coord((height - BUTTON_SIZE) / 3), coord(height - BUTTON_SIZE), 1.0, &pid.ki),
+      Kd(screen, coord(width / 2 / 3 * 2), 0, coord((height - BUTTON_SIZE) / 3), coord(height - BUTTON_SIZE), 1.0,
          &pid.kd),
       testBtn(lv_btn_create(screen)), errorLabel(lv_label_create(screen)), changeLabel(lv_label_create(screen)),
-      oscillationsLabel(lv_label_create(screen)), overshootLabel(lv_label_create(screen)), runName(std::move(runName)) {
+      oscillationsLabel(lv_label_create(screen)), overshootLabel(lv_label_create(screen)), runName(runName) {
 
   lv_obj_t *testLabel = lv_label_create(this->testBtn);
   lv_label_set_text(testLabel, "Test");

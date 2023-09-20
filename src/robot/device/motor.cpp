@@ -1,6 +1,6 @@
 #include "robot/device/motor.hpp"
 #include "debug/logger.hpp"
-#include "pros/apix.h"
+#include "pros/error.h"
 #include "pros/motors.h"
 #include <cerrno>
 #include <cmath>

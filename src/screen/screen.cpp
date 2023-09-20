@@ -146,13 +146,13 @@ void removeScreen(const std::function<std::unique_ptr<Screen>(robot::Robot &robo
 }
 
 void prev_page([[maybe_unused]] lv_event_t *event) {
-  logger::scope("Screen switching to previous page");
+  logger::scope("ScreenPrev");
   switch_to_screen(--screenIndex);
   logger::endScope();
 }
 
 void next_page([[maybe_unused]] lv_event_t *event) {
-  logger::scope("Screen switching to next page");
+  logger::scope("ScreenNext");
   switch_to_screen(++screenIndex);
   logger::endScope();
 }

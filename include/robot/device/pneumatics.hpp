@@ -11,6 +11,7 @@ private:
 
 public:
   explicit PneumaticPiston(int8_t port, const char *name, bool defaultState = false);
+  ~PneumaticPiston() override = default;
 
   void extend();
   void contract();

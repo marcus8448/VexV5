@@ -7,6 +7,7 @@ namespace robot::device {
 class Inertial : public Device {
 public:
   Inertial(int8_t port, const char *name);
+  ~Inertial() override = default;
 
   [[nodiscard]] double getRotation() const;
   [[nodiscard]] double getHeading() const;
