@@ -43,6 +43,7 @@ private:
   std::array<bool, LINE_COUNT> textDirty = {};
 
   const char *enqueuedRumble = nullptr;
+
 public:
   explicit Controller(pros::controller_id_e_t controller_id);
   ~Controller() = default;

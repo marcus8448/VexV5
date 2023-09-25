@@ -7,12 +7,11 @@
 namespace screen {
 class AutonomousSelect : public Screen {
 private:
-  lv_obj_t *list;
+  lv_obj list;
   lv_obj_t *selected = nullptr;
 
 public:
   explicit AutonomousSelect(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height);
-  ~AutonomousSelect() override;
 
   void update() override;
 

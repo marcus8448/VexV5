@@ -144,11 +144,11 @@ void Drivetrain::updateState() {
   rPosY += dRPosY;
 
   double dist = std::sqrt(((lPosX - rPosX) * (lPosX - rPosX)) + ((lPosY - rPosY) * (lPosY - rPosY)));
-//  logger::info("dist: %.2f", dist);
+  //  logger::info("dist: %.2f", dist);
 
   this->posX = (lPosX + rPosX) / 2.0;
   this->posY = (lPosY + rPosY) / 2.0;
-//  logger::info("L %.2f, %.2f | R %.2f, %.2f | C %.2f, %2.f", lPosX, lPosY, rPosX, rPosY, this->posX, this->posY);
+  //  logger::info("L %.2f, %.2f | R %.2f, %.2f | C %.2f, %2.f", lPosX, lPosY, rPosX, rPosY, this->posX, this->posY);
 
   this->leftPID.copyParams(this->rightPID);
   this->velLeftPID.copyParams(this->velRightPID);

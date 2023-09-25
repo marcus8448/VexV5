@@ -4,10 +4,8 @@
 #include "format.hpp"
 #include <cstring>
 
-#define controller_digital(button)                                                                                     \
-  print_error("controller", pros::c::controller_get_digital(this->id, button))
-#define controller_analog(stick_axis)                                                                                  \
-  print_error("controller", pros::c::controller_get_analog(this->id, stick_axis))
+#define controller_digital(button) print_error("controller", pros::c::controller_get_digital(this->id, button))
+#define controller_analog(stick_axis) print_error("controller", pros::c::controller_get_analog(this->id, stick_axis))
 
 namespace control::input {
 Controller::Controller(pros::controller_id_e_t controller_id) : id(controller_id) {}
@@ -45,7 +43,8 @@ Controller::Controller(pros::controller_id_e_t controller_id) : id(controller_id
 [[nodiscard]] double Controller::rightStickY() const { return this->rsY; }
 
 void Controller::setLine(uint8_t line, const char *str) {
-  if ((text[line] == nullptr && str != nullptr) || (text[line] != nullptr && str == nullptr) || std::strcmp(text[line], str) != 0) {
+  if ((text[line] == nullptr && str != nullptr) || (text[line] != nullptr && str == nullptr) ||
+      std::strcmp(text[line], str) != 0) {
     text[line] = str;
     textDirty[line] = true;
   }
@@ -58,9 +57,7 @@ void Controller::clearLine(uint8_t line) {
   }
 }
 
-void Controller::rumble(const char *str) {
-  this->enqueuedRumble = str;
-}
+void Controller::rumble(const char *str) { this->enqueuedRumble = str; }
 
 bool Controller::isConnected() const { return pros::c::controller_is_connected(this->id); }
 

@@ -12,10 +12,10 @@ class DataSet {
 public:
   const char *label;
   lv_color_t color;
-  float(*function)(const robot::Robot &);
+  float (*function)(const robot::Robot &);
 
 public:
-  explicit DataSet(const char *label, lv_color_t color, float(*function)(const robot::Robot &));
+  explicit DataSet(const char *label, lv_color_t color, float (*function)(const robot::Robot &));
 };
 
 template <size_t Sets, size_t Points> class Chart : public Screen {
@@ -24,14 +24,13 @@ template <size_t Sets, size_t Points> class Chart : public Screen {
   std::array<DataSet, Sets> dataSets;
   std::array<structure::FixedQueue<Points>, Sets> data = {};
 
-  lv_color_t *canvasBuffer;
-  lv_obj_t *canvas;
-  lv_obj_t *titleLabel;
+  std::unique_ptr<lv_color_t> canvasBuffer;
+  lv_obj canvas;
+  lv_obj titleLabel;
 
 public:
   explicit Chart(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height, const char *title,
                  std::array<DataSet, Sets> dataSets);
-  ~Chart() override;
 
   void update() override;
 };

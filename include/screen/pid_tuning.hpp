@@ -11,9 +11,9 @@ class ControlGroup {
   const lv_coord_t width;
   const lv_coord_t height;
 
-  lv_obj_t *increaseBtn;
-  lv_obj_t *valueLabel;
-  lv_obj_t *decreaseBtn;
+  lv_obj increaseBtn;
+  lv_obj valueLabel;
+  lv_obj decreaseBtn;
 
 public:
   double *value;
@@ -21,9 +21,6 @@ public:
 
   explicit ControlGroup(lv_obj_t *screen, lv_coord_t x, lv_coord_t y, lv_coord_t width, lv_coord_t height, double delta,
                         double *value);
-  ControlGroup(const Screen &) = delete;
-  ControlGroup &operator=(const Screen &) = delete;
-  ~ControlGroup();
 
   void update();
 };
@@ -36,14 +33,14 @@ private:
   ControlGroup Ki;
   ControlGroup Kd;
 
-  lv_obj_t *testBtn;
-  lv_obj_t *errorLabel;
-  lv_obj_t *changeLabel;
-  lv_obj_t *oscillationsLabel;
-  lv_obj_t *overshootLabel;
-  lv_obj_t *headingLabel;
-  lv_obj_t *leftPower;
-  lv_obj_t *rightPower;
+  lv_obj testBtn;
+  lv_obj errorLabel;
+  lv_obj changeLabel;
+  lv_obj oscillationsLabel;
+  lv_obj overshootLabel;
+  lv_obj headingLabel;
+  lv_obj leftPower;
+  lv_obj rightPower;
 
 public:
   std::string_view runName;
@@ -55,7 +52,6 @@ public:
 
   explicit PidTuning(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height,
                      robot::device::PID &pid, std::string_view runName);
-  ~PidTuning() override;
 
   void update() override;
   void startTest();

@@ -29,7 +29,7 @@ void switch_to_screen(int screen);
 void prev_page([[maybe_unused]] lv_event_t *event);
 void next_page([[maybe_unused]] lv_event_t *event);
 void update();
-[[noreturn]] void update_task([[maybe_unused]] void *params);
+void update_task([[maybe_unused]] lv_timer_t *);
 
 void initialize(robot::Robot &bot) {
   robot = &bot;
@@ -53,7 +53,8 @@ void initialize(robot::Robot &bot) {
     switch_to_screen(0);
   }
 
-  rtos::createTask("Screen update", update_task, nullptr, TASK_PRIORITY_DEFAULT - 1, 0x2000);
+  lv_timer_t *timer = lv_timer_create(update_task, UPDATE_RATE, nullptr);
+  lv_timer_set_repeat_count(timer, -1);
 }
 
 void switch_to_screen(int screen) {
@@ -85,12 +86,7 @@ void switch_to_screen(int screen) {
   pros::c::mutex_give(mutex);
 }
 
-[[noreturn]] void update_task([[maybe_unused]] void *params) {
-  while (true) {
-    update();
-    pros::c::delay(screen::UPDATE_RATE);
-  }
-}
+void update_task([[maybe_unused]] lv_timer_t *timer) { update(); }
 
 void update() {
   if (activeScreen != nullptr && pros::c::mutex_take(mutex, 100)) {
@@ -156,6 +152,8 @@ void next_page([[maybe_unused]] lv_event_t *event) {
   switch_to_screen(++screenIndex);
   logger::endScope();
 }
+
+void LvObjDeleter::operator()(lv_obj_t *obj) { lv_obj_del(obj); }
 
 Screen::Screen(robot::Robot &robot, lv_coord_t width, lv_coord_t height) : width(width), height(height), robot(robot) {}
 

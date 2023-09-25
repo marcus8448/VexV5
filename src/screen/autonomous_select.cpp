@@ -7,8 +7,8 @@
 namespace screen {
 AutonomousSelect::AutonomousSelect(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)
     : Screen(robot, width, height), list(lv_list_create(screen)) {
-  lv_obj_set_pos(this->list, 0, 0);
-  lv_obj_set_size(this->list, width, height);
+  lv_obj_set_pos(this->list.get(), 0, 0);
+  lv_obj_set_size(this->list.get(), width, height);
 
   auto programs = control::autonomous::getPrograms();
   for (auto const &[name, program] : programs) {
@@ -16,7 +16,7 @@ AutonomousSelect::AutonomousSelect(robot::Robot &robot, lv_obj_t *screen, lv_coo
       continue;
     }
 
-    lv_obj_t *btn = lv_list_add_btn(this->list, nullptr, name.data());
+    lv_obj_t *btn = lv_list_add_btn(this->list.get(), nullptr, name.data());
     lv_obj_add_event_cb(btn, SCREEN_CB_ADV(AutonomousSelect, click), LV_EVENT_CLICKED, this);
     lv_obj_set_style_text_color(btn, colour::GREEN, LV_STATE_CHECKED);
     if (name == this->robot.autonomous) {
@@ -28,11 +28,6 @@ AutonomousSelect::AutonomousSelect(robot::Robot &robot, lv_obj_t *screen, lv_coo
   }
 }
 
-AutonomousSelect::~AutonomousSelect() {
-  lv_obj_del_async(this->list);
-  lv_obj_del_async(this->selected);
-}
-
 void AutonomousSelect::update() {}
 
 void AutonomousSelect::click(lv_event_t *event) {
@@ -41,7 +36,7 @@ void AutonomousSelect::click(lv_event_t *event) {
   }
   this->selected = lv_event_get_target(event);
 
-  auto name = std::string(lv_list_get_btn_text(this->list, this->selected));
+  auto name = std::string(lv_list_get_btn_text(this->list.get(), this->selected));
 
   if (this->robot.controller != nullptr) {
     this->robot.controller->setLine(0, name.c_str());

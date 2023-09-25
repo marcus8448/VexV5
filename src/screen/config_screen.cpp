@@ -5,10 +5,10 @@
 namespace screen {
 ConfigurationScreen::ConfigurationScreen(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)
     : Screen(robot, width, height), driveSchemeBtn(lv_btn_create(screen)),
-      driveSchemeBtnLbl(lv_label_create(this->driveSchemeBtn)) {
-  lv_obj_set_pos(this->driveSchemeBtn, 0, 0);
-  lv_obj_set_size(this->driveSchemeBtn, width / 2, 48);
-  lv_obj_add_event_cb(this->driveSchemeBtn, SCREEN_CB(ConfigurationScreen, click), LV_EVENT_CLICKED, this);
+      driveSchemeBtnLbl(lv_label_create(this->driveSchemeBtn.get())) {
+  lv_obj_set_pos(this->driveSchemeBtn.get(), 0, 0);
+  lv_obj_set_size(this->driveSchemeBtn.get(), width / 2, 48);
+  lv_obj_add_event_cb(this->driveSchemeBtn.get(), SCREEN_CB(ConfigurationScreen, click), LV_EVENT_CLICKED, this);
   this->click();
 }
 
@@ -22,6 +22,4 @@ void ConfigurationScreen::click() {
       this->driveSchemeBtnLbl,
       fmt::string_format("Control Scheme: %s", robot::driveSchemeName(this->robot.drivetrain.controlScheme)).c_str());
 }
-
-ConfigurationScreen::~ConfigurationScreen() { lv_obj_del_async(this->driveSchemeBtn); }
 } // namespace screen
