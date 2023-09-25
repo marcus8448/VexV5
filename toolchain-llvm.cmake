@@ -3,7 +3,7 @@ set(TARGET_TRIPLE arm-none-eabi)
 add_compile_options(-target ${TARGET_TRIPLE} -Wno-unused-command-line-argument)
 add_link_options(-target ${TARGET_TRIPLE} -Wno-unused-command-line-argument)
 
-add_link_options("-fuse-ld=bfd")
+set(LINKER bfd)
 
 execute_process(COMMAND ${TARGET_TRIPLE}-g++ -print-sysroot OUTPUT_VARIABLE CMAKE_SYSROOT OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND ${TARGET_TRIPLE}-g++ -print-multi-directory OUTPUT_VARIABLE ARM_MULTI_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)

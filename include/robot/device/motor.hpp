@@ -15,6 +15,7 @@ public:
   double integralRange;
   double acceptableError;
   double moveMin = 0.0;
+  double output = 0.0;
 
 private:
   double error = 0.0;

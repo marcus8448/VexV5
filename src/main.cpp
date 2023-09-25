@@ -64,10 +64,16 @@ void initialize() {
   control::autonomous::registerRun("Right Score", control::autonomous::rightScore);
   control::autonomous::registerRun("Left Score", control::autonomous::leftScore);
   control::autonomous::registerRun("Skills", control::autonomous::skills);
-  control::autonomous::registerRun("!PidTuning", [](robot::Robot &robot) {
+  control::autonomous::registerRun("!PID_MOVE", [](robot::Robot &robot) {
     robot.drivetrain.tare();
     robot.drivetrain.forwards(24.0, true);
     robot.drivetrain.backwards(24.0, true);
+    robot.drivetrain.brake();
+  });
+  control::autonomous::registerRun("!PID_TURN", [](robot::Robot &robot) {
+    robot.drivetrain.tare();
+    robot.drivetrain.turnLeft(90.0, true);
+    robot.drivetrain.brake();
   });
   control::autonomous::initialize();
   logger::endScope();
@@ -84,31 +90,35 @@ void initialize() {
 #endif
   screen::addScreen(std::make_unique<screen::Information, robot::Robot &, lv_obj_t *, lv_coord_t, lv_coord_t>);
 #ifndef DISABLE_DRIVETRAIN_DEBUG_SCREEN
-  screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
-    return std::make_unique<screen::Chart<2, 100>>(
-        robot, screen, width, height, "Drivetrain Velocity",
-        std::array<screen::DataSet, 2>{
-            screen::DataSet("Left", screen::colour::RED,
-                            [](robot::Robot &robot) { return static_cast<float>(robot.drivetrain.getLeftVelocity()); }),
-            screen::DataSet("Right", screen::colour::GREEN, [](robot::Robot &robot) {
-              return static_cast<float>(robot.drivetrain.getRightVelocity());
-            })});
-  });
-  screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
-    return std::make_unique<screen::Chart<2, 100>>(
-        robot, screen, width, height, "Drivetrain PID Error",
-        std::array<screen::DataSet, 2>{screen::DataSet("Left", screen::colour::LIGHT_BLUE,
-                                                       [](robot::Robot &robot) {
-                                                         return static_cast<float>(robot.drivetrain.leftPID.getError());
-                                                       }),
-                                       screen::DataSet("Right", screen::colour::PINK, [](robot::Robot &robot) {
-                                         return static_cast<float>(robot.drivetrain.rightPID.getError());
-                                       })});
-  });
+//  screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
+//    return std::make_unique<screen::Chart<2, 100>>(
+//        robot, screen, width, height, "Drivetrain Velocity",
+//        std::array<screen::DataSet, 2>{
+//            screen::DataSet("Left", screen::colour::RED,
+//                            [](const robot::Robot &robot) { return static_cast<float>(robot.drivetrain.getLeftVelocity()); }),
+//            screen::DataSet("Right", screen::colour::GREEN, [](const robot::Robot &robot) {
+//              return static_cast<float>(robot.drivetrain.getRightVelocity());
+//            })});
+//  });
+//  screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
+//    return std::make_unique<screen::Chart<2, 100>>(
+//        robot, screen, width, height, "Drivetrain PID Error",
+//        std::array<screen::DataSet, 2>{screen::DataSet("Left", screen::colour::LIGHT_BLUE,
+//                                                       [](const robot::Robot &robot) {
+//                                                         return static_cast<float>(robot.drivetrain.leftPID.getError());
+//                                                       }),
+//                                       screen::DataSet("Right", screen::colour::PINK, [](const robot::Robot &robot) {
+//                                         return static_cast<float>(robot.drivetrain.rightPID.getError());
+//                                       })});
+//  });
 #endif
   screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
     return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.rightPID,
-                                               "!PidTuning");
+                                               "!PID_MOVE");
+  });
+  screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
+    return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.headingPID,
+                                               "!PID_TURN");
   });
   logger::scope("Initialize");
   screen::initialize(robot); // initialize the screen

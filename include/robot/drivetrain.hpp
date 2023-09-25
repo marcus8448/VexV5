@@ -47,9 +47,9 @@ private:
   device::Motor motorR2;
   device::Motor motorR3;
 
-  device::Inertial imu;
 
 public:
+  device::Inertial imu;
   device::PID velRightPID;
   device::PID velLeftPID;
 

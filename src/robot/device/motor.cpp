@@ -175,22 +175,25 @@ void PID::resetState() {
 
 double PID::update(double target, double value) {
   this->error = target - value;
-  if (std::abs(this->error) < this->acceptableError || value == PROS_ERR_F) {
-    return 0.0;
-  }
-
-  this->prevError = this->error;
-  this->integral += this->error;
   if (std::signbit(this->error) != std::signbit(this->prevError) || std::abs(this->error) > this->integralRange) {
     this->integral = 0;
   }
+  
+  if (std::abs(this->error) < this->acceptableError || value == PROS_ERR_F) {
+    this->integral = 0;
+    this->prevError = this->error;
+    return this->output = 0.0;
+  }
+  
+  this->integral += this->error;
+  this->output = clampMv(this->error * this->kp + this->integral * this->ki + (this->error - this->prevError) * this->kd,
+                     this->moveMin);
   logger::info("%.2f %.2f/%.2f, %.1f %.1f %.1f * %.2f %.2f %.2f -> %.2f/%.2f/%.2f -> %.2f", this->error, value, target,
                this->kp, this->ki, this->kd, this->error, this->integral, this->error - this->prevError,
-               this->error * this->kp, this->integral * this->ki, (this->error - this->prevError) * this->kd,
-               clampMv(this->error * this->kp + this->integral * this->ki + (this->error - this->prevError) * this->kd,
-                       this->moveMin));
-  return clampMv(this->error * this->kp + this->integral * this->ki + (this->error - this->prevError) * this->kd,
-                 this->moveMin);
+               this->error * this->kp, this->integral * this->ki, (this->error - this->prevError) * this->kd, this->output);
+
+  this->prevError = this->error;
+  return this->output;
 }
 
 double PID::getError() const { return error; }

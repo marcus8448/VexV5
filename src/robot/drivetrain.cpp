@@ -18,7 +18,7 @@ Drivetrain::Drivetrain(int8_t left1, int8_t left2, int8_t left3, int8_t right1, 
       motorR2(device::Motor(right2, "Drive R2", false, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       motorR3(device::Motor(right3, "Drive R3", true, pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       imu(device::Inertial(inertial, "IMU")), velRightPID(120.0, 15.0, 20.0, 50.0, 0.0),
-      rightPID(12.0, 3.0, 3.0, 90.0, 5.0), headingPID(80.0, 10.0, 0.0, 10.0, 10000.2) {}
+      rightPID(6.0, 0.10, 1.5, 90.0, 3.0), headingPID(85.0, 9.0, 3.0, 10.0, 0.3) {}
 
 bool Drivetrain::isAtTarget() const { return this->timeAtTarget > STABILIZE_TICKS; }
 
@@ -144,11 +144,11 @@ void Drivetrain::updateState() {
   rPosY += dRPosY;
 
   double dist = std::sqrt(((lPosX - rPosX) * (lPosX - rPosX)) + ((lPosY - rPosY) * (lPosY - rPosY)));
-  logger::info("dist: %.2f", dist);
+//  logger::info("dist: %.2f", dist);
 
   this->posX = (lPosX + rPosX) / 2.0;
   this->posY = (lPosY + rPosY) / 2.0;
-  logger::info("L %.2f, %.2f | R %.2f, %.2f | C %.2f, %2.f", lPosX, lPosY, rPosX, rPosY, this->posX, this->posY);
+//  logger::info("L %.2f, %.2f | R %.2f, %.2f | C %.2f, %2.f", lPosX, lPosY, rPosX, rPosY, this->posX, this->posY);
 
   this->leftPID.copyParams(this->rightPID);
   this->velLeftPID.copyParams(this->velRightPID);
@@ -175,9 +175,10 @@ void Drivetrain::updateState() {
   }
   case STATIC_TURN: {
     auto value = this->headingPID.update(this->targetHeading, this->heading);
+    logger::info("%.2f/%.2f", this->heading, this->targetHeading);
 
-    this->moveRight(static_cast<int16_t>(value));
-    this->moveLeft(static_cast<int16_t>(-value));
+    this->moveRight(static_cast<int16_t>(-value));
+    this->moveLeft(static_cast<int16_t>(value));
     if (std::abs(this->targetHeading - this->heading) < ACCEPTABLE_HEADING_ERROR) {
       atTarget = true;
     }
@@ -194,8 +195,8 @@ void Drivetrain::updateState() {
     double right = this->rightPID.update(this->targetRight, this->rightPos);
     double left = this->leftPID.update(this->targetLeft, this->leftPos);
 
-    left -= head;
-    right += head;
+    left += head;
+    right -= head;
     if (left < -device::Motor::MAX_MILLIVOLTS) {
       right += -device::Motor::MAX_MILLIVOLTS - left;
     }

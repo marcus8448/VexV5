@@ -16,7 +16,7 @@ include(CMakeOptions.txt)
 add_compile_options(-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp -nostdlib)
 add_link_options(-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp -nostdlib)
 
-add_link_options(LINKER:--no-enum-size-warning -z noexecstack)
+add_link_options(-z noexecstack)
 
 set(FIRMWARE_DIR ${CMAKE_SOURCE_DIR}/firmware)
 link_directories(BEFORE ${FIRMWARE_DIR} ${FIRMWARE_DIR}/extra)
@@ -26,6 +26,9 @@ set(LibPROS ${FIRMWARE_DIR}/libpros.a)
 set(LibLVGL ${FIRMWARE_DIR}/liblvgl.a)
 
 project(VexV5 VERSION 1.0.0 LANGUAGES C CXX)
+
+add_link_options(-fuse-ld=${LINKER})
+add_link_options(LINKER:--no-enum-size-warning)
 
 set(FIRMWARE_DIR ${CMAKE_SOURCE_DIR}/firmware)
 set(BIN_DIR ${CMAKE_SOURCE_DIR}/bin)

@@ -9,10 +9,11 @@ SECTIONS
 } > HOT_MEMORY
 
 .text : {
+    __text_start = .;
    KEEP (*(.vectors))
    /* boot data should be exactly 32 bytes long */
    *(.boot_data)
-   . = 0x20;
+   . = __text_start + 0x20;
    *(.boot)
    . = ALIGN(64);
    *(.freertos_vectors)

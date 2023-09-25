@@ -1,14 +1,14 @@
 #include "screen/chart.hpp"
+//#include "debug/logger.hpp"
 #include "format.hpp"
 #include "pros/rtos.h"
 #include "screen/colour.hpp"
 #include "screen/screen.hpp"
 #include <iostream>
-#include <utility>
 
 namespace screen {
-DataSet::DataSet(const char *label, lv_color_t color, std::function<float(robot::Robot &)> function)
-    : label(label), color(color), function(std::move(function)) {}
+DataSet::DataSet(const char *label, lv_color_t color, float(*function)(const robot::Robot &))
+    : label(label), color(color), function(function) {}
 
 template <size_t Sets, size_t Points>
 Chart<Sets, Points>::Chart(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height,
@@ -82,8 +82,14 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
   lv_canvas_draw_text(this->canvas, 40, height - 36, 100, &textDesc, str.c_str());
 
   for (size_t i = 0; i < Sets; ++i) {
-    DataSet set = this->dataSets[i];
+    DataSet &set = this->dataSets[i];
     pros::c::delay(1);
+    if (set.function == nullptr) {
+//      logger::info("NPTR??");
+      continue;
+    } else {
+//      logger::info("%p", set.function);
+    }
     float value = set.function(this->robot);
     if (value == INFINITY) {
       value = 0;

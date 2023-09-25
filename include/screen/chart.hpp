@@ -12,10 +12,10 @@ class DataSet {
 public:
   const char *label;
   lv_color_t color;
-  std::function<float(robot::Robot &)> function;
+  float(*function)(const robot::Robot &);
 
 public:
-  explicit DataSet(const char *label, lv_color_t color, std::function<float(robot::Robot &)> function);
+  explicit DataSet(const char *label, lv_color_t color, float(*function)(const robot::Robot &));
 };
 
 template <size_t Sets, size_t Points> class Chart : public Screen {

@@ -41,6 +41,9 @@ private:
   lv_obj_t *changeLabel;
   lv_obj_t *oscillationsLabel;
   lv_obj_t *overshootLabel;
+  lv_obj_t *headingLabel;
+  lv_obj_t *leftPower;
+  lv_obj_t *rightPower;
 
 public:
   std::string_view runName;
