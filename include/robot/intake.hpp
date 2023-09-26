@@ -10,8 +10,8 @@ constexpr uint16_t DEFAULT_INTAKE_SPEED = 12000;
 
 class Intake {
 private:
-  device::Motor leftMotor;
-  device::Motor rightMotor;
+  device::DirectMotor leftMotor;
+  device::DirectMotor rightMotor;
   device::PneumaticPiston pneumatic;
 
   int16_t speed = 0;

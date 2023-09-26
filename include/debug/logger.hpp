@@ -111,9 +111,7 @@ void debug(const std::string_view &string);
 #ifdef DEBUG_LOG
 template <typename... Args> void debug(const char *format, Args... args) { debug(fmt::string_format(format, args...)); }
 #else
-template <typename... Args> void debug(const char *, Args...) {
-  //  debug(fmt::string_format(format, args...));
-}
+template <typename... Args> void debug(const char *, Args...) {}
 #endif
 
 /**

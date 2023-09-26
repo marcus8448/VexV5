@@ -2,7 +2,7 @@
 
 namespace robot {
 Intake::Intake(int8_t leftPort, int8_t rightPort)
-    : leftMotor(device::Motor(leftPort, "Intake L")), rightMotor(device::Motor(rightPort, "Intake R", true)),
+    : leftMotor(device::DirectMotor(leftPort, "Intake L")), rightMotor(device::DirectMotor(rightPort, "Intake R", true)),
       pneumatic(device::PneumaticPiston('A', "Launcher")) {}
 
 void Intake::stop() { this->speed = 0; }

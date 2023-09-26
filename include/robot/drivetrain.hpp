@@ -4,6 +4,7 @@
 #include "control/input/controller.hpp"
 #include "device/inertial.hpp"
 #include "device/motor.hpp"
+#include "device/pid.hpp"
 #include <cstdint>
 
 namespace robot {
@@ -40,13 +41,8 @@ private:
     CURVE_MOVE
   };
 
-  device::Motor motorL1;
-  device::Motor motorL2;
-  device::Motor motorL3;
-  device::Motor motorR1;
-  device::Motor motorR2;
-  device::Motor motorR3;
-
+  std::unique_ptr<device::Motor> motorLeft;
+  std::unique_ptr<device::Motor> motorRight;
 
 public:
   device::Inertial imu;
@@ -152,6 +148,9 @@ public:
   [[nodiscard]] double getLeftVelocity() const;
   [[nodiscard]] double getRightVelocity() const;
 
+  [[nodiscard]] device::Motor &getLeftMotor() const;
+  [[nodiscard]] device::Motor &getRightMotor() const;
+
   /**
    * Resets the all of the motors' absolute position trackers.
    */
@@ -168,18 +167,6 @@ public:
 
 private:
   void setTarget(Drivetrain::TargetType type);
-
-  /**
-   * Moves the two right motors of the drivetrain at the specified voltage.
-   * @param voltage The voltage to run at [-127 - 127]
-   */
-  void moveRight(int16_t millivolts);
-
-  /**
-   * Moves the two left motors of the drivetrain at the specified voltage.
-   * @param voltage The voltage to run at [-127 - 127]
-   */
-  void moveLeft(int16_t millivolts);
 };
 
 [[nodiscard]] const char *driveSchemeName(Drivetrain::ControlScheme scheme);

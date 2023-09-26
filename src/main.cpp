@@ -72,7 +72,7 @@ void initialize() {
   });
   control::autonomous::registerRun("!PID_TURN", [](robot::Robot &robot) {
     robot.drivetrain.tare();
-    robot.drivetrain.turnLeft(90.0, true);
+    robot.drivetrain.turnLeft(45.0, true);
     robot.drivetrain.brake();
   });
   control::autonomous::initialize();

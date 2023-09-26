@@ -67,6 +67,7 @@ set(SOURCE_FILES
         src/robot/device/inertial.cpp
         src/robot/device/motor.cpp
         src/robot/device/optical.cpp
+        src/robot/device/pid.cpp
         src/robot/device/pneumatics.cpp
         src/robot/arm.cpp
         src/robot/drivetrain.cpp
@@ -87,6 +88,7 @@ set(HEADER_FILES
         include/robot/device/inertial.hpp
         include/robot/device/motor.hpp
         include/robot/device/optical.hpp
+        include/robot/device/pid.hpp
         include/robot/device/pneumatics.hpp
         include/robot/arm.hpp
         include/robot/drivetrain.hpp

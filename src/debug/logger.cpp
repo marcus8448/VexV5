@@ -8,11 +8,9 @@
 #include <vector>
 
 namespace logger {
-#ifdef DEBUG_LOG
 static std::unordered_map<pros::task_t, std::vector<std::pair<const char *, uint32_t>>> sections =
     std::unordered_map<pros::task_t,
                        std::vector<std::pair<const char *, uint32_t>>>(); // stores the name and timestamp of sections.
-#endif
 
 static const char *main_task_name = nullptr;
 
@@ -108,6 +106,11 @@ void debug(const std::string_view &string) {
 #endif
   std::cout.flush();
 }
+#else
+void debug(const char *) {}
+
+void debug(const std::string_view &) {}
+#endif // DEBUG_LOG
 
 void scope(const char *string) {
   pros::task_t task = pros::c::task_get_current();
@@ -120,7 +123,7 @@ void scope(const char *string) {
   for (const auto &pair : val) {
     str.append("/").append(pair.first);
   }
-  debug("> START %s", str.c_str());
+  info("> START %s", str.c_str());
 }
 
 void endScope() {
@@ -135,7 +138,7 @@ void endScope() {
     for (const auto &pair : stack) {
       str.append("/").append(pair.first);
     }
-    debug("> END %s [%ims]", str.c_str(), millis - back.second);
+    info("> END %s [%ims]", str.c_str(), millis - back.second);
     stack.pop_back();
     if (stack.empty()) {
       sections.erase(task);
@@ -147,17 +150,6 @@ void swapScope(const char *string) {
   endScope();
   scope(string);
 }
-#else
-void debug(const char *) {}
-
-void debug(const std::string_view &) {}
-
-void scope(const char *) {}
-
-void endScope() {}
-
-void swapScope(const char *) {}
-#endif // DEBUG_LOG
 
 void flush() {
 #ifdef FILE_LOG

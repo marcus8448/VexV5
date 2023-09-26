@@ -1,6 +1,7 @@
 #ifndef SCREEN_PID_TUNING_HPP
 #define SCREEN_PID_TUNING_HPP
 
+#include "robot/device/pid.hpp"
 #include "robot/robot.hpp"
 #include "screen.hpp"
 
