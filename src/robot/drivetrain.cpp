@@ -16,7 +16,7 @@ Drivetrain::Drivetrain(int8_t left1, int8_t left2, int8_t left3, int8_t right1, 
       motorRight(new device::MotorGroup<3>(
           {right1, right2, static_cast<int8_t>(-right3)}, "Drive R", pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       imu(device::Inertial(inertial, "IMU")), velRightPID(120.0, 15.0, 20.0, 50.0, 0.0),
-      rightPID(6.0, 0.10, 1.5, 90.0, 3.0), headingPID(80.0, 15.0, 10.0, 10.0, 0.3) {}
+      rightPID(6.0, 0.10, 1.5, 90.0, 3.0), headingPID(80.0, 15.0, 30.0, 10.0, 0.3) {}
 
 bool Drivetrain::isAtTarget() const { return this->timeAtTarget > STABILIZE_TICKS; }
 
@@ -146,8 +146,8 @@ void Drivetrain::updateState() {
   this->posY = (lPosY + rPosY) / 2.0;
 //  logger::info("L %.2f, %.2f | R %.2f, %.2f | C %.2f, %2.f", lPosX, lPosY, rPosX, rPosY, this->posX, this->posY);
 
-  this->leftPID.copyParams(this->rightPID);
-  this->velLeftPID.copyParams(this->velRightPID);
+  this->leftPID = this->rightPID;
+  this->velLeftPID = this->velRightPID;
 
   bool atTarget = false;
   switch (this->targetType) {

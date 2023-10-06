@@ -5,9 +5,9 @@
 #include <cstring>
 
 #define controller_digital(button)                                                                                     \
-  print_error("controller", pros::c::controller_get_digital(this->id, button))
+  error::print("controller", pros::c::controller_get_digital(this->id, button))
 #define controller_analog(stick_axis)                                                                                  \
-  print_error("controller", pros::c::controller_get_analog(this->id, stick_axis))
+  error::print("controller", pros::c::controller_get_analog(this->id, stick_axis))
 
 namespace control::input {
 Controller::Controller(pros::controller_id_e_t controller_id) : id(controller_id) {}
@@ -174,7 +174,7 @@ void Controller::update() {
     logger::debug("L2 pressed");
 
   if (this->enqueuedRumble != nullptr && this->ticks % 10 == 0) {
-    clear_error();
+    error::clear();
     if (pros::c::controller_rumble(this->id, this->enqueuedRumble)) {
       this->enqueuedRumble = nullptr;
     } else {

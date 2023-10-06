@@ -1,14 +1,11 @@
 #include "robot/device/motor.hpp"
 #include "debug/logger.hpp"
-#include "include/robot/device/pid.hpp"
 #include "pros/error.h"
 #include "pros/motors.h"
 #include <cerrno>
 #include <cmath>
 
 namespace robot::device {
-template class MotorGroup<3>;
-
 DirectMotor::DirectMotor(int8_t port, const char *name, bool reversed, pros::motor_gearset_e_t gearset,
              pros::motor_brake_mode_e_t brake_mode)
     : Device("DirectMotor", name, static_cast<int8_t>(reversed ? -port : port)), gearset(gearset),
@@ -378,4 +375,6 @@ constexpr int16_t Motor::gearsetMaxVelocity(pros::motor_gearset_e_t gearset) {
     return 0;
   }
 }
+
+template class MotorGroup<3>;
 } // namespace robot::device

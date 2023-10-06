@@ -12,11 +12,11 @@ namespace fmt {
  * @return The formatted string.
  */
 template <typename... Args> std::string string_format(const char *format, Args... args) {
-  uint32_t size_s = snprintf(nullptr, 0, format, args...) + 1; // Extra space for '\0'
+  int size_s = snprintf(nullptr, 0, format, args...) + 1; // Extra space for '\0'
   if (size_s <= 0) {
     return "format failure";
   }
-  auto size = static_cast<uint32_t>(size_s);
+  auto size = static_cast<size_t>(size_s);
   std::unique_ptr<char[]> buf(new char[size]);
   snprintf(buf.get(), size, format, args...);
   return {buf.get(), buf.get() + size - 1}; // We don't want the '\0' inside
@@ -29,11 +29,11 @@ template <typename... Args> std::string string_format(const char *format, Args..
  * @return The formatted string.
  */
 template <typename... Args> const char * static_string_format(const char *format, Args... args) {
-  uint32_t size_s = snprintf(nullptr, 0, format, args...) + 1; // Extra space for '\0'
+  int size_s = snprintf(nullptr, 0, format, args...) + 1; // Extra space for '\0'
   if (size_s <= 0) {
     return "format failure";
   }
-  auto size = static_cast<uint32_t>(size_s);
+  auto size = static_cast<size_t>(size_s);
   char *buf = new char[size];
   snprintf(buf, size, format, args...);
   return buf;

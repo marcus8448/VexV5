@@ -1,9 +1,8 @@
 #include "robot/intake.hpp"
 
 namespace robot {
-Intake::Intake(int8_t leftPort, int8_t rightPort)
-    : leftMotor(device::DirectMotor(leftPort, "Intake L")), rightMotor(device::DirectMotor(rightPort, "Intake R", true)),
-      pneumatic(device::PneumaticPiston('A', "Launcher")) {}
+Intake::Intake(int8_t motorPort)
+    : motor(device::DirectMotor(motorPort, "Intake")) {}
 
 void Intake::stop() { this->speed = 0; }
 
@@ -24,12 +23,6 @@ void Intake::updateTargeting(control::input::Controller *controller) {
 }
 
 void Intake::updateState() {
-  this->leftMotor.moveMillivolts(this->speed);
-  this->rightMotor.moveMillivolts(this->speed);
-  if (this->speed < 0) {
-    this->pneumatic.extend();
-  } else {
-    this->pneumatic.contract();
-  }
+  this->motor.moveMillivolts(this->speed);
 }
 } // namespace robot

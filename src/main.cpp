@@ -35,10 +35,8 @@
 #define DRIVETRAIN_MOTOR_R2 20
 #define DRIVETRAIN_MOTOR_R3 19
 #define DRIVETRAIN_IMU 7
-#define INTAKE_RIGHT_MOTOR 12
-#define INTAKE_LEFT_MOTOR 11
-#define ARM_1 19
-#define ARM_2 20
+#define WING_LEFT 'A'
+#define WING_RIGHT 'B'
 // END CONFIG
 
 using namespace robot;
@@ -187,7 +185,7 @@ void disabled() {
 Robot &getRobot() {
   static Robot robot =
       Robot(DRIVETRAIN_MOTOR_L1, DRIVETRAIN_MOTOR_L2, DRIVETRAIN_MOTOR_L3, DRIVETRAIN_MOTOR_R1, DRIVETRAIN_MOTOR_R2,
-            DRIVETRAIN_MOTOR_R3, INTAKE_RIGHT_MOTOR, INTAKE_LEFT_MOTOR, DRIVETRAIN_IMU, ARM_1, ARM_2);
+            DRIVETRAIN_MOTOR_R3, WING_LEFT, WING_RIGHT, DRIVETRAIN_IMU);
   device::initialize();
   return robot;
 }

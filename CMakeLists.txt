@@ -9,6 +9,7 @@ set(CMAKE_C_COMPILER_TARGET ${TARGET_TRIPLE})
 set(CMAKE_CXX_COMPILER_TARGET ${TARGET_TRIPLE})
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+set(LINKER bfd)
 
 include(CMakeOptions.txt)
 
@@ -69,10 +70,10 @@ set(SOURCE_FILES
         src/robot/device/optical.cpp
         src/robot/device/pid.cpp
         src/robot/device/pneumatics.cpp
-        src/robot/arm.cpp
         src/robot/drivetrain.cpp
         src/robot/intake.cpp
         src/robot/robot.cpp
+        src/robot/wings.cpp
 )
 
 set(HEADER_FILES
@@ -90,10 +91,10 @@ set(HEADER_FILES
         include/robot/device/optical.hpp
         include/robot/device/pid.hpp
         include/robot/device/pneumatics.hpp
-        include/robot/arm.hpp
         include/robot/drivetrain.hpp
         include/robot/intake.hpp
         include/robot/robot.hpp
+        include/robot/wings.hpp
         include/structure/fixed_queue.hpp
 )
 

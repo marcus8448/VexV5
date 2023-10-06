@@ -2,7 +2,6 @@
 #include "debug/error.hpp"
 #include "debug/logger.hpp"
 #include "pros/imu.h"
-#include <cerrno>
 
 namespace robot::device {
 Inertial::Inertial(int8_t port, const char *name) : Device("Inertial", name, port) { this->calibrate(); }
@@ -12,7 +11,7 @@ double Inertial::getRotation() const {
     logger::error("Still calibrating!!");
     return 0.0;
   }
-  return print_error(this->getName(), pros::c::imu_get_rotation(this->port));
+  return error::print(this->getName(), pros::c::imu_get_rotation(this->port));
 }
 
 double Inertial::getHeading() const {
@@ -20,7 +19,12 @@ double Inertial::getHeading() const {
     logger::error("Still calibrating!!");
     return 0.0;
   }
-  return print_error(this->getName(), pros::c::imu_get_heading(this->port));
+  double heading = pros::c::imu_get_heading(this->port);
+  if (error::check(heading)) {
+    error::print(this->getName());
+    return 0.0;
+  }
+  return heading;
 }
 
 double Inertial::getYaw() const { return pros::c::imu_get_yaw(this->port); }
@@ -30,16 +34,12 @@ double Inertial::getPitch() const { return pros::c::imu_get_pitch(this->port); }
 double Inertial::getRoll() const { return pros::c::imu_get_roll(this->port); }
 
 bool Inertial::isCalibrating() const {
-  return pros::c::imu_get_status(this->port) == pros::E_IMU_STATUS_CALIBRATING || get_error() == EAGAIN;
+  pros::imu_status_e_t status = pros::c::imu_get_status(this->port);
+  return status == pros::E_IMU_STATUS_CALIBRATING || status == pros::E_IMU_STATUS_ERROR;
 }
 
 bool Inertial::isConnected() const {
-  errno = 0;
-  pros::c::imu_get_status(this->port);
-
-  int e = errno;
-  errno = 0;
-  return e != ENODEV;
+  return pros::c::imu_get_status(this->port) == pros::E_IMU_STATUS_ERROR;
 }
 
 void Inertial::reconfigure() const {}
