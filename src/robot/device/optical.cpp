@@ -1,6 +1,6 @@
 #include "pros/optical.h"
+#include "debug/error.hpp"
 #include "robot/device/optical.hpp"
-#include <cerrno>
 
 namespace robot::device {
 Optical::Optical(int8_t port, const char *name, uint8_t led_pwm, bool gesture)
@@ -53,7 +53,9 @@ void Optical::reconfigure() const {
 }
 
 bool Optical::isConnected() const {
-  errno = 0;
-  return pros::c::optical_get_proximity(port) != INT32_MAX && checkConnect();
+  if (error::check(pros::c::optical_get_proximity(this->port))) {
+    return !error::isDisconnected();
+  }
+  return true;
 }
 } // namespace robot::device

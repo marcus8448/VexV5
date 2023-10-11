@@ -1,6 +1,6 @@
 #include "robot/device/pneumatics.hpp"
+#include "debug/error.hpp"
 #include "pros/adi.h"
-#include <cerrno>
 
 namespace robot::device {
 PneumaticPiston::PneumaticPiston(int8_t port, const char *name, bool defaultState)
@@ -38,8 +38,9 @@ void PneumaticPiston::reconfigure() const {
 }
 
 [[nodiscard]] bool PneumaticPiston::isConnected() const {
-  bool b = pros::c::adi_digital_write(this->port, this->extended) == 1;
-  errno = 0;
-  return b;
+  if (error::check(pros::c::adi_digital_write(this->port, this->extended))) {
+    return !error::isDisconnected();
+  }
+  return true;
 }
 } // namespace robot::device

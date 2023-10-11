@@ -7,11 +7,16 @@ namespace robot::device {
 Inertial::Inertial(int8_t port, const char *name) : Device("Inertial", name, port) { this->calibrate(); }
 
 double Inertial::getRotation() const {
-  if (this->isCalibrating()) {
-    logger::error("Still calibrating!!");
+  double rotation = pros::c::imu_get_rotation(this->port);
+  if (error::check(rotation)) {
+    if (this->isCalibrating()) {
+      logger::error("Still calibrating!!");
+    } else {
+      error::print(this->getName());
+    }
     return 0.0;
   }
-  return error::print(this->getName(), pros::c::imu_get_rotation(this->port));
+  return rotation;
 }
 
 double Inertial::getHeading() const {
@@ -35,7 +40,7 @@ double Inertial::getRoll() const { return pros::c::imu_get_roll(this->port); }
 
 bool Inertial::isCalibrating() const {
   pros::imu_status_e_t status = pros::c::imu_get_status(this->port);
-  return status == pros::E_IMU_STATUS_CALIBRATING || status == pros::E_IMU_STATUS_ERROR;
+  return status == pros::E_IMU_STATUS_CALIBRATING;
 }
 
 bool Inertial::isConnected() const {

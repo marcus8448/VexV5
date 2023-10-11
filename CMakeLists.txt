@@ -111,7 +111,6 @@ if (NOT DISABLE_SCREEN)
     set(HEADER_FILES ${HEADER_FILES}
             include/screen/autonomous_select.hpp
             include/screen/chart.hpp
-            include/screen/colour.hpp
             include/screen/config_screen.hpp
             include/screen/information.hpp
             include/screen/pid_tuning.hpp

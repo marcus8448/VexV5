@@ -47,7 +47,7 @@ void Robot::updateDevices() {
 }
 #ifdef ENABLE_TEMPORARY_CODE
 void Robot::runAutonomous() {
-  logger::warn("overriding autonomous");
+  logger::warn("Overriding autonomous");
   this->drivetrain.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
   this->drivetrain.tare();
 

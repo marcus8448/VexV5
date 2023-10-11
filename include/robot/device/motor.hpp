@@ -4,7 +4,7 @@
 #include "device.hpp"
 #include "pros/motors.h"
 #include <array>
-#include <cmath>
+#include <numeric>
 
 namespace robot::device {
 
@@ -54,7 +54,7 @@ class DirectMotor : public Device, public Motor {
 private:
   Motor::TargetType targetType = Motor::TargetType::VOLTAGE;
   int16_t target = 0;
-  double targetPosition = INFINITY;
+  double targetPosition = std::numeric_limits<double>::infinity();
 
   const pros::motor_gearset_e_t gearset;
   const int16_t maxVelocity;
@@ -104,7 +104,7 @@ template<uint8_t MOTORS> class MotorGroup : public Motor {
 private:
   Motor::TargetType targetType = Motor::TargetType::VOLTAGE;
   int16_t target = 0;
-  double targetPosition = INFINITY;
+  double targetPosition = std::numeric_limits<double>::infinity();
 
   int16_t maxVelocity;
   pros::motor_brake_mode_e_t brakeMode;

@@ -30,9 +30,6 @@ public:
 
   [[nodiscard]] const char *getTypeName() const;
   [[nodiscard]] const char *getName() const;
-
-protected:
-  [[nodiscard]] static bool checkConnect();
 };
 
 void initialize();

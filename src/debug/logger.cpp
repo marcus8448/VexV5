@@ -1,11 +1,14 @@
 #include "debug/logger.hpp"
-#include "filesystem.hpp"
 #include "pros/rtos.h"
 
 #include <cstring>
 #include <iostream>
 #include <unordered_map>
 #include <vector>
+
+#ifdef FILE_LOG
+#include "filesystem.hpp"
+#endif
 
 namespace logger {
 static std::unordered_map<pros::task_t, std::vector<std::pair<const char *, uint32_t>>> sections =

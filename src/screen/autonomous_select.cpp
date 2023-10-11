@@ -1,7 +1,6 @@
 #include "screen/autonomous_select.hpp"
 #include "control/autonomous/autonomous.hpp"
 #include "robot/robot.hpp"
-#include "screen/colour.hpp"
 #include "screen/screen.hpp"
 
 namespace screen {
@@ -18,7 +17,7 @@ AutonomousSelect::AutonomousSelect(robot::Robot &robot, lv_obj_t *screen, lv_coo
 
     lv_obj_t *btn = lv_list_add_btn(this->list, nullptr, name.data());
     lv_obj_add_event_cb(btn, SCREEN_CB_ADV(AutonomousSelect, click), LV_EVENT_CLICKED, this);
-    lv_obj_set_style_text_color(btn, colour::GREEN, LV_STATE_CHECKED);
+    lv_obj_set_style_text_color(btn, lv_color_hex(0x00FF00), LV_STATE_CHECKED);
     if (name == this->robot.autonomous) {
       this->selected = btn;
       lv_obj_add_state(btn, LV_STATE_CHECKED);

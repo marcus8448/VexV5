@@ -3,11 +3,8 @@
 
 #include "debug/logger.hpp"
 #include "device.hpp"
-#include "pros/error.h"
 #include "pros/motors.h"
 #include "robot/device/motor.hpp"
-#include <cerrno>
-#include <cmath>
 
 namespace robot::device {
 class PID {
@@ -28,7 +25,7 @@ private:
 public:
   explicit PID(double Kp, double Ki, double Kd, double integralRange, double acceptableError);
   explicit PID();
-
+  PID& operator=(const PID &pid);
   void resetState();
 
   [[nodiscard]] double getError() const;

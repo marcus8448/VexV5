@@ -2,7 +2,6 @@
 #include "debug/logger.hpp"
 #include "pros/rtos.h"
 #include "tasks.hpp"
-#include <cerrno>
 #include <vector>
 
 namespace robot::device {
@@ -24,12 +23,6 @@ void initialize() {
 }
 
 std::unordered_map<Device *, bool> &getDevices() { return devices; }
-
-bool Device::checkConnect() {
-  bool b = errno != ENODEV;
-  errno = 0;
-  return b;
-}
 
 [[nodiscard]] int8_t Device::getPort() const { return this->port; }
 

@@ -48,7 +48,7 @@ private:
 
 public:
   std::string_view runName;
-  double prevError = INFINITY;
+  double prevError = std::numeric_limits<double>::infinity();
   double overshoot = 0;
   uint16_t oscillations = 0;
   bool testing = false;

@@ -1,9 +1,7 @@
 #include "robot/device/motor.hpp"
 #include "debug/logger.hpp"
-#include "pros/error.h"
 #include "pros/motors.h"
-#include <cerrno>
-#include <cmath>
+#include "debug/error.hpp"
 
 namespace robot::device {
 DirectMotor::DirectMotor(int8_t port, const char *name, bool reversed, pros::motor_gearset_e_t gearset,
@@ -26,7 +24,7 @@ void DirectMotor::moveVelocity(int16_t velocity) {
   if (this->targetType != Motor::TargetType::VELOCITY || this->target != velocity) {
     this->target = velocity;
     this->targetType = Motor::TargetType::VELOCITY;
-    this->targetPosition = INFINITY;
+    this->targetPosition = std::numeric_limits<double>::infinity();
     pros::c::motor_move_velocity(this->port, velocity);
   }
 }
@@ -43,7 +41,7 @@ void DirectMotor::moveMillivolts(int16_t mV) {
     logger::debug("Targeting %imV", mV);
     this->target = mV;
     this->targetType = Motor::TargetType::VOLTAGE;
-    this->targetPosition = INFINITY;
+    this->targetPosition = std::numeric_limits<double>::infinity();
     pros::c::motor_move_voltage(this->port, mV);
   }
 }
@@ -106,8 +104,10 @@ void DirectMotor::setBrakeMode(pros::motor_brake_mode_e brake_mode) {
 [[nodiscard]] pros::motor_gearset_e_t DirectMotor::getGearset() const { return this->gearset; }
 
 [[nodiscard]] bool DirectMotor::isConnected() const {
-  errno = 0;
-  return pros::c::motor_get_position(this->port) != PROS_ERR_F && checkConnect();
+  if (error::check(pros::c::motor_get_position(this->port))) {
+    return !error::isDisconnected();
+  }
+  return true;
 }
 
 [[nodiscard]] double DirectMotor::getTemperature() const { return pros::c::motor_get_temperature(this->port); }
@@ -129,10 +129,10 @@ void DirectMotor::reconfigure() const {
 void DirectMotor::tare() { pros::c::motor_tare_position(this->port); }
 
 void DirectMotor::brake() {
-  if (this->targetPosition != INFINITY || this->targetType != Motor::TargetType::VOLTAGE || this->target != 0) {
+  if (this->targetPosition != std::numeric_limits<double>::infinity() || this->targetType != Motor::TargetType::VOLTAGE || this->target != 0) {
     this->target = 0;
     this->targetType = Motor::TargetType::VOLTAGE;
-    this->targetPosition = INFINITY;
+    this->targetPosition = std::numeric_limits<double>::infinity();
     pros::c::motor_brake(this->port);
   }
 }
@@ -158,7 +158,7 @@ template <uint8_t MOTORS> void MotorGroup<MOTORS>::moveVelocity(int16_t velocity
   if (this->targetType != Motor::TargetType::VELOCITY || this->target != velocity) {
     this->target = velocity;
     this->targetType = Motor::TargetType::VELOCITY;
-    this->targetPosition = INFINITY;
+    this->targetPosition = std::numeric_limits<double>::infinity();
     for (const auto &port : motors) {
       pros::c::motor_move_velocity(port, velocity);
     }
@@ -177,7 +177,7 @@ template <uint8_t MOTORS> void MotorGroup<MOTORS>::moveMillivolts(int16_t mV) {
     logger::debug("Targeting %imV", mV);
     this->target = mV;
     this->targetType = Motor::TargetType::VOLTAGE;
-    this->targetPosition = INFINITY;
+    this->targetPosition = std::numeric_limits<double>::infinity();
     for (const auto &port : this->motors) {
       pros::c::motor_move_voltage(port, mV);
     }

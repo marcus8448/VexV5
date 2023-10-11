@@ -4,11 +4,13 @@
 #include "robot/device/motor.hpp"
 #include "units.hpp"
 #include <algorithm>
+#include <cmath>
 
 namespace robot {
 constexpr double ACCEPTABLE_POSITION_ERROR = 5.0;
 constexpr double ACCEPTABLE_HEADING_ERROR = 0.4;
 constexpr uint16_t STABILIZE_TICKS = 25;
+
 Drivetrain::Drivetrain(int8_t left1, int8_t left2, int8_t left3, int8_t right1, int8_t right2, int8_t right3,
                        int8_t inertial)
     : motorLeft(new device::MotorGroup<3>(
@@ -128,7 +130,7 @@ void Drivetrain::updateState() {
   // drivetrain: 12in x 11.5in
   // 860.40 = 90
   // 4.5in, 6.25in
-  double avgHeadDeg = (this->heading + prevHeading) * M_PI / 360.0;
+  double avgHeadDeg = (this->heading + prevHeading) * std::numbers::pi / 360.0;
 
   double dLPosX = leftDiff * std::sin(avgHeadDeg);
   double dLPosY = leftDiff * std::cos(avgHeadDeg);

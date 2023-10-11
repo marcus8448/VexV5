@@ -1,3 +1,4 @@
+#include "debug/error.hpp"
 #include "robot/device/pid.hpp"
 
 namespace robot::device {
@@ -8,6 +9,15 @@ PID::PID(double Kp, double Ki, double Kd, double integralRange, double acceptabl
 
 PID::PID() : kp(0.0), ki(0.0), kd(0.0), integralRange(0.0), acceptableError(0.0) {}
 
+PID &PID::operator=(const PID &pid) {
+  this->kp = pid.kp;
+  this->ki = pid.ki;
+  this->kd = pid.kd;
+  this->integralRange = pid.integralRange;
+  this->acceptableError = pid.acceptableError;
+  return *this;
+}
+
 void PID::resetState() {
   this->integral = 0;
   this->error = 0;
@@ -15,11 +25,11 @@ void PID::resetState() {
 
 double PID::update(double target, double value) {
   this->error = target - value;
-  if (std::signbit(this->error) != std::signbit(this->prevError) || std::abs(this->error) > this->integralRange) {
+  if ((this->error > 0) != (this->prevError > 0) || std::abs(this->error) > this->integralRange) {
     this->integral = 0;
   }
 
-  if (std::abs(this->error) < this->acceptableError || value == PROS_ERR_F) {
+  if (std::abs(this->error) < this->acceptableError || error::check(value)) {
     this->integral = 0;
     this->prevError = this->error;
     return this->output = 0.0;
@@ -41,7 +51,7 @@ double PID::getError() const { return error; }
 
 static double clampMv(double value, double moveMin) {
   if (std::abs(value) < moveMin) {
-    value = value < 0 ? -600 : 600;
+    value = value < 0 ? -moveMin : moveMin;
   }
   return value > Motor::MAX_MILLIVOLTS    ? Motor::MAX_MILLIVOLTS
          : value < -Motor::MAX_MILLIVOLTS ? -Motor::MAX_MILLIVOLTS

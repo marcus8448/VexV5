@@ -1,7 +1,6 @@
 #ifndef STRUCTURE_FIXED_QUEUE_HPP
 #define STRUCTURE_FIXED_QUEUE_HPP
 #include <array>
-#include <cmath>
 #include <limits>
 
 namespace structure {
