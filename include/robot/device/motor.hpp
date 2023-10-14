@@ -3,97 +3,146 @@
 
 #include "device.hpp"
 #include "pros/motors.h"
-#include <cmath>
+#include <array>
+#include <numeric>
 
 namespace robot::device {
 
-class PID {
+class Motor {
 public:
-  double kp;
-  double ki;
-  double kd;
-  double integralRange;
-  double acceptableError;
-  double moveMin = 0.0;
-  double output = 0.0;
+  static constexpr int16_t MAX_MILLIVOLTS = 12000;
+  enum TargetType {
+    VOLTAGE,
+    VELOCITY
+  };
 
-private:
-  double error = 0.0;
-  double prevError = 0.0;
-  double integral = 0.0;
+  virtual ~Motor() = default;
 
-public:
-  explicit PID(double Kp, double Ki, double Kd, double integralRange, double acceptableError);
-  explicit PID();
+  virtual void moveVelocity(int16_t velocity) = 0;
+  virtual void moveMillivolts(int16_t mV) = 0;
 
-  void copyParams(const PID &other);
+  virtual void moveAbsolute(double position, int16_t velocity) = 0;
+  virtual void moveRelative(double amount, int16_t velocity) = 0;
+  virtual void moveTargetRelative(double amount, int16_t velocity) = 0;
 
-  void resetState();
+  virtual void setBrakeMode(pros::motor_brake_mode_e brake_mode) = 0;
 
-  [[nodiscard]] double getError() const;
+  [[nodiscard]] virtual double getVelocity() const = 0;
+  [[nodiscard]] virtual double getEfficiency() const = 0;
+  [[nodiscard]] virtual int32_t getTargetVelocity() const = 0;
+  [[nodiscard]] virtual int32_t getTargetVoltage() const = 0;
 
-  double update(double target, double value);
+  [[nodiscard]] virtual double getPosition() const = 0;
+  [[nodiscard]] virtual double getTargetPosition() const = 0;
+
+  [[nodiscard]] virtual pros::motor_brake_mode_e_t getBrakeMode() const = 0;
+
+  [[nodiscard]] virtual double getTemperature() const = 0;
+  [[nodiscard]] virtual double getPower() const = 0;
+  [[nodiscard]] virtual double getTorque() const = 0;
+
+  [[nodiscard]] virtual int32_t getCurrentDraw() const = 0;
+  [[nodiscard]] virtual int32_t getVoltage() const = 0;
+
+  virtual void tare() = 0;
+  virtual void brake() = 0;
+
+  static constexpr int16_t gearsetMaxVelocity(pros::motor_gearset_e_t gearset);
 };
 
-class Motor : public Device {
+class DirectMotor : public Device, public Motor {
 private:
-  enum TargetType { VOLTAGE, VELOCITY };
-
-  TargetType targetType = TargetType::VOLTAGE;
+  Motor::TargetType targetType = Motor::TargetType::VOLTAGE;
   int16_t target = 0;
-  double targetPosition = INFINITY;
+  double targetPosition = std::numeric_limits<double>::infinity();
 
   const pros::motor_gearset_e_t gearset;
   const int16_t maxVelocity;
   pros::motor_brake_mode_e_t brakeMode;
 
 public:
-  static constexpr int16_t MAX_MILLIVOLTS = 12000;
-
-  explicit Motor(int8_t port, const char *name, bool reversed = false,
+  explicit DirectMotor(int8_t port, const char *name, bool reversed = false,
                  pros::motor_gearset_e_t gearset = pros::E_MOTOR_GEARSET_18,
                  pros::motor_brake_mode_e_t brake_mode = pros::E_MOTOR_BRAKE_BRAKE);
-  ~Motor() override = default;
+  ~DirectMotor() override = default;
 
-  void moveVelocity(int16_t velocity);
-  void moveMillivolts(int16_t mV);
+  void moveVelocity(int16_t velocity) override;
+  void moveMillivolts(int16_t mV) override;
 
-  void moveAbsolute(double position, int16_t velocity);
-  void moveRelative(double amount, int16_t velocity);
-  void moveTargetRelative(double amount, int16_t velocity);
+  void moveAbsolute(double position, int16_t velocity) override;
+  void moveRelative(double amount, int16_t velocity) override;
+  void moveTargetRelative(double amount, int16_t velocity) override;
 
-  void setBrakeMode(pros::motor_brake_mode_e brake_mode);
+  void setBrakeMode(pros::motor_brake_mode_e brake_mode) override;
 
-  [[nodiscard]] double getVelocity() const;
-  [[nodiscard]] double getEfficiency() const;
-  [[nodiscard]] int32_t getTargetVelocity() const;
-  [[nodiscard]] int32_t getTargetVoltage() const;
+  [[nodiscard]] double getVelocity() const override;
+  [[nodiscard]] double getEfficiency() const override;
+  [[nodiscard]] int32_t getTargetVelocity() const override;
+  [[nodiscard]] int32_t getTargetVoltage() const override;
 
-  [[nodiscard]] double getPosition() const;
-  [[nodiscard]] double getTargetPosition() const;
+  [[nodiscard]] double getPosition() const override;
+  [[nodiscard]] double getTargetPosition() const override;
 
-  [[nodiscard]] pros::motor_brake_mode_e_t getBrakeMode() const;
+  [[nodiscard]] pros::motor_brake_mode_e_t getBrakeMode() const override;
   [[nodiscard]] pros::motor_gearset_e_t getGearset() const;
   [[nodiscard]] bool isConnected() const override;
 
-  [[nodiscard]] double getTemperature() const;
-  [[nodiscard]] double getPower() const;
-  [[nodiscard]] double getTorque() const;
+  [[nodiscard]] double getTemperature() const override;
+  [[nodiscard]] double getPower() const override;
+  [[nodiscard]] double getTorque() const override;
 
-  [[nodiscard]] int32_t getCurrentDraw() const;
-  [[nodiscard]] int32_t getVoltage() const;
-  [[nodiscard]] int32_t getCurrentLimit() const;
-  [[nodiscard]] int32_t getVoltageLimit() const;
+  [[nodiscard]] int32_t getCurrentDraw() const override;
+  [[nodiscard]] int32_t getVoltage() const override;
 
   void reconfigure() const override;
 
-  void tare();
-  void brake();
-
-  [[nodiscard]] Motor::TargetType getTargetType() const;
-
-  static constexpr int16_t gearsetMaxVelocity(pros::motor_gearset_e_t gearset);
+  void tare() override;
+  void brake() override;
 };
 
+template<uint8_t MOTORS> class MotorGroup : public Motor {
+private:
+  Motor::TargetType targetType = Motor::TargetType::VOLTAGE;
+  int16_t target = 0;
+  double targetPosition = std::numeric_limits<double>::infinity();
+
+  int16_t maxVelocity;
+  pros::motor_brake_mode_e_t brakeMode;
+
+  std::array<int8_t, MOTORS> motors;
+
+public:
+  explicit MotorGroup(std::array<int8_t, MOTORS> motors, const char *name, pros::motor_gearset_e_t gearset, pros::motor_brake_mode_e_t brake_mode);
+  ~MotorGroup() override = default;
+
+  void moveVelocity(int16_t velocity) override;
+  void moveMillivolts(int16_t mV) override;
+
+  void moveAbsolute(double position, int16_t velocity) override;
+  void moveRelative(double amount, int16_t velocity) override;
+  void moveTargetRelative(double amount, int16_t velocity) override;
+
+  void setBrakeMode(pros::motor_brake_mode_e brake_mode) override;
+
+  [[nodiscard]] double getVelocity() const override;
+  [[nodiscard]] double getEfficiency() const override;
+  [[nodiscard]] int32_t getTargetVelocity() const override;
+  [[nodiscard]] int32_t getTargetVoltage() const override;
+
+  [[nodiscard]] double getPosition() const override;
+  [[nodiscard]] double getTargetPosition() const override;
+
+  [[nodiscard]] pros::motor_brake_mode_e_t getBrakeMode() const override;
+
+  [[nodiscard]] double getTemperature() const override;
+  [[nodiscard]] double getPower() const override;
+  [[nodiscard]] double getTorque() const override;
+
+  [[nodiscard]] int32_t getCurrentDraw() const override;
+  [[nodiscard]] int32_t getVoltage() const override;
+
+  void tare() override;
+  void brake() override;
+};
 } // namespace robot::device
 #endif // ROBOT_DEVICE_MOTOR_HPP

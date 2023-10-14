@@ -1,6 +1,7 @@
 #ifndef SCREEN_PID_TUNING_HPP
 #define SCREEN_PID_TUNING_HPP
 
+#include "robot/device/pid.hpp"
 #include "robot/robot.hpp"
 #include "screen.hpp"
 
@@ -44,7 +45,7 @@ private:
 
 public:
   std::string_view runName;
-  double prevError = INFINITY;
+  double prevError = std::numeric_limits<double>::infinity();
   double overshoot = 0;
   uint16_t oscillations = 0;
   bool testing = false;

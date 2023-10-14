@@ -1,10 +1,7 @@
 #include "screen/chart.hpp"
-// #include "debug/logger.hpp"
 #include "format.hpp"
 #include "pros/rtos.h"
-#include "screen/colour.hpp"
 #include "screen/screen.hpp"
-#include <iostream>
 
 namespace screen {
 DataSet::DataSet(const char *label, lv_color_t color, float (*function)(const robot::Robot &))
@@ -42,18 +39,18 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
   lv_draw_label_dsc_t textDesc;
   lv_draw_line_dsc_init(&lineDesc);
   lv_draw_label_dsc_init(&textDesc);
-  lineDesc.color = textDesc.color = colour::WHITE;
+  lineDesc.color = textDesc.color = lv_color_white();
 
-  float max = -INFINITY;
-  float min = INFINITY;
+  float max = -std::numeric_limits<float>::infinity();
+  float min = std::numeric_limits<float>::infinity();
   for (size_t i = 0; i < Sets; ++i) {
     max = std::max(max, this->data[i].max);
     min = std::min(min, this->data[i].min);
   }
 
-  if (std::abs(max) == INFINITY)
+  if (std::abs(max) == std::numeric_limits<float>::infinity())
     max = 0;
-  if (std::abs(min) == INFINITY)
+  if (std::abs(min) == std::numeric_limits<float>::infinity())
     min = 0;
 
   if (max <= min) {
@@ -84,7 +81,7 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
       //      logger::info("%p", set.function);
     }
     float value = set.function(this->robot);
-    if (value == INFINITY) {
+    if (value == std::numeric_limits<float>::infinity()) {
       value = 0;
     }
 

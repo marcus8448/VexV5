@@ -9,6 +9,7 @@ set(CMAKE_C_COMPILER_TARGET ${TARGET_TRIPLE})
 set(CMAKE_CXX_COMPILER_TARGET ${TARGET_TRIPLE})
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+set(LINKER bfd)
 
 include(CMakeOptions.txt)
 
@@ -67,11 +68,12 @@ set(SOURCE_FILES
         src/robot/device/inertial.cpp
         src/robot/device/motor.cpp
         src/robot/device/optical.cpp
+        src/robot/device/pid.cpp
         src/robot/device/pneumatics.cpp
-        src/robot/arm.cpp
         src/robot/drivetrain.cpp
         src/robot/intake.cpp
         src/robot/robot.cpp
+        src/robot/wings.cpp
 )
 
 set(HEADER_FILES
@@ -87,11 +89,12 @@ set(HEADER_FILES
         include/robot/device/inertial.hpp
         include/robot/device/motor.hpp
         include/robot/device/optical.hpp
+        include/robot/device/pid.hpp
         include/robot/device/pneumatics.hpp
-        include/robot/arm.hpp
         include/robot/drivetrain.hpp
         include/robot/intake.hpp
         include/robot/robot.hpp
+        include/robot/wings.hpp
         include/structure/fixed_queue.hpp
 )
 
@@ -108,7 +111,6 @@ if (NOT DISABLE_SCREEN)
     set(HEADER_FILES ${HEADER_FILES}
             include/screen/autonomous_select.hpp
             include/screen/chart.hpp
-            include/screen/colour.hpp
             include/screen/config_screen.hpp
             include/screen/information.hpp
             include/screen/pid_tuning.hpp

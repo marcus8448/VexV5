@@ -2,22 +2,19 @@
 #include "debug/logger.hpp"
 #include <cerrno>
 
-bool check_error(const char *name) {
-  int error = get_error();
-  if (error != 0) {
-    if (error == ENODEV) { // skip printing 19 - no such device.
-      return false;
-    }
-    logger::error("%s: Error %i", name, error); // print the error
-    return false;
-  }
-  return true;
+namespace error {
+void print(const char *name) {
+  if (errno == ENODEV) return;
+  logger::error("%s: Error %i", name, errno); // print the error
 }
 
-void clear_error() { errno = 0; }
+bool check(double val) {
+  return val == FLOATING;
+}
 
-int get_error() {
-  int error = errno;
-  errno = 0;
-  return error;
+bool check(int32_t val) {
+  return val == INTEGER;
+}
+
+bool isDisconnected() { return errno == ENODEV; }
 }

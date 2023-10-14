@@ -20,10 +20,6 @@ protected:
 
 public:
   explicit Device(const char *typeName, const char *name, int8_t port);
-  Device(const Device &) = delete;
-  Device(Device &&) = delete;
-  Device &operator=(const Device &) = delete;
-  Device &operator=(Device &&) = delete;
 
   virtual ~Device() = default;
 
@@ -34,9 +30,6 @@ public:
 
   [[nodiscard]] const char *getTypeName() const;
   [[nodiscard]] const char *getName() const;
-
-protected:
-  [[nodiscard]] static bool checkConnect();
 };
 
 void initialize();

@@ -1,10 +1,10 @@
 #ifndef ROBOT_ROBOT_HPP
 #define ROBOT_ROBOT_HPP
 
-#include "arm.hpp"
 #include "control/input/controller.hpp"
 #include "drivetrain.hpp"
 #include "intake.hpp"
+#include "wings.hpp"
 #include <memory>
 #include <string>
 
@@ -18,14 +18,14 @@ public:
    * The robot's drivetrain.
    */
   Drivetrain drivetrain;
+//  /**
+//   * The robot's intake
+//   */
+//  Intake intake;
   /**
-   * The robot's arm.
+   * The robot's wings
    */
-  Arm arm;
-  /**
-   * The robot's intake
-   */
-  Intake intake;
+  Wings wings;
   /**
    * The robot's controller. Used during operator control.
    */
@@ -43,7 +43,7 @@ public:
    * @param roller The robot's roller.
    */
   explicit Robot(int8_t driveL1, int8_t driveL2, int8_t driveL3, int8_t driveR1, int8_t driveR2, int8_t driveR3,
-                 int8_t intakeRight, int8_t intakeLeft, int8_t inertial, int8_t arm1, int8_t arm2);
+                 int8_t wingsL, int8_t wingsR, int8_t inertial);
   Robot(const Robot &robot) = delete;
   Robot(Robot &&robot) = delete;
   Robot &operator=(const Robot &) = delete;

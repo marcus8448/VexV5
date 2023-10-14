@@ -3,8 +3,6 @@
 #include "debug/logger.hpp"
 #include "format.hpp"
 #include "main.hpp"
-#include "robot/robot.hpp"
-#include "screen/screen.hpp"
 #include "tasks.hpp"
 
 namespace screen {
@@ -19,10 +17,9 @@ void PidTuning::update() {
   double error = this->pid.getError();
 
   if (this->testing) {
-    if (this->prevError != INFINITY) {
-      if (std::signbit(this->prevError) != std::signbit(error)) {
-        lv_label_set_text(this->oscillationsLabel.get(),
-                          fmt::string_format("Oscillations: %i", this->oscillations++).c_str());
+    if (this->prevError != std::numeric_limits<double>::infinity()) {
+      if ((this->prevError < 0) != (error < 0)) {
+        lv_label_set_text(this->oscillationsLabel.get(), fmt::string_format("Oscillations: %i", this->oscillations++).c_str());
       }
 
       if (this->oscillations == 1) {
@@ -105,7 +102,7 @@ void PidTuning::startTest() {
           auto &self = *static_cast<PidTuning *>(param);
           self.overshoot = 0;
           self.oscillations = 0;
-          self.prevError = INFINITY;
+          self.prevError = std::numeric_limits<double>::infinity();
           std::string prevAuton = self.robot.autonomous;
           self.robot.autonomous = self.runName;
           logger::scope("PID test");

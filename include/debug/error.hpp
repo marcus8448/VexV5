@@ -1,23 +1,17 @@
 #ifndef DEBUG_ERROR_HPP
 #define DEBUG_ERROR_HPP
+#include <numeric>
+#include <cstdint>
 
-/**
- * Tests for a PROS error and prints out errno if one is found.
- * @return whether an error was found.
- */
-bool check_error(const char *name);
+namespace error {
+constexpr double INTEGER = std::numeric_limits<int32_t>::max();
+constexpr double FLOATING = std::numeric_limits<double>::infinity();
 
-void clear_error();
+void print(const char *name);
 
-int get_error();
+bool check(double val);
+bool check(int32_t val);
 
-/**
- * Tests for a PROS error and prints out errno if one is found.
- * @return the same value as the parameter passed.
- */
-template <class T> inline T print_error(const char *name, T value) {
-  check_error(name);
-  return value;
+bool isDisconnected();
 }
-
 #endif // DEBUG_ERROR_HPP

@@ -39,9 +39,9 @@ void Information::update() {
       this->rightColumn[0].get(),
       fmt::string_format("Control Scheme: %s", robot::driveSchemeName(robot.drivetrain.controlScheme)).c_str());
   lv_label_set_text(this->rightColumn[1].get(),
-                    fmt::string_format("X-position: %fin", units::encoderToInch(this->robot.drivetrain.posX)).c_str());
+                    fmt::string_format("X-position: %fin", this->robot.drivetrain.posX).c_str());
   lv_label_set_text(this->rightColumn[2].get(),
-                    fmt::string_format("Y-position: %fin", units::encoderToInch(this->robot.drivetrain.posY)).c_str());
+                    fmt::string_format("Y-position: %fin", this->robot.drivetrain.posY).c_str());
 }
 
 void update_device(lv_obj_t *label, const robot::device::Device &device, bool enabled) {

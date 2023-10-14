@@ -10,7 +10,7 @@ bool can_access(const std::filesystem::path &path) {
   if (!is_available()) {
     logger::warn("MicroSD unavailable. Cannot access %s", path.c_str());
     return false;
-  } else if (std::strncmp(path.c_str(), "/usd/", strlen("/usd/")) != 0) {
+  } else if (std::strncmp(path.c_str(), "/usd/", std::strlen("/usd/")) != 0) {
     logger::warn("Attempted to access file '%s' outside of MicroSD!", path.c_str());
     return false;
   }

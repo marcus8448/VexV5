@@ -175,6 +175,8 @@ public:
 
 private:
   void resetState();
+  inline bool get_digital(pros::controller_digital_e_t button);
+  inline double get_analog(pros::controller_analog_e_t stick);
 };
 } // namespace control::input
 

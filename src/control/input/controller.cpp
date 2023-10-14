@@ -4,9 +4,6 @@
 #include "format.hpp"
 #include <cstring>
 
-#define controller_digital(button) print_error("controller", pros::c::controller_get_digital(this->id, button))
-#define controller_analog(stick_axis) print_error("controller", pros::c::controller_get_analog(this->id, stick_axis))
-
 namespace control::input {
 Controller::Controller(pros::controller_id_e_t controller_id) : id(controller_id) {}
 
@@ -43,8 +40,7 @@ Controller::Controller(pros::controller_id_e_t controller_id) : id(controller_id
 [[nodiscard]] double Controller::rightStickY() const { return this->rsY; }
 
 void Controller::setLine(uint8_t line, const char *str) {
-  if ((text[line] == nullptr && str != nullptr) || (text[line] != nullptr && str == nullptr) ||
-      std::strcmp(text[line], str) != 0) {
+  if ((text[line] == nullptr && str != nullptr) || (text[line] != nullptr && str == nullptr) || std::strcmp(text[line], str) != 0) {
     text[line] = str;
     textDirty[line] = true;
   }
@@ -57,7 +53,9 @@ void Controller::clearLine(uint8_t line) {
   }
 }
 
-void Controller::rumble(const char *str) { this->enqueuedRumble = str; }
+void Controller::rumble(const char *str) {
+  this->enqueuedRumble = str;
+}
 
 bool Controller::isConnected() const { return pros::c::controller_is_connected(this->id); }
 
@@ -68,82 +66,82 @@ void Controller::update() {
     return;
   }
 
-  if (controller_digital(pros::E_CONTROLLER_DIGITAL_A)) {
+  if (this->get_digital(pros::E_CONTROLLER_DIGITAL_A)) {
     this->a++;
   } else {
     this->a = 0;
   }
 
-  if (controller_digital(pros::E_CONTROLLER_DIGITAL_B)) {
+  if (this->get_digital(pros::E_CONTROLLER_DIGITAL_B)) {
     this->b++;
   } else {
     this->b = 0;
   }
 
-  if (controller_digital(pros::E_CONTROLLER_DIGITAL_X)) {
+  if (this->get_digital(pros::E_CONTROLLER_DIGITAL_X)) {
     this->x++;
   } else {
     this->x = 0;
   }
 
-  if (controller_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
+  if (this->get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
     this->y++;
   } else {
     this->y = 0;
   }
 
-  if (controller_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
+  if (this->get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
     this->up++;
   } else {
     this->up = 0;
   }
 
-  if (controller_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) {
+  if (this->get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) {
     this->down++;
   } else {
     this->down = 0;
   }
 
-  if (controller_digital(pros::E_CONTROLLER_DIGITAL_LEFT)) {
+  if (this->get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)) {
     this->left++;
   } else {
     this->left = 0;
   }
 
-  if (controller_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
+  if (this->get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
     this->right++;
   } else {
     this->right = 0;
   }
 
-  if (controller_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
+  if (this->get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
     this->l1++;
   } else {
     this->l1 = 0;
   }
 
-  if (controller_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+  if (this->get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
     this->l2++;
   } else {
     this->l2 = 0;
   }
 
-  if (controller_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+  if (this->get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
     this->r1++;
   } else {
     this->r1 = 0;
   }
 
-  if (controller_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+  if (this->get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
     this->r2++;
   } else {
     this->r2 = 0;
   }
 
-  this->lsX = controller_analog(pros::E_CONTROLLER_ANALOG_LEFT_X);
-  this->lsY = controller_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
-  this->rsX = controller_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
-  this->rsY = controller_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
+  this->lsX = this->get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X);
+  this->lsY = this->get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+  this->rsX = this->get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
+  this->rsY = this->get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
 
   if (this->a == 1)
     logger::debug("A pressed");
@@ -171,8 +169,7 @@ void Controller::update() {
     logger::debug("L2 pressed");
 
   if (this->enqueuedRumble != nullptr && this->ticks % 10 == 0) {
-    clear_error();
-    if (pros::c::controller_rumble(this->id, this->enqueuedRumble)) {
+    if (pros::c::controller_rumble(this->id, this->enqueuedRumble) == 1) {
       this->enqueuedRumble = nullptr;
     } else {
       logger::debug("Failed to send rumble. Trying again soon.");
@@ -215,5 +212,15 @@ void Controller::resetState() {
   this->lsY = 0.0;
   this->rsX = 0.0;
   this->rsY = 0.0;
+}
+
+bool Controller::get_digital(pros::controller_digital_e_t button) {
+  return pros::c::controller_get_digital(this->id, button) == 1;
+}
+
+double Controller::get_analog(pros::controller_analog_e_t stick) {
+  double value = pros::c::controller_get_analog(this->id, stick);
+  if (error::check(value)) return 0.0;
+  return value;
 }
 } // namespace control::input
