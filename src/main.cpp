@@ -27,13 +27,13 @@
 #endif
 
 // CONFIG
-#define DRIVETRAIN_MOTOR_L1 2
-#define DRIVETRAIN_MOTOR_L2 12
-#define DRIVETRAIN_MOTOR_L3 13
-#define DRIVETRAIN_MOTOR_R1 10
-#define DRIVETRAIN_MOTOR_R2 20
-#define DRIVETRAIN_MOTOR_R3 19
-#define DRIVETRAIN_IMU 7
+#define DRIVETRAIN_MOTOR_L1 10
+#define DRIVETRAIN_MOTOR_L2 9
+#define DRIVETRAIN_MOTOR_L3 8
+#define DRIVETRAIN_MOTOR_R1 1
+#define DRIVETRAIN_MOTOR_R2 2
+#define DRIVETRAIN_MOTOR_R3 3
+#define DRIVETRAIN_IMU 6
 #define WING_LEFT 'A'
 #define WING_RIGHT 'B'
 // END CONFIG
@@ -63,13 +63,13 @@ void initialize() {
   control::autonomous::registerRun("Skills", control::autonomous::skills);
   control::autonomous::registerRun("!PID_MOVE", [](robot::Robot &robot) {
     robot.drivetrain.tare();
-    robot.drivetrain.forwards(24.0, true);
-    robot.drivetrain.backwards(24.0, true);
+    robot.drivetrain.forwards(24.0, 12000, true);
+    robot.drivetrain.backwards(24.0, 12000, true);
     robot.drivetrain.brake();
   });
   control::autonomous::registerRun("!PID_TURN", [](robot::Robot &robot) {
     robot.drivetrain.tare();
-    robot.drivetrain.turnLeft(45.0, true);
+    robot.drivetrain.turnLeft(45.0, 12000, true);
     robot.drivetrain.brake();
   });
   control::autonomous::initialize();
@@ -114,6 +114,9 @@ void initialize() {
   });
   screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
     return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.headingPID, "!PID_TURN");
+  });
+  screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
+    return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.headingPID, "Right Score");
   });
   logger::scope("Initialize");
   screen::initialize(robot); // initialize the screen

@@ -37,6 +37,8 @@ private:
     OPERATOR_DIRECT, // power L/R
 
     STATIC_TURN, // abs angle
+    PIVOT_TURN_RIGHT, // abs angle
+    PIVOT_TURN_LEFT, // abs angle
     DIRECT_MOVE, // dist
     CURVE_MOVE
   };
@@ -52,6 +54,8 @@ public:
   device::PID rightPID;
   device::PID leftPID;
   device::PID headingPID;
+
+  int16_t limit = device::Motor::MAX_MILLIVOLTS;
 
 #ifndef USE_ARCADE_DRIVE
   ControlScheme controlScheme = TANK;
@@ -107,28 +111,51 @@ public:
    * @param distance The distance (in inches) to drive forwards for.
    * @param wait Whether this function should wait for the robot to move or return immediately.
    */
-  void forwards(double distance, bool wait = true);
+  void forwards(double distance, int16_t limit = device::Motor::MAX_MILLIVOLTS, bool wait = true);
 
   /**
    * Drives the robot backwards by the specified distance.
    * @param distance The distance (in inches) to drive backwards for.
    * @param block Whether this function should wait for the robot to move or return immediately.
    */
-  void backwards(double distance, bool wait = true);
+  void backwards(double distance, int16_t limit = device::Motor::MAX_MILLIVOLTS, bool wait = true);
+
+  void turnAbs(double degrees, int16_t limit = device::Motor::MAX_MILLIVOLTS, bool wait = true);
 
   /**
    * Turns the robot to the right by spinning by the specified number of degrees.
    * @param degrees The number of degrees to turn.
    * @param wait Whether this function should wait for the robot to turn or return immediately.
    */
-  void turnRight(double degrees, bool wait = true);
+  void turnRight(double degrees, int16_t limit = device::Motor::MAX_MILLIVOLTS, bool wait = true);
 
   /**
    * Turns the robot to the left by spinning by the specified number of degrees.
    * @param degrees The number of degrees to turn.
    * @param wait Whether this function should wait for the robot to turn or return immediately.
    */
-  void turnLeft(double degrees, bool wait = true);
+  void turnLeft(double degrees, int16_t limit = device::Motor::MAX_MILLIVOLTS, bool wait = true);
+  /**
+   * Turns the robot to the right by spinning by the specified number of degrees.
+   * @param degrees The number of degrees to turn.
+   * @param wait Whether this function should wait for the robot to turn or return immediately.
+   */
+  void pivotRight(double degrees, int16_t limit = device::Motor::MAX_MILLIVOLTS, bool wait = true);
+
+  /**
+   * Turns the robot to the left by spinning by the specified number of degrees.
+   * @param degrees The number of degrees to turn.
+   * @param wait Whether this function should wait for the robot to turn or return immediately.
+   */
+  void pivotLeft(double degrees, int16_t limit = device::Motor::MAX_MILLIVOLTS, bool wait = true);
+  void pivotRightAbs(double degrees, int16_t limit = device::Motor::MAX_MILLIVOLTS, bool wait = true);
+
+  /**
+   * Turns the robot to the left by spinning by the specified number of degrees.
+   * @param degrees The number of degrees to turn.
+   * @param wait Whether this function should wait for the robot to turn or return immediately.
+   */
+  void pivotLeftAbs(double degrees, int16_t limit = device::Motor::MAX_MILLIVOLTS, bool wait = true);
 
   //  void directMove(double relInFwd, double relInLat);
 

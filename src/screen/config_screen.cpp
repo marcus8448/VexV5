@@ -1,5 +1,4 @@
 #include "screen/config_screen.hpp"
-#include "debug/logger.hpp"
 #include "format.hpp"
 
 namespace screen {
@@ -9,7 +8,10 @@ ConfigurationScreen::ConfigurationScreen(robot::Robot &robot, lv_obj_t *screen, 
   lv_obj_set_pos(this->driveSchemeBtn.get(), 0, 0);
   lv_obj_set_size(this->driveSchemeBtn.get(), width / 2, 48);
   lv_obj_add_event_cb(this->driveSchemeBtn.get(), SCREEN_CB(ConfigurationScreen, click), LV_EVENT_CLICKED, this);
-  this->click();
+
+  lv_label_set_text(
+      this->driveSchemeBtnLbl,
+      fmt::string_format("Control Scheme: %s", robot::driveSchemeName(this->robot.drivetrain.controlScheme)).c_str());
 }
 
 void ConfigurationScreen::update() {}
