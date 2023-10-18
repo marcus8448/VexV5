@@ -4,10 +4,6 @@
 #include "pros/rtos.h"
 #include "tasks.hpp"
 
-#ifdef ENABLE_TEMPORARY_CODE
-#include "../temporary.cpp"
-#endif
-
 namespace robot {
 Robot::Robot(int8_t driveL1, int8_t driveL2, int8_t driveL3, int8_t driveR1, int8_t driveR2, int8_t driveR3,
              int8_t wingsL, int8_t wingsR, int8_t inertial)
@@ -29,7 +25,7 @@ void Robot::updateDevices() {
     if (this->controller != nullptr) {
       this->controller->update();
       this->drivetrain.updateTargeting(this->controller.get());
-      this->wings.updateTargeting(this->controller.get());
+//      this->wings.updateTargeting(this->controller.get());
     } else {
       logger::error("Controller is null!");
     }
@@ -45,17 +41,6 @@ void Robot::updateDevices() {
     pros::c::delay(robot::device::TICK_RATE);
   }
 }
-#ifdef ENABLE_TEMPORARY_CODE
-void Robot::runAutonomous() {
-  logger::warn("Overriding autonomous");
-  this->drivetrain.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
-  this->drivetrain.tare();
-
-  pros::task_t task = rtos::createChildTask("Robot async control", autonomousBackground, this);
-  temporary::run(*this);
-  rtos::killTask(task);
-}
-#endif
 
 void Robot::runAutonomous() {
   if (control::autonomous::getPrograms().contains(this->autonomous)) {

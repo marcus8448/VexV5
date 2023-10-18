@@ -11,7 +11,6 @@ option(USE_ARCADE_DRIVE "Use arcade drive by default" OFF)
 
 # Operations
 option(DISABLE_AUTONOMOUS "Disable autonomous code" OFF)
-option(ENABLE_TEMPORARY_CODE "Load and run code in src/temporary.cpp" OFF)
 
 # Screen
 option(DISABLE_SCREEN "Disable screen code" OFF)
@@ -61,11 +60,6 @@ else()
     if (DISABLE_DRIVETRAIN_DEBUG_SCREEN)
         add_compile_definitions(DISABLE_DRIVETRAIN_DEBUG_SCREEN)
     endif()
-endif()
-
-if (ENABLE_TEMPORARY_CODE)
-    add_compile_definitions(ENABLE_TEMPORARY_CODE)
-    file(TOUCH ${CMAKE_SOURCE_DIR}/src/temporary.cpp)
 endif()
 
 if (LVGL_DARK_THEME)

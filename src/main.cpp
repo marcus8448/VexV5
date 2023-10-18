@@ -147,10 +147,6 @@ void autonomous() {
  * pressed.
  */
 void opcontrol() {
-#ifdef ENABLE_TEMPORARY_CODE
-  autonomous();
-#endif
-
   rtos::onRootTaskStart();
   Robot &robot = getRobot();
 
@@ -158,7 +154,6 @@ void opcontrol() {
   robot.setController(new control::input::Controller(
       pros::E_CONTROLLER_MASTER)); // set the robot controller to the default operator based one
   logger::endScope();
-
   robot.opcontrol();
   rtos::onRootTaskEnd();
 }

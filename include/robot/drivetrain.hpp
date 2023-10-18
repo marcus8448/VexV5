@@ -40,7 +40,6 @@ private:
     PIVOT_TURN_RIGHT, // abs angle
     PIVOT_TURN_LEFT, // abs angle
     DIRECT_MOVE, // dist
-    CURVE_MOVE
   };
 
   std::unique_ptr<device::Motor> motorLeft;
@@ -55,8 +54,6 @@ public:
   device::PID leftPID;
   device::PID headingPID;
 
-  int16_t limit = device::Motor::MAX_MILLIVOLTS;
-
 #ifndef USE_ARCADE_DRIVE
   ControlScheme controlScheme = TANK;
 #else
@@ -69,6 +66,7 @@ public:
 private:
   TargetType targetType = NONE;
   double targetHeading = 0.0;
+  int16_t powerLimit = device::Motor::MAX_MILLIVOLTS;
 
   int16_t powerLeft = 0;
   int16_t powerRight = 0;
@@ -83,13 +81,7 @@ private:
   uint16_t timeOff = 0;
   uint16_t timeAtTarget = 0;
 
-  double targetPosX = 0.0;
-  double targetPosY = 0.0;
-
-  double curve = 0.0;
-  double endCurveX = 0.0;
-  double endCurveY = 0.0;
-  double curveAngle = 0.0;
+  int16_t operatorPower = device::Motor::MAX_MILLIVOLTS;
 
   double rPosX = +6.25;
   double rPosY = 0.0;
@@ -156,10 +148,6 @@ public:
    * @param wait Whether this function should wait for the robot to turn or return immediately.
    */
   void pivotLeftAbs(double degrees, int16_t limit = device::Motor::MAX_MILLIVOLTS, bool wait = true);
-
-  //  void directMove(double relInFwd, double relInLat);
-
-  void curveTargeting(double relInFwd, double relInLat, double curve, double relAngle);
 
   /**
    * Blocks until the robot finishes moving.

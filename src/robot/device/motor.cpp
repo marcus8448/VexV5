@@ -129,12 +129,10 @@ void DirectMotor::reconfigure() const {
 void DirectMotor::tare() { pros::c::motor_tare_position(this->port); }
 
 void DirectMotor::brake() {
-  if (this->targetPosition != std::numeric_limits<double>::infinity() || this->targetType != Motor::TargetType::VOLTAGE || this->target != 0) {
-    this->target = 0;
-    this->targetType = Motor::TargetType::VOLTAGE;
-    this->targetPosition = std::numeric_limits<double>::infinity();
-    pros::c::motor_brake(this->port);
-  }
+  this->target = 0;
+  this->targetType = Motor::TargetType::VOLTAGE;
+  this->targetPosition = std::numeric_limits<double>::infinity();
+  pros::c::motor_brake(this->port);
 }
 
 template <uint8_t MOTORS> MotorGroup<MOTORS>::MotorGroup(std::array<int8_t, MOTORS> motors, const char *name, pros::motor_gearset_e_t gearset, pros::motor_brake_mode_e_t brake_mode)
@@ -220,8 +218,11 @@ template <uint8_t MOTORS> [[nodiscard]] double MotorGroup<MOTORS>::getVelocity()
   double velocity = 0.0;
   uint8_t count = 0;
   for (const auto &port : this->motors) {
-    double vel = pros::c::motor_get_actual_velocity(port);
-    if (vel != std::numeric_limits<double>::infinity()) {
+    double vel = pros::c::motor_get_actual_velocity(abs(port));
+    if (vel != error::FLOATING) {
+      if (port < 0) {
+        vel = -vel;
+      }
       velocity += vel;
       count++;
     }

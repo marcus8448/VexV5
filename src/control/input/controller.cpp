@@ -1,8 +1,6 @@
 #include "control/input/controller.hpp"
 #include "debug/error.hpp"
 #include "debug/logger.hpp"
-#include "format.hpp"
-#include <cstring>
 
 namespace control::input {
 Controller::Controller(pros::controller_id_e_t controller_id) : id(controller_id) {}
@@ -39,16 +37,16 @@ Controller::Controller(pros::controller_id_e_t controller_id) : id(controller_id
 
 [[nodiscard]] double Controller::rightStickY() const { return this->rsY; }
 
-void Controller::setLine(uint8_t line, const char *str) {
-  if ((text[line] == nullptr && str != nullptr) || (text[line] != nullptr && str == nullptr) || std::strcmp(text[line], str) != 0) {
+void Controller::setLine(uint8_t line, std::string str) {
+  if (std::equal(text[line].begin(), text[line].end(), str.begin(), str.end())) {
     text[line] = str;
     textDirty[line] = true;
   }
 }
 
 void Controller::clearLine(uint8_t line) {
-  if (text[line] != nullptr) {
-    text[line] = nullptr;
+  if (!text.empty()) {
+    text[line] = "";
     textDirty[line] = true;
   }
 }
@@ -179,12 +177,11 @@ void Controller::update() {
   for (auto i = 0u; i < LINE_COUNT; ++i) {
     if (this->textDirty[i]) {
       bool success;
-      if (this->text[i] != nullptr) {
-        success = pros::c::controller_set_text(this->id, i, 0, this->text[i]) == 1;
+      if (!this->text[i].empty()) {
+        success = pros::c::controller_set_text(this->id, i, 0, this->text[i].c_str()) == 1;
       } else {
         success = pros::c::controller_clear_line(this->id, i) == 1;
       }
-      errno = 0;
       if (success) {
         this->textDirty[i] = false;
         break; // only one success per cycle

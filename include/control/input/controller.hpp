@@ -4,6 +4,7 @@
 #include "pros/misc.h"
 #include <array>
 #include <cstdint>
+#include <string>
 
 namespace control::input {
 /**
@@ -39,7 +40,7 @@ private:
 
   uint32_t ticks = 0;
 
-  std::array<const char *, LINE_COUNT> text = {};
+  std::array<std::string, LINE_COUNT> text = {};
   std::array<bool, LINE_COUNT> textDirty = {};
 
   const char *enqueuedRumble = nullptr;
@@ -127,7 +128,7 @@ public:
    * @param row The row to set [0-2].
    * @param str The text to write.
    */
-  void setLine(uint8_t row, const char *str);
+  void setLine(uint8_t row, std::string str);
 
   /**
    * Blanks the specified row of text on the controller.
