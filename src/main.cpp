@@ -56,10 +56,10 @@ void initialize() {
 #ifndef DISABLE_AUTONOMOUS
   logger::scope("Autonomous");
   // Register the different types of autonomous-es
-  control::autonomous::registerRun("Right Winpoint", control::autonomous::rightWinpoint);
-  control::autonomous::registerRun("Left Winpoint", control::autonomous::leftWinpoint);
-  control::autonomous::registerRun("Right Score", control::autonomous::rightScore);
-  control::autonomous::registerRun("Left Score", control::autonomous::leftScore);
+//  control::autonomous::registerRun("Right Winpoint", control::autonomous::rightWinpoint);
+//  control::autonomous::registerRun("Left Winpoint", control::autonomous::leftWinpoint);
+  control::autonomous::registerRun("Right Match (Score)", control::autonomous::rightScore);
+  control::autonomous::registerRun("Left Match (Block)", control::autonomous::leftScore);
   control::autonomous::registerRun("Skills", control::autonomous::skills);
   control::autonomous::registerRun("!PID_MOVE", [](robot::Robot &robot) {
     robot.drivetrain.tare();
@@ -116,7 +116,10 @@ void initialize() {
     return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.headingPID, "!PID_TURN");
   });
   screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
-    return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.headingPID, "Right Score");
+    return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.rightPID, "Left Match (Block)");
+  });
+  screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
+    return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.rightPID, "Right Match (Score)");
   });
   logger::scope("Initialize");
   screen::initialize(robot); // initialize the screen

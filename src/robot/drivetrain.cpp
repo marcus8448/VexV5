@@ -9,7 +9,7 @@
 namespace robot {
 constexpr double ACCEPTABLE_POSITION_ERROR = 5.0;
 constexpr double ACCEPTABLE_HEADING_ERROR = 0.4;
-constexpr uint16_t STABILIZE_TICKS = 25;
+constexpr uint16_t STABILIZE_TICKS = 12;
 
 Drivetrain::Drivetrain(int8_t left1, int8_t left2, int8_t left3, int8_t right1, int8_t right2, int8_t right3,
                        int8_t inertial)
@@ -18,7 +18,7 @@ Drivetrain::Drivetrain(int8_t left1, int8_t left2, int8_t left3, int8_t right1, 
       motorRight(new device::MotorGroup<3>(
           {right1, right2, static_cast<int8_t>(-right3)}, "Drive R", pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       imu(device::Inertial(inertial, "IMU")), velRightPID(20.0, 10.0, 0.0, 50.0, 20.0),
-      rightPID(7.50, 0.730, 6.0, 180.0 * 3, 3.0), headingPID(80.0, 15.0, 30.0, 10.0, 0.3) {}
+      rightPID(7.50, 0.730, 8.0, 180.0 * 3, 3.0), headingPID(80.0, 15.0, 30.0, 10.0, 0.3) {}
 
 bool Drivetrain::isAtTarget() const { return this->timeAtTarget > STABILIZE_TICKS; }
 
@@ -348,9 +348,18 @@ void Drivetrain::tare() {
   this->targetLeft -= this->leftPos;
   this->targetHeading -= this->heading;
 
-  this->rightPos = 0;
-  this->leftPos = 0;
+  this->rightPos = 0.0;
+  this->leftPos = 0.0;
   this->heading = 0.0;
+
+  this->posX = 0.0;
+  this->posY = 0.0;
+
+  this->rPosX = +6.25;
+  this->rPosY = 0.0;
+  this->lPosX = -6.25;
+  this->lPosY = 0.0;
+
 
   this->motorLeft->tare();
   this->motorRight->tare();
