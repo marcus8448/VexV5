@@ -56,8 +56,8 @@ void initialize() {
 #ifndef DISABLE_AUTONOMOUS
   logger::scope("Autonomous");
   // Register the different types of autonomous-es
-//  control::autonomous::registerRun("Right Winpoint", control::autonomous::rightWinpoint);
-//  control::autonomous::registerRun("Left Winpoint", control::autonomous::leftWinpoint);
+  //  control::autonomous::registerRun("Right Winpoint", control::autonomous::rightWinpoint);
+  //  control::autonomous::registerRun("Left Winpoint", control::autonomous::leftWinpoint);
   control::autonomous::registerRun("Right Match (Score)", control::autonomous::rightScore);
   control::autonomous::registerRun("Left Match (Block)", control::autonomous::leftScore);
   control::autonomous::registerRun("Skills", control::autonomous::skills);
@@ -90,12 +90,13 @@ void initialize() {
   screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
     return std::make_unique<screen::Chart<2, 100>>(
         robot, screen, width, height, "Drivetrain Velocity",
-        std::array<screen::DataSet, 2>{
-            screen::DataSet("Left", lv_color_hex(0xFF00000),
-                            [](const robot::Robot &robot) { return static_cast<float>(robot.drivetrain.getLeftVelocity()); }),
-            screen::DataSet("Right", lv_color_hex(0x00FF000), [](const robot::Robot &robot) {
-              return static_cast<float>(robot.drivetrain.getRightVelocity());
-            })});
+        std::array<screen::DataSet, 2>{screen::DataSet("Left", lv_color_hex(0xFF00000),
+                                                       [](const robot::Robot &robot) {
+                                                         return static_cast<float>(robot.drivetrain.getLeftVelocity());
+                                                       }),
+                                       screen::DataSet("Right", lv_color_hex(0x00FF000), [](const robot::Robot &robot) {
+                                         return static_cast<float>(robot.drivetrain.getRightVelocity());
+                                       })});
   });
   screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
     return std::make_unique<screen::Chart<2, 100>>(
@@ -116,10 +117,12 @@ void initialize() {
     return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.headingPID, "!PID_TURN");
   });
   screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
-    return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.rightPID, "Left Match (Block)");
+    return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.rightPID,
+                                               "Left Match (Block)");
   });
   screen::addScreen([](robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
-    return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.rightPID, "Right Match (Score)");
+    return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.rightPID,
+                                               "Right Match (Score)");
   });
   logger::scope("Initialize");
   screen::initialize(robot); // initialize the screen
@@ -182,9 +185,8 @@ void disabled() {
  * @return the robot instance
  */
 Robot &getRobot() {
-  static Robot robot =
-      Robot(DRIVETRAIN_MOTOR_L1, DRIVETRAIN_MOTOR_L2, DRIVETRAIN_MOTOR_L3, DRIVETRAIN_MOTOR_R1, DRIVETRAIN_MOTOR_R2,
-            DRIVETRAIN_MOTOR_R3, WING_LEFT, WING_RIGHT, DRIVETRAIN_IMU);
+  static Robot robot = Robot(DRIVETRAIN_MOTOR_L1, DRIVETRAIN_MOTOR_L2, DRIVETRAIN_MOTOR_L3, DRIVETRAIN_MOTOR_R1,
+                             DRIVETRAIN_MOTOR_R2, DRIVETRAIN_MOTOR_R3, WING_LEFT, WING_RIGHT, DRIVETRAIN_IMU);
   device::initialize();
   return robot;
 }

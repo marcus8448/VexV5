@@ -96,8 +96,8 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
     lv_canvas_draw_line(this->canvas.get(), points.data(), Points, &lineDesc);
 
     str = fmt::string_format("%s: %f", set.label, value);
-    lv_canvas_draw_text(this->canvas.get(), 40 + i * ((width - (40 * 2)) / Sets), height - 16, (width - (40 * 2)) / Sets,
-                        &textDesc, str.c_str());
+    lv_canvas_draw_text(this->canvas.get(), 40 + i * ((width - (40 * 2)) / Sets), height - 16,
+                        (width - (40 * 2)) / Sets, &textDesc, str.c_str());
   }
 }
 

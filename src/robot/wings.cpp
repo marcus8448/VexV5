@@ -2,7 +2,8 @@
 
 namespace robot {
 Wings::Wings(int8_t leftPneumatic, int8_t rightPneumatic)
-    : left(device::PneumaticPiston(leftPneumatic, "Wing L")), right(device::PneumaticPiston(rightPneumatic, "Wing R")) {}
+    : left(device::PneumaticPiston(leftPneumatic, "Wing L")), right(device::PneumaticPiston(rightPneumatic, "Wing R")) {
+}
 
 void Wings::open() {
   this->openLeft();

@@ -51,9 +51,7 @@ void Controller::clearLine(uint8_t line) {
   }
 }
 
-void Controller::rumble(const char *str) {
-  this->enqueuedRumble = str;
-}
+void Controller::rumble(const char *str) { this->enqueuedRumble = str; }
 
 bool Controller::isConnected() const { return pros::c::controller_is_connected(this->id); }
 
@@ -217,7 +215,8 @@ bool Controller::get_digital(pros::controller_digital_e_t button) {
 
 double Controller::get_analog(pros::controller_analog_e_t stick) {
   double value = pros::c::controller_get_analog(this->id, stick);
-  if (error::check(value)) return 0.0;
+  if (error::check(value))
+    return 0.0;
   return value;
 }
 } // namespace control::input

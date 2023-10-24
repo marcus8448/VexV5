@@ -7,14 +7,12 @@
 namespace robot {
 Robot::Robot(int8_t driveL1, int8_t driveL2, int8_t driveL3, int8_t driveR1, int8_t driveR2, int8_t driveR3,
              int8_t wingsL, int8_t wingsR, int8_t inertial)
-    : drivetrain(driveL1, driveL2, driveL3, driveR1, driveR2, driveR3, inertial),
-      wings(wingsL, wingsR), controller(nullptr) {}
+    : drivetrain(driveL1, driveL2, driveL3, driveR1, driveR2, driveR3, inertial), wings(wingsL, wingsR),
+      controller(nullptr) {}
 
 Robot::~Robot() { logger::error("Robot destructor called"); }
 
-void Robot::updateDevices() {
-  this->drivetrain.updateState();
-}
+void Robot::updateDevices() { this->drivetrain.updateState(); }
 
 [[noreturn]] void Robot::opcontrol() {
   this->drivetrain.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
@@ -25,7 +23,7 @@ void Robot::updateDevices() {
     if (this->controller != nullptr) {
       this->controller->update();
       this->drivetrain.updateTargeting(this->controller.get());
-//      this->wings.updateTargeting(this->controller.get());
+      //      this->wings.updateTargeting(this->controller.get());
     } else {
       logger::error("Controller is null!");
     }

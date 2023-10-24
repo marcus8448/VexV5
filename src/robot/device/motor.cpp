@@ -1,11 +1,11 @@
 #include "robot/device/motor.hpp"
+#include "debug/error.hpp"
 #include "debug/logger.hpp"
 #include "pros/motors.h"
-#include "debug/error.hpp"
 
 namespace robot::device {
 DirectMotor::DirectMotor(int8_t port, const char *name, bool reversed, pros::motor_gearset_e_t gearset,
-             pros::motor_brake_mode_e_t brake_mode)
+                         pros::motor_brake_mode_e_t brake_mode)
     : Device("DirectMotor", name, static_cast<int8_t>(reversed ? -port : port)), gearset(gearset),
       maxVelocity(gearsetMaxVelocity(gearset)), brakeMode(brake_mode) {
   pros::c::motor_set_gearing(this->port, this->gearset);
@@ -135,7 +135,9 @@ void DirectMotor::brake() {
   pros::c::motor_brake(this->port);
 }
 
-template <uint8_t MOTORS> MotorGroup<MOTORS>::MotorGroup(std::array<int8_t, MOTORS> motors, const char *name, pros::motor_gearset_e_t gearset, pros::motor_brake_mode_e_t brake_mode)
+template <uint8_t MOTORS>
+MotorGroup<MOTORS>::MotorGroup(std::array<int8_t, MOTORS> motors, const char *name, pros::motor_gearset_e_t gearset,
+                               pros::motor_brake_mode_e_t brake_mode)
     : maxVelocity(Motor::gearsetMaxVelocity(gearset)), brakeMode(brake_mode), motors(motors) {
   int i = 0;
   for (const auto &port : this->motors) {
@@ -219,7 +221,7 @@ template <uint8_t MOTORS> [[nodiscard]] double MotorGroup<MOTORS>::getVelocity()
   uint8_t count = 0;
   for (const auto &port : this->motors) {
     double vel = pros::c::motor_get_actual_velocity(abs(port));
-    if (vel != error::FLOATING) {
+    if (error::check(vel)) {
       if (port < 0) {
         vel = -vel;
       }
@@ -227,7 +229,8 @@ template <uint8_t MOTORS> [[nodiscard]] double MotorGroup<MOTORS>::getVelocity()
       count++;
     }
   }
-  if (count == 0) return 0.0;
+  if (count == 0)
+    return 0.0;
   return velocity / count;
 }
 
@@ -241,7 +244,8 @@ template <uint8_t MOTORS> [[nodiscard]] double MotorGroup<MOTORS>::getEfficiency
       count++;
     }
   }
-  if (count == 0) return 0.0;
+  if (count == 0)
+    return 0.0;
   return efficiency / count;
 }
 
@@ -272,7 +276,8 @@ template <uint8_t MOTORS> [[nodiscard]] double MotorGroup<MOTORS>::getPosition()
       count++;
     }
   }
-  if (count == 0) return 0.0;
+  if (count == 0)
+    return 0.0;
   return position / count;
 }
 
@@ -280,7 +285,9 @@ template <uint8_t MOTORS> [[nodiscard]] double MotorGroup<MOTORS>::getTargetPosi
   return this->targetPosition;
 }
 
-template <uint8_t MOTORS> [[nodiscard]] pros::motor_brake_mode_e_t MotorGroup<MOTORS>::getBrakeMode() const { return pros::c::motor_get_brake_mode(this->motors[0]); }
+template <uint8_t MOTORS> [[nodiscard]] pros::motor_brake_mode_e_t MotorGroup<MOTORS>::getBrakeMode() const {
+  return pros::c::motor_get_brake_mode(this->motors[0]);
+}
 
 template <uint8_t MOTORS> [[nodiscard]] double MotorGroup<MOTORS>::getTemperature() const {
   double temperature = 0.0;
@@ -292,7 +299,8 @@ template <uint8_t MOTORS> [[nodiscard]] double MotorGroup<MOTORS>::getTemperatur
       count++;
     }
   }
-  if (count == 0) return 0.0;
+  if (count == 0)
+    return 0.0;
   return temperature / count;
 }
 
@@ -306,7 +314,8 @@ template <uint8_t MOTORS> [[nodiscard]] double MotorGroup<MOTORS>::getPower() co
       count++;
     }
   }
-  if (count == 0) return 0.0;
+  if (count == 0)
+    return 0.0;
   return power / count;
 }
 
@@ -320,7 +329,8 @@ template <uint8_t MOTORS> [[nodiscard]] double MotorGroup<MOTORS>::getTorque() c
       count++;
     }
   }
-  if (count == 0) return 0.0;
+  if (count == 0)
+    return 0.0;
   return torque / count;
 }
 
@@ -334,7 +344,8 @@ template <uint8_t MOTORS> [[nodiscard]] int32_t MotorGroup<MOTORS>::getCurrentDr
       count++;
     }
   }
-  if (count == 0) return 0.0;
+  if (count == 0)
+    return 0.0;
   return current / count;
 }
 
@@ -348,7 +359,8 @@ template <uint8_t MOTORS> [[nodiscard]] int32_t MotorGroup<MOTORS>::getVoltage()
       count++;
     }
   }
-  if (count == 0) return 0.0;
+  if (count == 0)
+    return 0.0;
   return voltage / count;
 }
 

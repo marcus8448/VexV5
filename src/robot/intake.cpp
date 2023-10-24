@@ -1,8 +1,7 @@
 #include "robot/intake.hpp"
 
 namespace robot {
-Intake::Intake(int8_t motorPort)
-    : motor(device::DirectMotor(motorPort, "Intake")) {}
+Intake::Intake(int8_t motorPort) : motor(device::DirectMotor(motorPort, "Intake")) {}
 
 void Intake::stop() { this->speed = 0; }
 
@@ -22,7 +21,5 @@ void Intake::updateTargeting(control::input::Controller *controller) {
   }
 }
 
-void Intake::updateState() {
-  this->motor.moveMillivolts(this->speed);
-}
+void Intake::updateState() { this->motor.moveMillivolts(this->speed); }
 } // namespace robot

@@ -36,10 +36,10 @@ private:
 
     OPERATOR_DIRECT, // power L/R
 
-    STATIC_TURN, // abs angle
+    STATIC_TURN,      // abs angle
     PIVOT_TURN_RIGHT, // abs angle
-    PIVOT_TURN_LEFT, // abs angle
-    DIRECT_MOVE, // dist
+    PIVOT_TURN_LEFT,  // abs angle
+    DIRECT_MOVE,      // dist
   };
 
   std::unique_ptr<device::Motor> motorLeft;

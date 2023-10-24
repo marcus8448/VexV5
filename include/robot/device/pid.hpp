@@ -25,7 +25,7 @@ private:
 public:
   explicit PID(double Kp, double Ki, double Kd, double integralRange, double acceptableError);
   explicit PID();
-  PID& operator=(const PID &pid);
+  PID &operator=(const PID &pid);
   void resetState();
 
   [[nodiscard]] double getError() const;

@@ -1,11 +1,12 @@
 #ifndef DEBUG_ERROR_HPP
 #define DEBUG_ERROR_HPP
-#include <numeric>
 #include <cstdint>
+#include <numeric>
 
 namespace error {
-constexpr double INTEGER = std::numeric_limits<int32_t>::max();
-constexpr double FLOATING = std::numeric_limits<double>::infinity();
+constexpr int32_t INTEGER = std::numeric_limits<int32_t>::max();
+constexpr float FLOATING = std::numeric_limits<float>::infinity();
+constexpr double DOUBLE = std::numeric_limits<double>::infinity();
 
 void print(const char *name);
 
@@ -13,5 +14,5 @@ bool check(double val);
 bool check(int32_t val);
 
 bool isDisconnected();
-}
+} // namespace error
 #endif // DEBUG_ERROR_HPP

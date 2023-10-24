@@ -22,7 +22,7 @@ constexpr uint32_t UPDATE_RATE = 50;
 constexpr lv_coord_t coord(int coord) { return static_cast<lv_coord_t>(coord); }
 
 struct LvObjDeleter {
-  void operator()(lv_obj_t* obj);
+  void operator()(lv_obj_t *obj);
 };
 
 typedef std::unique_ptr<lv_obj_t, LvObjDeleter> lv_obj;

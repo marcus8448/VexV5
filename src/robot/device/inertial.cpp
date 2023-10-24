@@ -43,9 +43,7 @@ bool Inertial::isCalibrating() const {
   return status == pros::E_IMU_STATUS_CALIBRATING;
 }
 
-bool Inertial::isConnected() const {
-  return pros::c::imu_get_status(this->port) == pros::E_IMU_STATUS_ERROR;
-}
+bool Inertial::isConnected() const { return pros::c::imu_get_status(this->port) == pros::E_IMU_STATUS_ERROR; }
 
 void Inertial::reconfigure() const {}
 

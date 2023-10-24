@@ -28,7 +28,7 @@ template <typename... Args> std::string string_format(const char *format, Args..
  * @param args The type arguments to insert into the format string.
  * @return The formatted string.
  */
-template <typename... Args> const char * static_string_format(const char *format, Args... args) {
+template <typename... Args> const char *static_string_format(const char *format, Args... args) {
   int size_s = snprintf(nullptr, 0, format, args...) + 1; // Extra space for '\0'
   if (size_s <= 0) {
     return "format failure";

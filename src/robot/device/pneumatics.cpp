@@ -33,9 +33,7 @@ void PneumaticPiston::toggle() {
 
 [[nodiscard]] bool PneumaticPiston::isExtended() const { return this->extended; }
 
-void PneumaticPiston::reconfigure() const {
-  pros::c::adi_digital_write(this->port, this->extended);
-}
+void PneumaticPiston::reconfigure() const { pros::c::adi_digital_write(this->port, this->extended); }
 
 [[nodiscard]] bool PneumaticPiston::isConnected() const {
   if (error::check(pros::c::adi_digital_write(this->port, this->extended))) {

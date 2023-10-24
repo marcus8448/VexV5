@@ -1,5 +1,5 @@
-#include "debug/error.hpp"
 #include "robot/device/pid.hpp"
+#include "debug/error.hpp"
 
 namespace robot::device {
 static double clampMv(double value, double moveMin);
@@ -50,9 +50,9 @@ double PID::update(double target, double value) {
 double PID::getError() const { return error; }
 
 static double clampMv(double value, double moveMin) {
-//  if (std::abs(value) < moveMin) {
-//    value = value < 0 ? -moveMin : moveMin;
-//  }
+  //  if (std::abs(value) < moveMin) {
+  //    value = value < 0 ? -moveMin : moveMin;
+  //  }
   return value > Motor::MAX_MILLIVOLTS    ? Motor::MAX_MILLIVOLTS
          : value < -Motor::MAX_MILLIVOLTS ? -Motor::MAX_MILLIVOLTS
                                           : value;

@@ -11,10 +11,7 @@ namespace robot::device {
 class Motor {
 public:
   static constexpr int16_t MAX_MILLIVOLTS = 12000;
-  enum TargetType {
-    VOLTAGE,
-    VELOCITY
-  };
+  enum TargetType { VOLTAGE, VELOCITY };
 
   virtual ~Motor() = default;
 
@@ -62,8 +59,8 @@ private:
 
 public:
   explicit DirectMotor(int8_t port, const char *name, bool reversed = false,
-                 pros::motor_gearset_e_t gearset = pros::E_MOTOR_GEARSET_18,
-                 pros::motor_brake_mode_e_t brake_mode = pros::E_MOTOR_BRAKE_BRAKE);
+                       pros::motor_gearset_e_t gearset = pros::E_MOTOR_GEARSET_18,
+                       pros::motor_brake_mode_e_t brake_mode = pros::E_MOTOR_BRAKE_BRAKE);
   ~DirectMotor() override = default;
 
   void moveVelocity(int16_t velocity) override;
@@ -100,7 +97,7 @@ public:
   void brake() override;
 };
 
-template<uint8_t MOTORS> class MotorGroup : public Motor {
+template <uint8_t MOTORS> class MotorGroup : public Motor {
 private:
   Motor::TargetType targetType = Motor::TargetType::VOLTAGE;
   int16_t target = 0;
@@ -112,7 +109,8 @@ private:
   std::array<int8_t, MOTORS> motors;
 
 public:
-  explicit MotorGroup(std::array<int8_t, MOTORS> motors, const char *name, pros::motor_gearset_e_t gearset, pros::motor_brake_mode_e_t brake_mode);
+  explicit MotorGroup(std::array<int8_t, MOTORS> motors, const char *name, pros::motor_gearset_e_t gearset,
+                      pros::motor_brake_mode_e_t brake_mode);
   ~MotorGroup() override = default;
 
   void moveVelocity(int16_t velocity) override;
