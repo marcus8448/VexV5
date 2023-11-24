@@ -22,17 +22,16 @@ static std::unique_ptr<std::ofstream> log_file = nullptr;
 #endif
 
 void info(const char *string) {
-  std::cout << string << '\n';
+  puts(string);
 #ifdef FILE_LOG
   if (log_file != nullptr && log_file->is_open()) {
     *log_file << "[INFO] [" << pros::c::millis() << "] " << string << '\n';
     log_file->flush();
   }
 #endif
-  std::cout.flush();
 }
 
-void info(const std::string_view &string) {
+void info(std::string_view string) {
   std::cout << string << '\n';
 #ifdef FILE_LOG
   if (log_file != nullptr && log_file->is_open()) {
@@ -44,17 +43,16 @@ void info(const std::string_view &string) {
 }
 
 void warn(const char *string) {
-  std::cout << string << '\n';
+  puts(string);
 #ifdef FILE_LOG
   if (log_file != nullptr && log_file->is_open()) {
     *log_file << "[WARN] [" << pros::c::millis() << "] " << '\n';
     log_file->flush();
   }
 #endif
-  std::cout.flush();
 }
 
-void warn(const std::string_view &string) {
+void warn(std::string_view string) {
   std::cout << string << '\n';
 #ifdef FILE_LOG
   if (log_file != nullptr && log_file->is_open()) {
@@ -66,17 +64,16 @@ void warn(const std::string_view &string) {
 }
 
 void error(const char *string) {
-  std::cout << string << '\n';
+  puts(string);
 #ifdef FILE_LOG
   if (log_file != nullptr && log_file->is_open()) {
     *log_file << "[ERROR] [" << pros::c::millis() << "] " << '\n';
     log_file->flush();
   }
 #endif
-  std::cout.flush();
 }
 
-void error(const std::string_view &string) {
+void error(std::string_view string) {
   std::cout << string << '\n';
 #ifdef FILE_LOG
   if (log_file != nullptr && log_file->is_open()) {
@@ -89,17 +86,16 @@ void error(const std::string_view &string) {
 
 #ifdef DEBUG_LOG
 void debug(const char *string) {
-  std::cout << string << '\n';
+  puts(string);
 #ifdef FILE_LOG
   if (log_file != nullptr && log_file->is_open()) {
     *log_file << "[DEBUG] [" << pros::c::millis() << "] " << '\n';
     log_file->flush();
   }
 #endif
-  std::cout.flush();
 }
 
-void debug(const std::string_view &string) {
+void debug(std::string_view string) {
   std::cout << string << '\n';
 #ifdef FILE_LOG
   if (log_file != nullptr && log_file->is_open()) {
@@ -112,7 +108,7 @@ void debug(const std::string_view &string) {
 #else
 void debug(const char *) {}
 
-void debug(const std::string_view &) {}
+void debug(std::string_view) {}
 #endif // DEBUG_LOG
 
 void scope(const char *string) {
@@ -126,7 +122,7 @@ void scope(const char *string) {
   for (const auto &pair : val) {
     str.append("/").append(pair.first);
   }
-  info("> START %s", str.c_str());
+  info("> START {}", str.c_str());
 }
 
 void endScope() {
@@ -136,12 +132,12 @@ void endScope() {
   if (stack.empty()) {
     error("Section stack underflow!");
   } else {
-    std::pair<const char *, uint32_t> &back = stack.back();
+    auto &[name, start] = stack.back();
     std::string str;
-    for (const auto &pair : stack) {
-      str.append("/").append(pair.first);
+    for (const auto &[name, time] : stack) {
+      str.append("/").append(name);
     }
-    info("> END %s [%ims]", str.c_str(), millis - back.second);
+    info("> END {} [{}ms]", str.c_str(), millis - start);
     stack.pop_back();
     if (stack.empty()) {
       sections.erase(task);
@@ -164,13 +160,12 @@ void flush() {
 
 void initialize(const char *name) {
   main_task_name = name;
-  info("Root task '%s' started.", main_task_name);
+  info("Root task '{}' started.", main_task_name);
 
 #ifdef FILE_LOG
   if (log_file == nullptr) {
-    auto stream = fs::open_indexed("log");
 
-    if (stream != nullptr) {
+    if (auto stream = fs::open_indexed("log"); stream != nullptr) {
       if (stream->is_open()) {
         log_file.swap(stream);
       } else {
@@ -187,12 +182,12 @@ void initialize(const char *name) {
 void clearRoot(char *name) {
   if (main_task_name != nullptr) {
     if (std::strcmp(name, main_task_name) != 0) {
-      warn("Clearing root task (%s) after other task (%s) has started!", name, main_task_name);
+      warn("Clearing root task ({}) after other task ({}) has started!", name, main_task_name);
     } else {
-      info("Root task '%s' ended.", name);
+      info("Root task '{}' ended.", name);
     }
   } else {
-    warn("Clearing root task (%s) with no task active!", name);
+    warn("Clearing root task ({}) with no task active!", name);
   }
   main_task_name = nullptr;
 }

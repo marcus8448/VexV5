@@ -3,10 +3,10 @@
 #include <cerrno>
 
 namespace error {
-void print(const char *name) {
+void print(std::string_view name) {
   if (errno == ENODEV)
     return;
-  logger::error("%s: Error %i", name, errno); // print the error
+  logger::error("{}: Error {}", name, errno); // print the error
 }
 
 bool check(float val) { return val == DOUBLE; }

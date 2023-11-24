@@ -5,8 +5,7 @@
 #include "screen.hpp"
 
 namespace screen {
-class ConfigurationScreen : public Screen {
-private:
+class ConfigurationScreen final : public Screen {
   lv_obj driveSchemeBtn;
   lv_obj_t *driveSchemeBtnLbl;
 

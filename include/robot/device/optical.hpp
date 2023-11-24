@@ -4,13 +4,12 @@
 #include "device.hpp"
 
 namespace robot::device {
-class Optical : public Device {
-private:
+class Optical final : public Device {
   uint8_t led_pwm;
   bool gesture = false;
 
 public:
-  explicit Optical(int8_t port, const char *name, uint8_t led_pwm = 0, bool gesture = false);
+  explicit Optical(int8_t port, std::string_view name, uint8_t led_pwm = 0, bool gesture = false);
   ~Optical() override = default;
 
   [[nodiscard]] double getHue() const;

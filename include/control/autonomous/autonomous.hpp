@@ -16,9 +16,9 @@ void initialize();
  * @param name The name of the autonomous run, to be shown on the screen. Must be unique.
  * @param function The autonomous run
  */
-void registerRun(const std::string &name, std::function<void(robot::Robot &)> function);
+void registerRun(const std::string &name, std::function<void(Robot &)> function);
 
-std::unordered_map<std::string, std::function<void(robot::Robot &)>> &getPrograms();
+std::unordered_map<std::string, std::function<void(Robot &)>> &getPrograms();
 
 /**
  * Returns the selected autonomous run.

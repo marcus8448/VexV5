@@ -7,8 +7,7 @@
 namespace screen {
 constexpr size_t INFO_COLUMNS = 12;
 
-class Information : public Screen {
-private:
+class Information final : public Screen {
   std::array<lv_obj, INFO_COLUMNS> leftColumn = {};
   std::array<lv_obj, INFO_COLUMNS> rightColumn = {};
 

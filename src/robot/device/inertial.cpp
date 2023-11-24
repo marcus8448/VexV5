@@ -4,7 +4,7 @@
 #include "pros/imu.h"
 
 namespace robot::device {
-Inertial::Inertial(int8_t port, const char *name) : Device("Inertial", name, port) { this->calibrate(); }
+Inertial::Inertial(int8_t port, std::string_view name) : Device("Inertial", name, port) { this->calibrate(); }
 
 double Inertial::getRotation() const {
   double rotation = pros::c::imu_get_rotation(this->port);

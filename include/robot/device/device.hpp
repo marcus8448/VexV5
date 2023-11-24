@@ -2,6 +2,7 @@
 #define ROBOT_DEVICE_DEVICE_HPP
 
 #include <cstdint>
+#include <string_view>
 #include <unordered_map>
 
 namespace robot::device {
@@ -12,14 +13,14 @@ public:
   static constexpr uint32_t CONFIGURE_RATE = 500;
 
 private:
-  const char *typeName;
-  const char *name;
+  std::string_view typeName;
+  std::string_view name;
 
 protected:
   const int8_t port;
 
 public:
-  explicit Device(const char *typeName, const char *name, int8_t port);
+  explicit Device(std::string_view typeName, std::string_view name, int8_t port);
 
   virtual ~Device() = default;
 
@@ -28,8 +29,8 @@ public:
   [[nodiscard]] virtual bool isConnected() const = 0;
   [[nodiscard]] int8_t getPort() const;
 
-  [[nodiscard]] const char *getTypeName() const;
-  [[nodiscard]] const char *getName() const;
+  [[nodiscard]] std::string_view getTypeName() const;
+  [[nodiscard]] std::string_view getName() const;
 };
 
 void initialize();

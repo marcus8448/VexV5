@@ -9,7 +9,6 @@ namespace robot {
 constexpr uint16_t DEFAULT_INTAKE_SPEED = 12000;
 
 class Intake {
-private:
   device::DirectMotor motor;
 
   int16_t speed = 0;

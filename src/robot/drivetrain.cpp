@@ -23,7 +23,7 @@ Drivetrain::Drivetrain(int8_t left1, int8_t left2, int8_t left3, int8_t right1, 
 bool Drivetrain::isAtTarget() const { return this->timeAtTarget > STABILIZE_TICKS; }
 
 void Drivetrain::forwards(double distance, int16_t limit, bool wait) {
-  logger::info("Moving forwards %fin.", distance);
+  logger::info("Moving forwards {}in.", distance);
   this->setTarget(DIRECT_MOVE);
   this->targetHeading = this->heading;
   this->targetLeft = this->leftPos + units::inchToEncoder(distance);
@@ -37,7 +37,7 @@ void Drivetrain::forwards(double distance, int16_t limit, bool wait) {
 }
 
 void Drivetrain::backwards(double distance, int16_t limit, bool wait) {
-  logger::info("Moving backwards %fin.", distance);
+  logger::info("Moving backwards {}in.", distance);
   this->setTarget(DIRECT_MOVE);
   this->targetHeading = this->heading;
   this->targetLeft = this->leftPos - units::inchToEncoder(distance);
@@ -51,7 +51,7 @@ void Drivetrain::backwards(double distance, int16_t limit, bool wait) {
 }
 
 void Drivetrain::turnAbs(double degrees, int16_t limit, bool wait) {
-  logger::info("Turning to %f degrees.", degrees);
+  logger::info("Turning to {} degrees.", degrees);
   this->setTarget(STATIC_TURN);
   this->headingPID.resetState();
   this->targetHeading = degrees;
@@ -64,7 +64,7 @@ void Drivetrain::turnAbs(double degrees, int16_t limit, bool wait) {
 }
 
 void Drivetrain::turnRight(double degrees, int16_t limit, bool wait) {
-  logger::info("Turning right %f degrees.", degrees);
+  logger::info("Turning right {} degrees.", degrees);
   this->setTarget(STATIC_TURN);
   this->headingPID.resetState();
   this->targetHeading += degrees;
@@ -77,7 +77,7 @@ void Drivetrain::turnRight(double degrees, int16_t limit, bool wait) {
 }
 
 void Drivetrain::turnLeft(double degrees, int16_t limit, bool wait) {
-  logger::info("Turning left %f degrees.", degrees);
+  logger::info("Turning left {} degrees.", degrees);
   this->setTarget(STATIC_TURN);
   this->headingPID.resetState();
   this->targetHeading -= degrees;
@@ -90,7 +90,7 @@ void Drivetrain::turnLeft(double degrees, int16_t limit, bool wait) {
 }
 
 void Drivetrain::pivotRight(double degrees, int16_t limit, bool wait) {
-  logger::info("Pivot right %f degrees.", degrees);
+  logger::info("Pivot right {} degrees.", degrees);
   this->setTarget(PIVOT_TURN_RIGHT);
   this->headingPID.resetState();
   this->targetHeading += degrees;
@@ -103,7 +103,7 @@ void Drivetrain::pivotRight(double degrees, int16_t limit, bool wait) {
 }
 
 void Drivetrain::pivotLeft(double degrees, int16_t limit, bool wait) {
-  logger::info("Pivot left %f degrees.", degrees);
+  logger::info("Pivot left {} degrees.", degrees);
   this->setTarget(PIVOT_TURN_LEFT);
   this->headingPID.resetState();
   this->targetHeading -= degrees;
@@ -127,7 +127,7 @@ void Drivetrain::pivotLeftAbs(double degrees, int16_t limit, bool wait) {
 
 void Drivetrain::awaitMovement() const {
   while (!this->isAtTarget()) {
-    pros::c::delay(robot::device::TICK_RATE * (STABILIZE_TICKS - this->timeAtTarget));
+    pros::c::delay(device::TICK_RATE * (STABILIZE_TICKS - this->timeAtTarget));
   }
 }
 
@@ -140,13 +140,13 @@ void Drivetrain::updateTargeting(control::input::Controller *controller) {
     if (this->operatorPower > device::Motor::MAX_MILLIVOLTS) {
       this->operatorPower = device::Motor::MAX_MILLIVOLTS;
     }
-    controller->setLine(0, fmt::string_format("Power: %i", this->operatorPower));
+    controller->setLine(0, fmt::string_format("Power: {}", this->operatorPower));
   } else if (controller->r2Pressed()) {
     this->operatorPower -= 10;
     if (this->operatorPower < -device::Motor::MAX_MILLIVOLTS) {
       this->operatorPower = -device::Motor::MAX_MILLIVOLTS;
     }
-    controller->setLine(0, fmt::string_format("Power: %i", this->operatorPower));
+    controller->setLine(0, fmt::string_format("Power: {}", this->operatorPower));
   }
   if (this->controlScheme == ARCADE) {
     double power = controller->leftStickY();
@@ -172,8 +172,8 @@ void Drivetrain::updateTargeting(control::input::Controller *controller) {
     //      this->motorLeft->getVelocity()));
     //    }
   } else {
-    double right = (controller->rightStickY() * 0.9) / control::input::Controller::JOYSTICK_MAX * this->operatorPower;
-    double left = (controller->leftStickY() * 0.9) / control::input::Controller::JOYSTICK_MAX * this->operatorPower;
+    double right = controller->rightStickY() * 0.9 / control::input::Controller::JOYSTICK_MAX * this->operatorPower;
+    double left = controller->leftStickY() * 0.9 / control::input::Controller::JOYSTICK_MAX * this->operatorPower;
     if (std::abs(right) > 60.0 && std::abs(left) > 60.0) {
       double delta = right - left;
       right -= delta / 5.0;
@@ -193,7 +193,7 @@ void Drivetrain::updateTargeting(control::input::Controller *controller) {
     //                                  this->motorLeft->getVelocity()));
     //    }
   }
-  logger::info("%imV / %imV", this->powerLeft, this->powerRight);
+  logger::info("{}mV / {}mV", this->powerLeft, this->powerRight);
 }
 
 void Drivetrain::updateState() {
@@ -207,7 +207,8 @@ void Drivetrain::updateState() {
   double rightDiff = units::encoderToInch(this->rightPos - prevRightPos);
   double leftDiff = units::encoderToInch(this->leftPos - prevLeftPos);
 
-  //  logger::info("D %.2f /%.2f | P %.2f / %.2f | H %.2f", leftDiff, rightDiff, this->leftPos, this->rightPos,
+  //  logger::info("D {:.2f} /{:.2f} | P {:.2f} / {:.2f} | H {:.2f}", leftDiff, rightDiff, this->leftPos,
+  //  this->rightPos,
   //               this->heading);
   // drivetrain: 12in x 11.5in
   // 860.40 = 90
@@ -223,12 +224,13 @@ void Drivetrain::updateState() {
   this->rPosX += dRPosX;
   this->rPosY += dRPosY;
 
-  double dist = std::sqrt(((lPosX - rPosX) * (lPosX - rPosX)) + ((lPosY - rPosY) * (lPosY - rPosY)));
-  //  logger::info("dist: %.2f", dist);
+  // double dist = std::sqrt(((lPosX - rPosX) * (lPosX - rPosX)) + ((lPosY - rPosY) * (lPosY - rPosY)));
+  //  logger::info("dist: {:.2f}", dist);
 
   this->posX = (this->lPosX + this->rPosX) / 2.0;
   this->posY = (this->lPosY + this->rPosY) / 2.0;
-  //  logger::info("L %.2f, %.2f | R %.2f, %.2f | C %.2f, %2.f", lPosX, lPosY, rPosX, rPosY, this->posX, this->posY);
+  //  logger::info("L {:.2f}, {:.2f} | R {:.2f}, {:.2f} | C {:.2f}, {:.2f}", lPosX, lPosY, rPosX, rPosY, this->posX,
+  //  this->posY);
 
   this->leftPID = this->rightPID;
 
@@ -259,7 +261,7 @@ void Drivetrain::updateState() {
     } else if (value < -this->powerLimit) {
       value = -this->powerLimit;
     }
-    //    logger::info("%.2f/%.2f", this->heading, this->targetHeading);
+    //    logger::info("{:.2f}/{:.2f}", this->heading, this->targetHeading);
 
     this->motorRight->moveMillivolts(static_cast<int16_t>(-value));
     this->motorLeft->moveMillivolts(static_cast<int16_t>(value));
@@ -275,7 +277,7 @@ void Drivetrain::updateState() {
     } else if (value < -this->powerLimit) {
       value = -this->powerLimit;
     }
-    //    logger::info("%.2f/%.2f", this->heading, this->targetHeading);
+    //    logger::info("{:.2f}/{:.2f}", this->heading, this->targetHeading);
 
     this->motorLeft->moveMillivolts(static_cast<int16_t>(value * 1.5));
     if (std::abs(this->targetHeading - this->heading) < ACCEPTABLE_HEADING_ERROR) {
@@ -290,7 +292,7 @@ void Drivetrain::updateState() {
     } else if (value < -this->powerLimit) {
       value = -this->powerLimit;
     }
-    //    logger::info("%.2f/%.2f", this->heading, this->targetHeading);
+    //    logger::info("{:.2f}/{:.2f}", this->heading, this->targetHeading);
 
     this->motorRight->moveMillivolts(static_cast<int16_t>(-value * 1.5));
     if (std::abs(this->targetHeading - this->heading) < ACCEPTABLE_HEADING_ERROR) {
@@ -309,15 +311,16 @@ void Drivetrain::updateState() {
     }
 
     if (left > this->powerLimit || right > this->powerLimit) {
-      double maximum = std::max(std::abs(left), std::abs(right));
-      left = (left / maximum) * this->powerLimit;
-      right = (right / maximum) * this->powerLimit;
+      const double maximum = std::max(std::abs(left), std::abs(right));
+      left = left / maximum * this->powerLimit;
+      right = right / maximum * this->powerLimit;
     }
 
     this->motorRight->moveMillivolts(static_cast<int16_t>(right));
     this->motorLeft->moveMillivolts(static_cast<int16_t>(left));
 
-    //    logger::info("L%.2f / R%.2f H%.2f", this->targetLeft - this->leftPos, this->targetRight - this->rightPos,
+    //    logger::info("L{:.2f} / R{:.2f} H{:.2f}", this->targetLeft - this->leftPos, this->targetRight -
+    //    this->rightPos,
     //                 this->heading);
     if (std::abs(this->targetLeft - this->leftPos) < ACCEPTABLE_POSITION_ERROR &&
         std::abs(this->targetRight - this->rightPos) < ACCEPTABLE_POSITION_ERROR) {
@@ -365,7 +368,7 @@ void Drivetrain::tare() {
   this->imu.tare();
 }
 
-void Drivetrain::setTarget(Drivetrain::TargetType type) {
+void Drivetrain::setTarget(TargetType type) {
   this->targetType = type;
   this->timeAtTarget = 0;
 }

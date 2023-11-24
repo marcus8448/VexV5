@@ -4,13 +4,12 @@
 #include "screen/screen.hpp"
 
 namespace screen {
-AutonomousSelect::AutonomousSelect(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)
+AutonomousSelect::AutonomousSelect(Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)
     : Screen(robot, width, height), list(lv_list_create(screen)) {
   lv_obj_set_pos(this->list.get(), 0, 0);
   lv_obj_set_size(this->list.get(), width, height);
 
-  auto programs = control::autonomous::getPrograms();
-  for (auto const &[name, program] : programs) {
+  for (auto programs = control::autonomous::getPrograms(); auto const &[name, program] : programs) {
     if (name.starts_with('!')) {
       continue;
     }
@@ -35,10 +34,10 @@ void AutonomousSelect::click(lv_event_t *event) {
   }
   this->selected = lv_event_get_target(event);
 
-  auto name = std::string(lv_list_get_btn_text(this->list.get(), this->selected));
+  const auto name = std::string(lv_list_get_btn_text(this->list.get(), this->selected));
 
   if (this->robot.controller != nullptr) {
-    this->robot.controller->setLine(0, name.c_str());
+    this->robot.controller->setLine(0, name);
   }
 
   this->robot.autonomous = name;

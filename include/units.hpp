@@ -12,9 +12,11 @@ constexpr double DRIVETRAIN_GEARING = 36.0 / 60.0;
  * @param inches the number of inches to convert.
  * @return the number of encoder units equivalent to the number of inches.
  */
-inline double inchToEncoder(double inches) { return inches / (WHEEL_CIRCUMFERENCE * DRIVETRAIN_GEARING) * 360.0; }
-inline double encoderToInch(double encoderUnits) {
-  return (encoderUnits / 360.0) * (WHEEL_CIRCUMFERENCE * DRIVETRAIN_GEARING);
+constexpr double inchToEncoder(const double inches) {
+  return inches / (WHEEL_CIRCUMFERENCE * DRIVETRAIN_GEARING) * 360.0;
+}
+constexpr double encoderToInch(const double encoderUnits) {
+  return encoderUnits / 360.0 * (WHEEL_CIRCUMFERENCE * DRIVETRAIN_GEARING);
 }
 } // namespace units
 

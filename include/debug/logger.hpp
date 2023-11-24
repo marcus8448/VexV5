@@ -2,13 +2,12 @@
 #define DEBUG_LOGGER_HPP
 
 #include "format.hpp"
-#include <memory>
-#include <string>
 
 #ifdef ENABLE_TIMERS
+// ReSharper disable once CppUnusedIncludeDirective
 #include "pros/rtos.h"
 #define startTiming(name) auto __timer_##name##__ = pros::c::millis()
-#define endTiming(name) logger::info("%s took %i ms", #name, pros::c::millis() - __timer_##name##__)
+#define endTiming(name) logger::info("{} took {} ms", #name, pros::c::millis() - __timer_##name##__)
 #else
 #define startTiming(name)                                                                                              \
   {}
@@ -30,7 +29,7 @@ void info(const char *string);
  * May also be printed to the robot screen with white text colour.
  * @param string The string to print out.
  */
-void info(const std::string_view &string);
+void info(std::string_view string);
 
 /**
  * Prints out a formatted message via standard output.
@@ -38,8 +37,8 @@ void info(const std::string_view &string);
  * @param string The string to print out.
  * @see string_format
  */
-template <typename... Args> void info(const char *format, Args... args) {
-  logger::info(fmt::string_format(format, args...));
+template <typename... Args> void info(std::format_string<Args...> format, Args &&...args) {
+  logger::info(std::vformat(format.get(), std::make_format_args(args...)));
 }
 
 /**
@@ -54,7 +53,7 @@ void warn(const char *string);
  * May also be printed to the robot screen with yellow text colour.
  * @param string The string to print out.
  */
-void warn(const std::string_view &string);
+void warn(std::string_view string);
 
 /**
  * Prints out a formatted message via standard output.
@@ -62,7 +61,9 @@ void warn(const std::string_view &string);
  * @param string The string to print out.
  * @see string_format
  */
-template <typename... Args> void warn(const char *format, Args... args) { warn(fmt::string_format(format, args...)); }
+template <typename... Args> void warn(std::format_string<Args...> format, Args &&...args) {
+  warn(std::vformat(format.get(), std::make_format_args(args...)));
+}
 
 /**
  * Prints out a message via standard output.
@@ -76,7 +77,7 @@ void error(const char *string);
  * May also be printed to the robot screen with red text colour.
  * @param string The string to print out.
  */
-void error(const std::string_view &string);
+void error(std::string_view string);
 
 /**
  * Prints out a formatted message via standard output.
@@ -84,8 +85,8 @@ void error(const std::string_view &string);
  * @param string The string to print out.
  * @see string_format
  */
-template <typename... Args> void error(const char *format, Args... args) {
-  logger::error(fmt::string_format(format, args...));
+template <typename... Args> void error(std::format_string<Args...> format, Args &&...args) {
+  logger::error(std::vformat(format.get(), std::make_format_args(args...)));
 }
 
 /**
@@ -100,7 +101,7 @@ void debug(const char *string);
  * May also be printed to the robot screen with green text colour.
  * @param string The string to print out.
  */
-void debug(const std::string_view &string);
+void debug(std::string_view string);
 
 /**
  * Prints out a formatted message via standard output, if the DEBUG_LOG flag is set.
@@ -109,7 +110,9 @@ void debug(const std::string_view &string);
  * @see string_format
  */
 #ifdef DEBUG_LOG
-template <typename... Args> void debug(const char *format, Args... args) { debug(fmt::string_format(format, args...)); }
+template <typename... Args> void debug(std::format_string<Args...> format, Args... args) {
+  debug(std::vformat(format.get(), std::make_format_args(args...)));
+}
 #else
 template <typename... Args> void debug(const char *, Args...) {}
 #endif

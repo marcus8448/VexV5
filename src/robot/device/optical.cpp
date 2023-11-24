@@ -3,7 +3,7 @@
 #include "robot/device/optical.hpp"
 
 namespace robot::device {
-Optical::Optical(int8_t port, const char *name, uint8_t led_pwm, bool gesture)
+Optical::Optical(int8_t port, std::string_view name, uint8_t led_pwm, bool gesture)
     : Device("Optical", name, port), led_pwm(led_pwm), gesture(gesture) {
   if (gesture) {
     pros::c::optical_enable_gesture(this->port);

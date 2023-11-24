@@ -5,7 +5,6 @@
 #include "screen.hpp"
 #include "structure/fixed_queue.hpp"
 #include <array>
-#include <functional>
 
 namespace screen {
 class DataSet {
@@ -14,7 +13,6 @@ public:
   lv_color_t color;
   float (*function)(const robot::Robot &);
 
-public:
   explicit DataSet(const char *label, lv_color_t color, float (*function)(const robot::Robot &));
 };
 

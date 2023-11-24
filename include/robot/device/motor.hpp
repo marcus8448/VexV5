@@ -47,9 +47,8 @@ public:
   static constexpr int16_t gearsetMaxVelocity(pros::motor_gearset_e_t gearset);
 };
 
-class DirectMotor : public Device, public Motor {
-private:
-  Motor::TargetType targetType = Motor::TargetType::VOLTAGE;
+class DirectMotor final : public Device, public Motor {
+  TargetType targetType = VOLTAGE;
   int16_t target = 0;
   double targetPosition = std::numeric_limits<double>::infinity();
 
@@ -58,7 +57,7 @@ private:
   pros::motor_brake_mode_e_t brakeMode;
 
 public:
-  explicit DirectMotor(int8_t port, const char *name, bool reversed = false,
+  explicit DirectMotor(int8_t port, std::string_view name, bool reversed = false,
                        pros::motor_gearset_e_t gearset = pros::E_MOTOR_GEARSET_18,
                        pros::motor_brake_mode_e_t brake_mode = pros::E_MOTOR_BRAKE_BRAKE);
   ~DirectMotor() override = default;
@@ -97,9 +96,8 @@ public:
   void brake() override;
 };
 
-template <uint8_t MOTORS> class MotorGroup : public Motor {
-private:
-  Motor::TargetType targetType = Motor::TargetType::VOLTAGE;
+template <uint8_t MOTORS> class MotorGroup final : public Motor {
+  TargetType targetType = VOLTAGE;
   int16_t target = 0;
   double targetPosition = std::numeric_limits<double>::infinity();
 
@@ -109,7 +107,7 @@ private:
   std::array<int8_t, MOTORS> motors;
 
 public:
-  explicit MotorGroup(std::array<int8_t, MOTORS> motors, const char *name, pros::motor_gearset_e_t gearset,
+  explicit MotorGroup(std::array<int8_t, MOTORS> motors, std::string_view name, pros::motor_gearset_e_t gearset,
                       pros::motor_brake_mode_e_t brake_mode);
   ~MotorGroup() override = default;
 

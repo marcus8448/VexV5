@@ -4,9 +4,9 @@
 #include "pros/motors.h"
 
 namespace robot::device {
-DirectMotor::DirectMotor(int8_t port, const char *name, bool reversed, pros::motor_gearset_e_t gearset,
+DirectMotor::DirectMotor(int8_t port, std::string_view name, bool reversed, pros::motor_gearset_e_t gearset,
                          pros::motor_brake_mode_e_t brake_mode)
-    : Device("DirectMotor", name, static_cast<int8_t>(reversed ? -port : port)), gearset(gearset),
+    : Device("Motor", name, static_cast<int8_t>(reversed ? -port : port)), gearset(gearset),
       maxVelocity(gearsetMaxVelocity(gearset)), brakeMode(brake_mode) {
   pros::c::motor_set_gearing(this->port, this->gearset);
   pros::c::motor_set_encoder_units(this->port, pros::E_MOTOR_ENCODER_DEGREES);
@@ -15,15 +15,15 @@ DirectMotor::DirectMotor(int8_t port, const char *name, bool reversed, pros::mot
 
 void DirectMotor::moveVelocity(int16_t velocity) {
   if (velocity > this->maxVelocity) {
-    logger::warn("Target velocity %i is over max velocity %i!", velocity, this->maxVelocity);
+    logger::warn("Target velocity {} is over max velocity {}!", velocity, this->maxVelocity);
     velocity = this->maxVelocity;
   } else if (velocity < -this->maxVelocity) {
-    logger::warn("Target velocity %i is over max velocity -%i!", velocity, this->maxVelocity);
+    logger::warn("Target velocity {} is over max velocity -{}!", velocity, this->maxVelocity);
     velocity = static_cast<int16_t>(-this->maxVelocity);
   }
-  if (this->targetType != Motor::TargetType::VELOCITY || this->target != velocity) {
+  if (this->targetType != VELOCITY || this->target != velocity) {
     this->target = velocity;
-    this->targetType = Motor::TargetType::VELOCITY;
+    this->targetType = VELOCITY;
     this->targetPosition = std::numeric_limits<double>::infinity();
     pros::c::motor_move_velocity(this->port, velocity);
   }
@@ -31,16 +31,16 @@ void DirectMotor::moveVelocity(int16_t velocity) {
 
 void DirectMotor::moveMillivolts(int16_t mV) {
   if (mV > MAX_MILLIVOLTS) {
-    logger::warn("Target voltage %imV is over max voltage %imV!", mV, MAX_MILLIVOLTS);
+    logger::warn("Target voltage {}mV is over max voltage {}mV!", mV, MAX_MILLIVOLTS);
     mV = MAX_MILLIVOLTS;
   } else if (mV < -MAX_MILLIVOLTS) {
-    logger::warn("Target voltage %imV is over max voltage -%imV!", mV, MAX_MILLIVOLTS);
+    logger::warn("Target voltage {}mV is over max voltage -{}mV!", mV, MAX_MILLIVOLTS);
     mV = -MAX_MILLIVOLTS;
   }
-  if (this->targetType != Motor::TargetType::VOLTAGE || this->target != mV) {
-    logger::debug("Targeting %imV", mV);
+  if (this->targetType != VOLTAGE || this->target != mV) {
+    logger::debug("Targeting {}mV", mV);
     this->target = mV;
-    this->targetType = Motor::TargetType::VOLTAGE;
+    this->targetType = VOLTAGE;
     this->targetPosition = std::numeric_limits<double>::infinity();
     pros::c::motor_move_voltage(this->port, mV);
   }
@@ -49,13 +49,13 @@ void DirectMotor::moveMillivolts(int16_t mV) {
 void DirectMotor::moveAbsolute(double position, int16_t velocity) {
   velocity = static_cast<int16_t>(std::abs(velocity));
   if (velocity > this->maxVelocity) {
-    logger::warn("Target velocity %i is over max velocity %i!", velocity, this->maxVelocity);
+    logger::warn("Target velocity {} is over max velocity {}!", velocity, this->maxVelocity);
     velocity = this->maxVelocity;
   } else if (velocity == 0) {
     logger::error("Target velocity is zero!");
   }
-  if (this->targetType != Motor::TargetType::VELOCITY || this->target != velocity || this->targetPosition != position) {
-    this->targetType = Motor::TargetType::VELOCITY;
+  if (this->targetType != VELOCITY || this->target != velocity || this->targetPosition != position) {
+    this->targetType = VELOCITY;
     this->target = velocity;
     this->targetPosition = position;
     pros::c::motor_move_absolute(this->port, position, velocity);
@@ -82,14 +82,14 @@ void DirectMotor::setBrakeMode(pros::motor_brake_mode_e brake_mode) {
 [[nodiscard]] double DirectMotor::getEfficiency() const { return pros::c::motor_get_efficiency(this->port); }
 
 [[nodiscard]] int32_t DirectMotor::getTargetVelocity() const {
-  if (this->targetType != Motor::TargetType::VELOCITY) {
+  if (this->targetType != VELOCITY) {
     logger::error("Requested target velocity while motor is targeting voltage!");
   }
   return this->target;
 }
 
 [[nodiscard]] int32_t DirectMotor::getTargetVoltage() const {
-  if (this->targetType != Motor::TargetType::VOLTAGE) {
+  if (this->targetType != VOLTAGE) {
     logger::error("Requested target voltage while motor is targeting velocity!");
   }
   return this->target;
@@ -130,18 +130,18 @@ void DirectMotor::tare() { pros::c::motor_tare_position(this->port); }
 
 void DirectMotor::brake() {
   this->target = 0;
-  this->targetType = Motor::TargetType::VOLTAGE;
+  this->targetType = VOLTAGE;
   this->targetPosition = std::numeric_limits<double>::infinity();
   pros::c::motor_brake(this->port);
 }
 
 template <uint8_t MOTORS>
-MotorGroup<MOTORS>::MotorGroup(std::array<int8_t, MOTORS> motors, const char *name, pros::motor_gearset_e_t gearset,
-                               pros::motor_brake_mode_e_t brake_mode)
-    : maxVelocity(Motor::gearsetMaxVelocity(gearset)), brakeMode(brake_mode), motors(motors) {
+MotorGroup<MOTORS>::MotorGroup(std::array<int8_t, MOTORS> motors, std::string_view name,
+                               pros::motor_gearset_e_t gearset, pros::motor_brake_mode_e_t brake_mode)
+    : maxVelocity(gearsetMaxVelocity(gearset)), brakeMode(brake_mode), motors(motors) {
   int i = 0;
   for (const auto &port : this->motors) {
-    auto *motor = new DirectMotor(port, fmt::static_string_format("%s%i", name, ++i), false, gearset);
+    auto *motor = new DirectMotor(port, fmt::leak_string_format("{}{}", name, ++i), false, gearset);
     motor->setBrakeMode(brake_mode);
     // leak
   }
@@ -149,15 +149,15 @@ MotorGroup<MOTORS>::MotorGroup(std::array<int8_t, MOTORS> motors, const char *na
 
 template <uint8_t MOTORS> void MotorGroup<MOTORS>::moveVelocity(int16_t velocity) {
   if (velocity > this->maxVelocity) {
-    logger::warn("Target velocity %i is over max velocity %i!", velocity, this->maxVelocity);
+    logger::warn("Target velocity {} is over max velocity {}!", velocity, this->maxVelocity);
     velocity = this->maxVelocity;
   } else if (velocity < -this->maxVelocity) {
-    logger::warn("Target velocity %i is over max velocity -%i!", velocity, this->maxVelocity);
+    logger::warn("Target velocity {} is over max velocity -{}!", velocity, this->maxVelocity);
     velocity = static_cast<int16_t>(-this->maxVelocity);
   }
-  if (this->targetType != Motor::TargetType::VELOCITY || this->target != velocity) {
+  if (this->targetType != VELOCITY || this->target != velocity) {
     this->target = velocity;
-    this->targetType = Motor::TargetType::VELOCITY;
+    this->targetType = VELOCITY;
     this->targetPosition = std::numeric_limits<double>::infinity();
     for (const auto &port : motors) {
       pros::c::motor_move_velocity(port, velocity);
@@ -167,16 +167,16 @@ template <uint8_t MOTORS> void MotorGroup<MOTORS>::moveVelocity(int16_t velocity
 
 template <uint8_t MOTORS> void MotorGroup<MOTORS>::moveMillivolts(int16_t mV) {
   if (mV > MAX_MILLIVOLTS) {
-    logger::warn("Target voltage %imV is over max voltage %imV!", mV, MAX_MILLIVOLTS);
+    logger::warn("Target voltage {}mV is over max voltage {}mV!", mV, MAX_MILLIVOLTS);
     mV = MAX_MILLIVOLTS;
   } else if (mV < -MAX_MILLIVOLTS) {
-    logger::warn("Target voltage %imV is over max voltage -%imV!", mV, MAX_MILLIVOLTS);
+    logger::warn("Target voltage {}mV is over max voltage -{}mV!", mV, MAX_MILLIVOLTS);
     mV = -MAX_MILLIVOLTS;
   }
-  if (this->targetType != Motor::TargetType::VOLTAGE || this->target != mV) {
-    logger::debug("Targeting %imV", mV);
+  if (this->targetType != VOLTAGE || this->target != mV) {
+    logger::debug("Targeting {}mV", mV);
     this->target = mV;
-    this->targetType = Motor::TargetType::VOLTAGE;
+    this->targetType = VOLTAGE;
     this->targetPosition = std::numeric_limits<double>::infinity();
     for (const auto &port : this->motors) {
       pros::c::motor_move_voltage(port, mV);
@@ -187,13 +187,13 @@ template <uint8_t MOTORS> void MotorGroup<MOTORS>::moveMillivolts(int16_t mV) {
 template <uint8_t MOTORS> void MotorGroup<MOTORS>::moveAbsolute(double position, int16_t velocity) {
   velocity = static_cast<int16_t>(std::abs(velocity));
   if (velocity > this->maxVelocity) {
-    logger::warn("Target velocity %i is over max velocity %i!", velocity, this->maxVelocity);
+    logger::warn("Target velocity {} is over max velocity {}!", velocity, this->maxVelocity);
     velocity = this->maxVelocity;
   } else if (velocity == 0) {
     logger::error("Target velocity is zero!");
   }
-  if (this->targetType != Motor::TargetType::VELOCITY || this->target != velocity || this->targetPosition != position) {
-    this->targetType = Motor::TargetType::VELOCITY;
+  if (this->targetType != VELOCITY || this->target != velocity || this->targetPosition != position) {
+    this->targetType = VELOCITY;
     this->target = velocity;
     this->targetPosition = position;
     for (const auto &port : this->motors) {
@@ -220,8 +220,7 @@ template <uint8_t MOTORS> [[nodiscard]] double MotorGroup<MOTORS>::getVelocity()
   double velocity = 0.0;
   uint8_t count = 0;
   for (const auto &port : this->motors) {
-    double vel = pros::c::motor_get_actual_velocity(abs(port));
-    if (error::check(vel)) {
+    if (double vel = pros::c::motor_get_actual_velocity(abs(port)); error::check(vel)) {
       if (port < 0) {
         vel = -vel;
       }
@@ -238,8 +237,7 @@ template <uint8_t MOTORS> [[nodiscard]] double MotorGroup<MOTORS>::getEfficiency
   double efficiency = 0.0;
   uint8_t count = 0;
   for (const auto &port : this->motors) {
-    double eff = pros::c::motor_get_efficiency(port);
-    if (eff != std::numeric_limits<double>::infinity()) {
+    if (const double eff = pros::c::motor_get_efficiency(port); eff != std::numeric_limits<double>::infinity()) {
       efficiency += eff;
       count++;
     }
@@ -251,8 +249,7 @@ template <uint8_t MOTORS> [[nodiscard]] double MotorGroup<MOTORS>::getEfficiency
 
 template <uint8_t MOTORS> [[nodiscard]] int32_t MotorGroup<MOTORS>::getTargetVelocity() const {
   for (const auto &port : this->motors) {
-    int32_t vel = pros::c::motor_get_target_velocity(port);
-    if (vel != std::numeric_limits<int32_t>::max()) {
+    if (const int32_t vel = pros::c::motor_get_target_velocity(port); vel != std::numeric_limits<int32_t>::max()) {
       return vel;
     }
   }
@@ -260,7 +257,7 @@ template <uint8_t MOTORS> [[nodiscard]] int32_t MotorGroup<MOTORS>::getTargetVel
 }
 
 template <uint8_t MOTORS> [[nodiscard]] int32_t MotorGroup<MOTORS>::getTargetVoltage() const {
-  if (this->targetType != Motor::TargetType::VOLTAGE) {
+  if (this->targetType != VOLTAGE) {
     logger::error("Requested target voltage while motor is targeting velocity!");
   }
   return this->target;
@@ -270,8 +267,7 @@ template <uint8_t MOTORS> [[nodiscard]] double MotorGroup<MOTORS>::getPosition()
   double position = 0.0;
   uint8_t count = 0;
   for (const auto &port : this->motors) {
-    double pos = pros::c::motor_get_position(port);
-    if (pos != std::numeric_limits<double>::infinity()) {
+    if (const double pos = pros::c::motor_get_position(port); pos != std::numeric_limits<double>::infinity()) {
       position += pos;
       count++;
     }
@@ -293,8 +289,7 @@ template <uint8_t MOTORS> [[nodiscard]] double MotorGroup<MOTORS>::getTemperatur
   double temperature = 0.0;
   uint8_t count = 0;
   for (const auto &port : this->motors) {
-    double tmp = pros::c::motor_get_temperature(port);
-    if (tmp != std::numeric_limits<double>::infinity()) {
+    if (const double tmp = pros::c::motor_get_temperature(port); tmp != std::numeric_limits<double>::infinity()) {
       temperature += tmp;
       count++;
     }
@@ -308,8 +303,7 @@ template <uint8_t MOTORS> [[nodiscard]] double MotorGroup<MOTORS>::getPower() co
   double power = 0.0;
   uint8_t count = 0;
   for (const auto &port : this->motors) {
-    double pwr = pros::c::motor_get_power(port);
-    if (pwr != std::numeric_limits<double>::infinity()) {
+    if (const double pwr = pros::c::motor_get_power(port); pwr != std::numeric_limits<double>::infinity()) {
       power += pwr;
       count++;
     }
@@ -323,8 +317,7 @@ template <uint8_t MOTORS> [[nodiscard]] double MotorGroup<MOTORS>::getTorque() c
   double torque = 0.0;
   uint8_t count = 0;
   for (const auto &port : this->motors) {
-    double tqe = pros::c::motor_get_torque(port);
-    if (tqe != std::numeric_limits<double>::infinity()) {
+    if (const double tqe = pros::c::motor_get_torque(port); tqe != std::numeric_limits<double>::infinity()) {
       torque += tqe;
       count++;
     }
@@ -338,8 +331,7 @@ template <uint8_t MOTORS> [[nodiscard]] int32_t MotorGroup<MOTORS>::getCurrentDr
   int32_t current = 0;
   uint8_t count = 0;
   for (const auto &port : this->motors) {
-    int32_t cur = pros::c::motor_get_current_draw(port);
-    if (cur != std::numeric_limits<int32_t>::max()) {
+    if (const int32_t cur = pros::c::motor_get_current_draw(port); cur != std::numeric_limits<int32_t>::max()) {
       current += cur;
       count++;
     }
@@ -353,8 +345,7 @@ template <uint8_t MOTORS> [[nodiscard]] int32_t MotorGroup<MOTORS>::getVoltage()
   int32_t voltage = 0;
   uint8_t count = 0;
   for (const auto &port : this->motors) {
-    int32_t vlt = pros::c::motor_get_voltage(port);
-    if (vlt != std::numeric_limits<int32_t>::max()) {
+    if (const int32_t vlt = pros::c::motor_get_voltage(port); vlt != std::numeric_limits<int32_t>::max()) {
       voltage += vlt;
       count++;
     }

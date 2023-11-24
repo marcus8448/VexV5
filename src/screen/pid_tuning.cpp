@@ -18,26 +18,26 @@ void PidTuning::update() {
 
   if (this->testing) {
     if (this->prevError != std::numeric_limits<double>::infinity()) {
-      if ((this->prevError < 0) != (error < 0)) {
+      if (this->prevError < 0 != error < 0) {
         lv_label_set_text(this->oscillationsLabel.get(),
-                          fmt::string_format("Oscillations: %i", this->oscillations++).c_str());
+                          fmt::string_format("Oscillations: {}", this->oscillations++).c_str());
       }
 
       if (this->oscillations == 1) {
         this->overshoot = std::max(this->overshoot, std::abs(error));
-        lv_label_set_text(this->overshootLabel.get(), fmt::string_format("Overshoot: %.4f", this->overshoot).c_str());
+        lv_label_set_text(this->overshootLabel.get(), fmt::string_format("Overshoot: {:.4f}", this->overshoot).c_str());
       }
 
-      lv_label_set_text(this->changeLabel.get(), fmt::string_format("Change: %.4f", error - this->prevError).c_str());
+      lv_label_set_text(this->changeLabel.get(), fmt::string_format("Change: {:.4f}", error - this->prevError).c_str());
     }
   }
 
-  lv_label_set_text(this->errorLabel.get(), fmt::string_format("Error: %.4f", error).c_str());
+  lv_label_set_text(this->errorLabel.get(), fmt::string_format("Error: {:.4f}", error).c_str());
   lv_label_set_text(this->headingLabel.get(),
-                    fmt::string_format("Heading: %.2f", this->robot.drivetrain.imu.getHeading()).c_str());
+                    fmt::string_format("Heading: {:.2f}", this->robot.drivetrain.imu.getHeading()).c_str());
   lv_label_set_text(this->leftPower.get(),
-                    fmt::string_format("PowerL: %.1f", this->robot.drivetrain.leftPID.output).c_str());
-  lv_label_set_text(this->rightPower.get(), fmt::string_format("PowerR: %.1f", this->pid.output).c_str());
+                    fmt::string_format("PowerL: {:.1f}", this->robot.drivetrain.leftPID.output).c_str());
+  lv_label_set_text(this->rightPower.get(), fmt::string_format("PowerR: {:.1f}", this->pid.output).c_str());
   this->prevError = error;
 }
 
@@ -119,8 +119,8 @@ void PidTuning::startTest() {
         this);
   } else {
     if (this->taskHandle != nullptr) {
-      pros::task_state_e_t state = pros::c::task_get_state(this->taskHandle);
-      if (state != pros::E_TASK_STATE_DELETED && state != pros::E_TASK_STATE_INVALID) {
+      if (const pros::task_state_e_t state = pros::c::task_get_state(this->taskHandle);
+          state != pros::E_TASK_STATE_DELETED && state != pros::E_TASK_STATE_INVALID) {
         logger::warn("Ending test early");
         rtos::killTask(this->taskHandle);
         this->robot.drivetrain.brake();
@@ -153,24 +153,24 @@ ControlGroup::ControlGroup(lv_obj_t *screen, lv_coord_t x, lv_coord_t y, lv_coor
   lv_obj_set_pos(this->decreaseBtn.get(), this->x, coord(this->y + splitHeight * 2));
   lv_obj_set_size(this->decreaseBtn.get(), this->width, splitHeight);
 
-  lv_label_set_text(increaseBtnLabel, fmt::string_format("+%.3f", this->delta).c_str());
-  lv_label_set_text(decreaseBtnLabel, fmt::string_format("-%.3f", this->delta).c_str());
+  lv_label_set_text(increaseBtnLabel, fmt::string_format("+{:.3f}", this->delta).c_str());
+  lv_label_set_text(decreaseBtnLabel, fmt::string_format("-{:.3f}", this->delta).c_str());
 
   lv_obj_add_event_cb(this->increaseBtn.get(), increaseValue, LV_EVENT_CLICKED, this);
   lv_obj_add_event_cb(this->decreaseBtn.get(), decreaseValue, LV_EVENT_CLICKED, this);
 }
 
 void ControlGroup::update() {
-  lv_label_set_text(this->valueLabel.get(), fmt::string_format("%.3f", *this->value).c_str());
+  lv_label_set_text(this->valueLabel.get(), fmt::string_format("{:.3f}", *this->value).c_str());
 }
 
 static void increaseValue(lv_event_t *event) {
-  auto &group = *static_cast<ControlGroup *>(event->user_data);
+  const auto &group = *static_cast<ControlGroup *>(event->user_data);
   *group.value += group.delta;
 }
 
 static void decreaseValue(lv_event_t *event) {
-  auto &group = *static_cast<ControlGroup *>(event->user_data);
+  const auto &group = *static_cast<ControlGroup *>(event->user_data);
   *group.value -= group.delta;
 }
 } // namespace screen

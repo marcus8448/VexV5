@@ -6,6 +6,7 @@
 #include "device/motor.hpp"
 #include "device/pid.hpp"
 #include <cstdint>
+#include <memory>
 
 namespace robot {
 /**
@@ -181,7 +182,7 @@ public:
   void updateState();
 
 private:
-  void setTarget(Drivetrain::TargetType type);
+  void setTarget(TargetType type);
 };
 
 [[nodiscard]] const char *driveSchemeName(Drivetrain::ControlScheme scheme);

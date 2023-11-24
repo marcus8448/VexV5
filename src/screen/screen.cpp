@@ -1,7 +1,6 @@
 #include "screen/screen.hpp"
 #include "debug/logger.hpp"
 #include "pros/rtos.h"
-#include "tasks.hpp"
 
 #include "liblvgl/lv_api_map.h"
 
@@ -23,7 +22,7 @@ static lv_obj_t *previousBtn = nullptr;
 static lv_obj_t *nextBtn = nullptr;
 
 static pros::mutex_t mutex = pros::c::mutex_create();
-static robot::Robot *robot;
+static robot::Robot *_robot;
 
 void switch_to_screen(int screen);
 void prev_page([[maybe_unused]] lv_event_t *event);
@@ -31,8 +30,8 @@ void next_page([[maybe_unused]] lv_event_t *event);
 void update();
 void update_task([[maybe_unused]] lv_timer_t *);
 
-void initialize(robot::Robot &bot) {
-  robot = &bot;
+void initialize(robot::Robot &robot) {
+  _robot = &robot;
   lv_theme_default_init(lv_disp_get_default(), LV_THEME_DEFAULT_COLOR_PRIMARY, LV_THEME_DEFAULT_COLOR_SECONDARY,
                         LV_THEME_DEFAULT_DARK, LV_THEME_DEFAULT_FONT_NORMAL);
 
@@ -67,7 +66,7 @@ void switch_to_screen(int screen) {
   screenIndex = screen;
 
   if (screen >= 0 && screen < static_cast<int>(registry.size())) {
-    activeScreen = registry[screen](*robot, lv_scr_act(), WIDTH, HEIGHT);
+    activeScreen = registry[screen](*_robot, lv_scr_act(), WIDTH, HEIGHT);
   }
 
   if (screenIndex > 0) {
@@ -153,7 +152,7 @@ void next_page([[maybe_unused]] lv_event_t *event) {
   logger::endScope();
 }
 
-void LvObjDeleter::operator()(lv_obj_t *obj) { lv_obj_del(obj); }
+void LvObjDeleter::operator()(lv_obj_t *obj) const { lv_obj_del(obj); }
 
 Screen::Screen(robot::Robot &robot, lv_coord_t width, lv_coord_t height) : width(width), height(height), robot(robot) {}
 

@@ -26,8 +26,7 @@ public:
   void update();
 };
 
-class PidTuning : public Screen {
-private:
+class PidTuning final : public Screen {
   robot::device::PID &pid;
 
   ControlGroup Kp;

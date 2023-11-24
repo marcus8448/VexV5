@@ -70,6 +70,7 @@ set(SOURCE_FILES
         src/robot/device/optical.cpp
         src/robot/device/pid.cpp
         src/robot/device/pneumatics.cpp
+        src/robot/catapult.cpp
         src/robot/drivetrain.cpp
         src/robot/intake.cpp
         src/robot/robot.cpp
@@ -91,6 +92,7 @@ set(HEADER_FILES
         include/robot/device/optical.hpp
         include/robot/device/pid.hpp
         include/robot/device/pneumatics.hpp
+        include/robot/catapult.hpp
         include/robot/drivetrain.hpp
         include/robot/intake.hpp
         include/robot/robot.hpp

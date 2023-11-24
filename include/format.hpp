@@ -1,6 +1,7 @@
 #ifndef FORMAT_HPP
 #define FORMAT_HPP
-#include <memory>
+#include <cstring>
+#include <format>
 #include <string>
 
 namespace fmt {
@@ -11,15 +12,8 @@ namespace fmt {
  * @param args The type arguments to insert into the format string.
  * @return The formatted string.
  */
-template <typename... Args> std::string string_format(const char *format, Args... args) {
-  int size_s = snprintf(nullptr, 0, format, args...) + 1; // Extra space for '\0'
-  if (size_s <= 0) {
-    return "format failure";
-  }
-  auto size = static_cast<size_t>(size_s);
-  std::unique_ptr<char[]> buf(new char[size]);
-  snprintf(buf.get(), size, format, args...);
-  return {buf.get(), buf.get() + size - 1}; // We don't want the '\0' inside
+template <typename... Args> std::string string_format(std::format_string<Args...> format, Args &&...args) {
+  return std::vformat(format.get(), std::make_format_args(args...));
 }
 /**
  * Formats a string, similar to printf, but without printing it.
@@ -28,15 +22,12 @@ template <typename... Args> std::string string_format(const char *format, Args..
  * @param args The type arguments to insert into the format string.
  * @return The formatted string.
  */
-template <typename... Args> const char *static_string_format(const char *format, Args... args) {
-  int size_s = snprintf(nullptr, 0, format, args...) + 1; // Extra space for '\0'
-  if (size_s <= 0) {
-    return "format failure";
-  }
-  auto size = static_cast<size_t>(size_s);
-  char *buf = new char[size];
-  snprintf(buf, size, format, args...);
-  return buf;
+template <typename... Args> const char *leak_string_format(const char *format, Args... args) {
+  const std::string str = std::vformat(format, std::make_format_args(args...));
+  char *out = new char[str.length() + 1];
+  str.copy(out, str.length());
+  out[str.length()] = '\0';
+  return out;
 }
 } // namespace fmt
 

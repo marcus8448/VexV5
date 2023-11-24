@@ -1,11 +1,6 @@
 #ifndef ROBOT_DEVICE_PID_HPP
 #define ROBOT_DEVICE_PID_HPP
 
-#include "debug/logger.hpp"
-#include "device.hpp"
-#include "pros/motors.h"
-#include "robot/device/motor.hpp"
-
 namespace robot::device {
 class PID {
 public:

@@ -28,7 +28,7 @@ void Robot::updateDevices() { this->drivetrain.updateState(); }
       logger::error("Controller is null!");
     }
 
-    pros::c::delay(robot::device::TICK_RATE);
+    pros::c::delay(device::TICK_RATE);
   }
 }
 
@@ -36,7 +36,7 @@ void Robot::updateDevices() { this->drivetrain.updateState(); }
   auto &robot = *static_cast<Robot *>(param);
   while (true) {
     robot.updateDevices();
-    pros::c::delay(robot::device::TICK_RATE);
+    pros::c::delay(device::TICK_RATE);
   }
 }
 
@@ -47,7 +47,7 @@ void Robot::runAutonomous() {
 
     pros::task_t task = rtos::createChildTask("Robot async control", autonomousBackground, this);
 
-    logger::info("Running autonomous: '%s'", this->autonomous.c_str());
+    logger::info("Running autonomous: '{}'", this->autonomous.c_str());
     control::autonomous::getPrograms()[this->autonomous](*this);
     rtos::killTask(task);
   } else {

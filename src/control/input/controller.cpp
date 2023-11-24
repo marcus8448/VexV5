@@ -37,15 +37,15 @@ Controller::Controller(pros::controller_id_e_t controller_id) : id(controller_id
 
 [[nodiscard]] double Controller::rightStickY() const { return this->rsY; }
 
-void Controller::setLine(uint8_t line, std::string str) {
-  if (std::equal(text[line].begin(), text[line].end(), str.begin(), str.end())) {
+void Controller::setLine(const uint8_t line, std::string str) {
+  if (std::ranges::equal(text[line], str)) {
     text[line] = str;
     textDirty[line] = true;
   }
 }
 
-void Controller::clearLine(uint8_t line) {
-  if (!text.empty()) {
+void Controller::clearLine(const uint8_t line) {
+  if (!text[line].empty()) {
     text[line] = "";
     textDirty[line] = true;
   }
@@ -209,12 +209,12 @@ void Controller::resetState() {
   this->rsY = 0.0;
 }
 
-bool Controller::get_digital(pros::controller_digital_e_t button) {
+[[nodiscard]] inline bool Controller::get_digital(const pros::controller_digital_e_t button) const {
   return pros::c::controller_get_digital(this->id, button) == 1;
 }
 
-double Controller::get_analog(pros::controller_analog_e_t stick) {
-  double value = pros::c::controller_get_analog(this->id, stick);
+[[nodiscard]] inline double Controller::get_analog(const pros::controller_analog_e_t stick) const {
+  const double value = pros::c::controller_get_analog(this->id, stick);
   if (error::check(value))
     return 0.0;
   return value;

@@ -4,9 +4,9 @@
 #include "device.hpp"
 
 namespace robot::device {
-class Inertial : public Device {
+class Inertial final : public Device {
 public:
-  Inertial(int8_t port, const char *name);
+  Inertial(int8_t port, std::string_view name);
   ~Inertial() override = default;
 
   [[nodiscard]] double getRotation() const;

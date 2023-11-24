@@ -9,8 +9,6 @@
 #include "robot/robot.hpp"
 #pragma GCC diagnostic pop
 #include <functional>
-#include <string>
-#include <type_traits>
 
 #define SCREEN_CB_ADV(TYPE, NAME) [](lv_event_t *event) { static_cast<TYPE *>(event->user_data)->NAME(event); }
 #define SCREEN_CB(TYPE, NAME) [](lv_event_t *event) { static_cast<TYPE *>(event->user_data)->NAME(); }
@@ -19,10 +17,10 @@ namespace screen {
 constexpr lv_coord_t BUTTON_SIZE = 40;
 constexpr uint32_t UPDATE_RATE = 50;
 
-constexpr lv_coord_t coord(int coord) { return static_cast<lv_coord_t>(coord); }
+constexpr lv_coord_t coord(const int coord) { return static_cast<lv_coord_t>(coord); }
 
 struct LvObjDeleter {
-  void operator()(lv_obj_t *obj);
+  void operator()(lv_obj_t *obj) const;
 };
 
 typedef std::unique_ptr<lv_obj_t, LvObjDeleter> lv_obj;

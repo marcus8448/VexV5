@@ -125,16 +125,16 @@ public:
 
   /**
    * Sets the row on the V5 controller to the specified text.
-   * @param row The row to set [0-2].
+   * @param line The row to set [0-2].
    * @param str The text to write.
    */
-  void setLine(uint8_t row, std::string str);
+  void setLine(uint8_t line, std::string str);
 
   /**
    * Blanks the specified row of text on the controller.
-   * @param row The row to blank.
+   * @param line The row to blank.
    */
-  void clearLine(uint8_t row);
+  void clearLine(uint8_t line);
 
   /**
    * Rumbles the controller with a specific pattern. Repeats indefinitely.
@@ -176,8 +176,8 @@ public:
 
 private:
   void resetState();
-  inline bool get_digital(pros::controller_digital_e_t button);
-  inline double get_analog(pros::controller_analog_e_t stick);
+  [[nodiscard]] bool get_digital(pros::controller_digital_e_t button) const;
+  [[nodiscard]] double get_analog(pros::controller_analog_e_t stick) const;
 };
 } // namespace control::input
 

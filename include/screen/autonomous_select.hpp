@@ -5,8 +5,7 @@
 #include "screen.hpp"
 
 namespace screen {
-class AutonomousSelect : public Screen {
-private:
+class AutonomousSelect final : public Screen {
   lv_obj list;
   lv_obj_t *selected = nullptr;
 

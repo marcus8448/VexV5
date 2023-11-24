@@ -25,7 +25,7 @@ public:
 
 template <size_t SIZE> FixedQueue<SIZE>::FixedQueue() = default;
 
-template <size_t SIZE> float FixedQueue<SIZE>::operator[](size_t index) const { return this->get(index); }
+template <size_t SIZE> float FixedQueue<SIZE>::operator[](const size_t index) const { return this->get(index); }
 
 template <size_t SIZE> float FixedQueue<SIZE>::get(size_t index) const {
   return this->values[(this->position + index) % SIZE];

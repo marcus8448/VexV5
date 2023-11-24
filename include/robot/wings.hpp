@@ -8,7 +8,6 @@ namespace robot {
 constexpr uint16_t DEFAULT_WINGS_SPEED = 12000;
 
 class Wings {
-private:
   device::PneumaticPiston left;
   device::PneumaticPiston right;
 
@@ -27,7 +26,6 @@ public:
   void closeRight();
 
   void updateTargeting(control::input::Controller *controller);
-  void updateState();
 };
 } // namespace robot
 #endif // ROBOT_WINGS_HPP

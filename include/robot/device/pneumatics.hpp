@@ -5,12 +5,11 @@
 #include <cstdint>
 
 namespace robot::device {
-class PneumaticPiston : public Device {
-private:
+class PneumaticPiston final : public Device {
   bool extended;
 
 public:
-  explicit PneumaticPiston(int8_t port, const char *name, bool defaultState = false);
+  explicit PneumaticPiston(int8_t port, std::string_view name, bool defaultState = false);
   ~PneumaticPiston() override = default;
 
   void extend();

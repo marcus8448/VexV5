@@ -1,6 +1,5 @@
 #include "screen/chart.hpp"
 #include "format.hpp"
-#include "pros/rtos.h"
 #include "screen/screen.hpp"
 
 namespace screen {
@@ -57,8 +56,8 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
     max = min + 1.0f;
   }
 
-  double heightScale = (height - 17 - 41) / (max - min);
-  double widthScale = width / static_cast<double>(Points);
+  const double heightScale = (height - 17 - 41) / (max - min);
+  const double widthScale = width / static_cast<double>(Points);
 
   lv_coord_t zero = height - (0 - min) * heightScale - 41;
   points[0] = {0, zero};
@@ -66,20 +65,13 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
 
   lv_canvas_draw_line(this->canvas.get(), points.data(), 2, &lineDesc);
 
-  std::string str = fmt::string_format("%f", max);
+  std::string str = fmt::string_format("{}", max);
   lv_canvas_draw_text(this->canvas.get(), 0, 0, 100, &textDesc, str.c_str());
-  str = fmt::string_format("%f", min);
+  str = fmt::string_format("{}", min);
   lv_canvas_draw_text(this->canvas.get(), 40, height - 36, 100, &textDesc, str.c_str());
 
   for (size_t i = 0; i < Sets; ++i) {
     DataSet &set = this->dataSets[i];
-    pros::c::delay(1);
-    if (set.function == nullptr) {
-      //      logger::info("NPTR??");
-      continue;
-    } else {
-      //      logger::info("%p", set.function);
-    }
     float value = set.function(this->robot);
     if (value == std::numeric_limits<float>::infinity()) {
       value = 0;
@@ -88,16 +80,16 @@ template <size_t Sets, size_t Points> void Chart<Sets, Points>::update() {
     this->data[i].add(value);
 
     for (size_t j = 0; j < Points; j++) {
-      points[j].x = coord(width - (j * widthScale));
+      points[j].x = coord(width - j * widthScale);
       points[j].y = coord(height - (this->data[i].get(Points - 1 - j) - min) * heightScale - 41);
     }
 
     textDesc.color = lineDesc.color = set.color;
     lv_canvas_draw_line(this->canvas.get(), points.data(), Points, &lineDesc);
 
-    str = fmt::string_format("%s: %f", set.label, value);
-    lv_canvas_draw_text(this->canvas.get(), 40 + i * ((width - (40 * 2)) / Sets), height - 16,
-                        (width - (40 * 2)) / Sets, &textDesc, str.c_str());
+    str = fmt::string_format("{}: {}", set.label, value);
+    lv_canvas_draw_text(this->canvas.get(), 40 + i * ((width - 40 * 2) / Sets), height - 16, (width - 40 * 2) / Sets,
+                        &textDesc, str.c_str());
   }
 }
 
