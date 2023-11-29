@@ -37,7 +37,7 @@ Controller::Controller(pros::controller_id_e_t controller_id) : id(controller_id
 
 [[nodiscard]] double Controller::rightStickY() const { return this->rsY; }
 
-void Controller::setLine(const uint8_t line, std::string str) {
+void Controller::setLine(const uint8_t line, const std::string &str) {
   if (std::ranges::equal(text[line], str)) {
     text[line] = str;
     textDirty[line] = true;
@@ -46,7 +46,7 @@ void Controller::setLine(const uint8_t line, std::string str) {
 
 void Controller::clearLine(const uint8_t line) {
   if (!text[line].empty()) {
-    text[line] = "";
+    text[line].clear();
     textDirty[line] = true;
   }
 }

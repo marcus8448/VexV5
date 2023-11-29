@@ -3,24 +3,26 @@
 
 #include "control/input/controller.hpp"
 #include "device/motor.hpp"
+#include "device/pid.hpp"
+#include "device/rotation.hpp"
 #include "robot/device/pneumatics.hpp"
 
 namespace robot {
 constexpr uint16_t DEFAULT_CATAPULT_SPEED = 12000;
 
 class Catapult {
-  enum State { RELEASE, HOLD, REPEAT_LAUNCH, SINGLE_LAUNCH } state = RELEASE;
+  enum State { HOLD, REPEAT_LAUNCH, SINGLE_LAUNCH } state = HOLD;
 
   device::DirectMotor motor;
+  device::Rotation rotation;
+  device::PID pid;
   int16_t speed = 0;
 
 public:
-  explicit Catapult(int8_t motorPort);
+  explicit Catapult(int8_t motorPort, int8_t rotationPort);
 
-  void stop();
   void launchOne(uint16_t speed = DEFAULT_CATAPULT_SPEED);
   void launchRepeat(uint16_t speed = DEFAULT_CATAPULT_SPEED);
-  void release();
   void hold();
 
   [[nodiscard]] int16_t getSpeed() const;

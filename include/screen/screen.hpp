@@ -6,8 +6,8 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-enum-enum-conversion"
 #pragma GCC diagnostic ignored "-Wdeprecated-anon-enum-enum-conversion"
 #include "liblvgl/lvgl.h"
-#include "robot/robot.hpp"
 #pragma GCC diagnostic pop
+#include "robot/robot.hpp"
 #include <functional>
 
 #define SCREEN_CB_ADV(TYPE, NAME) [](lv_event_t *event) { static_cast<TYPE *>(event->user_data)->NAME(event); }
@@ -40,10 +40,10 @@ public:
   virtual void update() = 0;
 };
 
+typedef std::function<std::unique_ptr<Screen>(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)> ScreenConstructor;
+
 void initialize(robot::Robot &robot);
-void addScreen(const std::function<std::unique_ptr<Screen>(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width,
-                                                           lv_coord_t height)> &screen);
-void removeScreen(const std::function<std::unique_ptr<Screen>(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width,
-                                                              lv_coord_t height)> &screen);
+void addScreen(const ScreenConstructor &screen);
+void removeScreen(const ScreenConstructor &screen);
 } // namespace screen
 #endif // SCREEN_SCREEN_HPP

@@ -1,0 +1,13 @@
+target_compile_definitions(HotPackage PRIVATE
+        DRIVETRAIN_MOTOR_L1=10
+        DRIVETRAIN_MOTOR_L2=9
+        DRIVETRAIN_MOTOR_L3=8
+        DRIVETRAIN_MOTOR_R1=1
+        DRIVETRAIN_MOTOR_R2=2
+        DRIVETRAIN_MOTOR_R3=3
+        DRIVETRAIN_IMU=6
+        CATAPULT_MOTOR=4
+        CATAPULT_ROTATION=5
+        WING_LEFT='A'
+        WING_RIGHT='B'
+)

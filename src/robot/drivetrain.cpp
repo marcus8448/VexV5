@@ -140,13 +140,13 @@ void Drivetrain::updateTargeting(control::input::Controller *controller) {
     if (this->operatorPower > device::Motor::MAX_MILLIVOLTS) {
       this->operatorPower = device::Motor::MAX_MILLIVOLTS;
     }
-    controller->setLine(0, fmt::string_format("Power: {}", this->operatorPower));
+    controller->setLine(0, std::format("Power: {}", this->operatorPower));
   } else if (controller->r2Pressed()) {
     this->operatorPower -= 10;
     if (this->operatorPower < -device::Motor::MAX_MILLIVOLTS) {
       this->operatorPower = -device::Motor::MAX_MILLIVOLTS;
     }
-    controller->setLine(0, fmt::string_format("Power: {}", this->operatorPower));
+    controller->setLine(0, std::format("Power: {}", this->operatorPower));
   }
   if (this->controlScheme == ARCADE) {
     double power = controller->leftStickY();

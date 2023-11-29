@@ -2,21 +2,16 @@
 #include "debug/logger.hpp"
 #include "pros/rtos.h"
 
-#include "liblvgl/lv_api_map.h"
-
 #include <vector>
 
 namespace screen {
 constexpr lv_coord_t WIDTH = 480;
 constexpr lv_coord_t HEIGHT = 240;
 
-static std::vector<
-    std::function<std::unique_ptr<Screen>(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)>>
-    registry = std::vector<std::function<std::unique_ptr<Screen>(robot::Robot &robot, lv_obj_t *screen,
-                                                                 lv_coord_t width, lv_coord_t height)>>();
+static std::vector<ScreenConstructor> registry = std::vector<ScreenConstructor>();
 
 static std::unique_ptr<Screen> activeScreen;
-static int screenIndex = -1;
+static size_t screenIndex = std::numeric_limits<size_t>::max();
 
 static lv_obj_t *previousBtn = nullptr;
 static lv_obj_t *nextBtn = nullptr;
@@ -24,7 +19,7 @@ static lv_obj_t *nextBtn = nullptr;
 static pros::mutex_t mutex = pros::c::mutex_create();
 static robot::Robot *_robot;
 
-void switch_to_screen(int screen);
+void switch_to_screen(size_t screen);
 void prev_page([[maybe_unused]] lv_event_t *event);
 void next_page([[maybe_unused]] lv_event_t *event);
 void update();
@@ -47,7 +42,7 @@ void initialize(robot::Robot &robot) {
 
   if (registry.empty()) {
     logger::info("no screens!");
-    switch_to_screen(-1);
+    switch_to_screen(std::numeric_limits<size_t>::max());
   } else {
     switch_to_screen(0);
   }
@@ -56,7 +51,7 @@ void initialize(robot::Robot &robot) {
   lv_timer_set_repeat_count(timer, -1);
 }
 
-void switch_to_screen(int screen) {
+void switch_to_screen(const size_t screen) {
   while (!pros::c::mutex_take(mutex, 1000)) {
     pros::c::delay(5);
   }
@@ -65,18 +60,18 @@ void switch_to_screen(int screen) {
 
   screenIndex = screen;
 
-  if (screen >= 0 && screen < static_cast<int>(registry.size())) {
+  if (screen != std::numeric_limits<size_t>::max() && screen < registry.size()) {
     activeScreen = registry[screen](*_robot, lv_scr_act(), WIDTH, HEIGHT);
   }
 
-  if (screenIndex > 0) {
+  if (screen != std::numeric_limits<size_t>::max() && screenIndex > 0) {
     lv_obj_clear_flag(previousBtn, LV_OBJ_FLAG_HIDDEN);
     lv_obj_move_foreground(previousBtn);
   } else {
     lv_obj_add_flag(previousBtn, LV_OBJ_FLAG_HIDDEN);
   }
 
-  if (screenIndex + 1 < static_cast<int>(registry.size())) {
+  if (screen != std::numeric_limits<size_t>::max() && screenIndex + 1 < registry.size()) {
     lv_obj_clear_flag(nextBtn, LV_OBJ_FLAG_HIDDEN);
     lv_obj_move_foreground(nextBtn);
   } else {
@@ -94,8 +89,7 @@ void update() {
   }
 }
 
-void addScreen(const std::function<std::unique_ptr<Screen>(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width,
-                                                           lv_coord_t height)> &screen) {
+void addScreen(const ScreenConstructor &screen) {
   while (!pros::c::mutex_take(mutex, 1000)) {
     pros::c::delay(5);
   }
@@ -103,41 +97,40 @@ void addScreen(const std::function<std::unique_ptr<Screen>(robot::Robot &robot, 
   registry.emplace_back(screen);
 
   if (nextBtn != nullptr) {
-    if (screenIndex + 2 == static_cast<int>(registry.size())) {
+    if (screenIndex + 2 == registry.size()) {
       lv_obj_clear_flag(nextBtn, LV_OBJ_FLAG_HIDDEN);
       lv_obj_move_foreground(nextBtn);
     }
 
-    if (screenIndex == -1) {
+    if (screenIndex == std::numeric_limits<size_t>::max()) {
       switch_to_screen(0);
     }
   }
   pros::c::mutex_give(mutex);
 }
 
-void removeScreen(const std::function<std::unique_ptr<Screen>(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width,
-                                                              lv_coord_t height)> &screen) {
-  //  while (!pros::c::mutex_take(mutex, 1000)) {
-  //    pros::c::delay(5);
-  //  }
+void removeScreen(const ScreenConstructor &screen) {
+  // while (!pros::c::mutex_take(mutex, 1000)) {
+  //   pros::c::delay(5);
+  // }
   //
-  //  int index = std::find(registry.begin(), registry.end(), screen) - registry.begin();
-  //  if (screenIndex == index) {
-  //    if (index + 1 == static_cast<int>(registry.size())) {
-  //      switch_to_screen(--screenIndex);
-  //    } else {
-  //      switch_to_screen(screenIndex + 1);
-  //    }
-  //  } else if (index < screenIndex) {
-  //    screenIndex--;
-  //  }
+  // int index = std::find(registry.begin(), registry.end(), screen) - registry.begin();
+  // if (screenIndex == index) {
+  //   if (index + 1 == registry.size()) {
+  //     switch_to_screen(--screenIndex);
+  //   } else {
+  //     switch_to_screen(screenIndex + 1);
+  //   }
+  // } else if (index < screenIndex) {
+  //   screenIndex--;
+  // }
   //
-  //  if (screenIndex == 0) {
-  //    lv_obj_add_flag(previousBtn, LV_OBJ_FLAG_HIDDEN);
-  //  }
+  // if (screenIndex == 0) {
+  //   lv_obj_add_flag(previousBtn, LV_OBJ_FLAG_HIDDEN);
+  // }
   //
-  //  registry.erase(std::remove(registry.begin(), registry.end(), &screen), registry.end());
-  //  pros::c::mutex_give(mutex);
+  // std::erase(registry, &screen);
+  // pros::c::mutex_give(mutex);
 }
 
 void prev_page([[maybe_unused]] lv_event_t *event) {
@@ -154,7 +147,7 @@ void next_page([[maybe_unused]] lv_event_t *event) {
 
 void LvObjDeleter::operator()(lv_obj_t *obj) const { lv_obj_del(obj); }
 
-Screen::Screen(robot::Robot &robot, lv_coord_t width, lv_coord_t height) : width(width), height(height), robot(robot) {}
+Screen::Screen(robot::Robot &robot, const lv_coord_t width, const lv_coord_t height) : width(width), height(height), robot(robot) {}
 
 Screen::~Screen() = default;
 } // namespace screen

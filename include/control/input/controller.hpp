@@ -128,7 +128,7 @@ public:
    * @param line The row to set [0-2].
    * @param str The text to write.
    */
-  void setLine(uint8_t line, std::string str);
+  void setLine(uint8_t line, const std::string &str);
 
   /**
    * Blanks the specified row of text on the controller.

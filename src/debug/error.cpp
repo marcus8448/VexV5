@@ -9,11 +9,11 @@ void print(std::string_view name) {
   logger::error("{}: Error {}", name, errno); // print the error
 }
 
-bool check(float val) { return val == DOUBLE; }
+bool check(const float val) { return val == FLOATING; }
 
-bool check(double val) { return val == DOUBLE; }
+bool check(const double val) { return val == DOUBLE; }
 
-bool check(int32_t val) { return val == INTEGER; }
+bool check(const int32_t val) { return val == INTEGER; }
 
 bool isDisconnected() { return errno == ENODEV; }
 } // namespace error

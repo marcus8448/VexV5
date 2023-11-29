@@ -18,7 +18,7 @@ public:
 
   [[nodiscard]] float get(size_t index) const;
   void add(float value);
-  [[nodiscard]] constexpr size_t size() const;
+  [[nodiscard]] static constexpr size_t size();
 
   void clear();
 };
@@ -62,7 +62,7 @@ template <size_t SIZE> void FixedQueue<SIZE>::add(float value) {
   }
 }
 
-template <size_t SIZE> constexpr size_t FixedQueue<SIZE>::size() const { return SIZE; }
+template <size_t SIZE> constexpr size_t FixedQueue<SIZE>::size() { return SIZE; }
 
 template <size_t SIZE> void FixedQueue<SIZE>::clear() {
   this->position = 0;

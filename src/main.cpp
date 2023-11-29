@@ -26,18 +26,6 @@
 #include "screen/pid_tuning.hpp"
 #endif
 
-// CONFIG
-#define DRIVETRAIN_MOTOR_L1 10
-#define DRIVETRAIN_MOTOR_L2 9
-#define DRIVETRAIN_MOTOR_L3 8
-#define DRIVETRAIN_MOTOR_R1 1
-#define DRIVETRAIN_MOTOR_R2 2
-#define DRIVETRAIN_MOTOR_R3 3
-#define DRIVETRAIN_IMU 6
-#define WING_LEFT 'A'
-#define WING_RIGHT 'B'
-// END CONFIG
-
 using namespace robot;
 
 Robot &getRobot();
@@ -184,7 +172,7 @@ void disabled() {
  */
 Robot &getRobot() {
   static Robot robot = Robot(DRIVETRAIN_MOTOR_L1, DRIVETRAIN_MOTOR_L2, DRIVETRAIN_MOTOR_L3, DRIVETRAIN_MOTOR_R1,
-                             DRIVETRAIN_MOTOR_R2, DRIVETRAIN_MOTOR_R3, WING_LEFT, WING_RIGHT, DRIVETRAIN_IMU);
+                             DRIVETRAIN_MOTOR_R2, DRIVETRAIN_MOTOR_R3, WING_LEFT, WING_RIGHT, DRIVETRAIN_IMU, CATAPULT_MOTOR, CATAPULT_ROTATION);
   device::initialize();
   return robot;
 }

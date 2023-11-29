@@ -70,6 +70,7 @@ set(SOURCE_FILES
         src/robot/device/optical.cpp
         src/robot/device/pid.cpp
         src/robot/device/pneumatics.cpp
+        src/robot/device/rotation.cpp
         src/robot/catapult.cpp
         src/robot/drivetrain.cpp
         src/robot/intake.cpp
@@ -91,7 +92,7 @@ set(HEADER_FILES
         include/robot/device/motor.hpp
         include/robot/device/optical.hpp
         include/robot/device/pid.hpp
-        include/robot/device/pneumatics.hpp
+        include/robot/device/rotation.hpp
         include/robot/catapult.hpp
         include/robot/drivetrain.hpp
         include/robot/intake.hpp
@@ -157,6 +158,8 @@ target_include_directories(HotPackage PRIVATE include)
 target_link_directories(HotPackage PRIVATE firmware)
 target_include_directories(MonolithPackage PRIVATE include)
 target_link_directories(MonolithPackage PRIVATE firmware)
+
+include(Ports.cmake)
 
 if (ProsCLI)
     add_custom_target(Upload DEPENDS HotPackage COMMAND ${ProsCLI} upload --slot 1)

@@ -1,7 +1,6 @@
 #include "screen/pid_tuning.hpp"
 
 #include "debug/logger.hpp"
-#include "format.hpp"
 #include "main.hpp"
 #include "tasks.hpp"
 
@@ -19,25 +18,24 @@ void PidTuning::update() {
   if (this->testing) {
     if (this->prevError != std::numeric_limits<double>::infinity()) {
       if (this->prevError < 0 != error < 0) {
-        lv_label_set_text(this->oscillationsLabel.get(),
-                          fmt::string_format("Oscillations: {}", this->oscillations++).c_str());
+        lv_label_set_text_fmt(this->oscillationsLabel.get(), "Oscillations: %i", this->oscillations++);
       }
 
       if (this->oscillations == 1) {
         this->overshoot = std::max(this->overshoot, std::abs(error));
-        lv_label_set_text(this->overshootLabel.get(), fmt::string_format("Overshoot: {:.4f}", this->overshoot).c_str());
+        lv_label_set_text_fmt(this->overshootLabel.get(), "Overshoot: %.4f", this->overshoot);
       }
 
-      lv_label_set_text(this->changeLabel.get(), fmt::string_format("Change: {:.4f}", error - this->prevError).c_str());
+      lv_label_set_text_fmt(this->changeLabel.get(), "Change: %.4f", error - this->prevError);
     }
   }
 
-  lv_label_set_text(this->errorLabel.get(), fmt::string_format("Error: {:.4f}", error).c_str());
-  lv_label_set_text(this->headingLabel.get(),
-                    fmt::string_format("Heading: {:.2f}", this->robot.drivetrain.imu.getHeading()).c_str());
-  lv_label_set_text(this->leftPower.get(),
-                    fmt::string_format("PowerL: {:.1f}", this->robot.drivetrain.leftPID.output).c_str());
-  lv_label_set_text(this->rightPower.get(), fmt::string_format("PowerR: {:.1f}", this->pid.output).c_str());
+  lv_label_set_text_fmt(this->errorLabel.get(), "Error: %.4f", error);
+  lv_label_set_text_fmt(this->headingLabel.get(),
+                    "Heading: %.2f", this->robot.drivetrain.imu.getHeading());
+  lv_label_set_text_fmt(this->leftPower.get(),
+                    "PowerL: %.1f", this->robot.drivetrain.leftPID.output);
+  lv_label_set_text_fmt(this->rightPower.get(), "PowerR: %.1f", this->pid.output);
   this->prevError = error;
 }
 
@@ -54,7 +52,7 @@ PidTuning::PidTuning(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv
       runName(runName) {
 
   lv_obj_t *testLabel = lv_label_create(this->testBtn.get());
-  lv_label_set_text(testLabel, "Test");
+  lv_label_set_text_static(testLabel, "Test");
   lv_obj_set_style_text_font(testLabel, LV_THEME_DEFAULT_FONT_TITLE, LV_STATE_ANY);
   lv_obj_set_align(testLabel, LV_ALIGN_CENTER);
 
@@ -70,14 +68,14 @@ PidTuning::PidTuning(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv
   lv_obj_set_pos(this->leftPower.get(), coord(width / 2), 80);
   lv_obj_set_pos(this->rightPower.get(), coord(width / 2), 96);
 
-  lv_label_set_text(this->errorLabel.get(), "Error: ?");
+  lv_label_set_text_static(this->errorLabel.get(), "Error: ?");
 
-  lv_label_set_text(this->changeLabel.get(), "Change: ?");
-  lv_label_set_text(this->overshootLabel.get(), "Overshoot: ?");
-  lv_label_set_text(this->oscillationsLabel.get(), "Oscillations: ?");
-  lv_label_set_text(this->headingLabel.get(), "Heading: ?");
-  lv_label_set_text(this->leftPower.get(), "PowerL: ?");
-  lv_label_set_text(this->rightPower.get(), "PowerR: ?");
+  lv_label_set_text_static(this->changeLabel.get(), "Change: ?");
+  lv_label_set_text_static(this->overshootLabel.get(), "Overshoot: ?");
+  lv_label_set_text_static(this->oscillationsLabel.get(), "Oscillations: ?");
+  lv_label_set_text_static(this->headingLabel.get(), "Heading: ?");
+  lv_label_set_text_static(this->leftPower.get(), "PowerL: ?");
+  lv_label_set_text_static(this->rightPower.get(), "PowerR: ?");
 }
 
 // PidTuning::~PidTuning() {
@@ -153,15 +151,15 @@ ControlGroup::ControlGroup(lv_obj_t *screen, lv_coord_t x, lv_coord_t y, lv_coor
   lv_obj_set_pos(this->decreaseBtn.get(), this->x, coord(this->y + splitHeight * 2));
   lv_obj_set_size(this->decreaseBtn.get(), this->width, splitHeight);
 
-  lv_label_set_text(increaseBtnLabel, fmt::string_format("+{:.3f}", this->delta).c_str());
-  lv_label_set_text(decreaseBtnLabel, fmt::string_format("-{:.3f}", this->delta).c_str());
+  lv_label_set_text_fmt(increaseBtnLabel, "+%.3f", this->delta);
+  lv_label_set_text_fmt(decreaseBtnLabel, "-%.3f", this->delta);
 
   lv_obj_add_event_cb(this->increaseBtn.get(), increaseValue, LV_EVENT_CLICKED, this);
   lv_obj_add_event_cb(this->decreaseBtn.get(), decreaseValue, LV_EVENT_CLICKED, this);
 }
 
 void ControlGroup::update() {
-  lv_label_set_text(this->valueLabel.get(), fmt::string_format("{:.3f}", *this->value).c_str());
+  lv_label_set_text_fmt(this->valueLabel.get(), "%.3f", *this->value);
 }
 
 static void increaseValue(lv_event_t *event) {

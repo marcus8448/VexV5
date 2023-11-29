@@ -139,11 +139,10 @@ template <uint8_t MOTORS>
 MotorGroup<MOTORS>::MotorGroup(std::array<int8_t, MOTORS> motors, std::string_view name,
                                pros::motor_gearset_e_t gearset, pros::motor_brake_mode_e_t brake_mode)
     : maxVelocity(gearsetMaxVelocity(gearset)), brakeMode(brake_mode), motors(motors) {
-  int i = 0;
   for (const auto &port : this->motors) {
-    auto *motor = new DirectMotor(port, fmt::leak_string_format("{}{}", name, ++i), false, gearset);
-    motor->setBrakeMode(brake_mode);
     // leak
+    auto *motor = new DirectMotor(port, name, false, gearset);
+    motor->setBrakeMode(brake_mode);
   }
 }
 
@@ -152,7 +151,7 @@ template <uint8_t MOTORS> void MotorGroup<MOTORS>::moveVelocity(int16_t velocity
     logger::warn("Target velocity {} is over max velocity {}!", velocity, this->maxVelocity);
     velocity = this->maxVelocity;
   } else if (velocity < -this->maxVelocity) {
-    logger::warn("Target velocity {} is over max velocity -{}!", velocity, this->maxVelocity);
+    logger::warn("Target velocity {} is over max velocity {}!", velocity, -this->maxVelocity);
     velocity = static_cast<int16_t>(-this->maxVelocity);
   }
   if (this->targetType != VELOCITY || this->target != velocity) {
@@ -170,7 +169,7 @@ template <uint8_t MOTORS> void MotorGroup<MOTORS>::moveMillivolts(int16_t mV) {
     logger::warn("Target voltage {}mV is over max voltage {}mV!", mV, MAX_MILLIVOLTS);
     mV = MAX_MILLIVOLTS;
   } else if (mV < -MAX_MILLIVOLTS) {
-    logger::warn("Target voltage {}mV is over max voltage -{}mV!", mV, MAX_MILLIVOLTS);
+    logger::warn("Target voltage {}mV is over max voltage {}mV!", mV, -MAX_MILLIVOLTS);
     mV = -MAX_MILLIVOLTS;
   }
   if (this->targetType != VOLTAGE || this->target != mV) {

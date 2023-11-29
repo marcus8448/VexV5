@@ -1,8 +1,6 @@
 #ifndef DEBUG_LOGGER_HPP
 #define DEBUG_LOGGER_HPP
 
-#include "format.hpp"
-
 #ifdef ENABLE_TIMERS
 // ReSharper disable once CppUnusedIncludeDirective
 #include "pros/rtos.h"
@@ -14,6 +12,8 @@
 #define endTiming(name)                                                                                                \
   {}
 #endif
+#include <format>
+#include <string_view>
 
 namespace logger {
 

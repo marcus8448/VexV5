@@ -6,13 +6,16 @@
 
 namespace robot {
 Robot::Robot(int8_t driveL1, int8_t driveL2, int8_t driveL3, int8_t driveR1, int8_t driveR2, int8_t driveR3,
-             int8_t wingsL, int8_t wingsR, int8_t inertial)
+             int8_t wingsL, int8_t wingsR, int8_t inertial, int8_t catapult, int8_t catapultR)
     : drivetrain(driveL1, driveL2, driveL3, driveR1, driveR2, driveR3, inertial), wings(wingsL, wingsR),
-      controller(nullptr) {}
+      catapult(catapult, catapultR), controller(nullptr) {}
 
 Robot::~Robot() { logger::error("Robot destructor called"); }
 
-void Robot::updateDevices() { this->drivetrain.updateState(); }
+void Robot::updateDevices() {
+  this->drivetrain.updateState();
+  this->catapult.updateState();
+}
 
 [[noreturn]] void Robot::opcontrol() {
   this->drivetrain.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
@@ -24,6 +27,7 @@ void Robot::updateDevices() { this->drivetrain.updateState(); }
       this->controller->update();
       this->drivetrain.updateTargeting(this->controller.get());
       //      this->wings.updateTargeting(this->controller.get());
+      this->catapult.updateTargeting(this->controller.get());
     } else {
       logger::error("Controller is null!");
     }
@@ -45,7 +49,7 @@ void Robot::runAutonomous() {
     this->drivetrain.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
     this->drivetrain.tare();
 
-    pros::task_t task = rtos::createChildTask("Robot async control", autonomousBackground, this);
+    const pros::task_t task = rtos::createChildTask("Robot async control", autonomousBackground, this);
 
     logger::info("Running autonomous: '{}'", this->autonomous.c_str());
     control::autonomous::getPrograms()[this->autonomous](*this);
