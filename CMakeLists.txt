@@ -79,26 +79,26 @@ set(SOURCE_FILES
 )
 
 set(HEADER_FILES
-        include/filesystem.hpp
-        include/format.hpp
-        include/main.hpp
-        include/tasks.hpp
-        include/units.hpp
-        include/debug/error.hpp
-        include/debug/logger.hpp
-        include/control/input/controller.hpp
-        include/robot/device/device.hpp
-        include/robot/device/inertial.hpp
-        include/robot/device/motor.hpp
-        include/robot/device/optical.hpp
-        include/robot/device/pid.hpp
-        include/robot/device/rotation.hpp
-        include/robot/catapult.hpp
-        include/robot/drivetrain.hpp
-        include/robot/intake.hpp
-        include/robot/robot.hpp
-        include/robot/wings.hpp
-        include/structure/fixed_queue.hpp
+        src/filesystem.hpp
+        src/format.hpp
+        src/main.hpp
+        src/tasks.hpp
+        src/units.hpp
+        src/debug/error.hpp
+        src/debug/logger.hpp
+        src/control/input/controller.hpp
+        src/robot/device/device.hpp
+        src/robot/device/inertial.hpp
+        src/robot/device/motor.hpp
+        src/robot/device/optical.hpp
+        src/robot/device/pid.hpp
+        src/robot/device/rotation.hpp
+        src/robot/catapult.hpp
+        src/robot/drivetrain.hpp
+        src/robot/intake.hpp
+        src/robot/robot.hpp
+        src/robot/wings.hpp
+        src/structure/fixed_queue.hpp
 )
 
 if (NOT DISABLE_SCREEN)
@@ -112,12 +112,12 @@ if (NOT DISABLE_SCREEN)
     )
 
     set(HEADER_FILES ${HEADER_FILES}
-            include/screen/autonomous_select.hpp
-            include/screen/chart.hpp
-            include/screen/config_screen.hpp
-            include/screen/information.hpp
-            include/screen/pid_tuning.hpp
-            include/screen/screen.hpp
+            src/screen/autonomous_select.hpp
+            src/screen/chart.hpp
+            src/screen/config_screen.hpp
+            src/screen/information.hpp
+            src/screen/pid_tuning.hpp
+            src/screen/screen.hpp
     )
 endif()
 
@@ -130,10 +130,10 @@ if (NOT DISABLE_AUTONOMOUS)
     )
 
     set(HEADER_FILES ${HEADER_FILES}
-            include/control/autonomous/autonomous.hpp
-            include/control/autonomous/score.hpp
-            include/control/autonomous/skills.hpp
-            include/control/autonomous/winpoint.hpp
+            src/control/autonomous/autonomous.hpp
+            src/control/autonomous/score.hpp
+            src/control/autonomous/skills.hpp
+            src/control/autonomous/winpoint.hpp
     )
 endif()
 
