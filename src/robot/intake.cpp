@@ -1,4 +1,4 @@
-#include "robot/intake.hpp"
+#include "intake.hpp"
 
 namespace robot {
 Intake::Intake(int8_t motorPort) : motor(device::DirectMotor(motorPort, "Intake")) {}

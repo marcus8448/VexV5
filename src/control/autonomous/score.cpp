@@ -1,4 +1,4 @@
-#include "control/autonomous/score.hpp"
+#include "score.hpp"
 
 namespace control::autonomous {
 void leftScore(Robot &robot) {

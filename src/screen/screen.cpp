@@ -1,4 +1,4 @@
-#include "screen/screen.hpp"
+#include "screen.hpp"
 #include "debug/logger.hpp"
 #include "pros/rtos.h"
 

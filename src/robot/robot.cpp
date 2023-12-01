@@ -1,4 +1,4 @@
-#include "robot/robot.hpp"
+#include "robot.hpp"
 #include "control/autonomous/autonomous.hpp"
 #include "debug/logger.hpp"
 #include "pros/rtos.h"

@@ -1,4 +1,4 @@
-#include "control/autonomous/winpoint.hpp"
+#include "winpoint.hpp"
 
 namespace control::autonomous {
 void leftWinpoint(Robot &robot) {}

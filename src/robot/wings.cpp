@@ -1,4 +1,4 @@
-#include "robot/wings.hpp"
+#include "wings.hpp"
 
 namespace robot {
 Wings::Wings(int8_t leftPneumatic, int8_t rightPneumatic)

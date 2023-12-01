@@ -48,12 +48,13 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 11)
 
 # Warnings
-add_compile_options(-Wall -Wno-psabi -Wno-shadow-field-in-constructor)
+add_compile_options(-Wall -Wno-psabi -Wno-shadow-field-in-constructor -Wno-parentheses)
+add_link_options(-Wall -Wno-psabi -Wno-shadow-field-in-constructor -Wno-parentheses)
 
 add_compile_options(-g -ffunction-sections -fdata-sections -fdiagnostics-color -funwind-tables -fno-exceptions)
 add_compile_definitions(_POSIX_THREADS _UNIX98_THREAD_MUTEX_ATTRIBUTES _POSIX_TIMERS _POSIX_MONOTONIC_CLOCK)
 
-set(ColdLibraries ${LibC} ${LibM} ${LibPROS} ${LibLVGL})
+set(ColdLibraries ${LibC} ${LibM} ${LibPROS} ${LibLVGL} gcc)
 set(HotLinked ${LibC},${LibM},${LibPROS},${LibLVGL})
 set(ExportedLibraries ${LibPROS},${LibLVGL})
 
@@ -68,7 +69,7 @@ set(SOURCE_FILES
         src/robot/device/inertial.cpp
         src/robot/device/motor.cpp
         src/robot/device/optical.cpp
-        src/robot/device/pid.cpp
+        src/control/pid.cpp
         src/robot/device/pneumatics.cpp
         src/robot/device/rotation.cpp
         src/robot/catapult.cpp
@@ -80,7 +81,6 @@ set(SOURCE_FILES
 
 set(HEADER_FILES
         src/filesystem.hpp
-        src/format.hpp
         src/main.hpp
         src/tasks.hpp
         src/units.hpp
@@ -91,7 +91,7 @@ set(HEADER_FILES
         src/robot/device/inertial.hpp
         src/robot/device/motor.hpp
         src/robot/device/optical.hpp
-        src/robot/device/pid.hpp
+        src/control/pid.hpp
         src/robot/device/rotation.hpp
         src/robot/catapult.hpp
         src/robot/drivetrain.hpp
@@ -154,9 +154,9 @@ if (ENABLE_LTO)
     set_property(TARGET MonolithPackage PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
-target_include_directories(HotPackage PRIVATE include)
+target_include_directories(HotPackage PRIVATE include src)
 target_link_directories(HotPackage PRIVATE firmware)
-target_include_directories(MonolithPackage PRIVATE include)
+target_include_directories(MonolithPackage PRIVATE include src)
 target_link_directories(MonolithPackage PRIVATE firmware)
 
 include(Ports.cmake)

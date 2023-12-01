@@ -1,4 +1,4 @@
-#include "control/input/controller.hpp"
+#include "controller.hpp"
 #include "debug/error.hpp"
 #include "debug/logger.hpp"
 

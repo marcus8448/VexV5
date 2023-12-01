@@ -1,4 +1,4 @@
-#include "debug/error.hpp"
+#include "error.hpp"
 #include "debug/logger.hpp"
 #include <cerrno>
 

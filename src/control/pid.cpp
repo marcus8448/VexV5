@@ -1,7 +1,7 @@
-#include "robot/device/pid.hpp"
-#include "debug/error.hpp"
-#include "debug/logger.hpp"
-#include "robot/device/motor.hpp"
+#include "pid.hpp"
+#include "../debug/error.hpp"
+#include "../debug/logger.hpp"
+#include "../robot/device/motor.hpp"
 
 #include <cmath>
 

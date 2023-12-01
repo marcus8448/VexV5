@@ -1,4 +1,4 @@
-#include "screen/information.hpp"
+#include "information.hpp"
 #include "debug/logger.hpp"
 
 namespace screen {

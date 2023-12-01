@@ -1,4 +1,4 @@
-#include "debug/logger.hpp"
+#include "logger.hpp"
 #include "pros/rtos.h"
 
 #include <cstring>

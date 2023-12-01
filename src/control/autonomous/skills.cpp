@@ -1,4 +1,4 @@
-#include "control/autonomous/skills.hpp"
+#include "skills.hpp"
 #include "debug/logger.hpp"
 
 namespace control::autonomous {

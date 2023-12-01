@@ -1,4 +1,4 @@
-#include "robot/device/motor.hpp"
+#include "motor.hpp"
 #include "debug/error.hpp"
 #include "debug/logger.hpp"
 #include "pros/motors.h"

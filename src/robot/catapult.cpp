@@ -1,4 +1,4 @@
-#include "robot/catapult.hpp"
+#include "catapult.hpp"
 
 #include "debug/logger.hpp"
 

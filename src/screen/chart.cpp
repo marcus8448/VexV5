@@ -1,4 +1,4 @@
-#include "screen/chart.hpp"
+#include "chart.hpp"
 #include "screen/screen.hpp"
 
 #include <format>

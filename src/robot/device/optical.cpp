@@ -1,6 +1,6 @@
+#include "optical.hpp"
 #include "pros/optical.h"
 #include "debug/error.hpp"
-#include "robot/device/optical.hpp"
 
 namespace robot::device {
 Optical::Optical(int8_t port, std::string_view name, uint8_t led_pwm, bool gesture)

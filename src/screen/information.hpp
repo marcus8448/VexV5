@@ -5,7 +5,7 @@
 #include "screen.hpp"
 
 namespace screen {
-constexpr size_t INFO_COLUMNS = 12;
+constexpr int INFO_COLUMNS = 12;
 
 class Information final : public Screen {
   std::array<lv_obj, INFO_COLUMNS> leftColumn = {};

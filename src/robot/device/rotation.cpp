@@ -1,4 +1,4 @@
-#include "robot/device/rotation.hpp"
+#include "rotation.hpp"
 #include "debug/error.hpp"
 #include "debug/logger.hpp"
 #include "pros/rotation.h"

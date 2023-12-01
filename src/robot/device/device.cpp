@@ -1,4 +1,4 @@
-#include "robot/device/device.hpp"
+#include "device.hpp"
 #include "debug/logger.hpp"
 #include "pros/rtos.h"
 #include "tasks.hpp"

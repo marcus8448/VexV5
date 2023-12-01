@@ -1,4 +1,4 @@
-#include "screen/config_screen.hpp"
+#include "config_screen.hpp"
 
 namespace screen {
 ConfigurationScreen::ConfigurationScreen(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)

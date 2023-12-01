@@ -1,4 +1,4 @@
-#include "robot/device/pneumatics.hpp"
+#include "pneumatics.hpp"
 #include "debug/error.hpp"
 #include "pros/adi.h"
 
