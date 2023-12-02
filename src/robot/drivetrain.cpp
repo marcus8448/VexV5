@@ -1,4 +1,5 @@
 #include "drivetrain.hpp"
+#include "config/tuning.hpp"
 #include "debug/logger.hpp"
 #include "pros/rtos.h"
 #include "robot/device/motor.hpp"
@@ -17,8 +18,8 @@ Drivetrain::Drivetrain(int8_t left1, int8_t left2, int8_t left3, int8_t right1, 
                                           pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       motorRight(new device::MotorGroup<3>({right1, right2, static_cast<int8_t>(-right3)}, "Drive R",
                                            pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
-      imu(device::Inertial(inertial, "IMU")), velRightPID(20.0, 10.0, 0.0, 50.0, 20.0),
-      rightPID(7.50, 0.730, 8.0, 180.0 * 3, 3.0), headingPID(80.0, 15.0, 30.0, 10.0, 0.3) {}
+      imu(device::Inertial(inertial, "IMU")), velRightPID(drivetrainKp, drivetrainKi, drivetrainKd, 50.0, 20.0),
+      rightPID(drivetrainKp, drivetrainKi, drivetrainKd, 180.0 * 3, 3.0), headingPID(drivetrainHeadingKp, drivetrainHeadingKi, drivetrainHeadingKd, 10.0, 0.3) {}
 
 bool Drivetrain::isAtTarget() const { return this->timeAtTarget > STABILIZE_TICKS; }
 
@@ -135,22 +136,9 @@ void Drivetrain::updateTargeting(control::input::Controller *controller) {
   this->setTarget(OPERATOR_DIRECT);
   this->velLeftPID = this->velRightPID;
 
-  if (controller->r1Pressed()) {
-    this->operatorPower += 10;
-    if (this->operatorPower > device::Motor::MAX_MILLIVOLTS) {
-      this->operatorPower = device::Motor::MAX_MILLIVOLTS;
-    }
-    controller->setLine(0, std::format("Power: {}", this->operatorPower));
-  } else if (controller->r2Pressed()) {
-    this->operatorPower -= 10;
-    if (this->operatorPower < -device::Motor::MAX_MILLIVOLTS) {
-      this->operatorPower = -device::Motor::MAX_MILLIVOLTS;
-    }
-    controller->setLine(0, std::format("Power: {}", this->operatorPower));
-  }
   if (this->controlScheme == ARCADE) {
     double power = controller->leftStickY();
-    double rotation = controller->rightStickX() * 0.8;
+    double rotation = controller->rightStickX() * arcadeTurnMultiplier;
 
     double left = (power + rotation) / control::input::Controller::JOYSTICK_MAX;
     double right = (power - rotation) / control::input::Controller::JOYSTICK_MAX;
@@ -172,8 +160,8 @@ void Drivetrain::updateTargeting(control::input::Controller *controller) {
     //      this->motorLeft->getVelocity()));
     //    }
   } else {
-    double right = controller->rightStickY() * 0.9 / control::input::Controller::JOYSTICK_MAX * this->operatorPower;
-    double left = controller->leftStickY() * 0.9 / control::input::Controller::JOYSTICK_MAX * this->operatorPower;
+    double right = controller->rightStickY() * tankMoveMultiplier / control::input::Controller::JOYSTICK_MAX * this->operatorPower;
+    double left = controller->leftStickY() * tankMoveMultiplier / control::input::Controller::JOYSTICK_MAX * this->operatorPower;
     if (std::abs(right) > 60.0 && std::abs(left) > 60.0) {
       double delta = right - left;
       right -= delta / 5.0;

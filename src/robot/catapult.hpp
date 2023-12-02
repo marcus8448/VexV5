@@ -1,7 +1,7 @@
 #ifndef ROBOT_CATAPULT_HPP
 #define ROBOT_CATAPULT_HPP
 
-#include "../control/pid.hpp"
+#include "control/pid.hpp"
 #include "control/input/controller.hpp"
 #include "device/motor.hpp"
 #include "device/rotation.hpp"

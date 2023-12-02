@@ -24,7 +24,13 @@ void Catapult::hold() {
 
 int16_t Catapult::getSpeed() const { return this->speed; }
 
-void Catapult::updateTargeting(control::input::Controller *controller) {}
+void Catapult::updateTargeting(control::input::Controller *controller) {
+  if (controller->l1Pressed()) {
+    this->hold();
+  } else if (controller->l2Pressed()) {
+    this->launchRepeat();
+  }
+}
 
 void Catapult::updateState() {
   switch (this->state) {

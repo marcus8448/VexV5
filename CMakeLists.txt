@@ -84,6 +84,8 @@ set(HEADER_FILES
         src/main.hpp
         src/tasks.hpp
         src/units.hpp
+        src/config/ports.hpp
+        src/config/tuning.hpp
         src/debug/error.hpp
         src/debug/logger.hpp
         src/control/input/controller.hpp
@@ -137,6 +139,16 @@ if (NOT DISABLE_AUTONOMOUS)
     )
 endif()
 
+if (ROBOT_B)
+  set(SOURCE_FILES ${SOURCE_FILES}
+          src/config/b.cpp
+  )
+else()
+  set(SOURCE_FILES ${SOURCE_FILES}
+          src/config/a.cpp
+  )
+endif()
+
 add_executable(ColdPackage)
 target_sources(ColdPackage PRIVATE ${CMAKE_BINARY_DIR}/empty.cpp)
 
@@ -158,8 +170,6 @@ target_include_directories(HotPackage PRIVATE include src)
 target_link_directories(HotPackage PRIVATE firmware)
 target_include_directories(MonolithPackage PRIVATE include src)
 target_link_directories(MonolithPackage PRIVATE firmware)
-
-include(Ports.cmake)
 
 if (ProsCLI)
     add_custom_target(Upload DEPENDS HotPackage COMMAND ${ProsCLI} upload --slot 1)

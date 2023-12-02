@@ -1,4 +1,5 @@
 #include "main.hpp"
+#include "config/ports.hpp"
 #include "control/input/controller.hpp"
 #include "debug/logger.hpp"
 #include "robot/robot.hpp"
@@ -143,8 +144,8 @@ void opcontrol() {
   Robot &robot = getRobot();
 
   logger::scope("Opcontrol/Setup");
-  robot.setController(new control::input::Controller(
-      pros::E_CONTROLLER_MASTER)); // set the robot controller to the default operator based one
+  // set the robot controller to the default operator based one
+  robot.setController(new control::input::Controller(pros::E_CONTROLLER_MASTER));
   logger::endScope();
   robot.opcontrol();
   rtos::onRootTaskEnd();
@@ -171,8 +172,9 @@ void disabled() {
  * @return the robot instance
  */
 Robot &getRobot() {
-  static Robot robot = Robot(DRIVETRAIN_MOTOR_L1, DRIVETRAIN_MOTOR_L2, DRIVETRAIN_MOTOR_L3, DRIVETRAIN_MOTOR_R1,
-                             DRIVETRAIN_MOTOR_R2, DRIVETRAIN_MOTOR_R3, WING_LEFT, WING_RIGHT, DRIVETRAIN_IMU, CATAPULT_MOTOR, CATAPULT_ROTATION);
+  static Robot robot = Robot(drivetrainMotorL1, drivetrainMotorL2, drivetrainMotorL3, drivetrainMotorR1,
+                             drivetrainMotorR2, drivetrainMotorR3, wingLeft, wingRight,
+                             drivetrainImu, catapultMotor, catapultRotation);
   device::initialize();
   return robot;
 }

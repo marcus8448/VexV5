@@ -1,7 +1,7 @@
 #ifndef ROBOT_DRIVETRAIN_HPP
 #define ROBOT_DRIVETRAIN_HPP
 
-#include "../control/pid.hpp"
+#include "control/pid.hpp"
 #include "control/input/controller.hpp"
 #include "device/inertial.hpp"
 #include "device/motor.hpp"

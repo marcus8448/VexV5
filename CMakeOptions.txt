@@ -22,6 +22,7 @@ cmake_dependent_option(DISABLE_DRIVETRAIN_DEBUG_SCREEN "Disable the drivetrain d
 
 # Compilation
 option(ENABLE_LTO "Enable link time optimization" OFF)
+option(ROBOT_B "Alternative mode" OFF)
 
 # Configuration application
 
