@@ -42,7 +42,7 @@ double PID::update(double target, double value) {
   this->integral += this->error;
   this->output = clampMv(
       this->error * this->kp + this->integral * this->ki + (this->error - this->prevError) * this->kd, this->moveMin);
-  logger::info("{:.2f} {:.2f}/{:.2f}, {:.1f} {:.1f} {:.1f} * {:.2f} {:.2f} {:.2f} -> {:.2f}/{:.2f}/{:.2f} -> {:.2f}",
+  logger::info("{:.2f} {:.2f}/{:.2f}, {:.3f} {:.3f} {:.3f} * {:.2f} {:.2f} {:.2f} -> {:.2f}/{:.2f}/{:.2f} -> {:.2f}",
                this->error, value, target, this->kp, this->ki, this->kd, this->error, this->integral,
                this->error - this->prevError, this->error * this->kp, this->integral * this->ki,
                (this->error - this->prevError) * this->kd, this->output);

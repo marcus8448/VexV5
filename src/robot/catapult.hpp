@@ -1,14 +1,14 @@
 #ifndef ROBOT_CATAPULT_HPP
 #define ROBOT_CATAPULT_HPP
 
-#include "control/pid.hpp"
 #include "control/input/controller.hpp"
+#include "control/pid.hpp"
 #include "device/motor.hpp"
 #include "device/rotation.hpp"
 #include "robot/device/pneumatics.hpp"
 
 namespace robot {
-constexpr uint16_t DEFAULT_CATAPULT_SPEED = 12000;
+constexpr uint16_t DEFAULT_CATAPULT_SPEED = 10000;
 
 class Catapult {
   enum State { HOLD, REPEAT_LAUNCH, SINGLE_LAUNCH } state = HOLD;

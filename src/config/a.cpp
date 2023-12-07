@@ -1,14 +1,14 @@
 #include <cstdint>
 
-int8_t drivetrainMotorL1 = 10;
-int8_t drivetrainMotorL2 = 9;
-int8_t drivetrainMotorL3 = 8;
-int8_t drivetrainMotorR1 = 1;
-int8_t drivetrainMotorR2 = 2;
-int8_t drivetrainMotorR3 = 3;
-int8_t drivetrainImu = 6;
+int8_t drivetrainMotorL1 = 3;
+int8_t drivetrainMotorL2 = 2;
+int8_t drivetrainMotorL3 = 1;
+int8_t drivetrainMotorR1 = 11;
+int8_t drivetrainMotorR2 = 12;
+int8_t drivetrainMotorR3 = 13;
+int8_t drivetrainImu = 5;
 int8_t catapultMotor = 4;
-int8_t catapultRotation = 5;
+int8_t catapultRotation = 10;
 int8_t wingLeft = 'A';
 int8_t wingRight = 'B';
 

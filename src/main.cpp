@@ -53,7 +53,7 @@ void initialize() {
   control::autonomous::registerRun("!PID_MOVE", [](Robot &robot) {
     robot.drivetrain.tare();
     robot.drivetrain.forwards(24.0, 12000, true);
-    robot.drivetrain.backwards(24.0, 12000, true);
+    // robot.drivetrain.backwards(24.0, 12000, true);
     robot.drivetrain.brake();
   });
   control::autonomous::registerRun("!PID_TURN", [](Robot &robot) {
@@ -101,16 +101,20 @@ void initialize() {
     return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.rightPID, "!PID_MOVE");
   });
   screen::addScreen([](Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
-    return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.headingPID, "!PID_TURN");
+    return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.rightPID, "Skills");
   });
-  screen::addScreen([](Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
-    return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.rightPID,
-                                               "Left Match (Block)");
-  });
-  screen::addScreen([](Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
-    return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.rightPID,
-                                               "Right Match (Score)");
-  });
+  // screen::addScreen([](Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
+  //   return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.headingPID,
+  //   "!PID_TURN");
+  // });
+  // screen::addScreen([](Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
+  //   return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.rightPID,
+  //                                              "Left Match (Block)");
+  // });
+  // screen::addScreen([](Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height) {
+  //   return std::make_unique<screen::PidTuning>(robot, screen, width, height, robot.drivetrain.rightPID,
+  //                                              "Right Match (Score)");
+  // });
   logger::scope("Initialize");
   screen::initialize(robot); // initialize the screen
   logger::endScope();
@@ -172,9 +176,9 @@ void disabled() {
  * @return the robot instance
  */
 Robot &getRobot() {
-  static Robot robot = Robot(drivetrainMotorL1, drivetrainMotorL2, drivetrainMotorL3, drivetrainMotorR1,
-                             drivetrainMotorR2, drivetrainMotorR3, wingLeft, wingRight,
-                             drivetrainImu, catapultMotor, catapultRotation);
+  static Robot robot =
+      Robot(drivetrainMotorL1, drivetrainMotorL2, drivetrainMotorL3, drivetrainMotorR1, drivetrainMotorR2,
+            drivetrainMotorR3, wingLeft, wingRight, drivetrainImu, catapultMotor, catapultRotation);
   device::initialize();
   return robot;
 }

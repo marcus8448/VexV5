@@ -19,7 +19,8 @@ Drivetrain::Drivetrain(int8_t left1, int8_t left2, int8_t left3, int8_t right1, 
       motorRight(new device::MotorGroup<3>({right1, right2, static_cast<int8_t>(-right3)}, "Drive R",
                                            pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       imu(device::Inertial(inertial, "IMU")), velRightPID(drivetrainKp, drivetrainKi, drivetrainKd, 50.0, 20.0),
-      rightPID(drivetrainKp, drivetrainKi, drivetrainKd, 180.0 * 3, 3.0), headingPID(drivetrainHeadingKp, drivetrainHeadingKi, drivetrainHeadingKd, 10.0, 0.3) {}
+      rightPID(drivetrainKp, drivetrainKi, drivetrainKd, 180.0 * 3, 3.0),
+      headingPID(drivetrainHeadingKp, drivetrainHeadingKi, drivetrainHeadingKd, 10.0, 0.3) {}
 
 bool Drivetrain::isAtTarget() const { return this->timeAtTarget > STABILIZE_TICKS; }
 
@@ -160,8 +161,10 @@ void Drivetrain::updateTargeting(control::input::Controller *controller) {
     //      this->motorLeft->getVelocity()));
     //    }
   } else {
-    double right = controller->rightStickY() * tankMoveMultiplier / control::input::Controller::JOYSTICK_MAX * this->operatorPower;
-    double left = controller->leftStickY() * tankMoveMultiplier / control::input::Controller::JOYSTICK_MAX * this->operatorPower;
+    double right =
+        controller->rightStickY() * tankMoveMultiplier / control::input::Controller::JOYSTICK_MAX * this->operatorPower;
+    double left =
+        controller->leftStickY() * tankMoveMultiplier / control::input::Controller::JOYSTICK_MAX * this->operatorPower;
     if (std::abs(right) > 60.0 && std::abs(left) > 60.0) {
       double delta = right - left;
       right -= delta / 5.0;
@@ -298,7 +301,7 @@ void Drivetrain::updateState() {
       right -= head;
     }
 
-    if (left > this->powerLimit || right > this->powerLimit) {
+    if (left > this->powerLimit || right > this->powerLimit || left < -this->powerLimit || right < -this->powerLimit) {
       const double maximum = std::max(std::abs(left), std::abs(right));
       left = left / maximum * this->powerLimit;
       right = right / maximum * this->powerLimit;

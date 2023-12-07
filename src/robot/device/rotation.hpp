@@ -6,7 +6,7 @@
 namespace robot::device {
 class Rotation final : public Device {
 public:
-  Rotation(int8_t port, std::string_view name);
+  Rotation(int8_t port, std::string_view name, bool reversed = false);
   ~Rotation() override = default;
 
   [[nodiscard]] double getRotation() const;

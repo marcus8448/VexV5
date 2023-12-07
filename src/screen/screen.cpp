@@ -147,7 +147,8 @@ void next_page([[maybe_unused]] lv_event_t *event) {
 
 void LvObjDeleter::operator()(lv_obj_t *obj) const { lv_obj_del(obj); }
 
-Screen::Screen(robot::Robot &robot, const lv_coord_t width, const lv_coord_t height) : width(width), height(height), robot(robot) {}
+Screen::Screen(robot::Robot &robot, const lv_coord_t width, const lv_coord_t height)
+    : width(width), height(height), robot(robot) {}
 
 Screen::~Screen() = default;
 } // namespace screen

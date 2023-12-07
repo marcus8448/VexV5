@@ -34,8 +34,8 @@ void Information::update() {
       break;
   }
 
-  lv_label_set_text_fmt(this->rightColumn[0].get(),
-    "Control Scheme: %s", driveSchemeName(robot.drivetrain.controlScheme));
+  lv_label_set_text_fmt(this->rightColumn[0].get(), "Control Scheme: %s",
+                        driveSchemeName(robot.drivetrain.controlScheme));
   lv_label_set_text_fmt(this->rightColumn[1].get(), "X-position: %.2fin", this->robot.drivetrain.posX);
   lv_label_set_text_fmt(this->rightColumn[2].get(), "Y-position: %.2fin", this->robot.drivetrain.posY);
 }

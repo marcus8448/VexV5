@@ -14,4 +14,4 @@ extern double drivetrainHeadingKd;
 extern double tankMoveMultiplier;
 extern double arcadeTurnMultiplier;
 
-#endif //CONFIG_CAPABILITIES_HPP
+#endif // CONFIG_CAPABILITIES_HPP

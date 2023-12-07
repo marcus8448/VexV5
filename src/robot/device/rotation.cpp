@@ -4,7 +4,9 @@
 #include "pros/rotation.h"
 
 namespace robot::device {
-Rotation::Rotation(int8_t port, std::string_view name) : Device("Rotation", name, port) { }
+Rotation::Rotation(int8_t port, std::string_view name, bool reversed) : Device("Rotation", name, port) {
+  pros::c::rotation_set_reversed(port, reversed);
+}
 
 double Rotation::getRotation() const {
   const double rotation = pros::c::rotation_get_angle(this->port);

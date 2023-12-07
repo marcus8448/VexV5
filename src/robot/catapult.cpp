@@ -3,7 +3,10 @@
 #include "debug/logger.hpp"
 
 namespace robot {
-Catapult::Catapult(int8_t motorPort, int8_t rotationPort) : motor(device::DirectMotor(motorPort, "Catapult")), rotation(device::Rotation(rotationPort, "CatapultR")), pid(1.0, 5.0, 1.0,0.0, 1.0) {}
+Catapult::Catapult(int8_t motorPort, int8_t rotationPort)
+    : motor(device::DirectMotor(motorPort, "Catapult", true, pros::E_MOTOR_GEAR_RED)),
+      rotation(device::Rotation(rotationPort, "CatapultR")), pid(2.0, 0.0006, 0.3, 13000.0, 3000.0) {
+}
 
 void Catapult::launchOne(const uint16_t speed) {
   this->state = SINGLE_LAUNCH;
@@ -32,17 +35,18 @@ void Catapult::updateTargeting(control::input::Controller *controller) {
   }
 }
 
-void Catapult::updateState() {
+void Catapult::updateState() { //90 -> 20 (tgt)
   switch (this->state) {
   case HOLD: {
-    const double update = this->pid.update(15000, this->rotation.getRotation() / 100.0);
-    if (update < 0.0) {
-      this->motor.moveMillivolts(this->speed);
-    }
+    const double update = -this->pid.update(2000, this->rotation.getRotation());
+    logger::info("update {}", update);
     this->motor.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
-    this->motor.moveMillivolts(update);
-  }
-    break;
+    if (update == 0.0) {
+      this->motor.brake();
+    } else {
+      this->motor.moveMillivolts(static_cast<int16_t>(update));
+    }
+  } break;
   case REPEAT_LAUNCH:
     this->motor.moveMillivolts(this->speed);
     break;
@@ -50,7 +54,6 @@ void Catapult::updateState() {
     this->motor.moveMillivolts(this->speed);
     break;
   }
-  logger::info("CATA: {:.2f} @ {:.2f}", this->motor.getEfficiency(), this->rotation.getRotation());
-  this->motor.moveMillivolts(this->speed);
+  logger::info("CATA: {:.2f} @ {:.2f}", this->motor.getEfficiency(), this->rotation.getRotation() - 36000);
 }
 } // namespace robot

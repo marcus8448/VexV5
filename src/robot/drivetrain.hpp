@@ -1,8 +1,8 @@
 #ifndef ROBOT_DRIVETRAIN_HPP
 #define ROBOT_DRIVETRAIN_HPP
 
-#include "control/pid.hpp"
 #include "control/input/controller.hpp"
+#include "control/pid.hpp"
 #include "device/inertial.hpp"
 #include "device/motor.hpp"
 #include <cstdint>
@@ -63,10 +63,11 @@ public:
 
   double posX = 0.0; // not anchored to anything - rel to start pos
   double posY = 0.0;
+  double targetHeading = 0.0;
+  double heading = 0.0;
 
 private:
   TargetType targetType = NONE;
-  double targetHeading = 0.0;
   int16_t powerLimit = device::Motor::MAX_MILLIVOLTS;
 
   int16_t powerLeft = 0;
@@ -75,7 +76,6 @@ private:
   double targetLeft = 0.0;
   double targetRight = 0.0;
 
-  double heading = 0.0;
   double rightPos = 0.0;
   double leftPos = 0.0;
 

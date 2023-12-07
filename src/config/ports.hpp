@@ -14,4 +14,4 @@ extern int8_t catapultRotation;
 extern int8_t wingLeft;
 extern int8_t wingRight;
 
-#endif //CONFIG_CONFIG_HPP
+#endif // CONFIG_CONFIG_HPP

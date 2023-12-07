@@ -30,10 +30,8 @@ void PidTuning::update() {
   }
 
   lv_label_set_text_fmt(this->errorLabel.get(), "Error: %.4d", error);
-  lv_label_set_text_fmt(this->headingLabel.get(),
-                    "Heading: %.2d", this->robot.drivetrain.imu.getHeading());
-  lv_label_set_text_fmt(this->leftPower.get(),
-                    "PowerL: %.1d", this->robot.drivetrain.leftPID.output);
+  lv_label_set_text_fmt(this->headingLabel.get(), "Heading: %.2d", this->robot.drivetrain.imu.getHeading());
+  lv_label_set_text_fmt(this->leftPower.get(), "PowerL: %.1d", this->robot.drivetrain.leftPID.output);
   lv_label_set_text_fmt(this->rightPower.get(), "PowerR: %.1d", this->pid.output);
   this->prevError = error;
 }
@@ -157,9 +155,7 @@ ControlGroup::ControlGroup(lv_obj_t *screen, lv_coord_t x, lv_coord_t y, lv_coor
   lv_obj_add_event_cb(this->decreaseBtn.get(), decreaseValue, LV_EVENT_CLICKED, this);
 }
 
-void ControlGroup::update() {
-  lv_label_set_text_fmt(this->valueLabel.get(), "%.3f", *this->value);
-}
+void ControlGroup::update() { lv_label_set_text_fmt(this->valueLabel.get(), "%.3f", *this->value); }
 
 static void increaseValue(lv_event_t *event) {
   const auto &group = *static_cast<ControlGroup *>(event->user_data);

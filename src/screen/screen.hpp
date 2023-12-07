@@ -40,7 +40,9 @@ public:
   virtual void update() = 0;
 };
 
-typedef std::function<std::unique_ptr<Screen>(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width, lv_coord_t height)> ScreenConstructor;
+typedef std::function<std::unique_ptr<Screen>(robot::Robot &robot, lv_obj_t *screen, lv_coord_t width,
+                                              lv_coord_t height)>
+    ScreenConstructor;
 
 void initialize(robot::Robot &robot);
 void addScreen(const ScreenConstructor &screen);
