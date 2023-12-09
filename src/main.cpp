@@ -178,7 +178,7 @@ void disabled() {
 Robot &getRobot() {
   static Robot robot =
       Robot(drivetrainMotorL1, drivetrainMotorL2, drivetrainMotorL3, drivetrainMotorR1, drivetrainMotorR2,
-            drivetrainMotorR3, wingLeft, wingRight, drivetrainImu, catapultMotor, catapultRotation);
+            drivetrainMotorR3, wingLeft, wingRight, drivetrainImu, catapultMotor, catapultMotor2, catapultRotation);
   device::initialize();
   return robot;
 }

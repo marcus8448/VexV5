@@ -46,7 +46,7 @@ public:
    * @param roller The robot's roller.
    */
   explicit Robot(int8_t driveL1, int8_t driveL2, int8_t driveL3, int8_t driveR1, int8_t driveR2, int8_t driveR3,
-                 int8_t wingsL, int8_t wingsR, int8_t inertial, int8_t catapult, int8_t catapultR);
+                 int8_t wingsL, int8_t wingsR, int8_t inertial, int8_t catapult, int8_t catapult2, int8_t catapultR);
   Robot(const Robot &robot) = delete;
   Robot(Robot &&robot) = delete;
   Robot &operator=(const Robot &) = delete;

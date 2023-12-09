@@ -8,6 +8,7 @@ int8_t drivetrainMotorR2 = 12;
 int8_t drivetrainMotorR3 = 13;
 int8_t drivetrainImu = 5;
 int8_t catapultMotor = 4;
+int8_t catapultMotor2 = 7;
 int8_t catapultRotation = 10;
 int8_t wingLeft = 'A';
 int8_t wingRight = 'B';

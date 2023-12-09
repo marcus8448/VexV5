@@ -3,25 +3,29 @@
 #include "debug/logger.hpp"
 
 namespace robot {
-Catapult::Catapult(int8_t motorPort, int8_t rotationPort)
-    : motor(device::DirectMotor(motorPort, "Catapult", true, pros::E_MOTOR_GEAR_RED)),
-      rotation(device::Rotation(rotationPort, "CatapultR")), pid(2.0, 0.0006, 0.3, 13000.0, 3000.0) {
-}
+Catapult::Catapult(int8_t motorPort, int8_t motor2Port, int8_t rotationPort)
+    : motor(device::DirectMotor(motorPort, "Catapult1", true, pros::E_MOTOR_GEAR_RED)),
+      motor2(device::DirectMotor(motor2Port, "Catapult2", false, pros::E_MOTOR_GEAR_RED)),
+      rotation(device::Rotation(rotationPort, "CatapultR")), pid(1.8, 0.0006, 0.3, 13000.0, 2000.0) {}
 
-void Catapult::launchOne(const uint16_t speed) {
-  this->state = SINGLE_LAUNCH;
-  this->speed = static_cast<int16_t>(speed);
+void Catapult::launch(const uint16_t count, const int16_t speed, uint16_t delay, const bool wait) {
+  this->pendingLaunches = count;
+  this->targetTime = 0;
+  this->delay = delay;
+  this->speed = speed;
   this->pid.resetState();
-}
-
-void Catapult::launchRepeat(const uint16_t speed) {
-  this->state = REPEAT_LAUNCH;
-  this->speed = static_cast<int16_t>(speed);
-  this->pid.resetState();
+  if (wait) {
+    while (this->pendingLaunches > 0) {
+      pros::c::delay(50);
+    }
+  }
 }
 
 void Catapult::hold() {
-  this->state = HOLD;
+  this->pendingLaunches = 0;
+  this->speed = 0;
+  this->delay = 0;
+  this->targetTime = 0;
   this->pid.resetState();
 }
 
@@ -29,31 +33,49 @@ int16_t Catapult::getSpeed() const { return this->speed; }
 
 void Catapult::updateTargeting(control::input::Controller *controller) {
   if (controller->l1Pressed()) {
-    this->hold();
+    this->launch(1, device::Motor::MAX_MILLIVOLTS);
   } else if (controller->l2Pressed()) {
-    this->launchRepeat();
-  }
+    this->hold();
+  } else if (controller->leftPressed()) {
+    // this->launch(1000, 6000);
+    this->launch(30, 12000, 500);
+}
 }
 
-void Catapult::updateState() { //90 -> 20 (tgt)
-  switch (this->state) {
-  case HOLD: {
-    const double update = -this->pid.update(2000, this->rotation.getRotation());
-    logger::info("update {}", update);
+void Catapult::updateState() {
+  if (!this->prime) {
+    this->motor.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
+    this->motor2.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
+  } else {
     this->motor.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
-    if (update == 0.0) {
+    this->motor2.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
+  }
+
+  if (this->position == CHARGE) {
+    if (this->rotation.getRotation() > 8000) {
+      this->position = RELEASE;
+      if (this->pendingLaunches > 0) {
+        this->pendingLaunches--;
+      }
+    }
+  } else {
+    if (this->rotation.getRotation() < 7500) {
+      this->position = CHARGE;
+      this->targetTime = pros::c::millis() + this->delay;
+    }
+  }
+  if (this->pendingLaunches == 0 || pros::c::millis() < this->targetTime) {
+    const double update = -this->pid.update(4500, this->rotation.getRotation());
+    if (update == 0.0 || !prime) {
       this->motor.brake();
+      this->motor2.brake();
     } else {
       this->motor.moveMillivolts(static_cast<int16_t>(update));
+      this->motor2.moveMillivolts(static_cast<int16_t>(update));
     }
-  } break;
-  case REPEAT_LAUNCH:
+  } else {
     this->motor.moveMillivolts(this->speed);
-    break;
-  case SINGLE_LAUNCH:
-    this->motor.moveMillivolts(this->speed);
-    break;
+    this->motor2.moveMillivolts(this->speed);
   }
-  logger::info("CATA: {:.2f} @ {:.2f}", this->motor.getEfficiency(), this->rotation.getRotation() - 36000);
 }
 } // namespace robot

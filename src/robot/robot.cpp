@@ -6,9 +6,9 @@
 
 namespace robot {
 Robot::Robot(int8_t driveL1, int8_t driveL2, int8_t driveL3, int8_t driveR1, int8_t driveR2, int8_t driveR3,
-             int8_t wingsL, int8_t wingsR, int8_t inertial, int8_t catapult, int8_t catapultR)
+             int8_t wingsL, int8_t wingsR, int8_t inertial, int8_t catapult, int8_t catapult2, int8_t catapultR)
     : drivetrain(driveL1, driveL2, driveL3, driveR1, driveR2, driveR3, inertial), wings(wingsL, wingsR),
-      catapult(catapult, catapultR), controller(nullptr) {}
+      catapult(catapult, catapult2, catapultR), controller(nullptr) {}
 
 Robot::~Robot() { logger::error("Robot destructor called"); }
 

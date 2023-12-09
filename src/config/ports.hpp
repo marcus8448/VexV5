@@ -10,6 +10,7 @@ extern int8_t drivetrainMotorR2;
 extern int8_t drivetrainMotorR3;
 extern int8_t drivetrainImu;
 extern int8_t catapultMotor;
+extern int8_t catapultMotor2;
 extern int8_t catapultRotation;
 extern int8_t wingLeft;
 extern int8_t wingRight;

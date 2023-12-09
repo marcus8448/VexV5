@@ -22,17 +22,17 @@ void PidTuning::update() {
 
       if (this->oscillations == 1) {
         this->overshoot = std::max(this->overshoot, std::abs(error));
-        lv_label_set_text_fmt(this->overshootLabel.get(), "Overshoot: %.4d", this->overshoot);
+        lv_label_set_text_fmt(this->overshootLabel.get(), "Overshoot: %.4f", this->overshoot);
       }
 
-      lv_label_set_text_fmt(this->changeLabel.get(), "Change: %.4d", error - this->prevError);
+      lv_label_set_text_fmt(this->changeLabel.get(), "Change: %.4f", error - this->prevError);
     }
   }
 
-  lv_label_set_text_fmt(this->errorLabel.get(), "Error: %.4d", error);
-  lv_label_set_text_fmt(this->headingLabel.get(), "Heading: %.2d", this->robot.drivetrain.imu.getHeading());
-  lv_label_set_text_fmt(this->leftPower.get(), "PowerL: %.1d", this->robot.drivetrain.leftPID.output);
-  lv_label_set_text_fmt(this->rightPower.get(), "PowerR: %.1d", this->pid.output);
+  lv_label_set_text_fmt(this->errorLabel.get(), "Error: %.4f", error);
+  lv_label_set_text_fmt(this->headingLabel.get(), "Heading: %.2f", this->robot.drivetrain.imu.getHeading());
+  lv_label_set_text_fmt(this->leftPower.get(), "PowerL: %.1f", this->robot.drivetrain.leftPID.output);
+  lv_label_set_text_fmt(this->rightPower.get(), "PowerR: %.1f", this->pid.output);
   this->prevError = error;
 }
 

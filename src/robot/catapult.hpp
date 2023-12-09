@@ -11,18 +11,23 @@ namespace robot {
 constexpr uint16_t DEFAULT_CATAPULT_SPEED = 10000;
 
 class Catapult {
-  enum State { HOLD, REPEAT_LAUNCH, SINGLE_LAUNCH } state = HOLD;
+  uint16_t pendingLaunches = 0;
+  uint16_t delay = 0;
+  uint16_t targetTime = 0;
+  bool prime = true;
+
+  enum Position { RELEASE, CHARGE } position = RELEASE;
 
   device::DirectMotor motor;
+  device::DirectMotor motor2;
   device::Rotation rotation;
   device::PID pid;
   int16_t speed = 0;
 
 public:
-  explicit Catapult(int8_t motorPort, int8_t rotationPort);
+  explicit Catapult(int8_t motorPort, int8_t motor2Port, int8_t rotationPort);
 
-  void launchOne(uint16_t speed = DEFAULT_CATAPULT_SPEED);
-  void launchRepeat(uint16_t speed = DEFAULT_CATAPULT_SPEED);
+  void launch(uint16_t count = 1, int16_t speed = DEFAULT_CATAPULT_SPEED, uint16_t delay = 500, bool wait = false);
   void hold();
 
   [[nodiscard]] int16_t getSpeed() const;

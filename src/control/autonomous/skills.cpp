@@ -4,15 +4,13 @@
 namespace control::autonomous {
 void skills(Robot &robot) {
   startTiming(skills);
-  robot.drivetrain.backwards(7.0);
+  robot.drivetrain.backwards(6.5);
   robot.drivetrain.pivotLeft(-45.0, device::Motor::MAX_MILLIVOLTS, false);
-  while (std::abs(robot.drivetrain.targetHeading - robot.drivetrain.heading) > 5.0) {
-    pros::c::delay(10);
-  }
   robot.drivetrain.backwards(100000, 3000, false);
-  robot.catapult.launchRepeat();
-  pros::c::delay(10000);
+  pros::c::delay(500);
+  robot.catapult.launch(30, 12000, 500, true);
   robot.drivetrain.brake();
+  pros::c::delay(100);
   robot.drivetrain.tare();
 
   endTiming(skills);
