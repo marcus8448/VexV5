@@ -26,7 +26,7 @@ void Robot::updateDevices() {
     if (this->controller != nullptr) {
       this->controller->update();
       this->drivetrain.updateTargeting(this->controller.get());
-      //      this->wings.updateTargeting(this->controller.get());
+      this->wings.updateTargeting(this->controller.get());
       this->catapult.updateTargeting(this->controller.get());
     } else {
       logger::error("Controller is null!");

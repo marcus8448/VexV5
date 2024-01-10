@@ -8,10 +8,10 @@ Catapult::Catapult(int8_t motorPort, int8_t motor2Port, int8_t rotationPort)
       motor2(device::DirectMotor(motor2Port, "Catapult2", false, pros::E_MOTOR_GEAR_RED)),
       rotation(device::Rotation(rotationPort, "CatapultR")), pid(1.8, 0.0006, 0.3, 13000.0, 2000.0) {}
 
-void Catapult::launch(const uint16_t count, const int16_t speed, uint16_t delay, const bool wait) {
+void Catapult::launch(const uint16_t count, const int16_t speed, uint32_t delay, const bool wait) {
   this->pendingLaunches = count;
   this->targetTime = 0;
-  this->delay = delay;
+  this->delay = std::max(static_cast<uint32_t>(200), delay) - 200;
   this->speed = speed;
   this->pid.resetState();
   if (wait) {
@@ -38,7 +38,7 @@ void Catapult::updateTargeting(control::input::Controller *controller) {
     this->hold();
   } else if (controller->leftPressed()) {
     // this->launch(1000, 6000);
-    this->launch(30, 12000, 500);
+    this->launch(30, 12000, 1250);
 }
 }
 
@@ -54,14 +54,15 @@ void Catapult::updateState() {
   if (this->position == CHARGE) {
     if (this->rotation.getRotation() > 8000) {
       this->position = RELEASE;
+      this->targetTime = pros::c::millis() + this->delay;
+      logger::info("at {}ms {}", pros::c::millis(), this->pendingLaunches);
       if (this->pendingLaunches > 0) {
         this->pendingLaunches--;
       }
     }
   } else {
-    if (this->rotation.getRotation() < 7500) {
+    if (this->rotation.getRotation() < 4500) {
       this->position = CHARGE;
-      this->targetTime = pros::c::millis() + this->delay;
     }
   }
   if (this->pendingLaunches == 0 || pros::c::millis() < this->targetTime) {

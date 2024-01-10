@@ -133,6 +133,10 @@ void Drivetrain::awaitMovement() const {
   }
 }
 
+void Drivetrain::manualOverride() {
+  this->targetType = NONE;
+}
+
 void Drivetrain::updateTargeting(control::input::Controller *controller) {
   this->setTarget(OPERATOR_DIRECT);
   this->velLeftPID = this->velRightPID;
@@ -184,7 +188,7 @@ void Drivetrain::updateTargeting(control::input::Controller *controller) {
     //                                  this->motorLeft->getVelocity()));
     //    }
   }
-  logger::info("{}mV / {}mV", this->powerLeft, this->powerRight);
+  logger::debug("{}mV / {}mV", this->powerLeft, this->powerRight);
 }
 
 void Drivetrain::updateState() {

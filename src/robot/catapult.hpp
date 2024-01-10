@@ -11,9 +11,11 @@ namespace robot {
 constexpr uint16_t DEFAULT_CATAPULT_SPEED = 10000;
 
 class Catapult {
+public:
   uint16_t pendingLaunches = 0;
-  uint16_t delay = 0;
-  uint16_t targetTime = 0;
+private:
+  uint32_t delay = 0;
+  uint32_t targetTime = 0;
   bool prime = true;
 
   enum Position { RELEASE, CHARGE } position = RELEASE;
@@ -27,7 +29,7 @@ class Catapult {
 public:
   explicit Catapult(int8_t motorPort, int8_t motor2Port, int8_t rotationPort);
 
-  void launch(uint16_t count = 1, int16_t speed = DEFAULT_CATAPULT_SPEED, uint16_t delay = 500, bool wait = false);
+  void launch(uint16_t count = 1, int16_t speed = DEFAULT_CATAPULT_SPEED, uint32_t delay = 500, bool wait = false);
   void hold();
 
   [[nodiscard]] int16_t getSpeed() const;

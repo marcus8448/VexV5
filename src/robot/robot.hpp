@@ -34,7 +34,7 @@ public:
    */
   std::unique_ptr<control::input::Controller> controller;
 
-  std::string autonomous = "None";
+  std::string autonomous = "Skills";
 
   /**
    * Creates a new robot with the specified components.

@@ -155,6 +155,8 @@ public:
    */
   void awaitMovement() const;
 
+  void manualOverride();
+
   /**
    * Checks if the drivetrain has stabilized at its target position.
    * @return Whether the drivetrain has stabilized at its target position.
