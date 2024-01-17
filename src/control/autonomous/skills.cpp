@@ -13,11 +13,11 @@ void skills(Robot &robot) {
   pros::c::delay(500); // 1000ms
   robot.catapult.launch(40, 12000, 1250, true); // 38500ms
   robot.drivetrain.brake();
-  robot.drivetrain.pivotLeft(40.0);
-  robot.drivetrain.forwards(80.0);
-  robot.drivetrain.pivotRight(90.0 + 30.0);
-  robot.drivetrain.forwards(48.0);
-  robot.drivetrain.pivotLeft(100.0);
+  robot.drivetrain.pivotLeft(40.0, device::Motor::MAX_MILLIVOLTS, true);
+  robot.drivetrain.forwards(80.0, device::Motor::MAX_MILLIVOLTS, true);
+  robot.drivetrain.pivotRight(90.0 + 30.0, device::Motor::MAX_MILLIVOLTS, true);
+  robot.drivetrain.forwards(48.0, device::Motor::MAX_MILLIVOLTS, true);
+  robot.drivetrain.pivotLeft(100.0, device::Motor::MAX_MILLIVOLTS, true);
   robot.wings.open();
   robot.drivetrain.forwards(36.0, device::Motor::MAX_MILLIVOLTS, false);
   pros::c::delay(1000);

@@ -8,23 +8,21 @@
 #include <cmath>
 
 namespace robot {
-constexpr double ACCEPTABLE_POSITION_ERROR = 5.0;
 constexpr double ACCEPTABLE_HEADING_ERROR = 0.4;
-constexpr uint16_t STABILIZE_TICKS = 12;
 
-Drivetrain::Drivetrain(int8_t left1, int8_t left2, int8_t left3, int8_t right1, int8_t right2, int8_t right3,
-                       int8_t inertial)
+Drivetrain::Drivetrain(const int8_t left1, const int8_t left2, const int8_t left3, const int8_t right1,
+                       const int8_t right2, const int8_t right3, const int8_t inertial)
     : motorLeft(new device::MotorGroup<3>({static_cast<int8_t>(-left1), static_cast<int8_t>(-left2), left3}, "Drive L",
                                           pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       motorRight(new device::MotorGroup<3>({right1, right2, static_cast<int8_t>(-right3)}, "Drive R",
                                            pros::E_MOTOR_GEAR_BLUE, pros::E_MOTOR_BRAKE_COAST)),
       imu(device::Inertial(inertial, "IMU")), velRightPID(drivetrainKp, drivetrainKi, drivetrainKd, 50.0, 20.0),
-      rightPID(drivetrainKp, drivetrainKi, drivetrainKd, 180.0 * 3, 3.0),
+      rightPID(drivetrainKp, drivetrainKi, drivetrainKd, 512.0, 3.0),
       headingPID(drivetrainHeadingKp, drivetrainHeadingKi, drivetrainHeadingKd, 10.0, 0.3) {}
 
-bool Drivetrain::isAtTarget() const { return this->timeAtTarget > STABILIZE_TICKS; }
+bool Drivetrain::isAtTarget() const { return this->timeAtTarget >= this->stabilizeTicks; }
 
-void Drivetrain::forwards(double distance, int16_t limit, bool wait) {
+void Drivetrain::forwards(double distance, const int16_t limit, const bool wait) {
   logger::info("Moving forwards {}in.", distance);
   this->setTarget(DIRECT_MOVE);
   this->targetHeading = this->heading;
@@ -38,7 +36,7 @@ void Drivetrain::forwards(double distance, int16_t limit, bool wait) {
   }
 }
 
-void Drivetrain::backwards(double distance, int16_t limit, bool wait) {
+void Drivetrain::backwards(double distance, const int16_t limit, const bool wait) {
   logger::info("Moving backwards {}in.", distance);
   this->setTarget(DIRECT_MOVE);
   this->targetHeading = this->heading;
@@ -52,7 +50,7 @@ void Drivetrain::backwards(double distance, int16_t limit, bool wait) {
   }
 }
 
-void Drivetrain::turnAbs(double degrees, int16_t limit, bool wait) {
+void Drivetrain::turnAbs(double degrees, const int16_t limit, const bool wait) {
   logger::info("Turning to {} degrees.", degrees);
   this->setTarget(STATIC_TURN);
   this->headingPID.resetState();
@@ -65,7 +63,7 @@ void Drivetrain::turnAbs(double degrees, int16_t limit, bool wait) {
   }
 }
 
-void Drivetrain::turnRight(double degrees, int16_t limit, bool wait) {
+void Drivetrain::turnRight(double degrees, const int16_t limit, const bool wait) {
   logger::info("Turning right {} degrees.", degrees);
   this->setTarget(STATIC_TURN);
   this->headingPID.resetState();
@@ -78,7 +76,7 @@ void Drivetrain::turnRight(double degrees, int16_t limit, bool wait) {
   }
 }
 
-void Drivetrain::turnLeft(double degrees, int16_t limit, bool wait) {
+void Drivetrain::turnLeft(double degrees, const int16_t limit, const bool wait) {
   logger::info("Turning left {} degrees.", degrees);
   this->setTarget(STATIC_TURN);
   this->headingPID.resetState();
@@ -91,7 +89,7 @@ void Drivetrain::turnLeft(double degrees, int16_t limit, bool wait) {
   }
 }
 
-void Drivetrain::pivotRight(double degrees, int16_t limit, bool wait) {
+void Drivetrain::pivotRight(double degrees, const int16_t limit, const bool wait) {
   logger::info("Pivot right {} degrees.", degrees);
   this->setTarget(PIVOT_TURN_RIGHT);
   this->headingPID.resetState();
@@ -104,7 +102,7 @@ void Drivetrain::pivotRight(double degrees, int16_t limit, bool wait) {
   }
 }
 
-void Drivetrain::pivotLeft(double degrees, int16_t limit, bool wait) {
+void Drivetrain::pivotLeft(double degrees, const int16_t limit, const bool wait) {
   logger::info("Pivot left {} degrees.", degrees);
   this->setTarget(PIVOT_TURN_LEFT);
   this->headingPID.resetState();
@@ -117,19 +115,35 @@ void Drivetrain::pivotLeft(double degrees, int16_t limit, bool wait) {
   }
 }
 
-void Drivetrain::pivotRightAbs(double degrees, int16_t limit, bool wait) {
-  this->targetHeading = 0.0;
-  this->pivotRight(degrees, limit, wait);
+void Drivetrain::pivotRightAbs(double degrees, const int16_t limit, const bool wait) {
+  logger::info("Pivot absolute right {} degrees.", degrees);
+  this->setTarget(PIVOT_TURN_RIGHT);
+  this->headingPID.resetState();
+  this->targetHeading = degrees;
+  this->powerLimit = limit;
+  if (wait) {
+    startTiming(pivotRight);
+    awaitMovement();
+    endTiming(pivotRight);
+  }
 }
 
-void Drivetrain::pivotLeftAbs(double degrees, int16_t limit, bool wait) {
-  this->targetHeading = 0.0;
-  this->pivotLeft(degrees, limit, wait);
+void Drivetrain::pivotLeftAbs(double degrees, const int16_t limit, const bool wait) {
+  logger::info("Pivot left absolute to {} degrees.", degrees);
+  this->setTarget(PIVOT_TURN_LEFT);
+  this->headingPID.resetState();
+  this->targetHeading = degrees;
+  this->powerLimit = limit;
+  if (wait) {
+    startTiming(pivotLeft);
+    awaitMovement();
+    endTiming(pivotLeft);
+  }
 }
 
 void Drivetrain::awaitMovement() const {
   while (!this->isAtTarget()) {
-    pros::c::delay(device::TICK_RATE * (STABILIZE_TICKS - this->timeAtTarget));
+    pros::c::delay(device::TICK_RATE * (this->stabilizeTicks - this->timeAtTarget));
   }
 }
 
@@ -317,8 +331,8 @@ void Drivetrain::updateState() {
     //    logger::info("L{:.2f} / R{:.2f} H{:.2f}", this->targetLeft - this->leftPos, this->targetRight -
     //    this->rightPos,
     //                 this->heading);
-    if (std::abs(this->targetLeft - this->leftPos) < ACCEPTABLE_POSITION_ERROR &&
-        std::abs(this->targetRight - this->rightPos) < ACCEPTABLE_POSITION_ERROR) {
+    if (std::abs(this->targetLeft - this->leftPos) < this->acceptablePositionError &&
+        std::abs(this->targetRight - this->rightPos) < this->acceptablePositionError) {
       atTarget = true;
     }
     break;
@@ -336,7 +350,7 @@ void Drivetrain::brake() {
   this->motorRight->brake();
 }
 
-void Drivetrain::setBrakeMode(pros::motor_brake_mode_e brake_mode) {
+void Drivetrain::setBrakeMode(const pros::motor_brake_mode_e brake_mode) {
   this->motorLeft->setBrakeMode(brake_mode);
   this->motorRight->setBrakeMode(brake_mode);
 }
@@ -363,7 +377,7 @@ void Drivetrain::tare() {
   this->imu.tare();
 }
 
-void Drivetrain::setTarget(TargetType type) {
+void Drivetrain::setTarget(const TargetType type) {
   this->targetType = type;
   this->timeAtTarget = 0;
 }
@@ -376,7 +390,7 @@ device::Motor &Drivetrain::getLeftMotor() const { return *this->motorLeft; }
 
 device::Motor &Drivetrain::getRightMotor() const { return *this->motorRight; }
 
-[[nodiscard]] const char *driveSchemeName(Drivetrain::ControlScheme scheme) {
+[[nodiscard]] const char *driveSchemeName(const Drivetrain::ControlScheme scheme) {
   switch (scheme) {
   case Drivetrain::ControlScheme::TANK:
     return "Tank";

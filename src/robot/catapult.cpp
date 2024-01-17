@@ -32,12 +32,11 @@ void Catapult::hold() {
 int16_t Catapult::getSpeed() const { return this->speed; }
 
 void Catapult::updateTargeting(control::input::Controller *controller) {
-  if (controller->l1Pressed()) {
+  if (controller->l1Pressed() == 1) {
     this->launch(1, device::Motor::MAX_MILLIVOLTS);
-  } else if (controller->l2Pressed()) {
+  } else if (controller->l2Pressed() == 1) {
     this->hold();
-  } else if (controller->leftPressed()) {
-    // this->launch(1000, 6000);
+  } else if (controller->leftPressed() == 1) {
     this->launch(30, 12000, 1250);
 }
 }

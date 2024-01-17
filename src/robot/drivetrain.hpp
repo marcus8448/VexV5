@@ -46,6 +46,9 @@ private:
   std::unique_ptr<device::Motor> motorLeft;
   std::unique_ptr<device::Motor> motorRight;
 
+  double acceptablePositionError = 5.0;
+  uint16_t stabilizeTicks = 10;
+
 public:
   device::Inertial imu;
   device::PID velRightPID;

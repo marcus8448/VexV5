@@ -19,10 +19,6 @@ public:
    * The robot's drivetrain.
    */
   Drivetrain drivetrain;
-  //  /**
-  //   * The robot's intake
-  //   */
-  //  Intake intake;
   /**
    * The robot's wings
    */
