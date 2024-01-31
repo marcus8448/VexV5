@@ -168,25 +168,23 @@ void Drivetrain::updateTargeting(control::input::Controller *controller) {
     }
     this->powerRight = static_cast<int16_t>(right * this->operatorPower);
     this->powerLeft = static_cast<int16_t>(left * this->operatorPower);
-
-    //    if (right != 0.0) {
-    //      this->powerRight = static_cast<int16_t>(this->velRightPID.update(right * 600.0,
-    //      this->motorRight->getVelocity()));
-    //    }
-    //
-    //    if (left != 0.0) {
-    //      this->powerLeft = static_cast<int16_t>(this->velLeftPID.update(left * 600.0,
-    //      this->motorLeft->getVelocity()));
-    //    }
   } else {
     double right =
         controller->rightStickY() * tankMoveMultiplier / control::input::Controller::JOYSTICK_MAX * this->operatorPower;
     double left =
         controller->leftStickY() * tankMoveMultiplier / control::input::Controller::JOYSTICK_MAX * this->operatorPower;
-    if (std::abs(right) > 60.0 && std::abs(left) > 60.0) {
-      double delta = right - left;
-      right -= delta / 5.0;
-      left += delta / 5.0;
+    if (left == 0.0 || right == 0.0) {
+      left *= 0.8;
+      right *= 0.8;
+    } else if (std::signbit(left) == std::signbit(right)) {
+      if (std::abs(right) > 50.0 && std::abs(left) > 50.0) {
+        double delta = right - left;
+        right -= delta / 4.0;
+        left += delta / 4.0;
+      }
+    } else {
+      right *= 0.6;
+      left *= 0.6;
     }
     this->powerRight = static_cast<int16_t>(right);
     this->powerLeft = static_cast<int16_t>(left);

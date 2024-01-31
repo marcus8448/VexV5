@@ -36,8 +36,8 @@ void Catapult::updateTargeting(control::input::Controller *controller) {
     this->launch(1, device::Motor::MAX_MILLIVOLTS);
   } else if (controller->l2Pressed() == 1) {
     this->hold();
-  } else if (controller->leftPressed() == 1) {
-    this->launch(30, 12000, 1250);
+  } else if (controller->aPressed() == 1) {
+    this->launch(40, 12000, 1000);
 }
 }
 

@@ -68,6 +68,7 @@ public:
   double posY = 0.0;
   double targetHeading = 0.0;
   double heading = 0.0;
+  uint16_t timeAtTarget = 0;
 
 private:
   TargetType targetType = NONE;
@@ -83,7 +84,6 @@ private:
   double leftPos = 0.0;
 
   uint16_t timeOff = 0;
-  uint16_t timeAtTarget = 0;
 
   int16_t operatorPower = device::Motor::MAX_MILLIVOLTS;
 
