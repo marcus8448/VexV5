@@ -9,7 +9,6 @@ set(CMAKE_C_COMPILER_TARGET ${TARGET_TRIPLE})
 set(CMAKE_CXX_COMPILER_TARGET ${TARGET_TRIPLE})
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
-set(LINKER bfd)
 
 include(CMakeOptions.txt)
 
@@ -29,7 +28,7 @@ set(LibLVGL ${FIRMWARE_DIR}/liblvgl.a)
 project(VexV5 VERSION 1.0.0 LANGUAGES C CXX)
 
 add_link_options(-fuse-ld=${LINKER})
-add_link_options(LINKER:--no-enum-size-warning)
+add_link_options($<$<STREQUAL:${LINKER},bfd>:LINKER:--no-enum-size-warning> $<$<STREQUAL:${LINKER},lld>:LINKER:-z,norelro>)
 
 set(FIRMWARE_DIR ${CMAKE_SOURCE_DIR}/firmware)
 set(BIN_DIR ${CMAKE_SOURCE_DIR}/bin)
@@ -197,7 +196,7 @@ set_property(TARGET HotPackage PROPERTY LINK_DEPENDS ${FIRMWARE_DIR}/v5-common.l
 set_property(TARGET ColdPackage PROPERTY LINK_DEPENDS ${FIRMWARE_DIR}/v5-common.ld ${FIRMWARE_DIR}/v5.ld)
 
 target_link_options(HotPackage PRIVATE LINKER:-R,$<TARGET_FILE:ColdPackage> -nostartfiles LINKER:-T${FIRMWARE_DIR}/v5-hot.ld,--gc-sections,--start-group,${HotLinked},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld)
-target_link_options(ColdPackage PRIVATE LINKER:--gc-keep-exported,--whole-archive,${ExportedLibraries},-lstdc++,--no-whole-archive,-T${FIRMWARE_DIR}/v5.ld,--gc-sections,--start-group,${HotLinked},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld)
+target_link_options(ColdPackage PRIVATE LINKER:$<$<STREQUAL:${LINKER},bfd>:--gc-keep-exported,>--whole-archive,${ExportedLibraries},-lstdc++,--no-whole-archive,-T${FIRMWARE_DIR}/v5.ld,--gc-sections,--start-group,${HotLinked},-lgcc,-lstdc++,--end-group,-T${FIRMWARE_DIR}/v5-common.ld)
 target_link_options(MonolithPackage PRIVATE LINKER:-T${FIRMWARE_DIR}/v5.ld,--gc-sections,--whole-archive,-lstdc++,--no-whole-archive,--start-group,${HotLinked},-lgcc,--end-group,-T${FIRMWARE_DIR}/v5-common.ld)
 
 # Strip packages after build
