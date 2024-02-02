@@ -170,17 +170,17 @@ void Drivetrain::updateTargeting(control::input::Controller *controller) {
     this->powerLeft = static_cast<int16_t>(left * this->operatorPower);
   } else {
     double right =
-        controller->rightStickY() * tankMoveMultiplier / control::input::Controller::JOYSTICK_MAX * this->operatorPower;
+        controller->rightStickY() / control::input::Controller::JOYSTICK_MAX * this->operatorPower;
     double left =
-        controller->leftStickY() * tankMoveMultiplier / control::input::Controller::JOYSTICK_MAX * this->operatorPower;
+        controller->leftStickY() / control::input::Controller::JOYSTICK_MAX * this->operatorPower;
     if (left == 0.0 || right == 0.0) {
       left *= 0.8;
       right *= 0.8;
     } else if (std::signbit(left) == std::signbit(right)) {
-      if (std::abs(right) > 50.0 && std::abs(left) > 50.0) {
-        double delta = right - left;
-        right -= delta / 4.0;
-        left += delta / 4.0;
+      if (std::abs(right) < 50.0 && std::abs(left) < 50.0) {
+        double delta = right / left;
+        right -= delta / 5.0;
+        left += delta / 5.0;
       }
     } else {
       right *= 0.6;
@@ -254,7 +254,7 @@ void Drivetrain::updateState() {
         this->brake();
       }
     } else {
-      this->setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
+      this->setBrakeMode(pros::E_MOTOR_BRAKE_BRAKE);
       this->timeOff = 0;
     }
     this->motorRight->moveMillivolts(this->powerRight);

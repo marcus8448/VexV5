@@ -1,5 +1,7 @@
 #include "score.hpp"
 
+#include <pros/rtos.h>
+
 namespace control::autonomous {
 void leftScore(Robot &robot) {
   robot.drivetrain.forwards(40.0);
@@ -8,15 +10,11 @@ void leftScore(Robot &robot) {
 }
 
 void rightScore(Robot &robot) {
-  robot.drivetrain.forwards(52.0, 8000);
-  robot.drivetrain.pivotRightAbs(90.0, 5000);
-  robot.drivetrain.forwards(17.0, 12000);
-  robot.drivetrain.backwards(22.0, 10000);
-  //  robot.drivetrain.forwards(22.0, 12000);
-  //  robot.drivetrain.backwards(22.0, 10000);
-  //  robot.drivetrain.pivotRightAbs(-24.0, 12000);
-  //  robot.drivetrain.forwards(16.0, 2500);
-  //  robot.drivetrain.pivotRightAbs(100.0, 2000);
-  //  robot.drivetrain.forwards(18.0, 12000);
+  robot.drivetrain.forwards(60.0, device::Motor::MAX_MILLIVOLTS, false);
+  const uint32_t time = pros::c::millis() + 2000;
+  while (!robot.drivetrain.isAtTarget() && pros::c::millis() < time) {
+    pros::c::delay(50);
+  } // 2000ms total
+  robot.drivetrain.backwards(20.0);
 }
 } // namespace control::autonomous

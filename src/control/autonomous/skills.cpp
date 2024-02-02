@@ -16,17 +16,21 @@ void skills(Robot &robot) {
   robot.drivetrain.heading = robot.drivetrain.targetHeading;
   robot.drivetrain.pivotRight(30.0, device::Motor::MAX_MILLIVOLTS, true);
   robot.drivetrain.forwards(80.0, device::Motor::MAX_MILLIVOLTS, true);
-  robot.drivetrain.pivotLeft(90.0 + 30.0, device::Motor::MAX_MILLIVOLTS, true);
+  robot.drivetrain.pivotLeft(90.0 + 35.0, device::Motor::MAX_MILLIVOLTS, true);
   robot.drivetrain.forwards(48.0, device::Motor::MAX_MILLIVOLTS, true);
   robot.drivetrain.pivotRight(110.0, device::Motor::MAX_MILLIVOLTS, true);
   robot.wings.open();
+  double heading = robot.drivetrain.heading;
   robot.drivetrain.forwards(36.0, device::Motor::MAX_MILLIVOLTS, false);
   pros::c::delay(1250);
   robot.drivetrain.backwards(36.0, 10000, false);
+  robot.drivetrain.targetHeading = heading;
   pros::c::delay(500);
   robot.drivetrain.forwards(36.0, device::Motor::MAX_MILLIVOLTS, false);
-  pros::c::delay(700);
+  robot.drivetrain.targetHeading = heading;
+  pros::c::delay(1000);
   robot.drivetrain.backwards(20.0);
+  robot.drivetrain.targetHeading = heading;
   robot.wings.close();
   endTiming(skills);
 }

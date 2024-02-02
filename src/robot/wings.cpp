@@ -44,10 +44,19 @@ void Wings::closeRight() {
 }
 
 void Wings::updateTargeting(control::input::Controller *controller) {
-  if (controller->r1Pressed()) {
-    this->open();
-  } else if (controller->r2Pressed()) {
-    this->close();
+  if (controller->r1Pressed() == 1) {
+    if (this->leftOpen) {
+      this->closeLeft();
+    } else {
+      this->openLeft();
+    }
+  }
+  if (controller->r2Pressed() == 1) {
+    if (this->rightOpen) {
+      this->closeRight();
+    } else {
+      this->openRight();
+    }
   }
 }
 } // namespace robot

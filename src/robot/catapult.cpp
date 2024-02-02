@@ -9,6 +9,7 @@ Catapult::Catapult(int8_t motorPort, int8_t motor2Port, int8_t rotationPort)
       rotation(device::Rotation(rotationPort, "CatapultR")), pid(1.8, 0.0006, 0.3, 13000.0, 2000.0) {}
 
 void Catapult::launch(const uint16_t count, const int16_t speed, uint32_t delay, const bool wait) {
+  this->prime = true;
   this->pendingLaunches = count;
   this->targetTime = 0;
   this->delay = std::max(static_cast<uint32_t>(200), delay) - 200;
@@ -22,6 +23,7 @@ void Catapult::launch(const uint16_t count, const int16_t speed, uint32_t delay,
 }
 
 void Catapult::hold() {
+  this->prime = true;
   this->pendingLaunches = 0;
   this->speed = 0;
   this->delay = 0;
@@ -38,7 +40,9 @@ void Catapult::updateTargeting(control::input::Controller *controller) {
     this->hold();
   } else if (controller->aPressed() == 1) {
     this->launch(40, 12000, 1000);
-}
+  } else if (controller->upPressed() == 1) {
+    this->prime = !this->prime;
+  }
 }
 
 void Catapult::updateState() {
